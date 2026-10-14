@@ -18,6 +18,7 @@ data class VideoInfo(
     val codec: String?,
     val hdr: String?,
     val bitrate: Int?,
+    val color: String? = null,
 ) {
     /** Dimensioni come appaiono a schermo (tenendo conto della rotazione). */
     val displayWidth get() = if (rotation % 180 == 0) width else height
@@ -31,6 +32,7 @@ data class VideoInfo(
         hdr?.let { append(" · $it") }
         append(" · ${formatDuration(durationMs)}")
         bitrate?.let { append(" · ${it / 1_000_000} Mbps") }
+        color?.let { append("\nColore: $it") }
     }
 }
 
@@ -72,6 +74,7 @@ fun readVideoInfo(context: Context, uri: Uri): VideoInfo {
 
     var codec: String? = null
     var hdr: String? = null
+    var color: String? = null
     val extractor = MediaExtractor()
     try {
         extractor.setDataSource(context, uri, null)
@@ -93,6 +96,7 @@ fun readVideoInfo(context: Context, uri: Uri): VideoInfo {
                 }
             }
             if (mime == MediaFormat.MIMETYPE_VIDEO_DOLBY_VISION) hdr = "Dolby Vision"
+            color = describeColor(format, mime)
             break
         }
     } catch (_: Exception) {
@@ -101,7 +105,37 @@ fun readVideoInfo(context: Context, uri: Uri): VideoInfo {
         extractor.release()
     }
 
-    return VideoInfo(width, height, rotation, durationMs, fps, codec, hdr, bitrate)
+    return VideoInfo(width, height, rotation, durationMs, fps, codec, hdr, bitrate, color)
+}
+
+/** Spazio colore, curva e profondità: serve a riconoscere i video LOG. */
+private fun describeColor(format: MediaFormat, mime: String): String {
+    fun int(key: String) = if (format.containsKey(key)) runCatching { format.getInteger(key) }.getOrNull() else null
+    val standard = when (int(MediaFormat.KEY_COLOR_STANDARD)) {
+        MediaFormat.COLOR_STANDARD_BT709 -> "BT.709"
+        MediaFormat.COLOR_STANDARD_BT2020 -> "BT.2020"
+        MediaFormat.COLOR_STANDARD_BT601_PAL, MediaFormat.COLOR_STANDARD_BT601_NTSC -> "BT.601"
+        null -> "standard ?"
+        else -> "standard ${int(MediaFormat.KEY_COLOR_STANDARD)}"
+    }
+    val transfer = when (int(MediaFormat.KEY_COLOR_TRANSFER)) {
+        MediaFormat.COLOR_TRANSFER_SDR_VIDEO -> "SDR"
+        MediaFormat.COLOR_TRANSFER_ST2084 -> "PQ"
+        MediaFormat.COLOR_TRANSFER_HLG -> "HLG"
+        MediaFormat.COLOR_TRANSFER_LINEAR -> "lineare"
+        null -> "curva ?"
+        else -> "curva ${int(MediaFormat.KEY_COLOR_TRANSFER)}"
+    }
+    val range = when (int(MediaFormat.KEY_COLOR_RANGE)) {
+        MediaFormat.COLOR_RANGE_FULL -> "full"
+        MediaFormat.COLOR_RANGE_LIMITED -> "limited"
+        else -> null
+    }
+    val profile = int(MediaFormat.KEY_PROFILE)
+    val tenBit = mime == MediaFormat.MIMETYPE_VIDEO_HEVC && profile != null &&
+        profile != MediaCodecInfo.CodecProfileLevel.HEVCProfileMain
+    return listOfNotNull(standard, transfer, range, if (tenBit) "10 bit" else if (profile != null) "8 bit" else null)
+        .joinToString(" · ")
 }
 
 /** Riassunto delle capacità degli encoder video del telefono. */
@@ -119,19 +153,25 @@ fun describeEncoders(): String {
         }
         val caps: MediaCodecInfo.VideoCapabilities? =
             runCatching { hw.getCapabilitiesForType(mime).videoCapabilities }.getOrNull()
-        val k60 = caps?.let { c ->
-            runCatching { c.areSizeAndRateSupported(3840, 2160, 60.0) }.getOrDefault(false)
-        } ?: false
-        val k30 = caps?.let { c ->
-            runCatching { c.areSizeAndRateSupported(3840, 2160, 30.0) }.getOrDefault(false)
-        } ?: false
-        val support = when {
-            k60 -> "4K 60fps"
-            k30 -> "4K 30fps"
-            else -> "sotto il 4K"
+        fun ok(w: Int, h: Int, fps: Double): String {
+            val c = caps ?: return "?"
+            val declared = runCatching { c.areSizeAndRateSupported(w, h, fps) }.getOrDefault(false)
+            // I "performance point" dicono cosa l'encoder regge davvero in tempo reale.
+            val points = runCatching { c.supportedPerformancePoints }.getOrNull()
+            val real = points?.let { list ->
+                val wanted = MediaCodecInfo.VideoCapabilities.PerformancePoint(w, h, fps.toInt())
+                list.any { it.covers(wanted) }
+            }
+            return when {
+                real == true -> "sì"
+                declared && real == null -> "sì"
+                declared -> "dichiarato"
+                else -> "no"
+            }
         }
         val kind = if (hw.isHardwareAccelerated) "hardware" else "software"
-        lines += "${codecLabel(mime)}: $support ($kind, ${hw.name})"
+        lines += "${codecLabel(mime)} ($kind, ${hw.name})\n" +
+            "   4K60: ${ok(3840, 2160, 60.0)} · 4K120: ${ok(3840, 2160, 120.0)} · 8K30: ${ok(7680, 4320, 30.0)}"
     }
     return lines.joinToString("\n")
 }
