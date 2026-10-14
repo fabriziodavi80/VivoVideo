@@ -151,6 +151,13 @@ private fun MainScreen(vm: MainViewModel) {
                     ChipRow(OutputSize.entries, vm.size, { it.label }, !running) { vm.size = it }
                     ChipRow(OutputCodec.entries, vm.codec, { it.label }, !running) { vm.codec = it }
                     ToggleRow("Mantieni l'audio", vm.keepAudio, !running) { vm.keepAudio = it }
+                    if (vm.keepAudio && vm.speed != SpeedMode.NORMAL) {
+                        ToggleRow("Mantieni il tono dell'audio", vm.keepPitch, !running) { vm.keepPitch = it }
+                        Hint(
+                            if (vm.keepPitch) "L'audio segue la velocità ma voci e suoni restano naturali."
+                            else "Effetto nastro: rallentando l'audio diventa più grave, accelerando più acuto."
+                        )
+                    }
                     if (info.isHdr) {
                         ToggleRow("Converti HDR in SDR", vm.toneMapHdr, !running) { vm.toneMapHdr = it }
                     }

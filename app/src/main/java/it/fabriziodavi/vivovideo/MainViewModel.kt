@@ -16,6 +16,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.media3.common.Effect
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
+import androidx.media3.common.SpeedParameters
 import androidx.media3.effect.Presentation
 import androidx.media3.transformer.Composition
 import androidx.media3.transformer.DefaultEncoderFactory
@@ -66,6 +67,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     var size by mutableStateOf(OutputSize.ORIGINAL)
     var codec by mutableStateOf(OutputCodec.H265)
     var keepAudio by mutableStateOf(true)
+    var keepPitch by mutableStateOf(true)
     var toneMapHdr by mutableStateOf(false)
 
     var exportState by mutableStateOf<ExportState>(ExportState.Idle)
@@ -109,7 +111,10 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         val itemBuilder = EditedMediaItem.Builder(MediaItem.fromUri(uri))
             .setEffects(Effects(emptyList(), videoEffects))
             .setRemoveAudio(!keepAudio)
-        speed.provider(src.durationMs * 1000)?.let { itemBuilder.setSpeed(it) }
+        speed.provider(src.durationMs * 1000)?.let {
+            // Con keepPitch l'audio si allunga/accorcia senza cambiare tono.
+            itemBuilder.setSpeed(SpeedParameters(it, keepPitch && keepAudio))
+        }
         val edited = itemBuilder.build()
 
         val sequence = if (keepAudio) {
