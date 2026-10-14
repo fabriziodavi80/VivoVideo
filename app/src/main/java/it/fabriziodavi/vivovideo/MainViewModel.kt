@@ -38,7 +38,15 @@ import java.util.Locale
 
 enum class OutputSize(val label: String, val shortSide: Int?) {
     ORIGINAL("Originale", null),
+    P2160("4K", 2160),
     P1080("1080p", 1080),
+}
+
+/** Fps massimi in uscita: da un video a 100/120fps si ottiene un rallentatore fluido. */
+enum class OutputFps(val label: String, val max: Int?) {
+    ORIGINAL("Originali", null),
+    F60("60", 60),
+    F30("30", 30),
 }
 
 enum class OutputCodec(val label: String, val mime: String) {
@@ -65,6 +73,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     var look by mutableStateOf(Look.NONE)
     var speed by mutableStateOf(SpeedMode.NORMAL)
     var size by mutableStateOf(OutputSize.ORIGINAL)
+    var fps by mutableStateOf(OutputFps.ORIGINAL)
     var codec by mutableStateOf(OutputCodec.H265)
     var keepAudio by mutableStateOf(true)
     var keepPitch by mutableStateOf(true)
@@ -115,6 +124,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             // Con keepPitch l'audio si allunga/accorcia senza cambiare tono.
             itemBuilder.setSpeed(SpeedParameters(it, keepPitch && keepAudio))
         }
+        fps.max?.let { itemBuilder.setFrameRate(it) }
         val edited = itemBuilder.build()
 
         val sequence = if (keepAudio) {
@@ -133,13 +143,16 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             .build()
 
         // --- Encoder hardware con bitrate adatto alla risoluzione ---
-        val outShort = size.shortSide ?: minOf(src.displayWidth, src.displayHeight)
-        val highFps = (src.fps ?: 30f) > 40f
-        var bitrate = when {
-            outShort >= 2000 -> if (highFps) 70_000_000 else 45_000_000
-            outShort >= 1000 -> if (highFps) 28_000_000 else 18_000_000
-            else -> 10_000_000
-        }
+        // Bitrate proporzionale a pixel × fotogrammi (riferimento: 4K30 ≈ 45 Mbps in H.265).
+        val srcShort = minOf(src.displayWidth, src.displayHeight).coerceAtLeast(1)
+        val srcLong = maxOf(src.displayWidth, src.displayHeight).coerceAtLeast(1)
+        val outShort = minOf(size.shortSide ?: srcShort, srcShort)
+        val outLong = srcLong.toLong() * outShort / srcShort
+        val srcFps = src.fps ?: 30f
+        val outFps = fps.max?.let { minOf(it.toFloat(), srcFps) } ?: srcFps
+        val pixelsPerSec = outShort.toDouble() * outLong * outFps
+        var bitrate = (45_000_000 * pixelsPerSec / (3840.0 * 2160 * 30))
+            .coerceIn(8_000_000.0, 160_000_000.0).toInt()
         if (codec == OutputCodec.H264) bitrate = (bitrate * 1.4).toInt()
 
         val encoderFactory = DefaultEncoderFactory.Builder(context)
@@ -163,7 +176,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                             append("Durata: ${formatDuration(exportResult.durationMs)}")
                             append(" · ${"%.1f".format(exportResult.fileSizeBytes / 1_048_576.0)} MB")
                             append("\nTempo di esportazione: ${"%.1f".format(seconds)} s")
-                            append("\nCodec: ${codec.label}, ${bitrate / 1_000_000} Mbps")
+                            append("\nCodec: ${codec.label}, ${bitrate / 1_000_000} Mbps, max ${"%.0f".format(outFps)} fps")
                             if (src.isHdr) append(if (toSdr) " · convertito in SDR" else " · HDR mantenuto")
                             exportResult.videoEncoderName?.let { append("\nEncoder: $it") }
                         }

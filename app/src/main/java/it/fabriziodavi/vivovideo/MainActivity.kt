@@ -149,6 +149,7 @@ private fun MainScreen(vm: MainViewModel) {
                 }
                 Section("Esportazione") {
                     ChipRow(OutputSize.entries, vm.size, { it.label }, !running) { vm.size = it }
+                    ChipRow(OutputFps.entries, vm.fps, { "fps: " + it.label }, !running) { vm.fps = it }
                     ChipRow(OutputCodec.entries, vm.codec, { it.label }, !running) { vm.codec = it }
                     ToggleRow("Mantieni l'audio", vm.keepAudio, !running) { vm.keepAudio = it }
                     if (vm.keepAudio && vm.speed != SpeedMode.NORMAL) {
