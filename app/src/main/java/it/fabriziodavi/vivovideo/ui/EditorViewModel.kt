@@ -178,6 +178,63 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         update { it.replaceClip(c.copy(trimStartUs = startUs, trimEndUs = endUs)) }
     }
 
+    // ---------------- Keyframe ----------------
+
+    /** Tempo (sul video originale, dall'inizio della clip) dell'indicatore dentro la clip selezionata. */
+    fun playheadInSelected(): Long? {
+        val p = project ?: return null
+        val c = selectedClip ?: return null
+        val start = p.clipStartsUs()[p.clips.indexOf(c)]
+        val out = playheadUs - start
+        if (out < 0 || out > c.outputUs) return null
+        return c.speedCurve().sourceTimeAt(out)
+    }
+
+    fun transformAtPlayhead(): it.fabriziodavi.vivovideo.model.Transform {
+        val c = selectedClip ?: return it.fabriziodavi.vivovideo.model.Transform()
+        val t = playheadInSelected() ?: 0L
+        return it.fabriziodavi.vivovideo.model.Keyframes.valueAt(c.keyframes, t)
+    }
+
+    /** Cambia la trasformazione nel punto dell'indicatore: crea il keyframe se non c'è. */
+    fun setTransformAtPlayhead(value: it.fabriziodavi.vivovideo.model.Transform) {
+        val t = playheadInSelected()
+        if (t == null) { message = "Porta l'indicatore dentro la clip selezionata per mettere un keyframe."; return }
+        updateSelected { c -> c.copy(keyframes = it.fabriziodavi.vivovideo.model.Keyframes.set(c.keyframes, t, value)) }
+    }
+
+    fun keyframeAtPlayhead(): it.fabriziodavi.vivovideo.model.Keyframe? {
+        val c = selectedClip ?: return null
+        val t = playheadInSelected() ?: return null
+        return c.keyframes.firstOrNull { kotlin.math.abs(it.timeUs - t) <= 40_000 }
+    }
+
+    fun toggleKeyframeAtPlayhead() {
+        val c = selectedClip ?: return
+        val k = keyframeAtPlayhead()
+        if (k != null) updateSelected { it.copy(keyframes = it.keyframes - k) }
+        else setTransformAtPlayhead(transformAtPlayhead())
+    }
+
+    fun setEasingAtPlayhead(e: it.fabriziodavi.vivovideo.model.Easing) {
+        val c = selectedClip ?: return
+        val t = playheadInSelected() ?: return
+        val k = c.keyframes.filter { it.timeUs <= t + 40_000 }.maxByOrNull { it.timeUs } ?: return
+        updateSelected { cl -> cl.copy(keyframes = cl.keyframes.map { if (it == k) it.copy(easing = e) else it }) }
+    }
+
+    fun clearKeyframes() = updateSelected { it.copy(keyframes = emptyList()) }
+
+    /** Salta al keyframe precedente (-1) o successivo (+1) della clip selezionata. */
+    fun jumpKeyframe(dir: Int) {
+        val p = project ?: return
+        val c = selectedClip ?: return
+        val start = p.clipStartsUs()[p.clips.indexOf(c)]
+        val times = c.keyframes.map { start + c.speedCurve().outputTimeAt(it.timeUs) }.sorted()
+        val target = if (dir > 0) times.firstOrNull { it > playheadUs + 20_000 } else times.lastOrNull { it < playheadUs - 20_000 }
+        target?.let { pause(); seekTo(it) }
+    }
+
     fun deleteSelected() {
         val id = selectedClipId ?: return
         val p = project ?: return

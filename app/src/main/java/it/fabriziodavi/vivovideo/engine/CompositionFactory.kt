@@ -125,8 +125,16 @@ class CompositionFactory(private val context: Context) {
                         .build()
                 )
                 .build()
-            val effects = colorEffects(clip, project) +
-                Presentation.createForWidthAndHeight(outW, outH, Presentation.LAYOUT_SCALE_TO_FIT)
+            val effects = buildList {
+                addAll(colorEffects(clip, project))
+                add(Presentation.createForWidthAndHeight(outW, outH, Presentation.LAYOUT_SCALE_TO_FIT))
+                if (clip.keyframes.isNotEmpty()) {
+                    if (clip.keyframes.any { it.value.x != 0f || it.value.y != 0f || it.value.scale != 1f || it.value.rotation != 0f }) {
+                        add(KeyframeTransformation(clip, outW.toFloat() / outH))
+                    }
+                    if (clip.keyframes.any { it.value.opacity != 1f }) add(KeyframeFade(clip))
+                }
+            }
             val b = EditedMediaItem.Builder(mediaItem)
                 .setDurationUs(clip.sourceDurationUs)
                 .setEffects(Effects(volumeProcessors(clip.volume), effects))

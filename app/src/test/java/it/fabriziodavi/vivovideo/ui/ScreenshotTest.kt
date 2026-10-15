@@ -65,6 +65,20 @@ class ScreenshotTest {
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/6_editor_orizzontale_strumenti.png")
     }
 
+    @Test fun editorKeyframePanel() {
+        val vm = vm()
+        val c = vm.project!!.clips[0]
+        vm.selectedClipId = c.id
+        vm.updateSelected {
+            it.copy(keyframes = listOf(
+                it.fabriziodavi.vivovideo.model.Keyframe(0, it.fabriziodavi.vivovideo.model.Transform()),
+                it.fabriziodavi.vivovideo.model.Keyframe(3_000_000, it.fabriziodavi.vivovideo.model.Transform(scale = 1.8f, x = 0.1f)),
+            ))
+        }
+        compose.setContent { VivoTheme { EditorScreen(vm, initialTool = Tool.KEYFRAME) } }
+        compose.onRoot().captureRoboImage("build/outputs/roborazzi/7_editor_keyframe.png")
+    }
+
     @Test fun home() {
         val vm = EditorViewModel(ApplicationProvider.getApplicationContext<Application>())
         compose.setContent { VivoTheme { HomeScreen(vm) } }

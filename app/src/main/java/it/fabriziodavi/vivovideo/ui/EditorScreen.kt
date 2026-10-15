@@ -11,6 +11,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.calculatePan
+import androidx.compose.foundation.gestures.calculateRotation
+import androidx.compose.foundation.gestures.calculateZoom
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -78,7 +85,7 @@ enum class Tool(val label: String, val icon: () -> ImageVector, val future: Bool
     SPEED("Velocità", { VVIcons.Speed }),
     AUDIO("Audio", { VVIcons.Volume }),
     COLOR("Colore", { VVIcons.Palette }),
-    KEYFRAME("Keyframe", { VVIcons.Keyframe }, future = true),
+    KEYFRAME("Keyframe", { VVIcons.Keyframe }),
     EFFECTS("Effetti", { VVIcons.Effects }, future = true),
     TRANSITION("Transizione", { VVIcons.Transition }, future = true),
     TEXT("Testo", { VVIcons.Text }, future = true),
@@ -107,7 +114,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
     val clip = vm.selectedClip
 
     // Un pannello di clip si chiude se non c'è più una clip selezionata.
-    if (clip == null && (activeTool == Tool.SPEED || activeTool == Tool.AUDIO)) activeTool = null
+    if (clip == null && (activeTool == Tool.SPEED || activeTool == Tool.AUDIO || activeTool == Tool.KEYFRAME)) activeTool = null
 
     BackHandler {
         when {
@@ -137,6 +144,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
     }
 
     val landscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+    var live by remember { mutableStateOf(LiveTransform()) }
     var fullscreen by remember { mutableStateOf(false) }
     BackHandler(enabled = fullscreen) { fullscreen = false }
 
@@ -181,11 +189,52 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
         Box(mod.background(Color.Black), contentAlignment = Alignment.Center) {
             val player = vm.player
             when {
-                player != null -> AndroidView(
-                    factory = { ctx -> PlayerView(ctx).apply { useController = false; setShutterBackgroundColor(android.graphics.Color.BLACK) } },
-                    update = { it.player = player },
-                    modifier = Modifier.fillMaxSize(),
-                )
+                player != null -> {
+                    // Con il pannello Keyframe aperto si può pizzicare, trascinare e ruotare il video.
+                    val gestures = activeTool == Tool.KEYFRAME && clip != null && !running
+                    AndroidView(
+                        factory = { ctx -> PlayerView(ctx).apply { useController = false; setShutterBackgroundColor(android.graphics.Color.BLACK) } },
+                        update = { it.player = player },
+                        modifier = Modifier.fillMaxSize().graphicsLayer {
+                            scaleX = live.zoom; scaleY = live.zoom
+                            translationX = live.pan.x; translationY = live.pan.y
+                            rotationZ = live.rotation
+                        },
+                    )
+                    if (gestures) {
+                        val firstClip = project.clips.firstOrNull()
+                        val videoAspect = if (firstClip != null && firstClip.height > 0) firstClip.width.toFloat() / firstClip.height else 16f / 9f
+                        Box(
+                            Modifier.fillMaxSize().pointerInput(clip?.id) {
+                                awaitEachGesture {
+                                    awaitFirstDown(requireUnconsumed = false)
+                                    var zoom = 1f; var pan = Offset.Zero; var rot = 0f
+                                    do {
+                                        val ev = awaitPointerEvent()
+                                        zoom *= ev.calculateZoom(); pan += ev.calculatePan(); rot += ev.calculateRotation()
+                                        live = LiveTransform(zoom, pan, rot)
+                                        ev.changes.forEach { it.consume() }
+                                    } while (ev.changes.any { it.pressed })
+                                    if (zoom != 1f || pan != Offset.Zero || rot != 0f) {
+                                        // Dimensione del video dentro l'anteprima (adattato senza tagli).
+                                        val vw = minOf(size.width.toFloat(), size.height * videoAspect)
+                                        val vh = vw / videoAspect
+                                        val base = vm.transformAtPlayhead()
+                                        vm.setTransformAtPlayhead(
+                                            base.copy(
+                                                x = (base.x + pan.x / vw).coerceIn(-2f, 2f),
+                                                y = (base.y + pan.y / vh).coerceIn(-2f, 2f),
+                                                scale = (base.scale * zoom).coerceIn(0.2f, 5f),
+                                                rotation = ((base.rotation + rot + 540f) % 360f) - 180f,
+                                            )
+                                        )
+                                    }
+                                    live = LiveTransform()
+                                }
+                            }
+                        )
+                    }
+                }
                 project.clips.isEmpty() -> EmptyState(onAdd = pickVideos)
                 running -> Text("Anteprima in pausa durante l'esportazione", style = MaterialTheme.typography.bodySmall)
             }
@@ -251,6 +300,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
     val panelBody: @Composable (Tool) -> Unit = { t ->
         when (t) {
             Tool.SPEED -> SpeedPanel(vm, running)
+            Tool.KEYFRAME -> KeyframePanel(vm, running)
             Tool.AUDIO -> AudioPanel(vm, running)
             Tool.COLOR -> ColorPanel(vm, running) { lutPicker.launch(arrayOf("*/*")) }
             Tool.EXPORT -> ExportPanel(vm) { uri ->
@@ -453,6 +503,70 @@ private fun SpeedPanel(vm: EditorViewModel, running: Boolean) {
                 else -> "Velocità originale. Scegli \"Curva\" per disegnare uno speed ramp."
             } + "  Durata: " + formatTime(clip.outputUs)
         )
+    }
+}
+
+/** Gesto in corso sul video, mostrato subito; il keyframe si salva quando si alzano le dita. */
+private data class LiveTransform(val zoom: Float = 1f, val pan: Offset = Offset.Zero, val rotation: Float = 0f)
+
+@Composable
+private fun KeyframePanel(vm: EditorViewModel, running: Boolean) {
+    val clip = vm.selectedClip ?: return
+    val inside = vm.playheadInSelected() != null
+    val here = vm.keyframeAtPlayhead()
+    val v = vm.transformAtPlayhead()
+    val enabled = !running && inside
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        IconBtn(VVIcons.MoveLeft, "Keyframe precedente", enabled = clip.keyframes.isNotEmpty()) { vm.jumpKeyframe(-1) }
+        Box(
+            Modifier.weight(1f).clip(RoundedCornerShape(12.dp)).background(if (here != null) VV.Tally else VV.Raised)
+                .clickable(enabled = enabled) { vm.toggleKeyframeAtPlayhead() }.padding(vertical = 11.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(VVIcons.Keyframe, null, tint = if (here != null) VV.TallyInk else VV.Text, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    if (here != null) "Togli il keyframe" else "Aggiungi keyframe qui",
+                    style = MaterialTheme.typography.labelLarge, color = if (here != null) VV.TallyInk else VV.Text,
+                )
+            }
+        }
+        IconBtn(VVIcons.MoveRight, "Keyframe successivo", enabled = clip.keyframes.isNotEmpty()) { vm.jumpKeyframe(+1) }
+    }
+    if (!inside) {
+        Hint("Porta l'indicatore dentro la clip selezionata.")
+        return
+    }
+    Hint(
+        if (clip.keyframes.isEmpty()) "Pizzica, trascina o ruota il video con due dita, oppure usa i cursori: il keyframe si crea da solo."
+        else "${clip.keyframes.size} keyframe in questa clip. Sposta l'indicatore e cambia i valori: ogni modifica crea o aggiorna un keyframe."
+    )
+    LabeledSlider("Zoom", null, (v.scale * 100).toInt(), enabled, range = 20..400, format = { "$it%" }) {
+        vm.setTransformAtPlayhead(v.copy(scale = it / 100f))
+    }
+    LabeledSlider("Orizzontale", null, (v.x * 100).toInt(), enabled, range = -100..100) {
+        vm.setTransformAtPlayhead(v.copy(x = it / 100f))
+    }
+    LabeledSlider("Verticale", null, (v.y * 100).toInt(), enabled, range = -100..100) {
+        vm.setTransformAtPlayhead(v.copy(y = it / 100f))
+    }
+    LabeledSlider("Rotazione", null, v.rotation.toInt(), enabled, range = -180..180, format = { "$it°" }) {
+        vm.setTransformAtPlayhead(v.copy(rotation = it.toFloat()))
+    }
+    LabeledSlider("Opacità", "Sotto il video c'è il nero: abbassandola si ottiene una dissolvenza.", (v.opacity * 100).toInt(), enabled, format = { "$it%" }) {
+        vm.setTransformAtPlayhead(v.copy(opacity = it / 100f))
+    }
+    if (clip.keyframes.size >= 2) {
+        PanelLabel("Andamento verso il keyframe successivo")
+        val t = vm.playheadInSelected() ?: 0L
+        val current = clip.keyframes.filter { it.timeUs <= t + 40_000 }.maxByOrNull { it.timeUs }?.easing
+        Segmented(it.fabriziodavi.vivovideo.model.Easing.entries, current ?: it.fabriziodavi.vivovideo.model.Easing.SMOOTH, { it.label }, !running && current != null) {
+            vm.setEasingAtPlayhead(it)
+        }
+    }
+    if (clip.keyframes.isNotEmpty()) {
+        SecondaryButton("Togli tutti i keyframe della clip", onClick = vm::clearKeyframes)
     }
 }
 

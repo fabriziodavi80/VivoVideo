@@ -244,6 +244,21 @@ private fun ClipBox(
             Badge(label)
             if (clip.log) Badge("LOG")
         }
+        // Rombi dei keyframe, nella loro posizione sul video finale.
+        if (clip.keyframes.isNotEmpty()) {
+            val curve = clip.speedCurve()
+            Canvas(Modifier.fillMaxSize()) {
+                val r = 5.dp.toPx()
+                clip.keyframes.forEach { k ->
+                    val x = (curve.outputTimeAt(k.timeUs).toFloat() / clip.outputUs.coerceAtLeast(1)) * size.width
+                    val p = Path().apply {
+                        moveTo(x, 3.dp.toPx()); lineTo(x + r, 3.dp.toPx() + r); lineTo(x, 3.dp.toPx() + 2 * r); lineTo(x - r, 3.dp.toPx() + r); close()
+                    }
+                    drawPath(p, if (selected) VV.Tally else VV.Text)
+                    drawPath(p, VV.TallyInk, style = androidx.compose.ui.graphics.drawscope.Stroke(1.dp.toPx()))
+                }
+            }
+        }
         if (selected) {
             Box(Modifier.fillMaxSize().border(2.dp, VV.Tally, shape))
             TrimHandle(Modifier.align(Alignment.CenterStart), left = true, clip, pxPerUs, onTrimDrag, onTrimEnd)

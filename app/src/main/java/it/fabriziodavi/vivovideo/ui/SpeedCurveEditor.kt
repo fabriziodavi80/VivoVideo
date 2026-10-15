@@ -19,7 +19,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -77,33 +76,41 @@ fun SpeedCurveEditor(
                 var lastTapTime = 0L
                 var lastTapIndex = -1
                 awaitEachGesture {
-                    val down = awaitFirstDown()
+                    val down = awaitFirstDown(requireUnconsumed = false)
                     val pts = currentPoints.sortedBy { it.t }
                     val hit = pts.indices.minByOrNull { hypot(x(pts[it].t) - down.position.x, y(pts[it].speed) - down.position.y) }
                         ?.takeIf { hypot(x(pts[it].t) - down.position.x, y(pts[it].speed) - down.position.y) < 28.dp.toPx() }
+                    // Preso un punto: il gesto è nostro, il pannello non deve scorrere.
+                    if (hit != null) down.consume()
+                    // Distanza fra dito e centro del punto: il punto non "salta" sotto il dito.
+                    val grab = if (hit != null) Offset(x(pts[hit].t) - down.position.x, y(pts[hit].speed) - down.position.y) else Offset.Zero
                     var moved = false
                     var work = pts
                     activeIndex = hit
                     while (true) {
                         val ev = awaitPointerEvent()
-                        val ch = ev.changes.firstOrNull() ?: break
+                        val ch = ev.changes.firstOrNull { it.id == down.id } ?: break
                         if (!ch.pressed) break
-                        if (hit != null && (moved || ch.positionChange().getDistance() > 2f)) {
-                            moved = true
+                        if (hit != null) {
                             ch.consume()
+                            if (!moved && (ch.position - down.position).getDistance() < 3f) continue
+                            moved = true
                             val i = hit
+                            val px = ch.position + grab
                             val t = when (i) {
                                 0 -> 0f
                                 pts.lastIndex -> 1f
-                                else -> tAt(ch.position.x).coerceIn(pts[i - 1].t + 0.03f, pts[i + 1].t - 0.03f)
+                                else -> tAt(px.x).coerceIn(pts[i - 1].t + 0.03f, pts[i + 1].t - 0.03f)
                             }
-                            work = pts.toMutableList().also { it[i] = SpeedPoint(t, sAt(ch.position.y)) }
+                            work = pts.toMutableList().also { it[i] = SpeedPoint(t, sAt(px.y)) }
                             draft = work
+                        } else if ((ch.position - down.position).getDistance() > 12f) {
+                            moved = true // trascinamento a vuoto: lo lasciamo al pannello
                         }
                     }
-                    if (moved) {
+                    if (moved && hit != null) {
                         onChange(work)
-                    } else {
+                    } else if (!moved) {
                         val now = System.currentTimeMillis()
                         if (hit != null) {
                             // Doppio tocco su un punto interno: lo toglie.
@@ -144,10 +151,11 @@ fun SpeedCurveEditor(
         }
         // Curva
         val path = Path()
-        val n = 120
+        val n = 100
+        val sampler = SpeedInterp.sampler(draft)
         for (i in 0..n) {
             val t = i / n.toFloat()
-            val xx = x(t); val yy = y(SpeedInterp.valueAt(draft, t))
+            val xx = x(t); val yy = y(sampler(t))
             if (i == 0) path.moveTo(xx, yy) else path.lineTo(xx, yy)
         }
         drawPath(path, VV.Tally, style = Stroke(2.5.dp.toPx()))

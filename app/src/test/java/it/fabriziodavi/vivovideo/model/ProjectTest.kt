@@ -84,4 +84,36 @@ class ProjectTest {
             .addClips(listOf(clip(3.0, ClipSpeed.RAMP).copy(log = true, trimStartUs = 500_000, speedPoints = SpeedPreset.HERO.points)))
         assertEquals(p, Project.fromJson(p.toJson()))
     }
+
+    @Test fun keyframeInterpolation() {
+        val keys = listOf(
+            Keyframe(0, Transform(scale = 1f), Easing.LINEAR),
+            Keyframe(2_000_000, Transform(scale = 4f, x = 0.5f, opacity = 0f)),
+        )
+        val mid = Keyframes.valueAt(keys, 1_000_000)
+        assertTrue("scale ${mid.scale}", abs(mid.scale - 2f) < 1e-3) // a metà tempo, metà zoom "percepito"
+        assertTrue(abs(mid.x - 0.25f) < 1e-4)
+        assertEquals(Transform(scale = 1f), Keyframes.valueAt(keys, -5))
+        assertEquals(4f, Keyframes.valueAt(keys, 9_000_000).scale, 1e-4f)
+        val hold = listOf(Keyframe(0, Transform(x = 0f), Easing.HOLD), Keyframe(1_000_000, Transform(x = 1f)))
+        assertEquals(0f, Keyframes.valueAt(hold, 999_000).x, 1e-6f)
+    }
+
+    @Test fun keyframeSetSnapsAndSorts() {
+        var k = Keyframes.set(emptyList(), 1_000_000, Transform(scale = 2f))
+        k = Keyframes.set(k, 0, Transform())
+        k = Keyframes.set(k, 1_020_000, Transform(scale = 3f)) // entro 40 ms: aggiorna
+        assertEquals(listOf(0L, 1_000_000L), k.map { it.timeUs })
+        assertEquals(3f, k[1].value.scale, 1e-6f)
+    }
+
+    @Test fun splitKeepsKeyframeValues() {
+        val c = clip(4.0).copy(keyframes = listOf(Keyframe(0, Transform(scale = 1f), Easing.LINEAR), Keyframe(4_000_000, Transform(scale = 2f), Easing.LINEAR)))
+        val p = Project(name = "t").addClips(listOf(c))
+        val s = p.splitAt(2_000_000)!!
+        val endOfFirst = Keyframes.valueAt(s.clips[0].keyframes, s.clips[0].trimmedUs)
+        val startOfSecond = Keyframes.valueAt(s.clips[1].keyframes, 0)
+        assertEquals(endOfFirst.scale, startOfSecond.scale, 1e-4f)
+        assertEquals(2f, Keyframes.valueAt(s.clips[1].keyframes, s.clips[1].trimmedUs).scale, 1e-4f)
+    }
 }

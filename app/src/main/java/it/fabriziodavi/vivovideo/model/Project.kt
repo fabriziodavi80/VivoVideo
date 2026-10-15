@@ -19,6 +19,68 @@ enum class ClipSpeed(val label: String) {
     RAMP("Curva");
 }
 
+/** Andamento fra un keyframe e il successivo. */
+@Serializable
+enum class Easing(val label: String) {
+    SMOOTH("Morbido"), LINEAR("Lineare"), EASE_IN("Accelera"), EASE_OUT("Rallenta"), HOLD("Scatto");
+
+    fun apply(u: Float): Float = when (this) {
+        LINEAR -> u
+        SMOOTH -> u * u * (3 - 2 * u)
+        EASE_IN -> u * u * u
+        EASE_OUT -> 1 - (1 - u) * (1 - u) * (1 - u)
+        HOLD -> 0f
+    }
+}
+
+/** Stato della trasformazione di una clip in un istante. */
+@Serializable
+data class Transform(
+    /** Spostamento in frazioni del fotogramma (1 = un fotogramma intero). */
+    val x: Float = 0f,
+    val y: Float = 0f,
+    val scale: Float = 1f,
+    /** Gradi, in senso orario. */
+    val rotation: Float = 0f,
+    /** 0 = nero, 1 = pieno. */
+    val opacity: Float = 1f,
+) {
+    val isIdentity get() = x == 0f && y == 0f && scale == 1f && rotation == 0f && opacity == 1f
+
+    fun lerp(o: Transform, u: Float) = Transform(
+        x + (o.x - x) * u, y + (o.y - y) * u,
+        // lo zoom si interpola in scala logaritmica: velocità di zoom costante a occhio
+        kotlin.math.exp(kotlin.math.ln(scale) + (kotlin.math.ln(o.scale) - kotlin.math.ln(scale)) * u).toFloat(),
+        rotation + (o.rotation - rotation) * u,
+        opacity + (o.opacity - opacity) * u,
+    )
+}
+
+/** Keyframe: [timeUs] dall'inizio della clip tagliata, sul tempo del video originale. */
+@Serializable
+data class Keyframe(val timeUs: Long, val value: Transform, val easing: Easing = Easing.SMOOTH)
+
+object Keyframes {
+    /** Valore della trasformazione al tempo t (sorgente, relativo all'inizio della clip). */
+    fun valueAt(keys: List<Keyframe>, tUs: Long): Transform {
+        if (keys.isEmpty()) return Transform()
+        val k = keys.sortedBy { it.timeUs }
+        if (tUs <= k.first().timeUs) return k.first().value
+        if (tUs >= k.last().timeUs) return k.last().value
+        val i = k.indexOfLast { it.timeUs <= tUs }
+        val a = k[i]; val b = k[i + 1]
+        val u = ((tUs - a.timeUs).toFloat() / (b.timeUs - a.timeUs).coerceAtLeast(1)).coerceIn(0f, 1f)
+        return a.value.lerp(b.value, a.easing.apply(u))
+    }
+
+    /** Mette o aggiorna un keyframe al tempo t (entro [snapUs] riusa quello esistente). */
+    fun set(keys: List<Keyframe>, tUs: Long, value: Transform, snapUs: Long = 40_000): List<Keyframe> {
+        val existing = keys.firstOrNull { kotlin.math.abs(it.timeUs - tUs) <= snapUs }
+        return if (existing != null) keys.map { if (it === existing) it.copy(value = value) else it }
+        else (keys + Keyframe(tUs, value)).sortedBy { it.timeUs }
+    }
+}
+
 /** Punto della curva di velocità: [t] posizione lungo la clip (0 inizio, 1 fine), [speed] velocità. */
 @Serializable
 data class SpeedPoint(val t: Float, val speed: Float)
@@ -54,6 +116,8 @@ data class Clip(
     val volume: Float = 1f,
     /** Punti della curva quando [speed] è RAMP ("Curva"); vuota = preset "Rallenty centrale". */
     val speedPoints: List<SpeedPoint> = emptyList(),
+    /** Animazione di posizione, zoom, rotazione e opacità (tempi sul video originale della clip). */
+    val keyframes: List<Keyframe> = emptyList(),
     val width: Int = 0,
     val height: Int = 0,
     val fps: Float = 30f,
@@ -63,10 +127,14 @@ data class Clip(
     /** Curva di velocità sul tempo della clip tagliata (0 = inizio del taglio). */
     val curvePoints: List<SpeedPoint> get() = speedPoints.ifEmpty { SpeedPreset.VALLEY.points }
 
-    fun speedCurve(): SpeedCurve = SpeedCurve.forClip(speed, trimmedUs, curvePoints)
+    // Calcolati una volta per istanza (la timeline li chiede molte volte al secondo).
+    private val cachedCurve: SpeedCurve by lazy { SpeedCurve.forClip(speed, trimmedUs, curvePoints) }
+    private val cachedOutputUs: Long by lazy { cachedCurve.outputDurationUs() }
+
+    fun speedCurve(): SpeedCurve = cachedCurve
 
     /** Durata di questa clip nel video finale. */
-    val outputUs: Long get() = speedCurve().outputDurationUs()
+    val outputUs: Long get() = cachedOutputUs
 
     val isHeavy: Boolean get() = width.toLong() * height * fps >= 3840L * 2160 * 120
 }
@@ -141,8 +209,15 @@ data class Project(
         val offsetSrc = clip.speedCurve().sourceTimeAt(offsetOut)
         val cut = clip.trimStartUs + offsetSrc
         if (cut - clip.trimStartUs < minPieceUs || clip.trimEndUs - cut < minPieceUs) return null
-        var first = clip.copy(trimEndUs = cut)
-        var second = clip.copy(id = UUID.randomUUID().toString(), trimStartUs = cut)
+        // I keyframe seguono il video: ogni metà tiene i suoi, più il valore nel punto di taglio.
+        val local = cut - clip.trimStartUs
+        val atCut = Keyframes.valueAt(clip.keyframes, local)
+        val k1 = if (clip.keyframes.isEmpty()) emptyList() else
+            clip.keyframes.filter { it.timeUs < local } + Keyframe(local, atCut)
+        val k2 = if (clip.keyframes.isEmpty()) emptyList() else
+            listOf(Keyframe(0, atCut)) + clip.keyframes.filter { it.timeUs > local }.map { it.copy(timeUs = it.timeUs - local) }
+        var first = clip.copy(trimEndUs = cut, keyframes = k1)
+        var second = clip.copy(id = UUID.randomUUID().toString(), trimStartUs = cut, keyframes = k2)
         if (clip.speed == ClipSpeed.RAMP) {
             // La curva si divide in due: ogni metà conserva la sua parte di curva.
             val f = offsetSrc.toFloat() / clip.trimmedUs
@@ -182,14 +257,16 @@ fun splitPoints(points: List<SpeedPoint>, f: Float): Pair<List<SpeedPoint>, List
  * passa esattamente dai punti e non "rimbalza" mai oltre i loro valori.
  */
 object SpeedInterp {
-    fun valueAt(points: List<SpeedPoint>, t: Float): Float {
+    fun valueAt(points: List<SpeedPoint>, t: Float): Float = sampler(points)(t)
+
+    /** Prepara la curva una volta sola; la funzione restituita si valuta velocemente molte volte. */
+    fun sampler(points: List<SpeedPoint>): (Float) -> Float {
         val p = points.sortedBy { it.t }
-        if (p.isEmpty()) return 1f
-        if (p.size == 1 || t <= p.first().t) return p.first().speed
-        if (t >= p.last().t) return p.last().speed
-        val xs = p.map { it.t.toDouble() }
-        val ys = p.map { kotlin.math.ln(it.speed.toDouble()) }
+        if (p.isEmpty()) return { 1f }
+        if (p.size == 1) return { p[0].speed }
         val n = p.size
+        val xs = DoubleArray(n) { p[it].t.toDouble() }
+        val ys = DoubleArray(n) { kotlin.math.ln(p[it].speed.toDouble()) }
         val d = DoubleArray(n - 1) { (ys[it + 1] - ys[it]) / (xs[it + 1] - xs[it]).coerceAtLeast(1e-6) }
         val m = DoubleArray(n)
         m[0] = d[0]; m[n - 1] = d[n - 2]
@@ -201,16 +278,25 @@ object SpeedInterp {
             val s = a * a + b * b
             if (s > 9) { val k = 3 / kotlin.math.sqrt(s); m[i] = k * a * d[i]; m[i + 1] = k * b * d[i] }
         }
-        var k = 0
-        while (k < n - 2 && t > xs[k + 1]) k++
-        val h = (xs[k + 1] - xs[k]).coerceAtLeast(1e-6)
-        val u = (t - xs[k]) / h
-        val h00 = 2 * u * u * u - 3 * u * u + 1
-        val h10 = u * u * u - 2 * u * u + u
-        val h01 = -2 * u * u * u + 3 * u * u
-        val h11 = u * u * u - u * u
-        val y = h00 * ys[k] + h10 * h * m[k] + h01 * ys[k + 1] + h11 * h * m[k + 1]
-        return kotlin.math.exp(y).toFloat().coerceIn(SpeedLimits.MIN, SpeedLimits.MAX)
+        return { tf ->
+            val t = tf.toDouble()
+            when {
+                t <= xs[0] -> p[0].speed
+                t >= xs[n - 1] -> p[n - 1].speed
+                else -> {
+                    var k = 0
+                    while (k < n - 2 && t > xs[k + 1]) k++
+                    val h = (xs[k + 1] - xs[k]).coerceAtLeast(1e-6)
+                    val u = (t - xs[k]) / h
+                    val h00 = 2 * u * u * u - 3 * u * u + 1
+                    val h10 = u * u * u - 2 * u * u + u
+                    val h01 = -2 * u * u * u + 3 * u * u
+                    val h11 = u * u * u - u * u
+                    val y = h00 * ys[k] + h10 * h * m[k] + h01 * ys[k + 1] + h11 * h * m[k + 1]
+                    kotlin.math.exp(y).toFloat().coerceIn(SpeedLimits.MIN, SpeedLimits.MAX)
+                }
+            }
+        }
     }
 }
 
@@ -284,6 +370,7 @@ class SpeedCurve(val segEndUs: LongArray, val speeds: FloatArray, val durationUs
 
         /** Curva disegnata, campionata a gradini di 40 ms (al centro di ogni gradino). */
         fun fromPoints(points: List<SpeedPoint>, durationUs: Long): SpeedCurve {
+            val sampler = SpeedInterp.sampler(points)
             val n = ((durationUs + RAMP_STEP_US - 1) / RAMP_STEP_US).toInt().coerceAtLeast(1)
             val ends = LongArray(n)
             val sp = FloatArray(n)
@@ -291,7 +378,7 @@ class SpeedCurve(val segEndUs: LongArray, val speeds: FloatArray, val durationUs
                 val start = i * RAMP_STEP_US
                 ends[i] = minOf(start + RAMP_STEP_US, durationUs)
                 val mid = (start + ends[i]) / 2.0 / durationUs
-                sp[i] = SpeedInterp.valueAt(points, mid.toFloat())
+                sp[i] = sampler(mid.toFloat())
             }
             return SpeedCurve(ends, sp, durationUs)
         }
