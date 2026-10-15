@@ -139,6 +139,8 @@ data class Clip(
     val isPhoto: Boolean = false,
     /** Riempie il quadro tagliando i bordi, invece di mostrare bande nere. */
     val fill: Boolean = false,
+    /** Inquadratura fissa (zoom, posizione, rotazione), sotto ad eventuali keyframe. */
+    val frame: Transform = Transform(),
     val width: Int = 0,
     val height: Int = 0,
     val fps: Float = 30f,

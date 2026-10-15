@@ -21,19 +21,27 @@ private fun Clip.transformAt(presentationTimeUs: Long, startUs: Long): Transform
 internal fun localTimeUs(presentationTimeUs: Long, startUs: Long): Long =
     (if (presentationTimeUs >= startUs) presentationTimeUs - startUs else presentationTimeUs).coerceAtLeast(0)
 
+/** Matrice di una trasformazione in coordinate normalizzate, con rotazione in proporzioni reali. */
+private fun transformMatrix(t: Transform, aspect: Float): Matrix = Matrix().apply {
+    postScale(t.scale, t.scale)
+    postScale(aspect, 1f)
+    postRotate(-t.rotation)
+    postScale(1f / aspect, 1f)
+    postTranslate(2f * t.x, -2f * t.y)
+}
+
+/** Inquadratura fissa della clip (strumento Inquadra). */
+class FrameTransformation(private val frame: Transform, private val aspect: Float) : MatrixTransformation {
+    private val m = transformMatrix(frame, aspect)
+    override fun getMatrix(presentationTimeUs: Long): Matrix = m
+}
+
 /** Posizione, zoom e rotazione animati. [aspect] = larghezza/altezza del fotogramma finale. */
 class KeyframeTransformation(private val clip: Clip, private val aspect: Float, private val startUs: Long) : MatrixTransformation {
     override fun getMatrix(presentationTimeUs: Long): Matrix {
-        val t = clip.transformAt(presentationTimeUs, startUs)
-        return Matrix().apply {
-            // Coordinate normalizzate (-1..1): la rotazione va fatta in proporzioni reali,
-            // altrimenti l'immagine si deformerebbe.
-            postScale(t.scale, t.scale)
-            postScale(aspect, 1f)
-            postRotate(-t.rotation)
-            postScale(1f / aspect, 1f)
-            postTranslate(2f * t.x, -2f * t.y)
-        }
+        // Coordinate normalizzate (-1..1): la rotazione va fatta in proporzioni reali,
+        // altrimenti l'immagine si deformerebbe.
+        return transformMatrix(clip.transformAt(presentationTimeUs, startUs), aspect)
     }
 }
 

@@ -547,6 +547,15 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         update { it.replaceClip(change(c)) }
     }
 
+    /** Inquadratura fissa della clip selezionata. */
+    fun setFrame(f: Transform) = updateSelected { it.copy(frame = f) }
+
+    /** Copia inquadratura e Adatta/Riempi della clip selezionata su tutte le clip. */
+    fun applyFrameToAll() {
+        val c = selectedClip ?: return
+        update { p -> p.copy(clips = p.clips.map { it.copy(frame = c.frame, fill = c.fill) }) }
+    }
+
     /** Durata di una foto. */
     fun setPhotoDuration(us: Long) = updateSelected { c ->
         val d = us.coerceIn(200_000, Clip.PHOTO_MAX_US)

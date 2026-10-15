@@ -114,7 +114,7 @@ class ScreenshotTest {
             )),
             startPreview = false,
         )
-        compose.setContent { VivoTheme { EditorScreen(vm, initialTool = Tool.DURATION) } }
+        compose.setContent { VivoTheme { EditorScreen(vm, initialTool = Tool.FRAME) } }
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/10_editor_foto.png")
     }
 

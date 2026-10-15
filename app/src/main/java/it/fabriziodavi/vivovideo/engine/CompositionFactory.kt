@@ -20,6 +20,7 @@ import it.fabriziodavi.vivovideo.Look
 import it.fabriziodavi.vivovideo.model.Clip
 import it.fabriziodavi.vivovideo.model.Project
 import it.fabriziodavi.vivovideo.model.SpeedCurve
+import it.fabriziodavi.vivovideo.model.Transform
 import java.io.File
 
 enum class OutputSize(val label: String, val shortSide: Int?) {
@@ -170,6 +171,9 @@ class CompositionFactory(private val context: Context) {
                     outW, outH,
                     if (clip.fill) Presentation.LAYOUT_SCALE_TO_FIT_WITH_CROP else Presentation.LAYOUT_SCALE_TO_FIT,
                 ))
+                if (clip.frame != Transform()) {
+                    add(FrameTransformation(clip.frame, outW.toFloat() / outH))
+                }
                 if (clip.keyframes.isNotEmpty()) {
                     if (clip.keyframes.any { it.value.x != 0f || it.value.y != 0f || it.value.scale != 1f || it.value.rotation != 0f }) {
                         add(KeyframeTransformation(clip, outW.toFloat() / outH, startUs))

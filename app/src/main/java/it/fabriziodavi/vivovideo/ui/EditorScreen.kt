@@ -7,6 +7,7 @@ import it.fabriziodavi.vivovideo.model.MusicTrack
 import it.fabriziodavi.vivovideo.model.SpeedInterp
 import it.fabriziodavi.vivovideo.model.SpeedLimits
 import it.fabriziodavi.vivovideo.model.SpeedPreset
+import it.fabriziodavi.vivovideo.model.Transform
 import it.fabriziodavi.vivovideo.model.TransitionSpec
 import it.fabriziodavi.vivovideo.model.TransitionType
 import android.content.Intent
@@ -100,6 +101,7 @@ enum class Tool(val label: String, val icon: () -> ImageVector, val future: Bool
     EFFECTS("Effetti", { VVIcons.Effects }, future = true),
     TRANSITION("Transizione", { VVIcons.Transition }),
     DURATION("Durata", { VVIcons.Speed }),
+    FRAME("Inquadra", { VVIcons.Fullscreen }),
     TEXT("Testo", { VVIcons.Text }, future = true),
     MUSIC("Musica", { VVIcons.Music }),
     DUPLICATE("Duplica", { VVIcons.Copy }),
@@ -110,11 +112,11 @@ enum class Tool(val label: String, val icon: () -> ImageVector, val future: Bool
 }
 
 private val CLIP_TOOLS = listOf(
-    Tool.SPLIT, Tool.SPEED, Tool.TRANSITION, Tool.KEYFRAME, Tool.AUDIO, Tool.COLOR,
+    Tool.SPLIT, Tool.SPEED, Tool.FRAME, Tool.TRANSITION, Tool.KEYFRAME, Tool.AUDIO, Tool.COLOR,
     Tool.DUPLICATE, Tool.MOVE_LEFT, Tool.MOVE_RIGHT, Tool.DELETE, Tool.EFFECTS,
 )
 private val PHOTO_TOOLS = listOf(
-    Tool.SPLIT, Tool.DURATION, Tool.TRANSITION, Tool.KEYFRAME, Tool.COLOR,
+    Tool.SPLIT, Tool.DURATION, Tool.FRAME, Tool.TRANSITION, Tool.KEYFRAME, Tool.COLOR,
     Tool.DUPLICATE, Tool.MOVE_LEFT, Tool.MOVE_RIGHT, Tool.DELETE, Tool.EFFECTS,
 )
 private val PROJECT_TOOLS = listOf(Tool.ADD, Tool.SPLIT, Tool.TRANSITION, Tool.COLOR, Tool.TEXT, Tool.MUSIC, Tool.EFFECTS)
@@ -130,7 +132,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
     val clip = vm.selectedClip
 
     // Un pannello di clip si chiude se non c'è più una clip selezionata.
-    if (clip == null && (activeTool == Tool.SPEED || activeTool == Tool.AUDIO || activeTool == Tool.KEYFRAME || activeTool == Tool.DURATION)) activeTool = null
+    if (clip == null && (activeTool == Tool.SPEED || activeTool == Tool.AUDIO || activeTool == Tool.KEYFRAME || activeTool == Tool.DURATION || activeTool == Tool.FRAME)) activeTool = null
     // Foto e video hanno strumenti diversi.
     if (clip != null && clip.isPhoto && (activeTool == Tool.SPEED || activeTool == Tool.AUDIO)) activeTool = Tool.DURATION
     if (clip != null && !clip.isPhoto && activeTool == Tool.DURATION) activeTool = Tool.SPEED
@@ -213,8 +215,9 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
             val player = vm.player
             when {
                 player != null -> {
-                    // Con il pannello Keyframe aperto si può pizzicare, trascinare e ruotare il video.
-                    val gestures = activeTool == Tool.KEYFRAME && clip != null && !running
+                    // Con i pannelli Keyframe e Inquadra aperti si può pizzicare, trascinare e ruotare il video.
+                    val framing = activeTool == Tool.FRAME
+                    val gestures = (activeTool == Tool.KEYFRAME || framing) && clip != null && !running
                     AndroidView(
                         factory = { ctx -> PlayerView(ctx).apply { useController = false; setShutterBackgroundColor(android.graphics.Color.BLACK) } },
                         update = { it.player = player },
@@ -242,15 +245,14 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
                                         // Dimensione del video dentro l'anteprima (adattato senza tagli).
                                         val vw = minOf(size.width.toFloat(), size.height * videoAspect)
                                         val vh = vw / videoAspect
-                                        val base = vm.transformAtPlayhead()
-                                        vm.setTransformAtPlayhead(
-                                            base.copy(
-                                                x = (base.x + pan.x / vw).coerceIn(-2f, 2f),
-                                                y = (base.y + pan.y / vh).coerceIn(-2f, 2f),
-                                                scale = (base.scale * zoom).coerceIn(0.2f, 5f),
-                                                rotation = ((base.rotation + rot + 540f) % 360f) - 180f,
-                                            )
+                                        val base = if (framing) vm.selectedClip?.frame ?: Transform() else vm.transformAtPlayhead()
+                                        val next = base.copy(
+                                            x = (base.x + pan.x / vw).coerceIn(-2f, 2f),
+                                            y = (base.y + pan.y / vh).coerceIn(-2f, 2f),
+                                            scale = (base.scale * zoom).coerceIn(0.2f, 5f),
+                                            rotation = ((base.rotation + rot + 540f) % 360f) - 180f,
                                         )
+                                        if (framing) vm.setFrame(next) else vm.setTransformAtPlayhead(next)
                                     }
                                     live = LiveTransform()
                                 }
@@ -332,6 +334,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
             Tool.KEYFRAME -> KeyframePanel(vm, running)
             Tool.TRANSITION -> TransitionPanel(vm, running)
             Tool.DURATION -> PhotoPanel(vm, running)
+            Tool.FRAME -> FramePanel(vm, running)
             Tool.MUSIC -> MusicPanel(vm, running, pickMusic)
             Tool.AUDIO -> AudioPanel(vm, running)
             Tool.COLOR -> ColorPanel(vm, running) { lutPicker.launch(arrayOf("*/*")) }
@@ -788,8 +791,33 @@ private fun PhotoPanel(vm: EditorViewModel, running: Boolean) {
         format = { String.format(java.util.Locale.ITALIAN, "%.1f s", it / 10f) },
     ) { v -> vm.setPhotoDuration(v * 100_000L) }
     ToggleRow("Zoom lento (effetto Ken Burns)", clip.keyframes.isNotEmpty(), enabled) { vm.toggleKenBurns() }
-    ToggleRow("Riempi il quadro (taglia i bordi)", clip.fill, enabled) { v -> vm.updateSelected { it.copy(fill = v) } }
-    Hint("Lo zoom lento usa due keyframe: puoi personalizzarlo dallo strumento Keyframe. Con il taglio a ritmo, la durata si può anche agganciare ai battiti trascinando la maniglia destra.")
+    Hint("Zoom, posizione, rotazione e Adatta/Riempi sono nello strumento Inquadra. Lo zoom lento usa due keyframe: lo personalizzi dallo strumento Keyframe. Con i battiti, trascinando la maniglia destra la durata si aggancia al ritmo.")
+}
+
+@Composable
+private fun FramePanel(vm: EditorViewModel, running: Boolean) {
+    val clip = vm.selectedClip ?: return
+    val enabled = !running
+    val f = clip.frame
+    Segmented(listOf(false, true), clip.fill, { if (it) "Riempi" else "Adatta" }, enabled) { v ->
+        vm.updateSelected { it.copy(fill = v) }
+    }
+    Hint("Pizzica, trascina o ruota l'anteprima con due dita, oppure usa i cursori.")
+    LabeledSlider("Zoom", null, (f.scale * 100).toInt(), enabled, range = 20..400, format = { "$it%" }) {
+        vm.setFrame(f.copy(scale = it / 100f))
+    }
+    LabeledSlider("Orizzontale", null, (f.x * 100).toInt(), enabled, range = -100..100) { vm.setFrame(f.copy(x = it / 100f)) }
+    LabeledSlider("Verticale", null, (f.y * 100).toInt(), enabled, range = -100..100) { vm.setFrame(f.copy(y = it / 100f)) }
+    LabeledSlider("Rotazione", null, f.rotation.toInt(), enabled, range = -180..180, format = { "$it°" }) {
+        vm.setFrame(f.copy(rotation = it.toFloat()))
+    }
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        SecondaryButton("Ruota 90°", onClick = {
+            if (enabled) vm.setFrame(f.copy(rotation = ((f.rotation + 90f + 540f) % 360f) - 180f))
+        })
+        SecondaryButton("Reimposta", onClick = { if (enabled) { vm.setFrame(Transform()); vm.updateSelected { it.copy(fill = false) } } })
+    }
+    SecondaryButton("Applica a tutte le clip", onClick = { if (enabled) vm.applyFrameToAll() })
 }
 
 @Composable
