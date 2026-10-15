@@ -28,9 +28,9 @@ object Thumbnails {
         return withContext(Dispatchers.IO) {
             lock.withLock {
                 cache.get(k)?.let { return@withLock it }
-                val r = retrievers.getOrPut(uri) {
+                val r = retrievers[uri] ?: runCatching {
                     MediaMetadataRetriever().apply { setDataSource(context, Uri.parse(uri)) }
-                }
+                }.getOrNull()?.also { retrievers[uri] = it } ?: return@withLock null
                 val frame = runCatching {
                     r.getScaledFrameAtTime(timeUs, MediaMetadataRetriever.OPTION_CLOSEST_SYNC, heightPx * 2, heightPx)
                 }.getOrNull() ?: return@withLock null

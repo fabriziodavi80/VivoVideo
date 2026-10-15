@@ -69,12 +69,12 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         addClips(uris)
     }
 
-    fun openProject(p: Project) {
+    fun openProject(p: Project, startPreview: Boolean = true) {
         project = p
         undoStack.clear(); redoStack.clear(); updateUndoFlags()
         selectedClipId = p.clips.firstOrNull()?.id
         exportState = ExportState.Idle
-        rebuildPreview(0)
+        if (startPreview) rebuildPreview(0)
     }
 
     fun closeProject() {

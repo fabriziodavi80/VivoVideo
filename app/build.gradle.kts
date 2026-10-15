@@ -3,6 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
     id("org.jetbrains.kotlin.plugin.serialization")
+    id("io.github.takahirom.roborazzi")
 }
 
 val buildNumber = (System.getenv("GITHUB_RUN_NUMBER") ?: "1").toInt()
@@ -55,6 +56,13 @@ android {
         compose = true
     }
 
+    // Le schermate dell'app vengono "fotografate" nei test (Robolectric + Roborazzi).
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
+
     lint {
         checkReleaseBuilds = false
         abortOnError = false
@@ -86,4 +94,11 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
 
     testImplementation("junit:junit:4.13.2")
+    testImplementation(platform("androidx.compose:compose-bom:2025.09.00"))
+    testImplementation("androidx.compose.ui:ui-test-junit4")
+    testImplementation("org.robolectric:robolectric:4.17")
+    testImplementation("io.github.takahirom.roborazzi:roborazzi:1.74.0")
+    testImplementation("io.github.takahirom.roborazzi:roborazzi-compose:1.74.0")
+    testImplementation("androidx.test.ext:junit:1.2.1")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
 }

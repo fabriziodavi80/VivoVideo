@@ -95,13 +95,13 @@ private val CLIP_TOOLS = listOf(
 private val PROJECT_TOOLS = listOf(Tool.ADD, Tool.SPLIT, Tool.COLOR, Tool.TEXT, Tool.MUSIC, Tool.EFFECTS)
 
 @Composable
-fun EditorScreen(vm: EditorViewModel) {
+fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
     val project = vm.project ?: return
     val context = LocalContext.current
     val running = vm.exportState is ExportState.Running
     var zoom by remember { mutableIntStateOf(2) }
     var renaming by remember { mutableStateOf(false) }
-    var activeTool by remember { mutableStateOf<Tool?>(null) }
+    var activeTool by remember { mutableStateOf(initialTool) }
     val clip = vm.selectedClip
 
     // Un pannello di clip si chiude se non c'è più una clip selezionata.
