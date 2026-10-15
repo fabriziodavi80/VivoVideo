@@ -30,6 +30,8 @@ import androidx.media3.transformer.CompositionPlayer
 import it.fabriziodavi.vivovideo.CubeLut
 import it.fabriziodavi.vivovideo.decodeAudioRange
 import it.fabriziodavi.vivovideo.engine.BeatDetector
+import it.fabriziodavi.vivovideo.engine.Midi
+import it.fabriziodavi.vivovideo.writeWavFile
 import it.fabriziodavi.vivovideo.engine.CompositionFactory
 import it.fabriziodavi.vivovideo.engine.ExportOptions
 import it.fabriziodavi.vivovideo.engine.ExportState
@@ -203,13 +205,34 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             val track = withContext(Dispatchers.IO) {
                 runCatching { ctx.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
                 runCatching {
-                    val (name, durUs) = readAudioInfo(ctx, uri)
+                    val (name, infoUs) = readAudioInfo(ctx, uri)
                     val total = p.durationUs
                     val start = if (total - playheadUs < 1_000_000) 0L else playheadUs
-                    MusicTrack(
-                        uri = uri.toString(), name = name, sourceDurationUs = durUs,
-                        startUs = start, lengthUs = minOf(durUs, total - start),
-                    )
+                    val head = ctx.contentResolver.openInputStream(uri)?.use { s -> ByteArray(16).also { s.read(it) } }
+                    val bytes = if (head != null && Midi.isMidi(head)) ctx.contentResolver.openInputStream(uri)?.use { it.readBytes() } else null
+                    if (bytes != null) {
+                        // MIDI: lo suona il sintetizzatore di Android e lo si salva come WAV;
+                        // tempo e battiti si leggono esatti dal file.
+                        withContext(Dispatchers.Main) { busy = "Conversione del MIDI…" }
+                        val pcm = decodeAudioRange(ctx, uri, 0, Long.MAX_VALUE / 4) ?: error("MIDI non riproducibile")
+                        if (pcm.size < 2 * 4800) error("MIDI vuoto")
+                        val dir = File(ctx.filesDir, "music").apply { mkdirs() }
+                        val wav = File(dir, "midi_${System.currentTimeMillis()}.wav")
+                        writeWavFile(wav, pcm)
+                        val durUs = pcm.size / 2 * 1_000_000L / 48_000
+                        val midi = Midi.parse(bytes)
+                        MusicTrack(
+                            uri = Uri.fromFile(wav).toString(), name = name, sourceDurationUs = durUs,
+                            startUs = start, lengthUs = minOf(durUs, total - start),
+                            beatsUs = midi?.beatsUs?.filter { it < durUs }.orEmpty(),
+                            bpm = midi?.bpm ?: 0f,
+                        )
+                    } else {
+                        MusicTrack(
+                            uri = uri.toString(), name = name, sourceDurationUs = infoUs,
+                            startUs = start, lengthUs = minOf(infoUs, total - start),
+                        )
+                    }
                 }.getOrNull()
             }
             busy = null

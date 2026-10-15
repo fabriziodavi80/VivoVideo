@@ -115,6 +115,14 @@ private fun mixTrack(context: Context, raf: RandomAccessFile, totalFrames: Long,
     }
 }
 
+/** Scrive un WAV stereo a 48 kHz (16 bit). */
+fun writeWavFile(file: File, stereo: FloatArray) {
+    BufferedOutputStream(FileOutputStream(file), 1 shl 16).use { out ->
+        out.write(wavHeader((stereo.size / OUT_CH).toLong()))
+        writePcm16(out, stereo)
+    }
+}
+
 private fun writePcm16(out: BufferedOutputStream, samples: FloatArray) {
     val chunk = ByteBuffer.allocate(1 shl 16).order(ByteOrder.LITTLE_ENDIAN)
     for (v in samples) {
