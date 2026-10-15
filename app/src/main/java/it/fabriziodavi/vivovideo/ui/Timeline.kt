@@ -204,7 +204,11 @@ private fun Ruler(durationUs: Long, dpPerSecond: Float) {
             drawLine(Color(0xFF3A404A), Offset(x, size.height), Offset(x, size.height - h), 1.dp.toPx())
             if (major) {
                 val s = t.toInt()
-                drawText(measurer, "${s / 60}:%02d".format(s % 60), Offset(x + 3.dp.toPx(), 2.dp.toPx()), style)
+                // Misura senza vincoli: vicino al bordo destro lo spazio residuo sarebbe negativo.
+                val layout = measurer.measure("${s / 60}:%02d".format(s % 60), style)
+                if (x + 3.dp.toPx() + layout.size.width <= size.width) {
+                    drawText(layout, topLeft = Offset(x + 3.dp.toPx(), 2.dp.toPx()))
+                }
             }
             t += minorStep
         }
