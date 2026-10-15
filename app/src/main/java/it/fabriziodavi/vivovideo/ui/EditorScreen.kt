@@ -38,6 +38,8 @@ import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -250,7 +252,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
                     Modifier.align(Alignment.BottomCenter).fillMaxWidth()
                         .background(androidx.compose.ui.graphics.Brush.verticalGradient(listOf(Color.Transparent, Color(0xB3000000))))
                         // Mai sotto i tasti di navigazione di Android (se visibili).
-                        .windowInsetsPadding(androidx.compose.foundation.layout.WindowInsets.safeDrawing)
+                        .windowInsetsPadding(WindowInsets.safeDrawing)
                         .padding(horizontal = 14.dp, vertical = 8.dp)
                 ) {
                     Box(Modifier.align(Alignment.CenterStart)) { timecode() }
