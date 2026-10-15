@@ -310,7 +310,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
                 transport()
                 timeline()
                 activeTool?.let { t ->
-                    Column(Modifier.fillMaxWidth().heightIn(max = 270.dp).background(VV.Panel)) {
+                    Column(Modifier.fillMaxWidth().heightIn(max = 340.dp).background(VV.Panel)) {
                         Box(Modifier.fillMaxWidth().height(1.dp).background(VV.Line))
                         panelHeader(t)
                         Column(
