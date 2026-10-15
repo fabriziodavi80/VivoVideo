@@ -57,6 +57,8 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     var project by mutableStateOf<Project?>(null)
         private set
     var selectedClipId by mutableStateOf<String?>(null)
+    /** Anteprima a schermo intero (nasconde anche le barre di sistema). */
+    var fullscreen by mutableStateOf(false)
     var message by mutableStateOf<String?>(null)
     var busy by mutableStateOf<String?>(null)
         private set
@@ -86,6 +88,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun closeProject() {
+        fullscreen = false
         project?.let { store.save(it) }
         releasePlayer()
         project = null

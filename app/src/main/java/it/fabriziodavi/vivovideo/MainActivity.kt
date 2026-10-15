@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
                 // In orizzontale nell'editor le barre di sistema si nascondono (riappaiono scorrendo dal bordo).
                 val landscape = androidx.compose.ui.platform.LocalConfiguration.current.orientation ==
                     android.content.res.Configuration.ORIENTATION_LANDSCAPE
-                val immersive = landscape && vm.project != null
+                val immersive = vm.project != null && (landscape || vm.fullscreen)
                 LaunchedEffect(immersive) {
                     val c = androidx.core.view.WindowCompat.getInsetsController(window, window.decorView)
                     c.systemBarsBehavior = androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
