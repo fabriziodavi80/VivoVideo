@@ -70,7 +70,8 @@ object BeatDetector {
                 val d = m - prev[b]
                 if (d > 0) flux += d
             }
-            env[f] = flux
+            // I primi frame vedono l'inizio del file (dal nulla al suono): non è un attacco musicale.
+            env[f] = if (f <= NFFT / HOP) 0f else flux
             prev = cur
         }
         // Toglie l'andamento lento (media mobile di ~0,5 s) e normalizza.
