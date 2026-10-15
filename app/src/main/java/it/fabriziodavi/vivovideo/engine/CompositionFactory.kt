@@ -207,7 +207,7 @@ class CompositionFactory(private val context: Context) {
                         .build()
                 )
                 .build()
-            val effects = if (light) listOf(Presentation.createForWidthAndHeight(outW, outH, Presentation.LAYOUT_SCALE_TO_FIT)) else buildList {
+            val effects: List<Effect> = if (light) listOf(Presentation.createForWidthAndHeight(outW, outH, Presentation.LAYOUT_SCALE_TO_FIT)) else buildList<Effect> {
                 addAll(colorEffects(clip, project))
                 add(Presentation.createForWidthAndHeight(
                     outW, outH,
