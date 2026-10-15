@@ -178,3 +178,30 @@ fun describeEncoders(): String {
     }
     return lines.joinToString("\n")
 }
+
+/** Nome leggibile (senza estensione) e durata in µs di un file audio. */
+fun readAudioInfo(context: Context, uri: Uri): Pair<String, Long> {
+    val name = runCatching {
+        context.contentResolver.query(uri, arrayOf(android.provider.OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c ->
+            if (c.moveToFirst()) c.getString(0) else null
+        }
+    }.getOrNull()?.substringBeforeLast('.')?.takeIf { it.isNotBlank() } ?: "Musica"
+    val r = MediaMetadataRetriever()
+    var durUs = try {
+        r.setDataSource(context, uri)
+        (r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull() ?: 0L) * 1000
+    } catch (e: Exception) { 0L } finally { r.release() }
+    if (durUs <= 0) {
+        val ex = MediaExtractor()
+        try {
+            ex.setDataSource(context, uri, null)
+            for (i in 0 until ex.trackCount) {
+                val f = ex.getTrackFormat(i)
+                if (f.getString(MediaFormat.KEY_MIME)?.startsWith("audio/") == true && f.containsKey(MediaFormat.KEY_DURATION)) {
+                    durUs = f.getLong(MediaFormat.KEY_DURATION); break
+                }
+            }
+        } finally { ex.release() }
+    }
+    return name to durUs
+}

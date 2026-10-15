@@ -166,6 +166,41 @@ data class ColorSettings(
     val lutName: String? = null,
 )
 
+/** Brano musicale sulla timeline: suona da [startUs] per [lengthUs], partendo da [offsetUs] nel file. */
+@Serializable
+data class MusicTrack(
+    val id: String = UUID.randomUUID().toString(),
+    val uri: String,
+    val name: String,
+    val sourceDurationUs: Long,
+    val startUs: Long = 0,
+    val offsetUs: Long = 0,
+    val lengthUs: Long = sourceDurationUs,
+    /** 1 = invariato, da 0 a 2. */
+    val volume: Float = 1f,
+    val fadeInUs: Long = 0,
+    val fadeOutUs: Long = 0,
+) {
+    val endUs: Long get() = startUs + lengthUs
+
+    /** Durata che suona davvero: si ferma alla fine del video. */
+    fun playUs(projectUs: Long): Long = minOf(lengthUs, projectUs - startUs).coerceAtLeast(0)
+
+    /** Guadagno (volume e dissolvenze) a [t] µs dall'inizio del brano sulla timeline. */
+    fun gainAt(t: Long, projectUs: Long): Float {
+        val len = playUs(projectUs)
+        var g = volume
+        if (fadeInUs > 0 && t < fadeInUs) g *= (t.toFloat() / fadeInUs).coerceIn(0f, 1f)
+        val fo = minOf(fadeOutUs, len)
+        if (fo > 0 && t > len - fo) g *= ((len - t).toFloat() / fo).coerceIn(0f, 1f)
+        return g
+    }
+
+    companion object {
+        const val MIN_US = 500_000L
+    }
+}
+
 @Serializable
 data class Project(
     val id: String = UUID.randomUUID().toString(),
@@ -174,8 +209,27 @@ data class Project(
     val updatedAt: Long = System.currentTimeMillis(),
     val clips: List<Clip> = emptyList(),
     val color: ColorSettings = ColorSettings(),
+    val music: List<MusicTrack> = emptyList(),
 ) {
     val durationUs: Long get() = clips.sumOf { it.outputUs }
+
+    /** Brani che suonano davvero (dentro la durata del video). */
+    fun audibleMusic(): List<MusicTrack> = durationUs.let { d -> music.filter { it.startUs < d && it.playUs(d) > 0 } }
+
+    /**
+     * Distribuisce i brani su righe senza sovrapposizioni (per la timeline e per l'anteprima):
+     * ogni riga è una lista ordinata per inizio.
+     */
+    fun musicLanes(tracks: List<MusicTrack> = music): List<List<MusicTrack>> {
+        val lanes = mutableListOf<MutableList<MusicTrack>>()
+        tracks.sortedBy { it.startUs }.forEach { t ->
+            val lane = lanes.firstOrNull { it.last().endUs <= t.startUs }
+            if (lane != null) lane += t else lanes += mutableListOf(t)
+        }
+        return lanes
+    }
+
+    fun replaceMusic(t: MusicTrack): Project = copy(music = music.map { if (it.id == t.id) t else it })
 
     /** Inizio di ogni clip sulla timeline finale. */
     fun clipStartsUs(): List<Long> {
@@ -244,7 +298,7 @@ data class Project(
             clip.keyframes.filter { it.timeUs < local } + Keyframe(local, atCut)
         val k2 = if (clip.keyframes.isEmpty()) emptyList() else
             listOf(Keyframe(0, atCut)) + clip.keyframes.filter { it.timeUs > local }.map { it.copy(timeUs = it.timeUs - local) }
-        var first = clip.copy(trimEndUs = cut, keyframes = k1)
+        var first = clip.copy(trimEndUs = cut, keyframes = k1, transitionOut = null)
         var second = clip.copy(id = UUID.randomUUID().toString(), trimStartUs = cut, keyframes = k2)
         if (clip.speed == ClipSpeed.RAMP) {
             // La curva si divide in due: ogni metà conserva la sua parte di curva.

@@ -104,6 +104,36 @@ class CompositionFactory(private val context: Context) {
         return even((w * scale).toLong()) to even((h * scale).toLong())
     }
 
+    private fun musicSequences(project: Project): List<EditedMediaItemSequence> {
+        val total = project.durationUs
+        return project.musicLanes(project.audibleMusic()).map { lane ->
+            val b = EditedMediaItemSequence.Builder(setOf(C.TRACK_TYPE_AUDIO))
+            var cursor = 0L
+            lane.forEach { t ->
+                if (t.startUs - cursor > 1_000) b.addGap(t.startUs - cursor)
+                val len = t.playUs(total)
+                val item = MediaItem.Builder()
+                    .setUri(Uri.parse(t.uri))
+                    .setClippingConfiguration(
+                        MediaItem.ClippingConfiguration.Builder()
+                            .setStartPositionUs(t.offsetUs)
+                            .setEndPositionUs(t.offsetUs + len)
+                            .build()
+                    )
+                    .build()
+                b.addItem(
+                    EditedMediaItem.Builder(item)
+                        .setDurationUs(t.sourceDurationUs)
+                        .setRemoveVideo(true)
+                        .setEffects(Effects(volumeProcessors(t.volume), emptyList()))
+                        .build()
+                )
+                cursor = maxOf(cursor, t.startUs) + len
+            }
+            b.build()
+        }
+    }
+
     /**
      * @param forPreview anteprima: audio di Media3 (tono mantenuto) e risoluzione ridotta.
      * @param nativeAudio WAV della colonna sonora già pronta (solo export), o null.
@@ -168,6 +198,9 @@ class CompositionFactory(private val context: Context) {
         } else {
             sequences += EditedMediaItemSequence.Builder(setOf(C.TRACK_TYPE_AUDIO, C.TRACK_TYPE_VIDEO))
                 .addItems(items).build()
+            // Musica (anteprima): una sequenza solo audio per riga, con pause fino a ogni brano.
+            // Le dissolvenze si applicano nel video esportato.
+            sequences += musicSequences(project)
         }
         // Tutto in SDR: i filtri e le LUT sono pensati per colori normali.
         return Composition.Builder(sequences)

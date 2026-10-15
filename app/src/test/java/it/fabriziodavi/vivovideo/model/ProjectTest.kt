@@ -135,4 +135,20 @@ class ProjectTest {
         assertEquals(0L, p.transitionHalfUs(1)) // ultima clip: nessuna successiva
         assertEquals(p, Project.fromJson(p.toJson()))
     }
+
+    @Test fun musicLanesAndGain() {
+        val clip = Clip(uri = "a", sourceDurationUs = 10_000_000)
+        val a = MusicTrack(uri = "m", name = "A", sourceDurationUs = 60_000_000, startUs = 0, lengthUs = 6_000_000, fadeInUs = 1_000_000, fadeOutUs = 2_000_000)
+        val b = a.copy(id = "b", startUs = 4_000_000, lengthUs = 20_000_000, fadeInUs = 0, fadeOutUs = 0)
+        val c = a.copy(id = "c", startUs = 6_000_000, lengthUs = 1_000_000)
+        val p = Project(name = "t", clips = listOf(clip), music = listOf(a, b, c))
+        val lanes = p.musicLanes()
+        assertEquals(2, lanes.size)
+        assertEquals(listOf("A", "A"), lanes[0].map { it.name })
+        // b si ferma alla fine del video.
+        assertEquals(6_000_000, b.playUs(p.durationUs))
+        assertEquals(0.5f, a.gainAt(500_000, p.durationUs), 0.001f)
+        assertEquals(1f, a.gainAt(3_000_000, p.durationUs), 0.001f)
+        assertEquals(0.5f, a.gainAt(5_000_000, p.durationUs), 0.001f)
+    }
 }

@@ -7,6 +7,7 @@ import it.fabriziodavi.vivovideo.model.ColorSettings
 import it.fabriziodavi.vivovideo.model.Easing
 import it.fabriziodavi.vivovideo.model.Keyframe
 import it.fabriziodavi.vivovideo.model.Keyframes
+import it.fabriziodavi.vivovideo.model.MusicTrack
 import it.fabriziodavi.vivovideo.model.Project
 import it.fabriziodavi.vivovideo.model.ProjectStore
 import it.fabriziodavi.vivovideo.model.SpeedInterp
@@ -31,6 +32,7 @@ import it.fabriziodavi.vivovideo.engine.CompositionFactory
 import it.fabriziodavi.vivovideo.engine.ExportOptions
 import it.fabriziodavi.vivovideo.engine.ExportState
 import it.fabriziodavi.vivovideo.engine.Exporter
+import it.fabriziodavi.vivovideo.readAudioInfo
 import it.fabriziodavi.vivovideo.readVideoInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -57,7 +59,16 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     // ---------------- Progetto aperto ----------------
     var project by mutableStateOf<Project?>(null)
         private set
-    var selectedClipId by mutableStateOf<String?>(null)
+    private var selectedClipState by mutableStateOf<String?>(null)
+    /** Clip selezionata; selezionarne una toglie la selezione dal brano musicale. */
+    var selectedClipId: String?
+        get() = selectedClipState
+        set(v) { selectedClipState = v; if (v != null) selectedMusicId = null }
+    /** Brano musicale selezionato; selezionarlo toglie la selezione dalla clip. */
+    private var selectedMusicState by mutableStateOf<String?>(null)
+    var selectedMusicId: String?
+        get() = selectedMusicState
+        set(v) { selectedMusicState = v; if (v != null) selectedClipState = null }
     /** Anteprima a schermo intero (nasconde anche le barre di sistema). */
     var fullscreen by mutableStateOf(false)
     var message by mutableStateOf<String?>(null)
@@ -72,6 +83,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         private set
 
     val selectedClip: Clip? get() = project?.clips?.firstOrNull { it.id == selectedClipId }
+    val selectedMusic: MusicTrack? get() = project?.music?.firstOrNull { it.id == selectedMusicId }
 
     fun newProject(uris: List<Uri>) {
         val n = projects.size + 1
@@ -173,6 +185,63 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                 updateColor(keepUndo = false) { it.copy(denoise = 40) }
             }
         }
+    }
+
+    // ---------------- Musica ----------------
+
+    /** Aggiunge un brano che parte dall'indicatore (o dall'inizio, se l'indicatore è in fondo). */
+    fun addMusic(uri: Uri) {
+        val ctx = getApplication<Application>()
+        val p = project ?: return
+        if (p.clips.isEmpty()) { message = "Aggiungi prima un video."; return }
+        viewModelScope.launch {
+            busy = "Lettura del brano…"
+            val track = withContext(Dispatchers.IO) {
+                runCatching { ctx.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
+                runCatching {
+                    val (name, durUs) = readAudioInfo(ctx, uri)
+                    val total = p.durationUs
+                    val start = if (total - playheadUs < 1_000_000) 0L else playheadUs
+                    MusicTrack(
+                        uri = uri.toString(), name = name, sourceDurationUs = durUs,
+                        startUs = start, lengthUs = minOf(durUs, total - start),
+                    )
+                }.getOrNull()
+            }
+            busy = null
+            if (track == null || track.sourceDurationUs <= 0) { message = "Questo file audio non si può leggere."; return@launch }
+            update { it.copy(music = it.music + track) }
+            selectedMusicId = track.id
+        }
+    }
+
+    fun updateMusic(keepUndo: Boolean = true, change: (MusicTrack) -> MusicTrack) {
+        val t = selectedMusic ?: return
+        update(keepUndo) { it.replaceMusic(change(t)) }
+    }
+
+    /** Modifica di un brano qualsiasi (trascinamento sulla timeline). */
+    fun setMusic(t: MusicTrack) = update { it.replaceMusic(t) }
+
+    internal fun setMusicForTest(list: List<MusicTrack>) = update { it.copy(music = list) }
+
+    fun deleteMusic() {
+        val id = selectedMusicId ?: return
+        update { p -> p.copy(music = p.music.filterNot { it.id == id }) }
+        selectedMusicId = null
+    }
+
+    /** Divide il brano selezionato nel punto dell'indicatore. */
+    fun splitMusicAtPlayhead() {
+        val t = selectedMusic ?: return
+        val cut = playheadUs - t.startUs
+        if (cut < MusicTrack.MIN_US || t.lengthUs - cut < MusicTrack.MIN_US) {
+            message = "Porta l'indicatore dentro il brano, lontano dai bordi."; return
+        }
+        val a = t.copy(lengthUs = cut, fadeOutUs = 0)
+        val b = t.copy(id = java.util.UUID.randomUUID().toString(), startUs = t.startUs + cut, offsetUs = t.offsetUs + cut, lengthUs = t.lengthUs - cut, fadeInUs = 0)
+        update { p -> p.copy(music = p.music.flatMap { if (it.id == t.id) listOf(a, b) else listOf(it) }) }
+        selectedMusicId = b.id
     }
 
     fun splitAtPlayhead() {

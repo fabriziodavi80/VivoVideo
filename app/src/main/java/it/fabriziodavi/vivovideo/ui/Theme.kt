@@ -30,6 +30,8 @@ object VV {
     val Wave = Color(0xFF5D8A8F)
     val WaveBg = Color(0xFF1F2A2C)
     val Danger = Color(0xFFE5484D)
+    val Music = Color(0xFF9C8BD9)
+    val MusicBg = Color(0xFF26223A)
 }
 
 val Plex = FontFamily(

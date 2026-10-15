@@ -2,6 +2,7 @@ package it.fabriziodavi.vivovideo.ui
 
 import it.fabriziodavi.vivovideo.model.ClipSpeed
 import it.fabriziodavi.vivovideo.model.Easing
+import it.fabriziodavi.vivovideo.model.MusicTrack
 import it.fabriziodavi.vivovideo.model.SpeedInterp
 import it.fabriziodavi.vivovideo.model.SpeedLimits
 import it.fabriziodavi.vivovideo.model.SpeedPreset
@@ -98,7 +99,7 @@ enum class Tool(val label: String, val icon: () -> ImageVector, val future: Bool
     EFFECTS("Effetti", { VVIcons.Effects }, future = true),
     TRANSITION("Transizione", { VVIcons.Transition }),
     TEXT("Testo", { VVIcons.Text }, future = true),
-    MUSIC("Musica", { VVIcons.Music }, future = true),
+    MUSIC("Musica", { VVIcons.Music }),
     DUPLICATE("Duplica", { VVIcons.Copy }),
     MOVE_LEFT("Indietro", { VVIcons.MoveLeft }),
     MOVE_RIGHT("Avanti", { VVIcons.MoveRight }),
@@ -137,13 +138,17 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
     val lutPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) vm.importLut(uri)
     }
+    val musicPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) { vm.addMusic(uri); activeTool = Tool.MUSIC }
+    }
+    val pickMusic = { musicPicker.launch(arrayOf("audio/*")) }
     val pickVideos = { picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.VideoOnly)) }
 
     fun onTool(t: Tool) {
         if (t.future) { vm.message = "\"${t.label}\" arriverà nelle prossime versioni: lo spazio è già pronto."; return }
         when (t) {
             Tool.ADD -> pickVideos()
-            Tool.SPLIT -> vm.splitAtPlayhead()
+            Tool.SPLIT -> if (vm.selectedMusicId != null) vm.splitMusicAtPlayhead() else vm.splitAtPlayhead()
             Tool.DUPLICATE -> vm.duplicateSelected()
             Tool.MOVE_LEFT -> vm.moveSelected(-1)
             Tool.MOVE_RIGHT -> vm.moveSelected(+1)
@@ -291,9 +296,13 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
             dpPerSecond = ZOOMS[zoom],
             onSeek = vm::seekTo,
             onScrubStart = vm::pause,
-            onSelect = { vm.selectedClipId = it },
+            onSelect = { vm.selectedClipId = it; if (it == null) vm.selectedMusicId = null },
             onTrim = { id, s, e -> vm.trimClip(id, s, e) },
             onAdd = pickVideos,
+            selectedMusicId = vm.selectedMusicId,
+            onSelectMusic = { vm.selectedMusicId = it; activeTool = Tool.MUSIC },
+            onMusicChange = vm::setMusic,
+            onAddMusic = pickMusic,
         )
     }
 
@@ -313,6 +322,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
             Tool.SPEED -> SpeedPanel(vm, running)
             Tool.KEYFRAME -> KeyframePanel(vm, running)
             Tool.TRANSITION -> TransitionPanel(vm, running)
+            Tool.MUSIC -> MusicPanel(vm, running, pickMusic)
             Tool.AUDIO -> AudioPanel(vm, running)
             Tool.COLOR -> ColorPanel(vm, running) { lutPicker.launch(arrayOf("*/*")) }
             Tool.EXPORT -> ExportPanel(vm) { uri ->
@@ -652,6 +662,64 @@ private fun TransitionPanel(vm: EditorViewModel, running: Boolean) {
         SecondaryButton("Applica a tutti i tagli", onClick = { vm.setTransitionAll(spec) })
     }
     Hint("Metà effetto alla fine di questa clip, metà all'inizio della successiva.")
+}
+
+@Composable
+private fun MusicPanel(vm: EditorViewModel, running: Boolean, onAdd: () -> Unit) {
+    val p = vm.project ?: return
+    val t = vm.selectedMusic
+    val enabled = !running
+    if (t == null) {
+        if (p.music.isEmpty()) {
+            Hint("Scegli un brano dal telefono (MP3, M4A, WAV, FLAC…): parte dal punto dell'indicatore e si ferma alla fine del video.")
+        } else {
+            PanelLabel("Brani nel progetto")
+            PillRow(p.music, null as MusicTrack?, { it?.name ?: "" }, enabled) { m -> if (m != null) vm.selectedMusicId = m.id }
+        }
+        SecondaryButton(if (p.music.isEmpty()) "Aggiungi musica" else "Aggiungi un altro brano", onClick = { if (enabled) onAdd() })
+        return
+    }
+    val total = p.durationUs
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(VVIcons.Music, null, tint = VV.Music, modifier = Modifier.size(16.dp))
+        Spacer(Modifier.width(8.dp))
+        Text(t.name, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+        Text(formatTime(t.playUs(total)), style = MaterialTheme.typography.bodySmall)
+    }
+    LabeledSlider("Volume", null, (t.volume * 100).toInt(), enabled, range = 0..200, format = { "$it%" }) { v ->
+        vm.updateMusic { it.copy(volume = v / 100f) }
+    }
+    val secs = { v: Int -> String.format(java.util.Locale.ITALIAN, "%.1f s", v / 10f) }
+    LabeledSlider("Dissolvenza in entrata", null, (t.fadeInUs / 100_000).toInt(), enabled, range = 0..100, format = secs) { v ->
+        vm.updateMusic { it.copy(fadeInUs = v * 100_000L) }
+    }
+    LabeledSlider("Dissolvenza in uscita", null, (t.fadeOutUs / 100_000).toInt(), enabled, range = 0..100, format = secs) { v ->
+        vm.updateMusic { it.copy(fadeOutUs = v * 100_000L) }
+    }
+    val maxOffset = ((t.sourceDurationUs - MusicTrack.MIN_US) / 100_000).toInt().coerceAtLeast(0)
+    LabeledSlider(
+        "Parti dal punto del brano", "Per far partire la musica dal ritornello o da un altro punto.",
+        (t.offsetUs / 100_000).toInt().coerceAtMost(maxOffset), enabled && maxOffset > 0, range = 0..maxOf(maxOffset, 1),
+        format = { formatTime(it * 100_000L) },
+    ) { v ->
+        vm.updateMusic { m ->
+            val off = v * 100_000L
+            m.copy(offsetUs = off, lengthUs = minOf(m.lengthUs, m.sourceDurationUs - off).coerceAtLeast(MusicTrack.MIN_US))
+        }
+    }
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        SecondaryButton("Inizia da qui", onClick = {
+            if (enabled) vm.updateMusic { it.copy(startUs = vm.playheadUs.coerceIn(0, (total - MusicTrack.MIN_US).coerceAtLeast(0))) }
+        })
+        SecondaryButton("Fino alla fine", onClick = {
+            if (enabled) vm.updateMusic { it.copy(lengthUs = (it.sourceDurationUs - it.offsetUs).coerceAtLeast(MusicTrack.MIN_US)) }
+        })
+    }
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        SecondaryButton("Dividi qui", onClick = { if (enabled) vm.splitMusicAtPlayhead() })
+        SecondaryButton("Elimina brano", onClick = { if (enabled) vm.deleteMusic() })
+    }
+    Hint("Tocca il brano nella timeline per selezionarlo: trascinalo per spostarlo, usa le maniglie per accorciarlo. Le dissolvenze si sentono nel video esportato.")
 }
 
 @Composable

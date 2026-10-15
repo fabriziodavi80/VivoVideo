@@ -6,6 +6,7 @@ import android.media.MediaCodec
 import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.net.Uri
+import it.fabriziodavi.vivovideo.model.MusicTrack
 import it.fabriziodavi.vivovideo.model.Project
 import java.io.BufferedOutputStream
 import java.io.File
@@ -37,6 +38,7 @@ private const val OUT_CH = 2
  * per ogni clip decodifica il tratto tagliato, lo allunga/accorcia con la sua curva
  * di velocità e lo accoda in un unico WAV stereo a 48 kHz.
  * Clip mute o senza audio diventano silenzio della durata giusta, così tutto resta in sincrono.
+ * Alla fine vi somma i brani musicali.
  */
 fun renderTimelineAudio(context: Context, project: Project, onProgress: (Float) -> Unit = {}): File {
     val file = File(context.cacheDir, "timeline_${System.currentTimeMillis()}.wav")
@@ -65,11 +67,52 @@ fun renderTimelineAudio(context: Context, project: Project, onProgress: (Float) 
             if (samples.size != needed) samples = samples.copyOf(needed)
             writePcm16(out, samples)
             frames += target
-            onProgress((i + 1f) / project.clips.size)
+            onProgress((i + 1f) / project.clips.size * if (project.music.isEmpty()) 1f else 0.6f)
         }
     }
-    RandomAccessFile(file, "rw").use { raf -> raf.write(wavHeader(frames)) }
+    RandomAccessFile(file, "rw").use { raf ->
+        raf.write(wavHeader(frames))
+        val tracks = project.audibleMusic()
+        tracks.forEachIndexed { k, t ->
+            mixTrack(context, raf, frames, t, project.durationUs)
+            onProgress(0.6f + 0.4f * (k + 1) / tracks.size)
+        }
+    }
     return file
+}
+
+/** Somma un brano (con volume e dissolvenze) nel WAV già scritto, a blocchi. */
+private fun mixTrack(context: Context, raf: RandomAccessFile, totalFrames: Long, t: MusicTrack, projectUs: Long) {
+    val len = t.playUs(projectUs)
+    val audio = runCatching {
+        decodeAudioRange(context, Uri.parse(t.uri), t.offsetUs, t.offsetUs + len)
+    }.getOrNull() ?: return
+    val startFrame = t.startUs * OUT_RATE / 1_000_000
+    val frames = minOf((audio.size / OUT_CH).toLong(), totalFrames - startFrame, len * OUT_RATE / 1_000_000)
+    if (frames <= 0) return
+    val blockFrames = 1 shl 14
+    val bytes = ByteArray(blockFrames * OUT_CH * 2)
+    var done = 0L
+    while (done < frames) {
+        val n = minOf(blockFrames.toLong(), frames - done).toInt()
+        val pos = 44 + (startFrame + done) * OUT_CH * 2
+        raf.seek(pos)
+        raf.readFully(bytes, 0, n * OUT_CH * 2)
+        val bb = ByteBuffer.wrap(bytes, 0, n * OUT_CH * 2).order(ByteOrder.LITTLE_ENDIAN)
+        for (f in 0 until n) {
+            val fi = done + f
+            val g = t.gainAt(fi * 1_000_000 / OUT_RATE, projectUs)
+            for (c in 0 until OUT_CH) {
+                val idx = (f * OUT_CH + c) * 2
+                val cur = bb.getShort(idx) / 32768f
+                val v = (cur + audio[(fi * OUT_CH + c).toInt()] * g).coerceIn(-1f, 1f)
+                bb.putShort(idx, (v * 32767f).toInt().toShort())
+            }
+        }
+        raf.seek(pos)
+        raf.write(bytes, 0, n * OUT_CH * 2)
+        done += n
+    }
 }
 
 private fun writePcm16(out: BufferedOutputStream, samples: FloatArray) {

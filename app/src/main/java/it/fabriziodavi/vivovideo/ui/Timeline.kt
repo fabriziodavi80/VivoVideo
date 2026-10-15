@@ -56,6 +56,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import it.fabriziodavi.vivovideo.model.Clip
 import it.fabriziodavi.vivovideo.model.ClipSpeed
+import it.fabriziodavi.vivovideo.model.MusicTrack
 import it.fabriziodavi.vivovideo.model.Project
 import kotlin.math.abs
 import kotlin.math.ceil
@@ -65,6 +66,7 @@ private val VIDEO_H = 48.dp
 private val AUDIO_H = 18.dp
 private val RULER_H = 20.dp
 private val HANDLE_W = 14.dp
+private val MUSIC_H = 22.dp
 
 /**
  * Timeline con l'indicatore fisso al centro: scorrendo si sceglie il punto,
@@ -82,6 +84,10 @@ fun Timeline(
     onTrim: (clipId: String, startUs: Long, endUs: Long) -> Unit,
     onAdd: () -> Unit,
     modifier: Modifier = Modifier,
+    selectedMusicId: String? = null,
+    onSelectMusic: (String) -> Unit = {},
+    onMusicChange: (MusicTrack) -> Unit = {},
+    onAddMusic: () -> Unit = {},
 ) {
     val density = LocalDensity.current
     val scroll = rememberScrollState()
@@ -107,12 +113,16 @@ fun Timeline(
 
     // Taglio in corso con le maniglie (anteprima della nuova durata prima di confermare).
     var trimDraft by remember { mutableStateOf<Triple<String, Long, Long>?>(null) }
+    // Brano trascinato o tagliato (anteprima prima di confermare).
+    var musicDraft by remember { mutableStateOf<MusicTrack?>(null) }
+    val music = project.music.map { if (it.id == musicDraft?.id) musicDraft!! else it }
+    val lanes = project.musicLanes(music).ifEmpty { listOf(emptyList()) }
     val noRipple = remember { MutableInteractionSource() }
 
     BoxWithConstraints(
         modifier
             .fillMaxWidth()
-            .height(RULER_H + VIDEO_H + AUDIO_H + 16.dp)
+            .height(RULER_H + VIDEO_H + AUDIO_H + 16.dp + (MUSIC_H + 3.dp) * lanes.size)
             .background(VV.Panel)
     ) {
         val half = maxWidth / 2
@@ -160,6 +170,40 @@ fun Timeline(
                     contentAlignment = Alignment.Center,
                 ) { Icon(VVIcons.Add, "Aggiungi video", tint = VV.Text) }
                 Spacer(Modifier.width(half))
+            }
+            // Righe della musica.
+            val totalW = (project.durationUs / 1e6f * dpPerSecond).dp
+            lanes.forEachIndexed { li, lane ->
+                Spacer(Modifier.height(3.dp))
+                Row {
+                    Spacer(Modifier.width(half))
+                    Box(Modifier.width(totalW).height(MUSIC_H)) {
+                        if (lane.isEmpty() && li == 0) {
+                            Row(
+                                Modifier.fillMaxHeight().clip(RoundedCornerShape(4.dp)).background(VV.Raised)
+                                    .clickable(onClick = onAddMusic).padding(horizontal = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Icon(VVIcons.Music, null, tint = VV.Music, modifier = Modifier.size(12.dp))
+                                Spacer(Modifier.width(4.dp))
+                                Text("Aggiungi musica", color = VV.Dim, fontSize = 10.sp, fontFamily = Plex)
+                            }
+                        }
+                        lane.forEach { t ->
+                            MusicBar(
+                                track = t,
+                                projectUs = project.durationUs,
+                                selected = t.id == selectedMusicId,
+                                dpPerSecond = dpPerSecond,
+                                pxPerUs = pxPerUs,
+                                onClick = { onSelectMusic(t.id) },
+                                onDraft = { musicDraft = it },
+                                onCommit = { musicDraft?.let(onMusicChange); musicDraft = null },
+                            )
+                        }
+                    }
+                    Spacer(Modifier.width(half))
+                }
             }
         }
         Playhead(Modifier.offset(x = half - 1.dp))
@@ -428,5 +472,129 @@ private fun AudioLane(clip: Clip, width: Dp) {
             drawLine(VV.Wave, Offset(x, mid - a), Offset(x, mid + a), 1.2.dp.toPx())
             x += step
         }
+    }
+}
+
+
+/** Brano sulla timeline: tocco = seleziona; se selezionato si sposta trascinandolo e si taglia dalle maniglie. */
+@Composable
+private fun MusicBar(
+    track: MusicTrack,
+    projectUs: Long,
+    selected: Boolean,
+    dpPerSecond: Float,
+    pxPerUs: Float,
+    onClick: () -> Unit,
+    onDraft: (MusicTrack) -> Unit,
+    onCommit: () -> Unit,
+) {
+    val context = LocalContext.current
+    val current by rememberUpdatedState(track)
+    val peaks by produceState(Waveforms.cached(track.uri), track.uri) {
+        if (value == null) value = Waveforms.get(context, track.uri)
+    }
+    val play = track.playUs(projectUs)
+    val x = (track.startUs / 1e6f * dpPerSecond).dp
+    val w = (play / 1e6f * dpPerSecond).dp.coerceAtLeast(6.dp)
+    var origin by remember { mutableStateOf(track) }
+    var acc by remember { mutableStateOf(0f) }
+    val shape = RoundedCornerShape(4.dp)
+    Box(
+        Modifier
+            .offset(x = x)
+            .width(w)
+            .fillMaxHeight()
+            .clip(shape)
+            .background(VV.MusicBg)
+            .clickable(onClick = onClick)
+            .then(
+                if (!selected) Modifier else Modifier.pointerInput(track.id) {
+                    detectHorizontalDragGestures(
+                        onDragStart = { origin = current; acc = 0f },
+                        onDragEnd = onCommit,
+                        onDragCancel = onCommit,
+                    ) { change, dx ->
+                        change.consume()
+                        acc += dx
+                        val d = (acc / pxPerUs).toLong()
+                        val s = (origin.startUs + d).coerceIn(0L, (projectUs - MusicTrack.MIN_US).coerceAtLeast(0L))
+                        onDraft(origin.copy(startUs = s))
+                    }
+                }
+            )
+    ) {
+        Canvas(Modifier.fillMaxSize()) {
+            val p = peaks
+            val mid = size.height / 2
+            if (p == null || p.isEmpty() || play <= 0) {
+                drawLine(VV.Music.copy(alpha = 0.5f), Offset(0f, mid), Offset(size.width, mid), 1.dp.toPx())
+                return@Canvas
+            }
+            val step = 2.dp.toPx()
+            var px = 0f
+            while (px < size.width) {
+                val t = (px / size.width * play).toLong()
+                val idx = ((track.offsetUs + t) / Waveforms.BUCKET_US).toInt().coerceIn(0, p.size - 1)
+                val a = (p[idx] * track.gainAt(t, projectUs).coerceIn(0f, 2f)).coerceAtMost(1f) * (mid - 1.dp.toPx())
+                drawLine(VV.Music.copy(alpha = 0.75f), Offset(px, mid - a), Offset(px, mid + a), 1.2.dp.toPx())
+                px += step
+            }
+        }
+        Row(Modifier.align(Alignment.CenterStart).padding(start = if (selected) HANDLE_W + 3.dp else 4.dp), verticalAlignment = Alignment.CenterVertically) {
+            Icon(VVIcons.Music, null, tint = Color.White, modifier = Modifier.size(11.dp))
+            Spacer(Modifier.width(3.dp))
+            Text(track.name, color = Color.White, fontSize = 10.sp, fontFamily = Plex, maxLines = 1)
+        }
+        if (selected) {
+            Box(Modifier.fillMaxSize().border(2.dp, VV.Tally, shape))
+            MusicHandle(Modifier.align(Alignment.CenterStart), left = true, track, projectUs, pxPerUs, onDraft, onCommit)
+            MusicHandle(Modifier.align(Alignment.CenterEnd), left = false, track, projectUs, pxPerUs, onDraft, onCommit)
+        }
+    }
+}
+
+@Composable
+private fun MusicHandle(
+    modifier: Modifier,
+    left: Boolean,
+    track: MusicTrack,
+    projectUs: Long,
+    pxPerUs: Float,
+    onDraft: (MusicTrack) -> Unit,
+    onCommit: () -> Unit,
+) {
+    val current by rememberUpdatedState(track)
+    var origin by remember { mutableStateOf(track) }
+    var acc by remember { mutableStateOf(0f) }
+    Box(
+        modifier
+            .width(HANDLE_W)
+            .fillMaxHeight()
+            .background(VV.Tally)
+            .pointerInput(track.id, left) {
+                detectHorizontalDragGestures(
+                    onDragStart = { origin = current; acc = 0f },
+                    onDragEnd = onCommit,
+                    onDragCancel = onCommit,
+                ) { change, dx ->
+                    change.consume()
+                    acc += dx
+                    val d = (acc / pxPerUs).toLong()
+                    val o = origin
+                    val min = MusicTrack.MIN_US
+                    if (left) {
+                        // Il bordo sinistro taglia l'inizio del brano: la musica resta ferma nel tempo.
+                        val dd = d.coerceIn(maxOf(-o.offsetUs, -o.startUs), o.lengthUs - min)
+                        onDraft(o.copy(startUs = o.startUs + dd, offsetUs = o.offsetUs + dd, lengthUs = o.lengthUs - dd))
+                    } else {
+                        val maxLen = minOf(o.sourceDurationUs - o.offsetUs, projectUs - o.startUs).coerceAtLeast(min)
+                        val len = (minOf(o.lengthUs, maxLen) + d).coerceIn(min, maxLen)
+                        onDraft(o.copy(lengthUs = len))
+                    }
+                }
+            },
+        contentAlignment = Alignment.Center,
+    ) {
+        Box(Modifier.width(2.dp).height(10.dp).clip(RoundedCornerShape(1.dp)).background(VV.TallyInk))
     }
 }

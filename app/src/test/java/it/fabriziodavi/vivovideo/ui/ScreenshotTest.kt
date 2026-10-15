@@ -91,6 +91,19 @@ class ScreenshotTest {
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/8_editor_transizioni.png")
     }
 
+    @Test fun editorMusicPanel() {
+        val vm = vm()
+        val t = it.fabriziodavi.vivovideo.model.MusicTrack(
+            uri = "content://demo/music", name = "Sunset Drive", sourceDurationUs = 180_000_000,
+            startUs = 1_000_000, lengthUs = 9_000_000, fadeOutUs = 2_000_000,
+        )
+        val t2 = t.copy(id = "b", name = "Voce", startUs = 6_000_000, lengthUs = 4_000_000)
+        vm.setMusicForTest(listOf(t, t2))
+        vm.selectedMusicId = t.id
+        compose.setContent { VivoTheme { EditorScreen(vm, initialTool = Tool.MUSIC) } }
+        compose.onRoot().captureRoboImage("build/outputs/roborazzi/9_editor_musica.png")
+    }
+
     @Test fun home() {
         val vm = EditorViewModel(ApplicationProvider.getApplicationContext<Application>())
         compose.setContent { VivoTheme { HomeScreen(vm) } }

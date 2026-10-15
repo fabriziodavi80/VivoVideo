@@ -55,8 +55,10 @@ class Exporter(
         cancelled = false
         startedAt = SystemClock.elapsedRealtime()
         scope.launch {
-            // L'audio a tono naturale serve solo se qualche clip cambia velocità.
-            val needsNative = options.keepPitch && project.clips.any { c -> !c.muted && c.speedCurve().speeds.any { it != 1f } }
+            // Colonna sonora calcolata in proprio se c'è musica (mix con dissolvenze)
+            // o se qualche clip cambia velocità (tono naturale).
+            val needsNative = project.audibleMusic().isNotEmpty() ||
+                (options.keepPitch && project.clips.any { c -> !c.muted && c.speedCurve().speeds.any { it != 1f } })
             var audio: File? = null
             if (needsNative) {
                 onState(ExportState.Running(null, "Elaborazione audio…"))
