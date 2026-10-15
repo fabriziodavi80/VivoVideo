@@ -77,6 +77,8 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         private set
     /** Recupero alte luci / cielo, da 0 a 100. */
     var highlights by mutableStateOf(0)
+    /** Riduzione rumore che preserva i bordi, da 0 a 100. */
+    var denoise by mutableStateOf(0)
     var lutError by mutableStateOf<String?>(null)
         private set
     private val builtInLog: CubeLut by lazy {
@@ -87,6 +89,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     fun colorEffects(): List<Effect> = buildList {
         if (logMode) add(builtInLog.toEffect())
         customLut?.let { add(it.toEffect()) }
+        if (denoise > 0) add(DenoiseEffect(denoise / 100f))
         // Shader alte luci; con il LOG serve comunque per il dithering anti-bande.
         if (highlights > 0 || logMode) add(HighlightEffect(highlights / 100f))
         addAll(look.effects())
@@ -134,6 +137,8 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                 toneMapHdr = false
                 // I video LOG del vivo sono a 10 bit ma etichettati come SDR normali.
                 logMode = it.tenBit && !it.isHdr
+                // Nel LOG il cielo mostra la grana di compressione: un po' di pulizia di base.
+                denoise = if (logMode) 40 else 0
             }.onFailure { infoError = it.message ?: it.toString() }
         }
     }
@@ -289,6 +294,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                             if (logMode) append("\nColore: LOG convertito")
                             customLut?.let { append("\nLUT: ${it.name}") }
                             if (highlights > 0) append("\nAlte luci / cielo: $highlights")
+                            if (denoise > 0) append("\nRiduzione rumore: $denoise")
                             if (nativeAudio) append("\nAudio: tono naturale (Signalsmith)")
                             if (log.isNotEmpty()) append("\nTentativi falliti prima: ${log.size}")
                         }

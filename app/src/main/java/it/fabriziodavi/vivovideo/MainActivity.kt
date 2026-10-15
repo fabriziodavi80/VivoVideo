@@ -141,7 +141,7 @@ private fun MainScreen(vm: MainViewModel) {
             val uri = vm.sourceUri
             val info = vm.info
             if (uri != null) {
-                val colorKey = "${vm.logMode}|${System.identityHashCode(vm.customLut)}|${vm.look}|${vm.highlights}"
+                val colorKey = "${vm.logMode}|${System.identityHashCode(vm.customLut)}|${vm.look}|${vm.highlights}|${vm.denoise}"
                 val effects = remember(colorKey) { vm.colorEffects() }
                 Preview(uri, effects, vm.speed, info, exporting = running)
             }
@@ -161,7 +161,8 @@ private fun MainScreen(vm: MainViewModel) {
                         }
                     }
                     vm.lutError?.let { Text(it, color = Accent, fontSize = 13.sp) }
-                    HighlightSlider(vm.highlights, !running) { vm.highlights = it }
+                    LabeledSlider("Alte luci / cielo", "Scurisce le zone chiare e ne recupera il colore.", vm.highlights, !running) { vm.highlights = it }
+                    LabeledSlider("Riduzione rumore", "Leviga cielo e zone uniformi mantenendo i bordi. Utile sui LOG.", vm.denoise, !running) { vm.denoise = it }
                 }
                 Section("Filtro") {
                     ChipRow(Look.entries, vm.look, { it.label }, !running) { vm.look = it }
@@ -352,11 +353,11 @@ private object BuildConfigInfo {
 }
 
 @Composable
-private fun HighlightSlider(value: Int, enabled: Boolean, onChange: (Int) -> Unit) {
+private fun LabeledSlider(label: String, hint: String, value: Int, enabled: Boolean, onChange: (Int) -> Unit) {
     // Il valore si applica quando sollevi il dito, così l'anteprima non si ricrea a ogni pixel.
     var local by remember(value) { mutableFloatStateOf(value.toFloat()) }
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Text("Alte luci / cielo", color = Color(0xFFDDE0E8), modifier = Modifier.weight(1f))
+        Text(label, color = Color(0xFFDDE0E8), modifier = Modifier.weight(1f))
         Text(local.toInt().toString(), color = Color(0xFF8A8F9C), fontSize = 13.sp)
     }
     Slider(
@@ -367,5 +368,5 @@ private fun HighlightSlider(value: Int, enabled: Boolean, onChange: (Int) -> Uni
         enabled = enabled,
         colors = SliderDefaults.colors(thumbColor = Accent, activeTrackColor = Accent),
     )
-    Hint("Scurisce le zone chiare e ne recupera il colore. Ottimo sui video LOG.")
+    Hint(hint)
 }
