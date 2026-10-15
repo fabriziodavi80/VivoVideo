@@ -48,6 +48,13 @@ object TextRenderer {
         }
     }
 
+    private fun blendToWhite(c: Int, k: Float): Int = Color.argb(
+        255,
+        (Color.red(c) + (255 - Color.red(c)) * k).toInt(),
+        (Color.green(c) + (255 - Color.green(c)) * k).toInt(),
+        (Color.blue(c) + (255 - Color.blue(c)) * k).toInt(),
+    )
+
     private fun isLight(c: Int): Boolean =
         (0.2126 * Color.red(c) + 0.7152 * Color.green(c) + 0.0722 * Color.blue(c)) > 140
 
@@ -72,7 +79,7 @@ object TextRenderer {
         val width = ceil(w).toInt().coerceAtMost(maxW)
         layout = StaticLayout.Builder.obtain(content, 0, content.length, paint, width)
             .setAlignment(Layout.Alignment.ALIGN_CENTER).setIncludePad(true).build()
-        val pad = (paint.textSize * if (item.look == TextLook.RIQUADRO) 0.45f else 0.25f).toInt() + 2
+        val pad = (paint.textSize * when (item.look) { TextLook.RIQUADRO -> 0.45f; TextLook.NEON -> 0.6f; else -> 0.25f }).toInt() + 2
         return Prepared(layout, width, pad, paint)
     }
 
@@ -112,6 +119,16 @@ object TextRenderer {
             p.layout.draw(c)
             p.paint.style = Paint.Style.FILL
             p.paint.color = fill
+        }
+        if (item.look == TextLook.NEON) {
+            // Alone luminoso del colore scelto (due passate) e anima chiara al centro.
+            val glow = p.paint.color
+            p.paint.setShadowLayer(p.paint.textSize * 0.45f, 0f, 0f, glow)
+            p.layout.draw(c)
+            p.paint.setShadowLayer(p.paint.textSize * 0.18f, 0f, 0f, glow)
+            p.layout.draw(c)
+            p.paint.color = blendToWhite(glow, 0.75f)
+            p.paint.setShadowLayer(p.paint.textSize * 0.06f, 0f, 0f, glow)
         }
         p.layout.draw(c)
         cache.put(key, bmp)

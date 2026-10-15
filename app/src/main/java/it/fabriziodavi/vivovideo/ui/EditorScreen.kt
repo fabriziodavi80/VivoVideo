@@ -1,5 +1,11 @@
 package it.fabriziodavi.vivovideo.ui
 
+import it.fabriziodavi.vivovideo.model.TextPreset
+
+import it.fabriziodavi.vivovideo.model.SlideshowOptions
+
+import it.fabriziodavi.vivovideo.model.MotionStyle
+
 import it.fabriziodavi.vivovideo.engine.LayerRenderer
 
 import it.fabriziodavi.vivovideo.model.LayerBorder
@@ -132,6 +138,7 @@ enum class Tool(val label: String, val icon: () -> ImageVector, val future: Bool
     FRAME("Inquadra", { VVIcons.Fullscreen }),
     TEXT("Testo", { VVIcons.Text }),
     LAYER("Immagini", { VVIcons.Layers }),
+    SLIDESHOW("Slideshow", { VVIcons.Movie }),
     MUSIC("Musica", { VVIcons.Music }),
     DUPLICATE("Duplica", { VVIcons.Copy }),
     MOVE_LEFT("Indietro", { VVIcons.MoveLeft }),
@@ -148,7 +155,7 @@ private val PHOTO_TOOLS = listOf(
     Tool.SPLIT, Tool.DURATION, Tool.FRAME, Tool.TRANSITION, Tool.KEYFRAME, Tool.COLOR,
     Tool.DUPLICATE, Tool.MOVE_LEFT, Tool.MOVE_RIGHT, Tool.DELETE, Tool.EFFECTS,
 )
-private val PROJECT_TOOLS = listOf(Tool.ADD, Tool.SPLIT, Tool.TRANSITION, Tool.TEXT, Tool.LAYER, Tool.MUSIC, Tool.COLOR, Tool.EFFECTS)
+private val PROJECT_TOOLS = listOf(Tool.ADD, Tool.SLIDESHOW, Tool.SPLIT, Tool.TRANSITION, Tool.TEXT, Tool.LAYER, Tool.MUSIC, Tool.COLOR, Tool.EFFECTS)
 
 @Composable
 fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
@@ -390,6 +397,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
             Tool.MUSIC -> MusicPanel(vm, running, pickMusic)
             Tool.TEXT -> TextPanel(vm, running)
             Tool.LAYER -> LayerPanel(vm, running, pickLayer)
+            Tool.SLIDESHOW -> SlideshowPanel(vm, running)
             Tool.AUDIO -> AudioPanel(vm, running)
             Tool.COLOR -> ColorPanel(vm, running) { lutPicker.launch(arrayOf("*/*")) }
             Tool.EXPORT -> ExportPanel(vm) { uri ->
@@ -844,8 +852,11 @@ private fun PhotoPanel(vm: EditorViewModel, running: Boolean) {
         "Durata della foto", null, (clip.trimmedUs / 100_000).toInt(), enabled, range = 2..150,
         format = { String.format(java.util.Locale.ITALIAN, "%.1f s", it / 10f) },
     ) { v -> vm.setPhotoDuration(v * 100_000L) }
-    ToggleRow("Zoom lento (effetto Ken Burns)", clip.keyframes.isNotEmpty(), enabled) { vm.toggleKenBurns() }
-    Hint("Zoom, posizione, rotazione e Adatta/Riempi sono nello strumento Inquadra. Lo zoom lento usa due keyframe: lo personalizzi dallo strumento Keyframe. Con i battiti, trascinando la maniglia destra la durata si aggancia al ritmo.")
+    PanelLabel("Movimento")
+    var allPhotos by remember { mutableStateOf(false) }
+    PillRow(MotionStyle.entries, null as MotionStyle?, { it?.label ?: "" }, enabled) { m -> if (m != null) vm.applyMotion(m, allPhotos) }
+    ToggleRow("Applica a tutte le foto", allPhotos, enabled) { allPhotos = it }
+    Hint("I movimenti usano due keyframe: li personalizzi dallo strumento Keyframe. Zoom fisso, posizione e Adatta/Riempi sono in Inquadra. Con i battiti, la maniglia destra aggancia la durata al ritmo.")
 }
 
 @Composable
@@ -904,6 +915,8 @@ private fun TextPanel(vm: EditorViewModel, running: Boolean) {
             focusedTextColor = VV.Text, unfocusedTextColor = VV.Text,
         ),
     )
+    PanelLabel("Stili pronti")
+    PillRow(TextPreset.entries, null as TextPreset?, { it?.label ?: "" }, enabled) { pr -> if (pr != null) vm.applyTextPreset(pr) }
     PanelLabel("Carattere")
     PillRow(TextFont.entries, t.font, { it.label }, enabled) { f -> vm.updateText { it.copy(font = f) } }
     PanelLabel("Colore")
@@ -1103,6 +1116,52 @@ private fun LayerPanel(vm: EditorViewModel, running: Boolean, onAdd: () -> Unit)
         SecondaryButton("Elimina", onClick = { if (enabled) vm.deleteLayer() })
     }
     SecondaryButton("Aggiungi un'altra immagine", onClick = { if (enabled) onAdd() })
+}
+
+@Composable
+private fun SlideshowPanel(vm: EditorViewModel, running: Boolean) {
+    val p = vm.project ?: return
+    val enabled = !running
+    val hasBeats = p.beatTimes().isNotEmpty()
+    var seconds by remember { mutableStateOf(30) }          // decimi di secondo
+    var rhythm by remember { mutableStateOf(hasBeats) }
+    var beats by remember { mutableStateOf(4) }
+    var motion by remember { mutableStateOf<MotionStyle?>(null) }
+    var transition by remember { mutableStateOf<TransitionType?>(null) }
+    var noTransitions by remember { mutableStateOf(false) }
+    var fill by remember { mutableStateOf(true) }
+    Hint("Prepara in un colpo tutte le foto del progetto (${p.clips.count { it.isPhoto }}): durata, movimento e transizioni. Si può annullare.")
+    PanelLabel("Durata di ogni foto")
+    if (hasBeats) ToggleRow("A ritmo della musica", rhythm, enabled) { rhythm = it }
+    if (rhythm && hasBeats) {
+        Segmented(listOf(1, 2, 4, 8), beats, { "$it battit" + if (it == 1) "o" else "i" }, enabled) { beats = it }
+    } else {
+        LabeledSlider("Secondi", null, seconds, enabled, range = 10..100, format = { String.format(java.util.Locale.ITALIAN, "%.1f s", it / 10f) }) { seconds = it }
+        if (!hasBeats) Hint("Con una musica e i suoi battiti, le foto possono cambiare a tempo.")
+    }
+    PanelLabel("Movimento delle foto")
+    val motions: List<MotionStyle?> = listOf(null) + MotionStyle.entries
+    PillRow(motions, motion, { it?.label ?: "Vario" }, enabled) { motion = it }
+    PanelLabel("Transizioni")
+    val trans: List<TransitionType?> = listOf(null) + TransitionType.entries
+    PillRow(listOf<Any?>("none") + trans, if (noTransitions) "none" else transition, { a ->
+        when (a) { "none" -> "Nessuna"; null -> "Varie"; else -> (a as TransitionType).label }
+    }, enabled) { a ->
+        noTransitions = a == "none"
+        transition = a as? TransitionType
+    }
+    ToggleRow("Foto a tutto schermo (riempi il quadro)", fill, enabled) { fill = it }
+    Box(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(VV.Tally)
+            .clickable(enabled = enabled) {
+                vm.createSlideshow(SlideshowOptions(
+                    photoUs = seconds * 100_000L,
+                    beatsPerPhoto = if (rhythm && hasBeats) beats else 0,
+                    motion = motion, transition = transition, noTransitions = noTransitions, fill = fill,
+                ))
+            }.padding(vertical = 13.dp),
+        contentAlignment = Alignment.Center,
+    ) { Text("Crea slideshow", style = MaterialTheme.typography.labelLarge, color = VV.TallyInk) }
 }
 
 @Composable

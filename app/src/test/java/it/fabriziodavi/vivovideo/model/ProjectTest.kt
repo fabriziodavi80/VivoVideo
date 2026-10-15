@@ -182,4 +182,20 @@ class ProjectTest {
         // Tap doppio ravvicinato ignorato.
         assertEquals(1, m.addMarker(2_000_000).addMarker(2_030_000).markersUs.size)
     }
+
+    @Test fun slideshowOnBeats() {
+        val photo = Clip(uri = "p", sourceDurationUs = Clip.PHOTO_MAX_US, trimEndUs = Clip.PHOTO_DEFAULT_US, isPhoto = true, width = 4, height = 3)
+        val clips = List(4) { photo.copy(id = "p$it") }
+        val m = MusicTrack(uri = "m", name = "M", sourceDurationUs = 60_000_000, lengthUs = 60_000_000, beatsUs = (0 until 200).map { it * 500_000L })
+        val p = Project(name = "s", clips = clips, music = listOf(m)).slideshow(SlideshowOptions(beatsPerPhoto = 4))
+        // Ogni foto dura 4 battiti (2 s) e ogni taglio cade su un battito.
+        val starts = p.clipStartsUs()
+        p.clips.forEachIndexed { i, c ->
+            assertEquals(2_000_000L, c.outputUs)
+            assertEquals(0L, (starts[i] + c.outputUs) % 500_000)
+            assertTrue(c.keyframes.size == 2)
+        }
+        assertNotNull(p.clips[0].transitionOut)
+        assertNull(p.clips.last().transitionOut)
+    }
 }

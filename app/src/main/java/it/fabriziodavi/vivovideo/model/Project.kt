@@ -178,12 +178,40 @@ data class ColorSettings(
     val lutName: String? = null,
 )
 
+/** Movimenti pronti per foto (e video), come gli stili di diapositiva di ProShow. */
+enum class MotionStyle(val label: String) {
+    NONE("Fermo"), ZOOM_IN("Zoom avanti"), ZOOM_OUT("Zoom indietro"),
+    PAN_RIGHT("Verso destra"), PAN_LEFT("Verso sinistra"), PAN_DOWN("Verso il basso"), PAN_UP("Verso l'alto"),
+    DIAGONAL("Diagonale"), TILT("Inclinazione");
+
+    /** Keyframe di inizio e fine per una clip di [durationUs] (tempo del video originale). */
+    fun keyframes(durationUs: Long): List<Keyframe> {
+        val (a, b) = when (this) {
+            NONE -> return emptyList()
+            ZOOM_IN -> Transform() to Transform(scale = 1.2f)
+            ZOOM_OUT -> Transform(scale = 1.2f) to Transform()
+            PAN_RIGHT -> Transform(x = -0.08f, scale = 1.22f) to Transform(x = 0.08f, scale = 1.22f)
+            PAN_LEFT -> Transform(x = 0.08f, scale = 1.22f) to Transform(x = -0.08f, scale = 1.22f)
+            PAN_DOWN -> Transform(y = -0.07f, scale = 1.22f) to Transform(y = 0.07f, scale = 1.22f)
+            PAN_UP -> Transform(y = 0.07f, scale = 1.22f) to Transform(y = -0.07f, scale = 1.22f)
+            DIAGONAL -> Transform(x = -0.06f, y = -0.05f, scale = 1.12f) to Transform(x = 0.05f, y = 0.05f, scale = 1.3f)
+            TILT -> Transform(scale = 1.18f, rotation = -2.5f) to Transform(scale = 1.25f, rotation = 2.5f)
+        }
+        return listOf(Keyframe(0, a, Easing.LINEAR), Keyframe(durationUs, b, Easing.LINEAR))
+    }
+
+    companion object {
+        /** Movimenti per il "casuale": tutti tranne fermo, senza ripetere lo stesso due volte di fila. */
+        val varied = entries.filter { it != NONE }
+    }
+}
+
 enum class TextFont(val label: String) {
     MODERNO("Moderno"), TITOLO("Titolo"), IMPATTO("Impatto"), POSTER("Poster"),
     ELEGANTE("Elegante"), CORSIVO("Corsivo"), PENNARELLO("Pennarello"), MACCHINA("Macchina"),
 }
 
-enum class TextLook(val label: String) { SEMPLICE("Semplice"), CONTORNO("Contorno"), OMBRA("Ombra"), RIQUADRO("Riquadro") }
+enum class TextLook(val label: String) { SEMPLICE("Semplice"), CONTORNO("Contorno"), OMBRA("Ombra"), RIQUADRO("Riquadro"), NEON("Neon") }
 
 enum class TextAnim(val label: String) {
     NONE("Nessuna"), FADE("Dissolvenza"), POP("Pop"), SLIDE("Scorri"), ZOOM("Zoom"), TYPE("Macchina da scrivere"),
@@ -252,6 +280,48 @@ data class Layer(
     companion object {
         const val MIN_US = 300_000L
     }
+}
+
+/** Impostazioni dello slideshow automatico. */
+data class SlideshowOptions(
+    /** Durata di ogni foto (se non si segue il ritmo). */
+    val photoUs: Long = 3_000_000,
+    /** Battiti per foto (0 = non seguire il ritmo). */
+    val beatsPerPhoto: Int = 0,
+    /** Movimento delle foto: null = vario (uno diverso per foto); NONE = ferme. */
+    val motion: MotionStyle? = null,
+    /** Transizione fra le clip: null = varie; [noTransitions] = nessuna. */
+    val transition: TransitionType? = null,
+    val noTransitions: Boolean = false,
+    val transitionUs: Long = 600_000,
+    val fill: Boolean = true,
+)
+
+/** Stili di titolo pronti: un tocco imposta carattere, colore, effetto, posizione, animazioni e movimento. */
+enum class TextPreset(val label: String) {
+    CINEMA("Cinema"), DIDASCALIA("Didascalia"), POP("Pop"), ELEGANTE("Elegante"), NEON("Neon"),
+    IMPATTO("Impatto"), FIRMA("Firma"), DIARIO("Diario");
+
+    fun applyTo(t: TextItem): TextItem = when (this) {
+        CINEMA -> t.copy(font = TextFont.TITOLO, color = WHITE, look = TextLook.OMBRA, size = 0.11f, x = 0f, y = 0f, rotation = 0f,
+            animIn = TextAnim.FADE, animOut = TextAnim.FADE, endPose = Transform(x = 0f, y = 0f, scale = 1.12f))
+        DIDASCALIA -> t.copy(font = TextFont.MODERNO, color = WHITE, look = TextLook.RIQUADRO, size = 0.045f, x = 0f, y = 0.36f, rotation = 0f,
+            animIn = TextAnim.SLIDE, animOut = TextAnim.FADE, endPose = null)
+        POP -> t.copy(font = TextFont.POSTER, color = 0xFFFFE14D.toInt(), look = TextLook.CONTORNO, size = 0.08f, x = 0f, y = 0f, rotation = -4f,
+            animIn = TextAnim.POP, animOut = TextAnim.POP, endPose = null)
+        ELEGANTE -> t.copy(font = TextFont.ELEGANTE, color = WHITE, look = TextLook.OMBRA, size = 0.07f, x = 0f, y = 0.05f, rotation = 0f,
+            animIn = TextAnim.FADE, animOut = TextAnim.FADE, endPose = Transform(x = 0f, y = -0.02f, scale = 1.04f))
+        NEON -> t.copy(font = TextFont.IMPATTO, color = 0xFFFF7AB6.toInt(), look = TextLook.NEON, size = 0.09f, x = 0f, y = 0f, rotation = 0f,
+            animIn = TextAnim.ZOOM, animOut = TextAnim.FADE, endPose = null)
+        IMPATTO -> t.copy(font = TextFont.IMPATTO, color = WHITE, look = TextLook.CONTORNO, size = 0.14f, x = 0f, y = 0f, rotation = 0f,
+            animIn = TextAnim.ZOOM, animOut = TextAnim.ZOOM, endPose = null)
+        FIRMA -> t.copy(font = TextFont.CORSIVO, color = WHITE, look = TextLook.OMBRA, size = 0.06f, x = 0.2f, y = 0.38f, rotation = -3f,
+            animIn = TextAnim.FADE, animOut = TextAnim.FADE, endPose = null)
+        DIARIO -> t.copy(font = TextFont.MACCHINA, color = WHITE, look = TextLook.RIQUADRO, size = 0.04f, x = 0f, y = 0.3f, rotation = 0f,
+            animIn = TextAnim.TYPE, animOut = TextAnim.FADE, endPose = null)
+    }
+
+    private companion object { const val WHITE = 0xFFFFFFFF.toInt() }
 }
 
 /** Distribuisce elementi su righe senza sovrapposizioni (ordinati per inizio). */
@@ -435,6 +505,45 @@ data class Project(
             changed = true
         }
         return if (changed) p else null
+    }
+
+    /**
+     * Slideshow automatico: durata delle foto (fissa o a ritmo), movimento, riempimento del quadro
+     * e transizioni fra tutte le clip. A ritmo, anche i tagli dei video si allineano ai battiti.
+     */
+    fun slideshow(o: SlideshowOptions, seed: Int = 7): Project {
+        val beats = beatTimes()
+        val rnd = kotlin.random.Random(seed)
+        var q = this
+        var prev: MotionStyle? = null
+        var prevT: TransitionType? = null
+        for (i in clips.indices) {
+            var c = q.clips[i]
+            if (c.isPhoto) {
+                val start = q.clipStartsUs()[i]
+                var dur = o.photoUs
+                if (o.beatsPerPhoto > 0 && beats.isNotEmpty()) {
+                    val j0 = beats.indexOfFirst { it > start + 150_000 }
+                    if (j0 >= 0) dur = beats[(j0 + o.beatsPerPhoto - 1).coerceAtMost(beats.lastIndex)] - start
+                }
+                dur = dur.coerceIn(300_000L, Clip.PHOTO_MAX_US)
+                val style = o.motion ?: MotionStyle.varied.filter { it != prev }.random(rnd)
+                prev = style
+                c = c.copy(trimStartUs = 0, trimEndUs = dur, fill = o.fill, keyframes = style.keyframes(dur))
+            }
+            if (i < clips.lastIndex) {
+                val type = when {
+                    o.noTransitions -> null
+                    o.transition != null -> o.transition
+                    else -> TransitionType.entries.filter { it != prevT }.random(rnd)
+                }
+                prevT = type
+                c = c.copy(transitionOut = type?.let { TransitionSpec(it, o.transitionUs) })
+            }
+            q = q.replaceClip(c)
+        }
+        if (o.beatsPerPhoto > 0) q = q.alignCutsToBeats() ?: q
+        return q
     }
 
     /** Divide i video su ogni battito fra [fromUs] e [toUs] (per montare un video lungo a ritmo). */

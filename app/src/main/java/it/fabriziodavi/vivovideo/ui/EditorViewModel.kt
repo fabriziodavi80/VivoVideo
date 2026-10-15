@@ -9,7 +9,10 @@ import it.fabriziodavi.vivovideo.model.Easing
 import it.fabriziodavi.vivovideo.model.Keyframe
 import it.fabriziodavi.vivovideo.model.Keyframes
 import it.fabriziodavi.vivovideo.model.Layer
+import it.fabriziodavi.vivovideo.model.MotionStyle
 import it.fabriziodavi.vivovideo.model.MusicTrack
+import it.fabriziodavi.vivovideo.model.SlideshowOptions
+import it.fabriziodavi.vivovideo.model.TextPreset
 import it.fabriziodavi.vivovideo.model.Project
 import it.fabriziodavi.vivovideo.model.ProjectStore
 import it.fabriziodavi.vivovideo.model.SpeedInterp
@@ -739,6 +742,23 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         val k = if (c.trimmedUs > 0) c.keyframes.map { it.copy(timeUs = it.timeUs * d / c.trimmedUs) } else c.keyframes
         c.copy(trimStartUs = 0, trimEndUs = d, keyframes = k)
     }
+
+    /** Movimento pronto sulla clip selezionata, o su tutte le foto. */
+    fun applyMotion(style: MotionStyle, allPhotos: Boolean) {
+        val c = selectedClip ?: return
+        if (!allPhotos) { updateSelected { it.copy(keyframes = style.keyframes(it.trimmedUs)) }; return }
+        update { p -> p.copy(clips = p.clips.map { if (it.isPhoto || it.id == c.id) it.copy(keyframes = style.keyframes(it.trimmedUs)) else it }) }
+    }
+
+    fun createSlideshow(o: SlideshowOptions) {
+        val p = project ?: return
+        if (p.clips.none { it.isPhoto } && o.noTransitions) { message = "Aggiungi qualche foto per lo slideshow."; return }
+        update { it.slideshow(o, seed = (System.currentTimeMillis() % 10_000).toInt()) }
+        message = "Slideshow pronto: ${p.clips.count { it.isPhoto }} foto" +
+            (if (o.beatsPerPhoto > 0) " a ritmo di musica." else ".") + " Puoi sempre ritoccare ogni clip o annullare."
+    }
+
+    fun applyTextPreset(preset: TextPreset) = updateText { preset.applyTo(it) }
 
     /** Zoom lento su tutta la foto (effetto Ken Burns), o lo toglie. */
     fun toggleKenBurns() = updateSelected { c ->
