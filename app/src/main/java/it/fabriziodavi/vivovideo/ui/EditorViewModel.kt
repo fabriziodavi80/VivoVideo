@@ -1041,6 +1041,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                 sizeOverride = w to h, crossfadesOverride = listOf(job.cf))
         }.getOrElse { failedSegments += job.key; segQueue.removeFirstOrNull(); nextSegment(false); return }
         val t = Transformer.Builder(ctx)
+            .setMaxDelayBetweenMuxerSamplesMs(180_000)
             .setVideoMimeType(androidx.media3.common.MimeTypes.VIDEO_H264)
             .addListener(object : Transformer.Listener {
                 override fun onCompleted(composition: androidx.media3.transformer.Composition, exportResult: androidx.media3.transformer.ExportResult) {

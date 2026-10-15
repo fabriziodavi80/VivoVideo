@@ -139,7 +139,7 @@ class DeviceTest {
             val done = CountDownLatch(1)
             val error = AtomicReference<String?>(null)
             main.post {
-                Transformer.Builder(ctx).setVideoMimeType(MimeTypes.VIDEO_H264)
+                Transformer.Builder(ctx).setMaxDelayBetweenMuxerSamplesMs(180_000).setVideoMimeType(MimeTypes.VIDEO_H264)
                     .addListener(object : Transformer.Listener {
                         override fun onCompleted(composition: Composition, exportResult: ExportResult) { done.countDown() }
                         override fun onError(composition: Composition, exportResult: ExportResult, exportException: ExportException) {
@@ -214,7 +214,7 @@ class DeviceTest {
             if (s is ExportState.Done || s is ExportState.Failed) done.countDown()
         }
         main.post { exporter.start(project, ExportOptions()) }
-        assertTrue("esportazione bloccata (${state.get()})", done.await(300, TimeUnit.SECONDS))
+        assertTrue("esportazione bloccata (${state.get()})", done.await(600, TimeUnit.SECONDS))
         val s = state.get()
         if (s is ExportState.Failed) fail("esportazione fallita: ${s.message}")
         val uri = (s as ExportState.Done).uri

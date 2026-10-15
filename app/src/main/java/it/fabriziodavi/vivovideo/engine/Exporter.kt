@@ -194,6 +194,9 @@ class Exporter(
         }
 
         val t = Transformer.Builder(context)
+            // Con molti effetti su video pesanti un fotogramma può richiedere molto: si aspetta fino a 3 minuti
+            // (resta il controllo per i blocchi veri).
+            .setMaxDelayBetweenMuxerSamplesMs(180_000)
             .setVideoMimeType(options.codec.mime)
             .setEncoderFactory(
                 DefaultEncoderFactory.Builder(context).setRequestedVideoEncoderSettings(settings.build()).build()
