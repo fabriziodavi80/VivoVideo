@@ -25,6 +25,7 @@ import it.fabriziodavi.vivovideo.model.FxType
 import it.fabriziodavi.vivovideo.model.Project
 import it.fabriziodavi.vivovideo.model.SpeedCurve
 import it.fabriziodavi.vivovideo.model.Transform
+import it.fabriziodavi.vivovideo.model.TransitionSpec
 import it.fabriziodavi.vivovideo.model.TransitionType
 import java.io.File
 
@@ -112,7 +113,7 @@ class CompositionFactory(private val context: Context) {
     }
 
     /** Una riga di video sovrapposti: pause fino a ogni video, video senza audio alla misura "adattata". */
-    private fun videoLayerSequence(lane: List<Layer>, outW: Int, outH: Int, keepAudio: Boolean): EditedMediaItemSequence {
+    private fun videoLayerSequence(lane: List<Layer>, outW: Int, outH: Int, keepAudio: Boolean, padToUs: Long): EditedMediaItemSequence {
         val b = EditedMediaItemSequence.Builder(if (keepAudio) setOf(C.TRACK_TYPE_AUDIO, C.TRACK_TYPE_VIDEO) else setOf(C.TRACK_TYPE_VIDEO))
         var cursor = 0L
         lane.forEach { l ->
@@ -139,6 +140,7 @@ class CompositionFactory(private val context: Context) {
             )
             cursor = maxOf(cursor, l.startUs) + l.durationUs
         }
+        if (padToUs - cursor > 1_000) b.addGap(padToUs - cursor)
         return b.build()
     }
 
@@ -146,7 +148,7 @@ class CompositionFactory(private val context: Context) {
      * Seconda traccia per le dissolvenze incrociate: prima del taglio la testa della clip successiva,
      * dopo il taglio la coda della precedente, entrambe a tutto quadro; la trasparenza la regola il compositore.
      */
-    private fun crossfadeSequence(project: Project, cfs: List<Project.Crossfade>, outW: Int, outH: Int): EditedMediaItemSequence {
+    private fun crossfadeSequence(project: Project, cfs: List<Project.Crossfade>, outW: Int, outH: Int, padToUs: Long): EditedMediaItemSequence {
         val b = EditedMediaItemSequence.Builder(setOf(C.TRACK_TYPE_VIDEO))
         var cursor = 0L
         fun piece(clip: Clip, fromUs: Long, lengthUs: Long) {
@@ -181,6 +183,7 @@ class CompositionFactory(private val context: Context) {
             if (cf.beforeUs > 0) piece(next, next.trimStartUs - cf.beforeUs, cf.beforeUs)
             if (cf.afterUs > 0) piece(a, a.trimEndUs, cf.afterUs)
         }
+        if (padToUs - cursor > 1_000) b.addGap(padToUs - cursor)
         return b.build()
     }
 
@@ -223,13 +226,15 @@ class CompositionFactory(private val context: Context) {
         options: ExportOptions,
         forPreview: Boolean,
         nativeAudio: File?,
+        /** false = niente compositore a più ingressi (ripiego): dissolvenza incrociata → passaggio al nero, video sovrapposti esclusi. */
+        allowMulti: Boolean = true,
     ): Composition {
         val (outW, outH) = outputSize(project, if (forPreview) 1080 else options.size.shortSide)
         val starts = project.clipStartsUs()
         val beats = project.beatTimes()
         val videoLayers = project.layers.filter { it.isVideo }
         val crossfades = project.crossfades()
-        val multi = videoLayers.isNotEmpty() || crossfades.isNotEmpty()
+        val multi = allowMulti && (videoLayers.isNotEmpty() || crossfades.isNotEmpty())
         // Con video sovrapposti, testi e immagini vanno sopra a tutto: effetti dell'intera composizione.
         fun overlaysFor(fromUs: Long, toUs: Long): List<androidx.media3.effect.TextureOverlay> {
             val texts = project.texts.filter { t -> t.startUs < toUs && t.endUs > fromUs && t.text.isNotBlank() }
@@ -272,9 +277,14 @@ class CompositionFactory(private val context: Context) {
                 if (clip.fx.isNotEmpty()) add(FxEffect(clip.fx, if (clip.fx.any { f -> f.type == FxType.PULSE }) beats else emptyList()))
                 // Transizioni: metà alla fine di questa clip, metà all'inizio della successiva.
                 // (la dissolvenza incrociata la fa il compositore, non questo effetto)
-                val inSpec = project.clips.getOrNull(index - 1)?.transitionOut?.takeIf { it.type != TransitionType.CROSSFADE }
+                fun adapt(t: TransitionSpec?) = when {
+                    t?.type != TransitionType.CROSSFADE -> t
+                    multi -> null
+                    else -> t.copy(type = TransitionType.FADE_BLACK)
+                }
+                val inSpec = adapt(project.clips.getOrNull(index - 1)?.transitionOut)
                 val inUs = if (index > 0) project.transitionHalfUs(index - 1) else 0
-                val outSpec = clip.transitionOut?.takeIf { it.type != TransitionType.CROSSFADE }
+                val outSpec = adapt(clip.transitionOut)
                 val outUs = project.transitionHalfUs(index)
                 if ((inSpec != null && inUs > 0) || (outSpec != null && outUs > 0)) {
                     add(TransitionEffect(startUs, clip.outputUs, inSpec?.type, inUs, outSpec?.type, outUs))
@@ -314,8 +324,11 @@ class CompositionFactory(private val context: Context) {
                 if (audioInMain) setOf(C.TRACK_TYPE_AUDIO, C.TRACK_TYPE_VIDEO) else setOf(C.TRACK_TYPE_VIDEO)
             ).addItems(mainItems(light = true, removeAudio = !audioInMain)).build()
             val lanes = packLanes(videoLayers, { it.startUs }, { it.endUs })
-            lanes.forEach { lane -> sequences += videoLayerSequence(lane, outW, outH, keepAudio = audioInMain) }
-            if (crossfades.isNotEmpty()) sequences += crossfadeSequence(project, crossfades, outW, outH)
+            // Le sequenze secondarie si allungano oltre la fine con una pausa: altrimenti il lettore
+            // le ripeterebbe tagliando di nuovo clip già tagliate (caso non gestito dalla libreria).
+            val padTo = project.durationUs + 1_000_000
+            lanes.forEach { lane -> sequences += videoLayerSequence(lane, outW, outH, keepAudio = audioInMain, padToUs = padTo) }
+            if (crossfades.isNotEmpty()) sequences += crossfadeSequence(project, crossfades, outW, outH, padTo)
             sequences += EditedMediaItemSequence.Builder(setOf(C.TRACK_TYPE_VIDEO))
                 .addItems(mainItems(light = false, removeAudio = true)).build()
             if (nativeAudio != null) {

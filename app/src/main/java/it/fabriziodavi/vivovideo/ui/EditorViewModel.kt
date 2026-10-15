@@ -122,6 +122,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
 
     fun openProject(p: Project, startPreview: Boolean = true) {
         project = p
+        multiFailed = false
         undoStack.clear(); redoStack.clear(); updateUndoFlags()
         selectedClipId = p.clips.firstOrNull()?.id
         exportState = ExportState.Idle
@@ -847,15 +848,18 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private var playerMulti = false
+    /** Il compositore a più ingressi ha dato errore in anteprima: si usa il ripiego. */
+    private var multiFailed = false
 
     private fun rebuildPreview(positionMs: Long) {
         val p = project ?: return
         if (exportState is ExportState.Running) return
         if (p.clips.isEmpty()) { releasePlayer(); playheadUs = 0; return }
-        val composition = runCatching { factory.build(p, exportOptions, forPreview = true, nativeAudio = null) }
+        val composition = runCatching { factory.build(p, exportOptions, forPreview = true, nativeAudio = null, allowMulti = !multiFailed) }
             .getOrElse { previewError = "Anteprima non disponibile: ${it.message}"; return }
-        // Con video sovrapposti serve il compositore a più ingressi: si ricrea il lettore se cambia modalità.
-        val multi = p.layers.any { it.isVideo }
+        // Con video sovrapposti o dissolvenze incrociate serve il compositore a più ingressi:
+        // si ricrea il lettore se cambia modalità.
+        val multi = !multiFailed && (p.layers.any { it.isVideo } || p.crossfades().isNotEmpty())
         if (player != null && playerMulti != multi) releasePlayer()
         playerMulti = multi
         val pl = player ?: CompositionPlayer.Builder(getApplication())
@@ -863,7 +867,20 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             .build().also { np ->
             np.addListener(object : Player.Listener {
                 override fun onPlayerError(error: PlaybackException) {
-                    previewError = "Errore anteprima: ${error.errorCodeName} ${error.message ?: ""}"
+                    // Catena delle cause: serve per capire cosa non va sul telefono.
+                    val chain = generateSequence(error.cause) { it.cause }.take(3)
+                        .joinToString(" ← ") { "${it.javaClass.simpleName}: ${it.message?.take(120) ?: ""}" }
+                    val detail = "${error.errorCodeName}${if (chain.isNotEmpty()) "\n$chain" else ""}"
+                    if (playerMulti && !multiFailed) {
+                        // Ripiego: anteprima senza compositore a più ingressi.
+                        multiFailed = true
+                        handler.post {
+                            rebuildPreview(playheadUs / 1000)
+                            previewError = "Anteprima semplificata (dissolvenza incrociata mostrata come passaggio al nero, video sovrapposti nascosti). Dettaglio: $detail"
+                        }
+                        return
+                    }
+                    previewError = "Errore anteprima: $detail"
                 }
             })
             np.repeatMode = Player.REPEAT_MODE_ALL

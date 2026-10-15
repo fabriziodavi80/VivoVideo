@@ -90,9 +90,13 @@ class Exporter(
         onState(ExportState.Idle)
     }
 
-    private fun attempt(project: Project, options: ExportOptions, audio: File?, attempt: Int, log: MutableList<String>) {
+    private fun attempt(
+        project: Project, options: ExportOptions, audio: File?, attempt: Int, log: MutableList<String>,
+        allowMulti: Boolean = true,
+    ) {
         if (cancelled) return
-        val composition = factory.build(project, options, forPreview = false, nativeAudio = audio)
+        val composition = factory.build(project, options, forPreview = false, nativeAudio = audio, allowMulti = allowMulti)
+        val usesMulti = allowMulti && (project.layers.any { it.isVideo } || project.crossfades().isNotEmpty())
         val (outW, outH) = factory.outputSize(project, options.size.shortSide)
         val maxClipFps = project.clips.maxOfOrNull { it.fps } ?: 30f
         val outFps = options.fps.max?.let { minOf(it.toFloat(), maxClipFps) } ?: maxClipFps
@@ -142,6 +146,9 @@ class Exporter(
                             exportResult.videoEncoderName?.let { append("\nEncoder: $it ($mode)") }
                             if (audio != null) append("\nAudio: tono naturale (Signalsmith)")
                             if (log.isNotEmpty()) append("\nTentativi falliti prima: ${log.size}")
+                            if (!allowMulti && (project.layers.any { it.isVideo } || project.crossfades().isNotEmpty())) {
+                                append("\nAttenzione: esportato senza video sovrapposti e con le dissolvenze incrociate come passaggio al nero (il compositore ha dato errore).")
+                            }
                         }))
                     }.onFailure { onState(ExportState.Failed("Video creato ma non salvato in galleria: ${it.message}")) }
                 }
@@ -158,11 +165,21 @@ class Exporter(
                     exportException.errorCode == ExportException.ERROR_CODE_DECODER_INIT_FAILED
                 if (retryable && step < 3 && !cancelled) {
                     onState(ExportState.Running(null, "Nuovo tentativo con impostazioni più prudenti…"))
-                    handler.post { attempt(project, options, audio, attempt + 1, log) }
+                    handler.post { attempt(project, options, audio, attempt + 1, log, allowMulti) }
+                    return
+                }
+                if (usesMulti && !cancelled) {
+                    // Ultimo ripiego: senza compositore a più ingressi.
+                    val chain = generateSequence(exportException.cause) { it.cause }.take(3)
+                        .joinToString(" ← ") { "${it.javaClass.simpleName}: ${it.message?.take(100) ?: ""}" }
+                    log += "• compositore: $chain"
+                    onState(ExportState.Running(null, "Nuovo tentativo senza sovrapposizioni…"))
+                    handler.post { attempt(project, options, audio, 0, log, allowMulti = false) }
                     return
                 }
                 audio?.delete()
-                val causeText = cause?.let { "\nCausa: ${it.javaClass.simpleName}: ${it.message}" } ?: ""
+                val causeText = generateSequence(cause) { it.cause }.take(3)
+                    .joinToString("") { "\nCausa: ${it.javaClass.simpleName}: ${it.message?.take(160)}" }
                 onState(ExportState.Failed(
                     "Errore ${exportException.errorCode} (${exportException.errorCodeName})$causeText\n\nTentativi:\n" +
                         log.joinToString("\n")
