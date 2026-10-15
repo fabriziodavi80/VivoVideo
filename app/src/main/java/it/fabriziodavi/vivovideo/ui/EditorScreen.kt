@@ -689,16 +689,41 @@ private fun MusicPanel(vm: EditorViewModel, running: Boolean, onAdd: () -> Unit)
     }
     PanelLabel("Ritmo")
     if (t.beatsUs.isEmpty()) {
-        SecondaryButton("Rileva i battiti", onClick = { if (enabled) vm.detectBeats() })
-        Hint("Trova il tempo del brano e segna i battiti sulla timeline, per tagliare i video a ritmo.")
+        SecondaryButton("Rileva i battiti automaticamente", onClick = { if (enabled) vm.detectBeats() })
     } else {
         Text(
             "${t.bpm.roundToInt()} BPM · ${t.timelineBeats(total).size} battiti nel video",
             style = MaterialTheme.typography.bodyMedium,
         )
         Segmented(listOf(1, 2, 4), t.beatEvery, { if (it == 1) "Tutti" else "Ogni $it" }, enabled) { n ->
-            vm.updateMusic { it.copy(beatEvery = n) }
+            vm.updateBeats { it.copy(beatEvery = n) }
         }
+        LabeledSlider(
+            "Sposta i battiti automatici", "Se cadono tutti un po' prima o dopo il colpo, correggili qui.",
+            (t.beatShiftUs / 10_000).toInt(), enabled, range = -30..30,
+            format = { (if (it > 0) "+" else "") + "${it * 10} ms" },
+        ) { v -> vm.updateBeats { it.copy(beatShiftUs = v * 10_000L) } }
+    }
+    PanelLabel("Battiti a mano")
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+        SecondaryButton("Segna / togli qui", onClick = { if (enabled) vm.toggleBeatAtPlayhead() })
+        // Tap: si preme play e si tocca a tempo di musica.
+        Box(
+            Modifier.weight(1f).clip(RoundedCornerShape(12.dp))
+                .background(if (vm.isPlaying) VV.Tally else VV.Raised)
+                .clickable(enabled = enabled) { if (vm.isPlaying) vm.tapBeat() else vm.togglePlay() }
+                .padding(vertical = 13.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                if (vm.isPlaying) "TAP a tempo" else "▶ Ascolta e tocca",
+                style = MaterialTheme.typography.labelLarge,
+                color = if (vm.isPlaying) VV.TallyInk else VV.Text,
+            )
+        }
+    }
+    Hint("Segna: aggiunge un battito nel punto dell'indicatore, o toglie quello che c'è già (anche automatico). Tap: avvia l'ascolto e tocca il pulsante a ogni colpo; i battiti a mano sono bianchi.")
+    if (t.hasBeats) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             SecondaryButton("◀ Battito", onClick = { vm.jumpBeat(-1) })
             SecondaryButton("Battito ▶", onClick = { vm.jumpBeat(+1) })
@@ -706,7 +731,7 @@ private fun MusicPanel(vm: EditorViewModel, running: Boolean, onAdd: () -> Unit)
         SecondaryButton("Allinea i tagli al ritmo", onClick = { if (enabled) vm.alignCutsToBeats() })
         SecondaryButton("Dividi i video sui battiti", onClick = { if (enabled) vm.splitOnBeats() })
         ToggleRow("Aggancia i tagli ai battiti", vm.snapToBeats, enabled) { vm.snapToBeats = it }
-        Hint("Allinea: ogni cambio di clip cade sul battito più vicino. Dividi: taglia i video a ogni battito sotto il brano. Con l'aggancio, accorciando una clip la fine si ferma sul battito.")
+        SecondaryButton("Cancella tutti i battiti", onClick = { if (enabled) vm.clearBeats() })
     }
     PanelLabel("Brano")
     LabeledSlider("Volume", null, (t.volume * 100).toInt(), enabled, range = 0..200, format = { "$it%" }) { v ->

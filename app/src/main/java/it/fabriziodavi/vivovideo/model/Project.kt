@@ -185,16 +185,55 @@ data class MusicTrack(
     val bpm: Float = 0f,
     /** Usa un battito ogni N (1 = tutti, 2, 4 = uno per battuta). */
     val beatEvery: Int = 1,
+    /** Spostamento di tutti i battiti automatici (correzione fine), in µs. */
+    val beatShiftUs: Long = 0,
+    /** Battiti segnati a mano (tempo nel file del brano). */
+    val markersUs: List<Long> = emptyList(),
+    /** Battiti automatici tolti a mano. */
+    val hiddenUs: List<Long> = emptyList(),
 ) {
     val endUs: Long get() = startUs + lengthUs
 
-    /** Battiti in uso, già sulla timeline del video, dentro la parte che suona. */
-    fun timelineBeats(projectUs: Long): List<Long> {
+    /** Battiti automatici in uso (tempo nel file, già spostati). */
+    fun autoBeatsSrc(): List<Long> = beatsUs
+        .filterIndexed { i, _ -> i % beatEvery.coerceAtLeast(1) == 0 }
+        .filter { b -> hiddenUs.none { kotlin.math.abs(it - b) < 20_000 } }
+        .map { it + beatShiftUs }
+
+    private fun toTimeline(src: List<Long>, projectUs: Long): List<Long> {
         val play = playUs(projectUs)
-        return beatsUs.filterIndexed { i, _ -> i % beatEvery.coerceAtLeast(1) == 0 }
-            .map { startUs + it - offsetUs }
-            .filter { it >= startUs && it < startUs + play }
+        return src.map { startUs + it - offsetUs }.filter { it >= startUs && it < startUs + play }
     }
+
+    /** Battiti automatici sulla timeline del video, dentro la parte che suona. */
+    fun timelineAutoBeats(projectUs: Long): List<Long> = toTimeline(autoBeatsSrc(), projectUs)
+
+    /** Battiti segnati a mano, sulla timeline. */
+    fun timelineMarkers(projectUs: Long): List<Long> = toTimeline(markersUs, projectUs)
+
+    /** Tutti i battiti in uso (automatici e a mano) sulla timeline, ordinati. */
+    fun timelineBeats(projectUs: Long): List<Long> =
+        (timelineAutoBeats(projectUs) + timelineMarkers(projectUs)).sorted()
+
+    /**
+     * Segna o toglie un battito nel punto [srcUs] del brano:
+     * se c'è già un battito vicino (entro [tolUs]) lo toglie, altrimenti ne aggiunge uno a mano.
+     */
+    fun toggleBeatAt(srcUs: Long, tolUs: Long = 80_000): MusicTrack {
+        markersUs.minByOrNull { kotlin.math.abs(it - srcUs) }?.let { m ->
+            if (kotlin.math.abs(m - srcUs) <= tolUs) return copy(markersUs = markersUs - m)
+        }
+        autoBeatsSrc().minByOrNull { kotlin.math.abs(it - srcUs) }?.let { b ->
+            if (kotlin.math.abs(b - srcUs) <= tolUs) return copy(hiddenUs = hiddenUs + (b - beatShiftUs))
+        }
+        return copy(markersUs = (markersUs + srcUs).sorted())
+    }
+
+    /** Aggiunge un battito a mano (tap durante l'ascolto); ignora un doppio tocco ravvicinato. */
+    fun addMarker(srcUs: Long): MusicTrack =
+        if (markersUs.any { kotlin.math.abs(it - srcUs) < 60_000 }) this else copy(markersUs = (markersUs + srcUs).sorted())
+
+    val hasBeats: Boolean get() = beatsUs.isNotEmpty() || markersUs.isNotEmpty()
 
     /** Durata che suona davvero: si ferma alla fine del video. */
     fun playUs(projectUs: Long): Long = minOf(lengthUs, projectUs - startUs).coerceAtLeast(0)

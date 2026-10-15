@@ -166,4 +166,20 @@ class ProjectTest {
         // Il primo taglio era a 2,3 s: il battito più vicino è 2,5 s.
         assertEquals(2_500_000.0, ends[0].toDouble(), 2_000.0)
     }
+
+    @Test fun manualBeats() {
+        val m = MusicTrack(uri = "m", name = "M", sourceDurationUs = 10_000_000, beatsUs = listOf(0, 500_000, 1_000_000, 1_500_000))
+        val total = 10_000_000L
+        // Togli un battito automatico vicino all'indicatore.
+        val a = m.toggleBeatAt(520_000)
+        assertEquals(listOf(0L, 1_000_000L, 1_500_000L), a.timelineAutoBeats(total))
+        // Aggiungi un battito a mano e poi toglilo.
+        val b = a.toggleBeatAt(700_000)
+        assertEquals(listOf(700_000L), b.markersUs)
+        assertEquals(emptyList<Long>(), b.toggleBeatAt(690_000).markersUs)
+        // Spostamento fine dei battiti automatici.
+        assertEquals(1_030_000L, m.copy(beatShiftUs = 30_000).timelineAutoBeats(total)[2])
+        // Tap doppio ravvicinato ignorato.
+        assertEquals(1, m.addMarker(2_000_000).addMarker(2_030_000).markersUs.size)
+    }
 }

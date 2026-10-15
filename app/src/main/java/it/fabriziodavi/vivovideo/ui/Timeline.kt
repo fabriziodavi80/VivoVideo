@@ -532,9 +532,16 @@ private fun MusicBar(
             val p = peaks
             val mid = size.height / 2
             // Battiti: puntini arancioni in alto.
-            if (play > 0) track.timelineBeats(projectUs).forEach { b ->
-                val bx = (b - track.startUs).toFloat() / play * size.width
-                drawCircle(VV.Tally, 2.dp.toPx(), Offset(bx, 3.dp.toPx()))
+            if (play > 0) {
+                track.timelineAutoBeats(projectUs).forEach { b ->
+                    val bx = (b - track.startUs).toFloat() / play * size.width
+                    drawCircle(VV.Tally, 2.dp.toPx(), Offset(bx, 3.dp.toPx()))
+                }
+                // Battiti a mano: tacca bianca su tutta l'altezza.
+                track.timelineMarkers(projectUs).forEach { b ->
+                    val bx = (b - track.startUs).toFloat() / play * size.width
+                    drawLine(Color.White, Offset(bx, 0f), Offset(bx, size.height), 1.5.dp.toPx())
+                }
             }
             if (p == null || p.isEmpty() || play <= 0) {
                 drawLine(VV.Music.copy(alpha = 0.5f), Offset(0f, mid), Offset(size.width, mid), 1.dp.toPx())

@@ -115,7 +115,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /** Ogni modifica passa da qui: salva, aggiorna l'anteprima e prepara l'annulla. */
-    private fun update(keepUndo: Boolean = true, change: (Project) -> Project?) {
+    private fun update(keepUndo: Boolean = true, rebuild: Boolean = true, change: (Project) -> Project?) {
         val old = project ?: return
         val new = change(old)?.touch() ?: return
         if (keepUndo) {
@@ -124,7 +124,8 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         }
         project = new
         scheduleSave()
-        rebuildPreview(playheadUs / 1000)
+        // I battiti non cambiano audio e video: l'anteprima continua senza interruzioni.
+        if (rebuild) rebuildPreview(playheadUs / 1000)
     }
 
     fun undo() {
@@ -277,6 +278,40 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                 p.replaceMusic(cur.copy(beatsUs = r.beatsUs, bpm = r.bpm))
             }
         }
+    }
+
+    /** Punto del brano selezionato sotto l'indicatore (o null se l'indicatore è fuori dal brano). */
+    private fun musicSrcAt(t: MusicTrack, timelineUs: Long): Long? {
+        val total = project?.durationUs ?: return null
+        val rel = timelineUs - t.startUs
+        if (rel < 0 || rel > t.playUs(total)) return null
+        return t.offsetUs + rel
+    }
+
+    /** Segna o toglie un battito nel punto dell'indicatore. */
+    fun toggleBeatAtPlayhead() {
+        val t = selectedMusic ?: return
+        val src = musicSrcAt(t, playheadUs) ?: run { message = "Porta l'indicatore sopra il brano."; return }
+        update(rebuild = false) { it.replaceMusic(t.toggleBeatAt(src)) }
+    }
+
+    /** Tap a tempo durante l'ascolto: segna un battito nel punto che si sta sentendo. */
+    fun tapBeat() {
+        val t = selectedMusic ?: return
+        val now = player?.currentPosition?.let { it * 1000 } ?: playheadUs
+        val src = musicSrcAt(t, now) ?: return
+        update(keepUndo = false, rebuild = false) { p ->
+            val cur = p.music.firstOrNull { it.id == t.id } ?: return@update null
+            p.replaceMusic(cur.addMarker(src))
+        }
+    }
+
+    fun clearBeats() = updateMusic { it.copy(beatsUs = emptyList(), bpm = 0f, markersUs = emptyList(), hiddenUs = emptyList(), beatShiftUs = 0) }
+
+    /** Modifica dei battiti del brano selezionato senza ricaricare l'anteprima. */
+    fun updateBeats(change: (MusicTrack) -> MusicTrack) {
+        val t = selectedMusic ?: return
+        update(rebuild = false) { it.replaceMusic(change(t)) }
     }
 
     /** Sposta l'indicatore sul battito precedente o successivo. */
