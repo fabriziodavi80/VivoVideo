@@ -944,8 +944,26 @@ private fun TextPanel(vm: EditorViewModel, running: Boolean) {
             )
         }
     }
+    PanelLabel("Sfumatura verso")
+    Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
+        Box(
+            Modifier.clip(RoundedCornerShape(15.dp)).background(if (t.gradientTo == null) VV.Tally else VV.Raised)
+                .clickable(enabled = enabled) { vm.updateText { it.copy(gradientTo = null) } }.padding(horizontal = 12.dp, vertical = 6.dp)
+        ) { Text("Nessuna", style = MaterialTheme.typography.labelMedium, color = if (t.gradientTo == null) VV.TallyInk else VV.Text) }
+        TEXT_COLORS.forEach { c ->
+            Box(
+                Modifier.size(30.dp).clip(RoundedCornerShape(15.dp)).background(Color(c))
+                    .border(if (c == t.gradientTo) 3.dp else 1.dp, if (c == t.gradientTo) VV.Tally else VV.Line, RoundedCornerShape(15.dp))
+                    .clickable(enabled = enabled) { vm.updateText { it.copy(gradientTo = c) } }
+            )
+        }
+    }
     PanelLabel("Stile")
     Segmented(TextLook.entries, t.look, { it.label }, enabled) { l -> vm.updateText { it.copy(look = l) } }
+    LabeledSlider("Spaziatura lettere", null, (t.spacing * 100).toInt(), enabled, range = -5..60) { v ->
+        vm.updateText(typing = true) { it.copy(spacing = v / 100f) }
+    }
+    ToggleRow("Tutto maiuscolo", t.upper, enabled) { v -> vm.updateText { it.copy(upper = v) } }
     LabeledSlider("Dimensione", null, (t.size * 1000).toInt(), enabled, range = 15..250, format = { "${it / 10}" }) { v ->
         vm.updateText(typing = true) { it.copy(size = v / 1000f) }
     }
@@ -960,7 +978,7 @@ private fun TextPanel(vm: EditorViewModel, running: Boolean) {
     PanelLabel("Animazione in entrata")
     PillRow(TextAnim.entries, t.animIn, { it.label }, enabled) { a -> vm.updateText { it.copy(animIn = a) } }
     PanelLabel("Animazione in uscita")
-    PillRow(TextAnim.entries.filter { it != TextAnim.TYPE }, t.animOut, { it.label }, enabled) { a -> vm.updateText { it.copy(animOut = a) } }
+    PillRow(TextAnim.entries.filter { it != TextAnim.TYPE && it != TextAnim.WORDS }, t.animOut, { it.label }, enabled) { a -> vm.updateText { it.copy(animOut = a) } }
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         SecondaryButton("Duplica", onClick = { if (enabled) vm.duplicateText() })
         SecondaryButton("Elimina", onClick = { if (enabled) vm.deleteText() })
@@ -1136,9 +1154,9 @@ private fun LayerPanel(vm: EditorViewModel, running: Boolean, onAdd: () -> Unit)
         }
     }
     PanelLabel("Animazione in entrata")
-    PillRow(TextAnim.entries.filter { it != TextAnim.TYPE }, l.animIn, { it.label }, enabled) { a -> vm.updateLayer { it.copy(animIn = a) } }
+    PillRow(TextAnim.entries.filter { it != TextAnim.TYPE && it != TextAnim.WORDS }, l.animIn, { it.label }, enabled) { a -> vm.updateLayer { it.copy(animIn = a) } }
     PanelLabel("Animazione in uscita")
-    PillRow(TextAnim.entries.filter { it != TextAnim.TYPE }, l.animOut, { it.label }, enabled) { a -> vm.updateLayer { it.copy(animOut = a) } }
+    PillRow(TextAnim.entries.filter { it != TextAnim.TYPE && it != TextAnim.WORDS }, l.animOut, { it.label }, enabled) { a -> vm.updateLayer { it.copy(animOut = a) } }
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         SecondaryButton("Porta sopra", onClick = { if (enabled) vm.moveLayerZ(+1) })
         SecondaryButton("Porta sotto", onClick = { if (enabled) vm.moveLayerZ(-1) })

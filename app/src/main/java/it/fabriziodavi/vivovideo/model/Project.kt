@@ -228,7 +228,7 @@ enum class TextFont(val label: String) {
 enum class TextLook(val label: String) { SEMPLICE("Semplice"), CONTORNO("Contorno"), OMBRA("Ombra"), RIQUADRO("Riquadro"), NEON("Neon") }
 
 enum class TextAnim(val label: String) {
-    NONE("Nessuna"), FADE("Dissolvenza"), POP("Pop"), SLIDE("Scorri"), ZOOM("Zoom"), TYPE("Macchina da scrivere"),
+    NONE("Nessuna"), FADE("Dissolvenza"), POP("Pop"), SLIDE("Scorri"), ZOOM("Zoom"), TYPE("Macchina da scrivere"), WORDS("Parola per parola"),
 }
 
 /** Testo sovrapposto al video, dal tempo [startUs] della timeline per [durationUs]. */
@@ -251,6 +251,11 @@ data class TextItem(
     val animOut: TextAnim = TextAnim.FADE,
     /** Movimento (come in ProShow): posizione finale; null = fermo. x, y assoluti, scala e rotazione relative. */
     val endPose: Transform? = null,
+    /** Secondo colore per una sfumatura dall'alto in basso (null = colore pieno). */
+    val gradientTo: Int? = null,
+    /** Spaziatura fra le lettere, in frazioni della misura del carattere. */
+    val spacing: Float = 0f,
+    val upper: Boolean = false,
 ) {
     val endUs: Long get() = startUs + durationUs
 
@@ -340,21 +345,21 @@ enum class TextPreset(val label: String) {
     IMPATTO("Impatto"), FIRMA("Firma"), DIARIO("Diario");
 
     fun applyTo(t: TextItem): TextItem = when (this) {
-        CINEMA -> t.copy(font = TextFont.TITOLO, color = WHITE, look = TextLook.OMBRA, size = 0.11f, x = 0f, y = 0f, rotation = 0f,
-            animIn = TextAnim.FADE, animOut = TextAnim.FADE, endPose = Transform(x = 0f, y = 0f, scale = 1.12f))
-        DIDASCALIA -> t.copy(font = TextFont.MODERNO, color = WHITE, look = TextLook.RIQUADRO, size = 0.045f, x = 0f, y = 0.36f, rotation = 0f,
+        CINEMA -> t.copy(font = TextFont.TITOLO, color = WHITE, gradientTo = 0xFFF2B33D.toInt(), spacing = 0.12f, upper = true, look = TextLook.OMBRA,
+            size = 0.11f, x = 0f, y = 0f, rotation = 0f, animIn = TextAnim.FADE, animOut = TextAnim.FADE, endPose = Transform(x = 0f, y = 0f, scale = 1.12f))
+        DIDASCALIA -> t.copy(gradientTo = null, spacing = 0f, upper = false, font = TextFont.MODERNO, color = WHITE, look = TextLook.RIQUADRO, size = 0.045f, x = 0f, y = 0.36f, rotation = 0f,
             animIn = TextAnim.SLIDE, animOut = TextAnim.FADE, endPose = null)
-        POP -> t.copy(font = TextFont.POSTER, color = 0xFFFFE14D.toInt(), look = TextLook.CONTORNO, size = 0.08f, x = 0f, y = 0f, rotation = -4f,
-            animIn = TextAnim.POP, animOut = TextAnim.POP, endPose = null)
-        ELEGANTE -> t.copy(font = TextFont.ELEGANTE, color = WHITE, look = TextLook.OMBRA, size = 0.07f, x = 0f, y = 0.05f, rotation = 0f,
+        POP -> t.copy(font = TextFont.POSTER, color = 0xFFFFE14D.toInt(), gradientTo = 0xFFFF7AB6.toInt(), spacing = 0f, upper = true, look = TextLook.CONTORNO,
+            size = 0.08f, x = 0f, y = 0f, rotation = -4f, animIn = TextAnim.WORDS, animOut = TextAnim.POP, endPose = null)
+        ELEGANTE -> t.copy(font = TextFont.ELEGANTE, color = WHITE, gradientTo = null, spacing = 0.04f, upper = false, look = TextLook.OMBRA, size = 0.07f, x = 0f, y = 0.05f, rotation = 0f,
             animIn = TextAnim.FADE, animOut = TextAnim.FADE, endPose = Transform(x = 0f, y = -0.02f, scale = 1.04f))
-        NEON -> t.copy(font = TextFont.IMPATTO, color = 0xFFFF7AB6.toInt(), look = TextLook.NEON, size = 0.09f, x = 0f, y = 0f, rotation = 0f,
+        NEON -> t.copy(gradientTo = null, spacing = 0f, upper = false, font = TextFont.IMPATTO, color = 0xFFFF7AB6.toInt(), look = TextLook.NEON, size = 0.09f, x = 0f, y = 0f, rotation = 0f,
             animIn = TextAnim.ZOOM, animOut = TextAnim.FADE, endPose = null)
-        IMPATTO -> t.copy(font = TextFont.IMPATTO, color = WHITE, look = TextLook.CONTORNO, size = 0.14f, x = 0f, y = 0f, rotation = 0f,
+        IMPATTO -> t.copy(font = TextFont.IMPATTO, color = WHITE, gradientTo = null, spacing = 0.02f, upper = true, look = TextLook.CONTORNO, size = 0.14f, x = 0f, y = 0f, rotation = 0f,
             animIn = TextAnim.ZOOM, animOut = TextAnim.ZOOM, endPose = null)
-        FIRMA -> t.copy(font = TextFont.CORSIVO, color = WHITE, look = TextLook.OMBRA, size = 0.06f, x = 0.2f, y = 0.38f, rotation = -3f,
+        FIRMA -> t.copy(gradientTo = null, spacing = 0f, upper = false, font = TextFont.CORSIVO, color = WHITE, look = TextLook.OMBRA, size = 0.06f, x = 0.2f, y = 0.38f, rotation = -3f,
             animIn = TextAnim.FADE, animOut = TextAnim.FADE, endPose = null)
-        DIARIO -> t.copy(font = TextFont.MACCHINA, color = WHITE, look = TextLook.RIQUADRO, size = 0.04f, x = 0f, y = 0.3f, rotation = 0f,
+        DIARIO -> t.copy(gradientTo = null, spacing = 0f, upper = false, font = TextFont.MACCHINA, color = WHITE, look = TextLook.RIQUADRO, size = 0.04f, x = 0f, y = 0.3f, rotation = 0f,
             animIn = TextAnim.TYPE, animOut = TextAnim.FADE, endPose = null)
     }
 

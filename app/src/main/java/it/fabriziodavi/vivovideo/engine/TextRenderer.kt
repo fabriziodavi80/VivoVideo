@@ -55,6 +55,8 @@ object TextRenderer {
         (Color.blue(c) + (255 - Color.blue(c)) * k).toInt(),
     )
 
+    fun displayText(item: TextItem): String = if (item.upper) item.text.uppercase() else item.text
+
     private fun isLight(c: Int): Boolean =
         (0.2126 * Color.red(c) + 0.7152 * Color.green(c) + 0.0722 * Color.blue(c)) > 140
 
@@ -65,8 +67,9 @@ object TextRenderer {
             typeface = typeface(context, item.font)
             textSize = (item.size * frameH).coerceAtLeast(4f)
             color = item.color
+            letterSpacing = item.spacing
         }
-        val text = item.text.ifEmpty { " " }
+        val text = displayText(item).ifEmpty { " " }
         // Larghezza massima: 90% del quadro; poi si stringe alla riga più lunga.
         val maxW = (frameW * 0.9f).toInt().coerceAtLeast(16)
         val content: CharSequence = if (visible >= text.length) text else SpannableString(text).apply {
@@ -90,8 +93,8 @@ object TextRenderer {
     }
 
     fun render(context: Context, item: TextItem, frameW: Int, frameH: Int, visible: Int = Int.MAX_VALUE): Bitmap {
-        val v = visible.coerceAtMost(item.text.length)
-        val key = "${item.text.hashCode()}|${item.font}|${item.look}|${item.color}|${item.size}|$frameW|$frameH|$v"
+        val v = visible.coerceAtMost(displayText(item).length)
+        val key = "${item.text.hashCode()}|${item.font}|${item.look}|${item.color}|${item.gradientTo}|${item.spacing}|${item.upper}|${item.size}|$frameW|$frameH|$v"
         cache.get(key)?.let { return it }
         val p = prepare(context, item, frameW, frameH, v)
         val bw = p.width + 2 * p.pad
@@ -120,6 +123,10 @@ object TextRenderer {
             p.paint.style = Paint.Style.FILL
             p.paint.color = fill
         }
+        // Sfumatura: il riempimento passa dal primo al secondo colore dall'alto in basso.
+        val gradient = item.gradientTo?.let {
+            android.graphics.LinearGradient(0f, 0f, 0f, p.layout.height.toFloat(), item.color, it, android.graphics.Shader.TileMode.CLAMP)
+        }
         if (item.look == TextLook.NEON) {
             // Alone luminoso del colore scelto (due passate) e anima chiara al centro.
             val glow = p.paint.color
@@ -130,7 +137,9 @@ object TextRenderer {
             p.paint.color = blendToWhite(glow, 0.75f)
             p.paint.setShadowLayer(p.paint.textSize * 0.06f, 0f, 0f, glow)
         }
+        p.paint.shader = gradient
         p.layout.draw(c)
+        p.paint.shader = null
         cache.put(key, bmp)
         return bmp
     }
@@ -163,7 +172,7 @@ internal fun animFactors(animIn: TextAnim, animOut: TextAnim, local: Long, durat
         else -> {}
     }
     when (animOut) {
-        TextAnim.FADE, TextAnim.TYPE -> alpha *= ease(pout)
+        TextAnim.FADE, TextAnim.TYPE, TextAnim.WORDS -> alpha *= ease(pout)
         TextAnim.POP -> { scale *= 0.5f + 0.5f * ease(pout); alpha *= ease(pout) }
         TextAnim.SLIDE -> { dy -= 0.08f * (1 - ease(pout)); alpha *= ease(pout) }
         TextAnim.ZOOM -> { scale *= 1f + 0.6f * (1 - ease(pout)); alpha *= ease(pout) }
@@ -199,11 +208,24 @@ class TimedTextOverlay(
 
     override fun getBitmap(presentationTimeUs: Long): Bitmap {
         val local = presentationTimeUs - item.startUs
+        if (item.animIn == TextAnim.WORDS) {
+            // Parola per parola: ogni parola compare a turno (~0,25 s l'una).
+            val text = TextRenderer.displayText(item)
+            val ends = Regex("\\S+").findAll(text).map { it.range.last + 1 }.toList()
+            if (ends.isNotEmpty()) {
+                val revealUs = minOf(ends.size * 250_000L, 2_000_000L, item.durationUs / 2).coerceAtLeast(1)
+                if (local < revealUs) {
+                    val n = (ends.size * local.coerceAtLeast(0) / revealUs).toInt() + 1
+                    return TextRenderer.render(context, item, frameW, frameH, ends[(n - 1).coerceIn(0, ends.lastIndex)])
+                }
+            }
+        }
         if (item.animIn == TextAnim.TYPE) {
             // Macchina da scrivere: le lettere compaiono in ~1 s (al massimo metà della durata).
-            val typeUs = minOf(item.text.length * 60_000L, 1_200_000L, item.durationUs / 2).coerceAtLeast(1)
+            val len = TextRenderer.displayText(item).length
+            val typeUs = minOf(len * 60_000L, 1_200_000L, item.durationUs / 2).coerceAtLeast(1)
             if (local < typeUs) {
-                val n = (item.text.length * local.coerceAtLeast(0) / typeUs).toInt()
+                val n = (len * local.coerceAtLeast(0) / typeUs).toInt()
                 return TextRenderer.render(context, item, frameW, frameH, n)
             }
         }
