@@ -241,8 +241,11 @@ class DeviceTest {
         exportAndCheck(fullProject(), multi = false)
     }
 
-    /** L'anteprima deve scorrere davvero: tempo che avanza e fotogrammi che arrivano. */
-    private fun playFor(p: Project, seconds: Long = 4) {
+    /**
+     * L'anteprima deve scorrere davvero: dopo l'avvio, il tempo avanza quasi come l'orologio e
+     * arrivano i fotogrammi. Registra la posizione ogni mezzo secondo per capire dove si ferma.
+     */
+    private fun playFor(p: Project, seconds: Int = 6) {
         val factory = CompositionFactory(ctx)
         val (w, h) = factory.outputSize(p, 1080)
         val shown = CrossfadePreview.previewProject(ctx, p, w, h)
@@ -252,10 +255,12 @@ class DeviceTest {
         val reader = ImageReader.newInstance(w, h, PixelFormat.RGBA_8888, 4)
         reader.setOnImageAvailableListener({ r -> r.acquireLatestImage()?.close(); frames.incrementAndGet() }, main)
         val player = AtomicReference<CompositionPlayer>()
+        val ready = CountDownLatch(1)
         main.post {
             val pl = CompositionPlayer.Builder(ctx).build()
             pl.addListener(object : Player.Listener {
-                override fun onPlayerError(e: PlaybackException) { error.set(chain(e)) }
+                override fun onPlayerError(e: PlaybackException) { error.set(chain(e)); ready.countDown() }
+                override fun onIsPlayingChanged(isPlaying: Boolean) { if (isPlaying) ready.countDown() }
             })
             pl.setVideoSurface(reader.surface, Size(w, h))
             pl.setComposition(composition)
@@ -263,15 +268,27 @@ class DeviceTest {
             pl.play()
             player.set(pl)
         }
-        Thread.sleep(seconds * 1000)
-        val pos = AtomicReference(0L)
+        assertTrue("l'anteprima non parte", ready.await(15, TimeUnit.SECONDS))
+        error.get()?.let { fail("anteprima: $it") }
+        fun pos(): Long {
+            val r = AtomicReference(0L); val l = CountDownLatch(1)
+            main.post { r.set(player.get().currentPosition); l.countDown() }
+            l.await(5, TimeUnit.SECONDS)
+            return r.get()
+        }
+        val samples = mutableListOf<Long>()
+        val f0 = frames.get()
+        repeat(seconds * 2) { samples += pos(); Thread.sleep(500) }
         val latch = CountDownLatch(1)
-        main.post { pos.set(player.get().currentPosition); player.get().release(); latch.countDown() }
+        main.post { player.get().release(); latch.countDown() }
         latch.await(10, TimeUnit.SECONDS)
         reader.close()
         error.get()?.let { fail("anteprima: $it") }
-        assertTrue("anteprima ferma: posizione ${pos.get()} ms", pos.get() > (seconds - 2) * 1000)
-        assertTrue("anteprima senza immagini: ${frames.get()} fotogrammi", frames.get() > 20)
+        val advanced = samples.last() - samples.first()
+        val trace = samples.joinToString(" ")
+        val expected = (seconds * 2 - 1) * 500L
+        assertTrue("anteprima lenta: avanzata di $advanced ms invece di ~$expected (posizioni: $trace)", advanced > expected * 0.7)
+        assertTrue("anteprima senza immagini: ${frames.get() - f0} fotogrammi (posizioni: $trace)", frames.get() - f0 > seconds * 5)
     }
 
     @Test fun previewPlaysEveryFeature() {
@@ -292,6 +309,6 @@ class DeviceTest {
             assertTrue(out.length() > 1000)
         }
         // L'anteprima con le dissolvenze pronte scorre.
-        playFor(p, seconds = 5)
+        playFor(p, seconds = 8)
     }
 }
