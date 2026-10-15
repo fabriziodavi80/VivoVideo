@@ -75,6 +75,8 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     var logMode by mutableStateOf(false)
     var customLut by mutableStateOf<CubeLut?>(null)
         private set
+    /** Recupero alte luci / cielo, da 0 a 100. */
+    var highlights by mutableStateOf(0)
     var lutError by mutableStateOf<String?>(null)
         private set
     private val builtInLog: CubeLut by lazy {
@@ -85,6 +87,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     fun colorEffects(): List<Effect> = buildList {
         if (logMode) add(builtInLog.toEffect())
         customLut?.let { add(it.toEffect()) }
+        if (highlights > 0) add(highlightEffect(highlights / 100f))
         addAll(look.effects())
     }
 
@@ -284,6 +287,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                             exportResult.videoEncoderName?.let { append("\nEncoder: $it ($modeLabel)") }
                             if (logMode) append("\nColore: LOG convertito")
                             customLut?.let { append("\nLUT: ${it.name}") }
+                            if (highlights > 0) append("\nAlte luci / cielo: $highlights")
                             if (nativeAudio) append("\nAudio: tono naturale (Signalsmith)")
                             if (log.isNotEmpty()) append("\nTentativi falliti prima: ${log.size}")
                         }

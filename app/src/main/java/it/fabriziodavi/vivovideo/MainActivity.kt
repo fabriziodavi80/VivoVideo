@@ -37,13 +37,18 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -136,7 +141,7 @@ private fun MainScreen(vm: MainViewModel) {
             val uri = vm.sourceUri
             val info = vm.info
             if (uri != null) {
-                val colorKey = "${vm.logMode}|${System.identityHashCode(vm.customLut)}|${vm.look}"
+                val colorKey = "${vm.logMode}|${System.identityHashCode(vm.customLut)}|${vm.look}|${vm.highlights}"
                 val effects = remember(colorKey) { vm.colorEffects() }
                 Preview(uri, effects, vm.speed, info, exporting = running)
             }
@@ -156,6 +161,7 @@ private fun MainScreen(vm: MainViewModel) {
                         }
                     }
                     vm.lutError?.let { Text(it, color = Accent, fontSize = 13.sp) }
+                    HighlightSlider(vm.highlights, !running) { vm.highlights = it }
                 }
                 Section("Filtro") {
                     ChipRow(Look.entries, vm.look, { it.label }, !running) { vm.look = it }
@@ -343,4 +349,23 @@ private object BuildConfigInfo {
         runCatching {
             context.packageManager.getPackageInfo(context.packageName, 0).versionName
         }.getOrNull() ?: "?"
+}
+
+@Composable
+private fun HighlightSlider(value: Int, enabled: Boolean, onChange: (Int) -> Unit) {
+    // Il valore si applica quando sollevi il dito, così l'anteprima non si ricrea a ogni pixel.
+    var local by remember(value) { mutableFloatStateOf(value.toFloat()) }
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Text("Alte luci / cielo", color = Color(0xFFDDE0E8), modifier = Modifier.weight(1f))
+        Text(local.toInt().toString(), color = Color(0xFF8A8F9C), fontSize = 13.sp)
+    }
+    Slider(
+        value = local,
+        onValueChange = { local = it },
+        onValueChangeFinished = { onChange(local.toInt()) },
+        valueRange = 0f..100f,
+        enabled = enabled,
+        colors = SliderDefaults.colors(thumbColor = Accent, activeTrackColor = Accent),
+    )
+    Hint("Scurisce le zone chiare e ne recupera il colore. Ottimo sui video LOG.")
 }
