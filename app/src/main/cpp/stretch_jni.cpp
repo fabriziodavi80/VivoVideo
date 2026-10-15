@@ -7,7 +7,7 @@ Java_it_fabriziodavi_vivovideo_NativeStretch_stretch(
         jfloatArray input, jint channels, jint sampleRate,
         jdoubleArray segEnd, jdoubleArray speed) {
     const jsize n = env->GetArrayLength(input);
-    std::vector<float> in(size_t(n));
+    std::vector<float> in(static_cast<size_t>(n));
     env->GetFloatArrayRegion(input, 0, n, in.data());
 
     vivo::SpeedCurve curve;
