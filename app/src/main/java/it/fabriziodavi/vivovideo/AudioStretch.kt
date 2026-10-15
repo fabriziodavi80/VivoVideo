@@ -65,6 +65,15 @@ fun renderTimelineAudio(context: Context, project: Project, onProgress: (Float) 
             // Lunghezza esatta della clip nel video: si completa con silenzio o si taglia.
             val needed = (target * OUT_CH).toInt()
             if (samples.size != needed) samples = samples.copyOf(needed)
+            // Micro-dissolvenze (8 ms) agli estremi di ogni clip: niente "clic" sui tagli.
+            val ramp = minOf(OUT_RATE * 8 / 1000, samples.size / OUT_CH / 2)
+            for (f in 0 until ramp) {
+                val g = f.toFloat() / ramp
+                for (ch in 0 until OUT_CH) {
+                    samples[f * OUT_CH + ch] *= g
+                    samples[samples.size - (f + 1) * OUT_CH + ch] *= g
+                }
+            }
             writePcm16(out, samples)
             frames += target
             onProgress((i + 1f) / project.clips.size * if (project.music.isEmpty() && project.layers.none { it.isVideo }) 1f else 0.6f)

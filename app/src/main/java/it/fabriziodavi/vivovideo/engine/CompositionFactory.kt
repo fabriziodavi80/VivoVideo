@@ -19,7 +19,10 @@ import it.fabriziodavi.vivovideo.DenoiseEffect
 import it.fabriziodavi.vivovideo.HighlightEffect
 import it.fabriziodavi.vivovideo.Look
 import it.fabriziodavi.vivovideo.model.Clip
+import it.fabriziodavi.vivovideo.model.KeyColor
 import it.fabriziodavi.vivovideo.model.Layer
+import it.fabriziodavi.vivovideo.model.LayerBorder
+import it.fabriziodavi.vivovideo.model.LayerMask
 import it.fabriziodavi.vivovideo.model.packLanes
 import it.fabriziodavi.vivovideo.model.FxType
 import it.fabriziodavi.vivovideo.model.Project
@@ -134,7 +137,10 @@ class CompositionFactory(private val context: Context) {
                     .setRemoveAudio(!keepAudio || l.muted)
                     .setEffects(Effects(
                         if (keepAudio && !l.muted) volumeProcessors(l.volume) else emptyList(),
-                        listOf(Presentation.createForWidthAndHeight(lw, lh, Presentation.LAYOUT_SCALE_TO_FIT)),
+                        buildList<Effect> {
+                            add(Presentation.createForWidthAndHeight(lw, lh, Presentation.LAYOUT_SCALE_TO_FIT))
+                            if (l.shape != LayerMask.NONE || l.key != KeyColor.NONE || l.border != LayerBorder.NONE) add(LayerMaskEffect(l))
+                        },
                     ))
                     .build()
             )

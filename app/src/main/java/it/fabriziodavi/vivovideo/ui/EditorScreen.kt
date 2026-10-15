@@ -1138,11 +1138,11 @@ private fun LayerPanel(vm: EditorViewModel, running: Boolean, onAdd: () -> Unit)
         if (!l.muted) LabeledSlider("Volume", null, (l.volume * 100).toInt(), enabled, range = 0..200, format = { "$it%" }) { v ->
             vm.updateLayer { it.copy(volume = v / 100f) }
         }
-        Hint("Forme, cornici e scontorno per ora valgono solo per le immagini.")
-    } else {
-        PanelLabel("Cornice e ombra")
+    }
+    run {
+        PanelLabel(if (l.isVideo) "Cornice" else "Cornice e ombra")
         Segmented(LayerBorder.entries, l.border, { it.label }, enabled) { b -> vm.updateLayer { it.copy(border = b) } }
-        ToggleRow("Ombra", l.shadow, enabled) { v -> vm.updateLayer { it.copy(shadow = v) } }
+        if (!l.isVideo) ToggleRow("Ombra", l.shadow, enabled) { v -> vm.updateLayer { it.copy(shadow = v) } }
         PanelLabel("Forma")
         PillRow(LayerMask.entries, l.shape, { it.label }, enabled) { m -> vm.updateLayer { it.copy(mask = m, rounded = false) } }
         PanelLabel("Scontorno (togli lo sfondo)")

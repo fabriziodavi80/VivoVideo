@@ -57,7 +57,7 @@ object Safety {
         }
     }
 
-    fun multiPreview(c: Context) = prefs(c).getBoolean("multi_preview", false)
+    fun multiPreview(c: Context) = prefs(c).getBoolean("multi_preview", true)
     fun setMultiPreview(c: Context, on: Boolean) = prefs(c).edit().putBoolean("multi_preview", on).apply()
     fun multiExport(c: Context) = prefs(c).getBoolean("multi_export", true)
     fun setMultiExport(c: Context, on: Boolean) = prefs(c).edit().putBoolean("multi_export", on).apply()
