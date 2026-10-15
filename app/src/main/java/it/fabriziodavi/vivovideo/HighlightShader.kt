@@ -78,8 +78,11 @@ uniform float uAmount;
 uniform float uSeed;
 varying vec2 vTexSamplingCoord;
 
+// Hash senza seno: stabile anche sulle GPU mobili (nessun motivo regolare).
 float rand(vec2 p) {
-  return fract(sin(dot(p + uSeed, vec2(12.9898, 78.233))) * 43758.5453);
+  vec3 p3 = fract(vec3(p.xyx + uSeed) * 0.1031);
+  p3 += dot(p3, p3.yzx + 33.33);
+  return fract((p3.x + p3.y) * p3.z);
 }
 
 void main() {
