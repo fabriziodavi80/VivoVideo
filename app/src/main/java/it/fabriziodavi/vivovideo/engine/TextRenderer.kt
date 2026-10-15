@@ -122,6 +122,53 @@ object TextRenderer {
 private const val IN_US = 450_000L
 private const val OUT_US = 350_000L
 
+/** Effetto delle animazioni di entrata/uscita a [local] µs dall'inizio: trasparenza, scala, spostamento verticale. */
+internal data class AnimFactors(val alpha: Float, val scale: Float, val dy: Float)
+
+internal fun animFactors(animIn: TextAnim, animOut: TextAnim, local: Long, duration: Long): AnimFactors {
+    if (local < 0 || local >= duration) return AnimFactors(0f, 1f, 0f)
+    var alpha = 1f
+    var scale = 1f
+    var dy = 0f
+    fun ease(x: Float) = x.coerceIn(0f, 1f).let { 1 - (1 - it) * (1 - it) * (1 - it) }
+    val pin = local.toFloat() / minOf(IN_US, duration / 2).coerceAtLeast(1)
+    val pout = (duration - local).toFloat() / minOf(OUT_US, duration / 2).coerceAtLeast(1)
+    when (animIn) {
+        TextAnim.FADE -> alpha *= ease(pin)
+        TextAnim.POP -> if (pin < 1) {
+            // Rimbalzo: cresce oltre la misura e torna indietro.
+            val e = pin.coerceIn(0f, 1f)
+            scale *= if (e < 0.7f) 0.5f + 0.6f * (e / 0.7f) else 1.1f - 0.1f * ((e - 0.7f) / 0.3f)
+            alpha *= ease(pin * 2)
+        }
+        TextAnim.SLIDE -> { dy += 0.08f * (1 - ease(pin)); alpha *= ease(pin) }
+        TextAnim.ZOOM -> { scale *= 1.6f - 0.6f * ease(pin); alpha *= ease(pin) }
+        else -> {}
+    }
+    when (animOut) {
+        TextAnim.FADE, TextAnim.TYPE -> alpha *= ease(pout)
+        TextAnim.POP -> { scale *= 0.5f + 0.5f * ease(pout); alpha *= ease(pout) }
+        TextAnim.SLIDE -> { dy -= 0.08f * (1 - ease(pout)); alpha *= ease(pout) }
+        TextAnim.ZOOM -> { scale *= 1f + 0.6f * (1 - ease(pout)); alpha *= ease(pout) }
+        else -> {}
+    }
+    return AnimFactors(alpha, scale, dy)
+}
+
+/** Movimento morbido 0→1 lungo la durata. */
+internal fun motionU(local: Long, duration: Long): Float {
+    val u = (local.toFloat() / duration.coerceAtLeast(1)).coerceIn(0f, 1f)
+    return u * u * (3 - 2 * u)
+}
+
+internal fun overlaySettings(alpha: Float, scale: Float, rotation: Float, x: Float, y: Float): OverlaySettings =
+    StaticOverlaySettings.Builder()
+        .setAlphaScale(alpha.coerceIn(0f, 1f))
+        .setScale(scale.coerceAtLeast(0.001f), scale.coerceAtLeast(0.001f))
+        .setRotationDegrees(-rotation)
+        .setBackgroundFrameAnchor((2 * x).coerceIn(-1f, 1f), (-2 * y).coerceIn(-1f, 1f))
+        .build()
+
 /**
  * Un testo come livello sopra al video: immagine fissa, animazioni con le impostazioni del livello
  * (trasparenza, scala, posizione), quindi leggere anche in 4K. Il tempo è quello del montaggio.
@@ -148,40 +195,15 @@ class TimedTextOverlay(
 
     override fun getOverlaySettings(presentationTimeUs: Long): OverlaySettings {
         val local = presentationTimeUs - item.startUs
-        var alpha = 1f
-        var scale = 1f
-        var dy = 0f
-        if (local < 0 || local >= item.durationUs) {
-            alpha = 0f
-        } else {
-            fun ease(x: Float) = x.coerceIn(0f, 1f).let { 1 - (1 - it) * (1 - it) * (1 - it) }
-            val pin = local.toFloat() / minOf(IN_US, item.durationUs / 2)
-            val pout = (item.durationUs - local).toFloat() / minOf(OUT_US, item.durationUs / 2)
-            when (item.animIn) {
-                TextAnim.FADE -> alpha *= ease(pin)
-                TextAnim.POP -> if (pin < 1) {
-                    // Rimbalzo: cresce oltre la misura e torna indietro.
-                    val e = pin.coerceIn(0f, 1f)
-                    scale *= if (e < 0.7f) 0.5f + 0.6f * (e / 0.7f) else 1.1f - 0.1f * ((e - 0.7f) / 0.3f)
-                    alpha *= ease(pin * 2)
-                }
-                TextAnim.SLIDE -> { dy += 0.08f * (1 - ease(pin)); alpha *= ease(pin) }
-                TextAnim.ZOOM -> { scale *= 1.6f - 0.6f * ease(pin); alpha *= ease(pin) }
-                else -> {}
-            }
-            when (item.animOut) {
-                TextAnim.FADE, TextAnim.TYPE -> alpha *= ease(pout)
-                TextAnim.POP -> { scale *= 0.5f + 0.5f * ease(pout); alpha *= ease(pout) }
-                TextAnim.SLIDE -> { dy -= 0.08f * (1 - ease(pout)); alpha *= ease(pout) }
-                TextAnim.ZOOM -> { scale *= 1f + 0.6f * (1 - ease(pout)); alpha *= ease(pout) }
-                else -> {}
-            }
+        val f = animFactors(item.animIn, item.animOut, local, item.durationUs)
+        var x = item.x; var y = item.y; var scale = 1f; var rot = item.rotation; var alpha = 1f
+        item.endPose?.let { e ->
+            val u = motionU(local, item.durationUs)
+            x += (e.x - x) * u; y += (e.y - y) * u
+            scale = kotlin.math.exp(kotlin.math.ln(e.scale.coerceAtLeast(0.01f)) * u)
+            rot += (e.rotation - rot) * u
+            alpha = 1f + (e.opacity - 1f) * u
         }
-        return StaticOverlaySettings.Builder()
-            .setAlphaScale(alpha.coerceIn(0f, 1f))
-            .setScale(scale, scale)
-            .setRotationDegrees(-item.rotation)
-            .setBackgroundFrameAnchor((2 * item.x).coerceIn(-1f, 1f), (-2 * (item.y + dy)).coerceIn(-1f, 1f))
-            .build()
+        return overlaySettings(f.alpha * alpha, f.scale * scale, rot, x, y + f.dy)
     }
 }

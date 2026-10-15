@@ -18,7 +18,7 @@ data class ImportedPhoto(val file: File, val width: Int, val height: Int)
  * Copia una foto nella cartella dell'app, già raddrizzata (EXIF) e ridotta:
  * le foto da 200 MP non entrerebbero nella memoria video.
  */
-fun importPhoto(context: Context, uri: Uri): ImportedPhoto {
+fun importPhoto(context: Context, uri: Uri, dirName: String = "photos", keepAlpha: Boolean = false): ImportedPhoto {
     val cr = context.contentResolver
     val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
     cr.openInputStream(uri)!!.use { BitmapFactory.decodeStream(it, null, bounds) }
@@ -56,9 +56,13 @@ fun importPhoto(context: Context, uri: Uri): ImportedPhoto {
         if (r !== bmp) bmp.recycle()
         bmp = r
     }
-    val dir = File(context.filesDir, "photos").apply { mkdirs() }
-    val file = File(dir, "photo_${System.currentTimeMillis()}_${(Math.random() * 1e6).toInt()}.jpg")
-    FileOutputStream(file).use { bmp.compress(Bitmap.CompressFormat.JPEG, 93, it) }
+    val dir = File(context.filesDir, dirName).apply { mkdirs() }
+    val ext = if (keepAlpha) "png" else "jpg"
+    val file = File(dir, "img_${System.currentTimeMillis()}_${(Math.random() * 1e6).toInt()}.$ext")
+    FileOutputStream(file).use {
+        // PNG conserva la trasparenza (loghi, adesivi); le foto restano JPEG, più leggere.
+        if (keepAlpha) bmp.compress(Bitmap.CompressFormat.PNG, 100, it) else bmp.compress(Bitmap.CompressFormat.JPEG, 93, it)
+    }
     bmp.recycle()
     return ImportedPhoto(file, w, h)
 }

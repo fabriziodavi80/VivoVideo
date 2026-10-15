@@ -207,8 +207,47 @@ data class TextItem(
     val look: TextLook = TextLook.OMBRA,
     val animIn: TextAnim = TextAnim.FADE,
     val animOut: TextAnim = TextAnim.FADE,
+    /** Movimento (come in ProShow): posizione finale; null = fermo. x, y assoluti, scala e rotazione relative. */
+    val endPose: Transform? = null,
 ) {
     val endUs: Long get() = startUs + durationUs
+
+    companion object {
+        const val MIN_US = 300_000L
+    }
+}
+
+enum class LayerBorder(val label: String) { NONE("Nessuno"), WHITE("Bianco"), BLACK("Nero") }
+
+/**
+ * Livello immagine (foto, logo, adesivo PNG con trasparenza) sopra al video.
+ * [pose] = posizione iniziale (scala 1 = grande quanto il quadro), [endPose] = finale (movimento) o null.
+ */
+@Serializable
+data class Layer(
+    val id: String = UUID.randomUUID().toString(),
+    val uri: String,
+    val name: String = "Immagine",
+    val width: Int,
+    val height: Int,
+    val startUs: Long = 0,
+    val durationUs: Long = 4_000_000,
+    val pose: Transform = Transform(scale = 0.5f),
+    val endPose: Transform? = null,
+    val border: LayerBorder = LayerBorder.NONE,
+    val shadow: Boolean = false,
+    val rounded: Boolean = false,
+    val animIn: TextAnim = TextAnim.FADE,
+    val animOut: TextAnim = TextAnim.FADE,
+) {
+    val endUs: Long get() = startUs + durationUs
+
+    /** Posizione al tempo [localUs] dall'inizio del livello (movimento morbido fra inizio e fine). */
+    fun poseAt(localUs: Long): Transform {
+        val e = endPose ?: return pose
+        val u = (localUs.toFloat() / durationUs.coerceAtLeast(1)).coerceIn(0f, 1f)
+        return pose.lerp(e, u * u * (3 - 2 * u))
+    }
 
     companion object {
         const val MIN_US = 300_000L
@@ -322,7 +361,10 @@ data class Project(
     val color: ColorSettings = ColorSettings(),
     val music: List<MusicTrack> = emptyList(),
     val texts: List<TextItem> = emptyList(),
+    val layers: List<Layer> = emptyList(),
 ) {
+    fun replaceLayer(l: Layer): Project = copy(layers = layers.map { if (it.id == l.id) l else it })
+
     fun replaceText(t: TextItem): Project = copy(texts = texts.map { if (it.id == t.id) t else it })
 
     val durationUs: Long get() = clips.sumOf { it.outputUs }

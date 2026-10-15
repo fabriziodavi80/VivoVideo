@@ -1,5 +1,11 @@
 package it.fabriziodavi.vivovideo.ui
 
+import it.fabriziodavi.vivovideo.engine.LayerRenderer
+
+import it.fabriziodavi.vivovideo.model.LayerBorder
+
+import it.fabriziodavi.vivovideo.model.Layer
+
 import it.fabriziodavi.vivovideo.engine.TextRenderer
 
 import androidx.compose.runtime.rememberUpdatedState
@@ -125,6 +131,7 @@ enum class Tool(val label: String, val icon: () -> ImageVector, val future: Bool
     DURATION("Durata", { VVIcons.Speed }),
     FRAME("Inquadra", { VVIcons.Fullscreen }),
     TEXT("Testo", { VVIcons.Text }),
+    LAYER("Immagini", { VVIcons.Layers }),
     MUSIC("Musica", { VVIcons.Music }),
     DUPLICATE("Duplica", { VVIcons.Copy }),
     MOVE_LEFT("Indietro", { VVIcons.MoveLeft }),
@@ -141,7 +148,7 @@ private val PHOTO_TOOLS = listOf(
     Tool.SPLIT, Tool.DURATION, Tool.FRAME, Tool.TRANSITION, Tool.KEYFRAME, Tool.COLOR,
     Tool.DUPLICATE, Tool.MOVE_LEFT, Tool.MOVE_RIGHT, Tool.DELETE, Tool.EFFECTS,
 )
-private val PROJECT_TOOLS = listOf(Tool.ADD, Tool.SPLIT, Tool.TRANSITION, Tool.COLOR, Tool.TEXT, Tool.MUSIC, Tool.EFFECTS)
+private val PROJECT_TOOLS = listOf(Tool.ADD, Tool.SPLIT, Tool.TRANSITION, Tool.TEXT, Tool.LAYER, Tool.MUSIC, Tool.COLOR, Tool.EFFECTS)
 
 @Composable
 fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
@@ -175,6 +182,10 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
         if (uri != null) { vm.addMusic(uri); activeTool = Tool.MUSIC }
     }
     val pickMusic = { musicPicker.launch(arrayOf("audio/*")) }
+    val layerPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) { vm.addLayer(uri); activeTool = Tool.LAYER }
+    }
+    val pickLayer = { layerPicker.launch(arrayOf("image/*")) }
     val pickVideos = { picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo)) }
 
     fun onTool(t: Tool) {
@@ -189,6 +200,10 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
             Tool.TEXT -> {
                 activeTool = Tool.TEXT
                 if (project.texts.isEmpty()) vm.addText()
+            }
+            Tool.LAYER -> {
+                activeTool = Tool.LAYER
+                if (project.layers.isEmpty()) pickLayer()
             }
             else -> activeTool = if (activeTool == t) null else t
         }
@@ -256,6 +271,8 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
                     // Testo selezionato: riquadro da trascinare, pizzicare e ruotare con le dita.
                     val txt = vm.selectedText
                     if (activeTool == Tool.TEXT && txt != null && !running) TextHandleOverlay(vm, txt)
+                    val lay = vm.selectedLayer
+                    if (activeTool == Tool.LAYER && lay != null && !running) LayerHandleOverlay(vm, lay)
                     if (gestures) {
                         val firstClip = project.clips.firstOrNull()
                         val videoAspect = if (firstClip != null && firstClip.height > 0) firstClip.width.toFloat() / firstClip.height else 16f / 9f
@@ -336,7 +353,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
             dpPerSecond = ZOOMS[zoom],
             onSeek = vm::seekTo,
             onScrubStart = vm::pause,
-            onSelect = { vm.selectedClipId = it; if (it == null) { vm.selectedMusicId = null; vm.selectedTextId = null } },
+            onSelect = { vm.selectedClipId = it; if (it == null) { vm.selectedMusicId = null; vm.selectedTextId = null; vm.selectedLayerId = null } },
             onTrim = { id, s, e -> vm.trimClip(id, s, e) },
             onAdd = pickVideos,
             selectedMusicId = vm.selectedMusicId,
@@ -346,6 +363,9 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
             selectedTextId = vm.selectedTextId,
             onSelectText = { vm.selectText(it); activeTool = Tool.TEXT },
             onTextChange = vm::setText,
+            selectedLayerId = vm.selectedLayerId,
+            onSelectLayer = { vm.selectLayer(it); activeTool = Tool.LAYER },
+            onLayerChange = vm::setLayerItem,
         )
     }
 
@@ -369,6 +389,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
             Tool.FRAME -> FramePanel(vm, running)
             Tool.MUSIC -> MusicPanel(vm, running, pickMusic)
             Tool.TEXT -> TextPanel(vm, running)
+            Tool.LAYER -> LayerPanel(vm, running, pickLayer)
             Tool.AUDIO -> AudioPanel(vm, running)
             Tool.COLOR -> ColorPanel(vm, running) { lutPicker.launch(arrayOf("*/*")) }
             Tool.EXPORT -> ExportPanel(vm) { uri ->
@@ -907,6 +928,7 @@ private fun TextPanel(vm: EditorViewModel, running: Boolean) {
         SecondaryButton("Basso", onClick = { vm.updateText { it.copy(x = 0f, y = 0.36f) } })
     }
     Hint("Oppure trascina, pizzica e ruota il riquadro sull'anteprima con le dita.")
+    MotionSection(vm, t.endPose != null, enabled, t.startUs, t.durationUs) { vm.toggleTextMotion() }
     PanelLabel("Animazione in entrata")
     PillRow(TextAnim.entries, t.animIn, { it.label }, enabled) { a -> vm.updateText { it.copy(animIn = a) } }
     PanelLabel("Animazione in uscita")
@@ -921,38 +943,46 @@ private fun TextPanel(vm: EditorViewModel, running: Boolean) {
     }
 }
 
-/** Riquadro del testo selezionato sopra all'anteprima: si trascina, si pizzica (misura) e si ruota. */
+/**
+ * Riquadro tratteggiato sopra all'anteprima per un elemento posizionabile (testo, immagine):
+ * si trascina, si pizzica (misura) e si ruota con le dita. Le misure sono in pixel del fotogramma.
+ */
 @Composable
-private fun TextHandleOverlay(vm: EditorViewModel, t: TextItem) {
-    val context = LocalContext.current
-    val (outW, outH) = vm.previewFrameSize()
-    val (bw, bh) = remember(t.text, t.font, t.look, t.size, outW, outH) {
-        TextRenderer.measure(context, t, outW, outH)
-    }
+private fun PoseHandleOverlay(
+    key: Any,
+    frameW: Int,
+    frameH: Int,
+    boxW: Float,
+    boxH: Float,
+    x: Float,
+    y: Float,
+    rotation: Float,
+    onGesture: (dx: Float, dy: Float, zoom: Float, rot: Float) -> Unit,
+) {
     var live by remember { mutableStateOf(LiveTransform()) }
-    val current by rememberUpdatedState(t)
+    val onG by rememberUpdatedState(onGesture)
     BoxWithConstraints(Modifier.fillMaxSize()) {
         val density = LocalDensity.current
         val wPx = with(density) { maxWidth.toPx() }
         val hPx = with(density) { maxHeight.toPx() }
-        val aspect = outW.toFloat() / outH
+        val aspect = frameW.toFloat() / frameH
         val vw = minOf(wPx, hPx * aspect)
         val vh = vw / aspect
-        val k = vw / outW
-        val cx = wPx / 2 + t.x * vw + live.pan.x
-        val cy = hPx / 2 + t.y * vh + live.pan.y
-        val boxW = bw * k * live.zoom
-        val boxH = bh * k * live.zoom
+        val k = vw / frameW
+        val cx = wPx / 2 + x * vw + live.pan.x
+        val cy = hPx / 2 + y * vh + live.pan.y
+        val bw = boxW * k * live.zoom
+        val bh = boxH * k * live.zoom
         Canvas(Modifier.fillMaxSize()) {
-            rotate(t.rotation + live.rotation, Offset(cx, cy)) {
+            rotate(rotation + live.rotation, Offset(cx, cy)) {
                 drawRect(
-                    VV.Tally, topLeft = Offset(cx - boxW / 2, cy - boxH / 2), size = androidx.compose.ui.geometry.Size(boxW, boxH),
+                    VV.Tally, topLeft = Offset(cx - bw / 2, cy - bh / 2), size = androidx.compose.ui.geometry.Size(bw, bh),
                     style = Stroke(2.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 8f))),
                 )
             }
         }
         Box(
-            Modifier.fillMaxSize().pointerInput(t.id, vw) {
+            Modifier.fillMaxSize().pointerInput(key, vw) {
                 awaitEachGesture {
                     awaitFirstDown(requireUnconsumed = false)
                     var zoom = 1f; var pan = Offset.Zero; var rot = 0f
@@ -962,20 +992,117 @@ private fun TextHandleOverlay(vm: EditorViewModel, t: TextItem) {
                         live = LiveTransform(zoom, pan, rot)
                         ev.changes.forEach { it.consume() }
                     } while (ev.changes.any { it.pressed })
-                    if (zoom != 1f || pan != Offset.Zero || rot != 0f) {
-                        val b = current
-                        vm.updateText { it.copy(
-                            x = (b.x + pan.x / vw).coerceIn(-0.5f, 0.5f),
-                            y = (b.y + pan.y / vh).coerceIn(-0.5f, 0.5f),
-                            size = (b.size * zoom).coerceIn(0.015f, 0.25f),
-                            rotation = ((b.rotation + rot + 540f) % 360f) - 180f,
-                        ) }
-                    }
+                    if (zoom != 1f || pan != Offset.Zero || rot != 0f) onG(pan.x / vw, pan.y / vh, zoom, rot)
                     live = LiveTransform()
                 }
             }
         )
     }
+}
+
+private fun wrapDeg(d: Float) = ((d + 540f) % 360f) - 180f
+
+/** Riquadro del testo selezionato (posizione iniziale o finale del movimento). */
+@Composable
+private fun TextHandleOverlay(vm: EditorViewModel, t: TextItem) {
+    val context = LocalContext.current
+    val (outW, outH) = vm.previewFrameSize()
+    val (bw, bh) = remember(t.text, t.font, t.look, t.size, outW, outH) { TextRenderer.measure(context, t, outW, outH) }
+    val end = if (vm.editEnd) t.endPose else null
+    val mul = end?.scale ?: 1f
+    PoseHandleOverlay(
+        key = t.id to (end != null), frameW = outW, frameH = outH,
+        boxW = bw * mul, boxH = bh * mul,
+        x = end?.x ?: t.x, y = end?.y ?: t.y, rotation = end?.rotation ?: t.rotation,
+    ) { dx, dy, zoom, rot ->
+        vm.updateText { cur ->
+            val e = cur.endPose
+            if (vm.editEnd && e != null) cur.copy(endPose = e.copy(
+                x = (e.x + dx).coerceIn(-0.5f, 0.5f), y = (e.y + dy).coerceIn(-0.5f, 0.5f),
+                scale = (e.scale * zoom).coerceIn(0.2f, 5f), rotation = wrapDeg(e.rotation + rot),
+            )) else cur.copy(
+                x = (cur.x + dx).coerceIn(-0.5f, 0.5f), y = (cur.y + dy).coerceIn(-0.5f, 0.5f),
+                size = (cur.size * zoom).coerceIn(0.015f, 0.25f), rotation = wrapDeg(cur.rotation + rot),
+            )
+        }
+    }
+}
+
+/** Riquadro dell'immagine selezionata (posizione iniziale o finale del movimento). */
+@Composable
+private fun LayerHandleOverlay(vm: EditorViewModel, l: Layer) {
+    val (outW, outH) = vm.previewFrameSize()
+    val pose = vm.editedLayerPose() ?: l.pose
+    val (cw, ch) = LayerRenderer.containSize(l, outW, outH)
+    PoseHandleOverlay(
+        key = l.id to vm.editEnd, frameW = outW, frameH = outH,
+        boxW = cw * pose.scale, boxH = ch * pose.scale, x = pose.x, y = pose.y, rotation = pose.rotation,
+    ) { dx, dy, zoom, rot ->
+        val p = vm.editedLayerPose() ?: return@PoseHandleOverlay
+        vm.setLayerPose(p.copy(
+            x = (p.x + dx).coerceIn(-1f, 1f), y = (p.y + dy).coerceIn(-1f, 1f),
+            scale = (p.scale * zoom).coerceIn(0.05f, 1.5f), rotation = wrapDeg(p.rotation + rot),
+        ))
+    }
+}
+
+/** Interruttore del movimento e scelta della posizione da modificare (inizio/fine), come in ProShow. */
+@Composable
+private fun MotionSection(vm: EditorViewModel, on: Boolean, enabled: Boolean, startUs: Long, durationUs: Long, onToggle: () -> Unit) {
+    PanelLabel("Movimento")
+    ToggleRow("Muovi da una posizione a un'altra", on, enabled) { onToggle() }
+    if (on) {
+        Segmented(listOf(false, true), vm.editEnd, { if (it) "Posizione finale" else "Posizione iniziale" }, enabled) { e ->
+            vm.showPoseEnd(e, startUs, durationUs)
+        }
+        Hint("Scegli quale posizione modificare e sistemala con le dita sull'anteprima: il movimento va dall'una all'altra in modo morbido.")
+    }
+}
+
+@Composable
+private fun LayerPanel(vm: EditorViewModel, running: Boolean, onAdd: () -> Unit) {
+    val p = vm.project ?: return
+    val l = vm.selectedLayer
+    val enabled = !running
+    if (l == null) {
+        if (p.layers.isNotEmpty()) {
+            PanelLabel("Immagini nel progetto")
+            PillRow(p.layers, null as Layer?, { it?.name?.take(18) ?: "" }, enabled) { x -> if (x != null) vm.selectLayer(x.id) }
+        }
+        SecondaryButton("Aggiungi immagine", onClick = { if (enabled) onAdd() })
+        Hint("Foto, loghi o adesivi PNG con trasparenza sopra al video, dall'indicatore. Nella timeline li sposti e ne cambi la durata con le maniglie.")
+        return
+    }
+    val pose = vm.editedLayerPose() ?: l.pose
+    Text(l.name, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    Hint("Trascina, pizzica e ruota il riquadro sull'anteprima con due dita.")
+    LabeledSlider("Dimensione", null, (pose.scale * 100).toInt(), enabled, range = 5..150, format = { "$it%" }) {
+        vm.setLayerPose(pose.copy(scale = it / 100f))
+    }
+    LabeledSlider("Opacità", null, (pose.opacity * 100).toInt(), enabled, format = { "$it%" }) {
+        vm.setLayerPose(pose.copy(opacity = it / 100f))
+    }
+    LabeledSlider("Rotazione", null, pose.rotation.toInt(), enabled, range = -180..180, format = { "$it°" }) {
+        vm.setLayerPose(pose.copy(rotation = it.toFloat()))
+    }
+    MotionSection(vm, l.endPose != null, enabled, l.startUs, l.durationUs) { vm.toggleLayerMotion() }
+    PanelLabel("Cornice")
+    Segmented(LayerBorder.entries, l.border, { it.label }, enabled) { b -> vm.updateLayer { it.copy(border = b) } }
+    ToggleRow("Ombra", l.shadow, enabled) { v -> vm.updateLayer { it.copy(shadow = v) } }
+    ToggleRow("Angoli arrotondati", l.rounded, enabled) { v -> vm.updateLayer { it.copy(rounded = v) } }
+    PanelLabel("Animazione in entrata")
+    PillRow(TextAnim.entries.filter { it != TextAnim.TYPE }, l.animIn, { it.label }, enabled) { a -> vm.updateLayer { it.copy(animIn = a) } }
+    PanelLabel("Animazione in uscita")
+    PillRow(TextAnim.entries.filter { it != TextAnim.TYPE }, l.animOut, { it.label }, enabled) { a -> vm.updateLayer { it.copy(animOut = a) } }
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        SecondaryButton("Porta sopra", onClick = { if (enabled) vm.moveLayerZ(+1) })
+        SecondaryButton("Porta sotto", onClick = { if (enabled) vm.moveLayerZ(-1) })
+    }
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        SecondaryButton("Duplica", onClick = { if (enabled) vm.duplicateLayer() })
+        SecondaryButton("Elimina", onClick = { if (enabled) vm.deleteLayer() })
+    }
+    SecondaryButton("Aggiungi un'altra immagine", onClick = { if (enabled) onAdd() })
 }
 
 @Composable

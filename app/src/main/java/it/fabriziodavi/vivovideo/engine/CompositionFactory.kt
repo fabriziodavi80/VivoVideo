@@ -192,8 +192,13 @@ class CompositionFactory(private val context: Context) {
                 // Testi: livelli sopra a tutto (dopo inquadratura, keyframe e transizioni).
                 val endUs = startUs + clip.outputUs
                 val texts = project.texts.filter { t -> t.startUs < endUs && t.endUs > startUs && t.text.isNotBlank() }
-                if (texts.isNotEmpty()) {
-                    add(OverlayEffect(texts.map { t -> TimedTextOverlay(context, t, outW, outH) }))
+                val layers = project.layers.filter { l -> l.startUs < endUs && l.endUs > startUs }
+                if (texts.isNotEmpty() || layers.isNotEmpty()) {
+                    // Immagini sotto, testi sopra.
+                    add(OverlayEffect(
+                        layers.map { l -> LayerOverlay(l, outW, outH) } +
+                            texts.map { t -> TimedTextOverlay(context, t, outW, outH) }
+                    ))
                 }
             }
             if (clip.isPhoto) {

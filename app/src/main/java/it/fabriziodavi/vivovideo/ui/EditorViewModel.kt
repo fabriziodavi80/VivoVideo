@@ -8,6 +8,7 @@ import it.fabriziodavi.vivovideo.model.ColorSettings
 import it.fabriziodavi.vivovideo.model.Easing
 import it.fabriziodavi.vivovideo.model.Keyframe
 import it.fabriziodavi.vivovideo.model.Keyframes
+import it.fabriziodavi.vivovideo.model.Layer
 import it.fabriziodavi.vivovideo.model.MusicTrack
 import it.fabriziodavi.vivovideo.model.Project
 import it.fabriziodavi.vivovideo.model.ProjectStore
@@ -71,17 +72,24 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     /** Clip selezionata; selezionarne una toglie la selezione dal brano musicale. */
     var selectedClipId: String?
         get() = selectedClipState
-        set(v) { selectedClipState = v; if (v != null) { selectedMusicState = null; selectedTextState = null } }
+        set(v) { selectedClipState = v; if (v != null) { selectedMusicState = null; selectedTextState = null; selectedLayerState = null } }
     /** Brano musicale selezionato; selezionarlo toglie le altre selezioni. */
     private var selectedMusicState by mutableStateOf<String?>(null)
     var selectedMusicId: String?
         get() = selectedMusicState
-        set(v) { selectedMusicState = v; if (v != null) { selectedClipState = null; selectedTextState = null } }
+        set(v) { selectedMusicState = v; if (v != null) { selectedClipState = null; selectedTextState = null; selectedLayerState = null } }
     /** Testo selezionato; selezionarlo toglie le altre selezioni. */
     private var selectedTextState by mutableStateOf<String?>(null)
     var selectedTextId: String?
         get() = selectedTextState
-        set(v) { selectedTextState = v; if (v != null) { selectedClipState = null; selectedMusicState = null } }
+        set(v) { selectedTextState = v; if (v != null) { selectedClipState = null; selectedMusicState = null; selectedLayerState = null } }
+    /** Livello immagine selezionato; selezionarlo toglie le altre selezioni. */
+    private var selectedLayerState by mutableStateOf<String?>(null)
+    var selectedLayerId: String?
+        get() = selectedLayerState
+        set(v) { selectedLayerState = v; if (v != null) { selectedClipState = null; selectedMusicState = null; selectedTextState = null } }
+    /** Con il movimento attivo: si modifica la posizione finale invece di quella iniziale. */
+    var editEnd by mutableStateOf(false)
     /** Anteprima a schermo intero (nasconde anche le barre di sistema). */
     var fullscreen by mutableStateOf(false)
     var message by mutableStateOf<String?>(null)
@@ -98,6 +106,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     val selectedClip: Clip? get() = project?.clips?.firstOrNull { it.id == selectedClipId }
     val selectedMusic: MusicTrack? get() = project?.music?.firstOrNull { it.id == selectedMusicId }
     val selectedText: TextItem? get() = project?.texts?.firstOrNull { it.id == selectedTextId }
+    val selectedLayer: Layer? get() = project?.layers?.firstOrNull { it.id == selectedLayerId }
 
     fun newProject(uris: List<Uri>) {
         val n = projects.size + 1
@@ -233,6 +242,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     /** Seleziona un testo e porta l'indicatore dove si vede (dopo l'animazione di entrata). */
     fun selectText(id: String) {
         selectedTextId = id
+        editEnd = false
         val t = selectedText ?: return
         if (playheadUs < t.startUs || playheadUs >= t.endUs) {
             pause(); seekTo(t.startUs + minOf(500_000L, t.durationUs / 2))
@@ -259,6 +269,12 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     /** Modifica di un testo qualsiasi (trascinamento sulla timeline). */
     fun setText(t: TextItem) = update { it.replaceText(t) }
 
+    /** Movimento del testo: posizione finale (x, y, rotazione assolute; scala relativa). */
+    fun toggleTextMotion() = updateText { t ->
+        if (t.endPose != null) t.copy(endPose = null)
+        else t.copy(endPose = Transform(x = t.x, y = t.y, scale = 1.2f, rotation = t.rotation))
+    }.also { editEnd = false }
+
     fun deleteText() {
         val id = selectedTextId ?: return
         update { p -> p.copy(texts = p.texts.filterNot { it.id == id }) }
@@ -278,6 +294,92 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         update { p -> p.copy(texts = p.texts.map {
             it.copy(font = t.font, look = t.look, color = t.color, size = t.size, animIn = t.animIn, animOut = t.animOut)
         }) }
+    }
+
+    // ---------------- Livelli immagine ----------------
+
+    fun addLayer(uri: Uri) {
+        val ctx = getApplication<Application>()
+        val p = project ?: return
+        if (p.clips.isEmpty()) { message = "Aggiungi prima un video o una foto."; return }
+        viewModelScope.launch {
+            busy = "Preparazione dell'immagine…"
+            val layer = withContext(Dispatchers.IO) {
+                runCatching {
+                    val mime = ctx.contentResolver.getType(uri).orEmpty()
+                    val alpha = mime.contains("png") || mime.contains("webp") || mime.contains("gif")
+                    val img = importPhoto(ctx, uri, "layers", keepAlpha = alpha)
+                    val (name, _) = runCatching { readAudioInfo(ctx, uri) }.getOrDefault("Immagine" to 0L)
+                    val total = p.durationUs
+                    val start = if (total - playheadUs < Layer.MIN_US) 0L else playheadUs
+                    Layer(
+                        uri = Uri.fromFile(img.file).toString(), name = name, width = img.width, height = img.height,
+                        startUs = start, durationUs = minOf(4_000_000L, total - start).coerceAtLeast(Layer.MIN_US),
+                    )
+                }.getOrNull()
+            }
+            busy = null
+            if (layer == null) { message = "Questa immagine non si può leggere."; return@launch }
+            update { it.copy(layers = it.layers + layer) }
+            editEnd = false
+            selectedLayerId = layer.id
+        }
+    }
+
+    fun selectLayer(id: String) {
+        selectedLayerId = id
+        editEnd = false
+        val l = selectedLayer ?: return
+        if (playheadUs < l.startUs || playheadUs >= l.endUs) { pause(); seekTo(l.startUs + minOf(500_000L, l.durationUs / 2)) }
+    }
+
+    fun updateLayer(change: (Layer) -> Layer) {
+        val l = selectedLayer ?: return
+        update(rebuild = false) { it.replaceLayer(change(l)) }
+        scheduleRebuild()
+    }
+
+    /** Posizione in modifica (iniziale o finale) del livello selezionato. */
+    fun editedLayerPose(): Transform? = selectedLayer?.let { l -> if (editEnd && l.endPose != null) l.endPose else l.pose }
+
+    fun setLayerPose(t: Transform) = updateLayer { l -> if (editEnd && l.endPose != null) l.copy(endPose = t) else l.copy(pose = t) }
+
+    fun setLayerItem(l: Layer) = update { it.replaceLayer(l) }
+
+    /** Attiva/disattiva il movimento: la fine parte un po' più grande dell'inizio (zoom lento). */
+    fun toggleLayerMotion() = updateLayer { l ->
+        if (l.endPose != null) l.copy(endPose = null) else l.copy(endPose = l.pose.copy(scale = l.pose.scale * 1.25f))
+    }.also { editEnd = false }
+
+    fun deleteLayer() {
+        val id = selectedLayerId ?: return
+        update { p -> p.copy(layers = p.layers.filterNot { it.id == id }) }
+        selectedLayerId = null
+    }
+
+    fun duplicateLayer() {
+        val l = selectedLayer ?: return
+        val c = l.copy(id = java.util.UUID.randomUUID().toString(), startUs = l.endUs)
+        update { it.copy(layers = it.layers + c) }
+        selectedLayerId = c.id
+    }
+
+    /** Porta il livello sopra (+1) o sotto (-1) agli altri. */
+    fun moveLayerZ(dir: Int) {
+        val id = selectedLayerId ?: return
+        update { p ->
+            val i = p.layers.indexOfFirst { it.id == id }
+            val j = i + dir
+            if (i < 0 || j !in p.layers.indices) return@update null
+            p.copy(layers = p.layers.toMutableList().apply { add(j, removeAt(i)) })
+        }
+    }
+
+    /** Porta l'indicatore all'inizio o alla fine del movimento, per vedere la posizione che si modifica. */
+    fun showPoseEnd(end: Boolean, startUs: Long, durationUs: Long) {
+        editEnd = end
+        pause()
+        seekTo(if (end) startUs + durationUs - minOf(400_000L, durationUs / 3) else startUs + minOf(500_000L, durationUs / 3))
     }
 
     // ---------------- Musica ----------------
@@ -338,6 +440,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     fun setMusic(t: MusicTrack) = update { it.replaceMusic(t) }
 
     internal fun setMusicForTest(list: List<MusicTrack>) = update { it.copy(music = list) }
+    internal fun setLayersForTest(list: List<Layer>) = update { it.copy(layers = list) }
 
     fun deleteMusic() {
         val id = selectedMusicId ?: return

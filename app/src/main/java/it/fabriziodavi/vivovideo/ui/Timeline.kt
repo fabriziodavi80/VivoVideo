@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.sp
 import it.fabriziodavi.vivovideo.model.Clip
 import it.fabriziodavi.vivovideo.model.ClipSpeed
 import it.fabriziodavi.vivovideo.model.MusicTrack
+import it.fabriziodavi.vivovideo.model.Layer
 import it.fabriziodavi.vivovideo.model.TextItem
 import it.fabriziodavi.vivovideo.model.packLanes
 import it.fabriziodavi.vivovideo.model.Project
@@ -93,6 +94,9 @@ fun Timeline(
     selectedTextId: String? = null,
     onSelectText: (String) -> Unit = {},
     onTextChange: (TextItem) -> Unit = {},
+    selectedLayerId: String? = null,
+    onSelectLayer: (String) -> Unit = {},
+    onLayerChange: (Layer) -> Unit = {},
 ) {
     val density = LocalDensity.current
     val scroll = rememberScrollState()
@@ -125,12 +129,15 @@ fun Timeline(
     var textDraft by remember { mutableStateOf<TextItem?>(null) }
     val texts = project.texts.map { if (it.id == textDraft?.id) textDraft!! else it }
     val textLanes = packLanes(texts, { it.startUs }, { it.endUs })
+    var layerDraft by remember { mutableStateOf<Layer?>(null) }
+    val layerItems = project.layers.map { if (it.id == layerDraft?.id) layerDraft!! else it }
+    val layerLanes = packLanes(layerItems, { it.startUs }, { it.endUs })
     val noRipple = remember { MutableInteractionSource() }
 
     BoxWithConstraints(
         modifier
             .fillMaxWidth()
-            .height(RULER_H + VIDEO_H + AUDIO_H + 16.dp + (MUSIC_H + 3.dp) * (lanes.size + textLanes.size))
+            .height(RULER_H + VIDEO_H + AUDIO_H + 16.dp + (MUSIC_H + 3.dp) * (lanes.size + textLanes.size + layerLanes.size))
             .background(VV.Panel)
     ) {
         val half = maxWidth / 2
@@ -180,6 +187,27 @@ fun Timeline(
                 Spacer(Modifier.width(half))
             }
             val totalW = (project.durationUs / 1e6f * dpPerSecond).dp
+            // Righe delle immagini (livelli).
+            layerLanes.forEach { lane ->
+                Spacer(Modifier.height(3.dp))
+                Row {
+                    Spacer(Modifier.width(half))
+                    Box(Modifier.width(totalW).height(MUSIC_H)) {
+                        lane.forEach { l ->
+                            RangeBar(
+                                id = l.id, startUs = l.startUs, durationUs = l.durationUs,
+                                label = l.name, icon = VVIcons.Layers, background = VV.LayerBg,
+                                minUs = Layer.MIN_US, projectUs = project.durationUs,
+                                selected = l.id == selectedLayerId, dpPerSecond = dpPerSecond, pxPerUs = pxPerUs,
+                                onClick = { onSelectLayer(l.id) },
+                                onDraft = { st, du -> layerDraft = l.copy(startUs = st, durationUs = du) },
+                                onCommit = { layerDraft?.let(onLayerChange); layerDraft = null },
+                            )
+                        }
+                    }
+                    Spacer(Modifier.width(half))
+                }
+            }
             // Righe dei testi.
             textLanes.forEach { lane ->
                 Spacer(Modifier.height(3.dp))
@@ -187,14 +215,13 @@ fun Timeline(
                     Spacer(Modifier.width(half))
                     Box(Modifier.width(totalW).height(MUSIC_H)) {
                         lane.forEach { t ->
-                            TextBar(
-                                item = t,
-                                projectUs = project.durationUs,
-                                selected = t.id == selectedTextId,
-                                dpPerSecond = dpPerSecond,
-                                pxPerUs = pxPerUs,
+                            RangeBar(
+                                id = t.id, startUs = t.startUs, durationUs = t.durationUs,
+                                label = t.text.replace('\n', ' '), icon = VVIcons.Text, background = VV.TextBg,
+                                minUs = TextItem.MIN_US, projectUs = project.durationUs,
+                                selected = t.id == selectedTextId, dpPerSecond = dpPerSecond, pxPerUs = pxPerUs,
                                 onClick = { onSelectText(t.id) },
-                                onDraft = { textDraft = it },
+                                onDraft = { st, du -> textDraft = t.copy(startUs = st, durationUs = du) },
                                 onCommit = { textDraft?.let(onTextChange); textDraft = null },
                             )
                         }
@@ -648,50 +675,56 @@ private fun MusicHandle(
 }
 
 
-/** Testo sulla timeline: tocco = seleziona; se selezionato si sposta e si allunga/accorcia dalle maniglie. */
+/**
+ * Elemento con inizio e durata su una riga della timeline (testi, immagini):
+ * tocco = seleziona; se selezionato si sposta trascinandolo e si allunga/accorcia dalle maniglie.
+ */
 @Composable
-private fun TextBar(
-    item: TextItem,
+private fun RangeBar(
+    id: String,
+    startUs: Long,
+    durationUs: Long,
+    label: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    background: Color,
+    minUs: Long,
     projectUs: Long,
     selected: Boolean,
     dpPerSecond: Float,
     pxPerUs: Float,
     onClick: () -> Unit,
-    onDraft: (TextItem) -> Unit,
+    onDraft: (startUs: Long, durationUs: Long) -> Unit,
     onCommit: () -> Unit,
 ) {
-    val current by rememberUpdatedState(item)
-    var origin by remember { mutableStateOf(item) }
+    val curStart by rememberUpdatedState(startUs)
+    val curDur by rememberUpdatedState(durationUs)
+    var o0 by remember { mutableStateOf(0L) }
+    var d0 by remember { mutableStateOf(0L) }
     var acc by remember { mutableStateOf(0f) }
     val shape = RoundedCornerShape(4.dp)
-    val min = TextItem.MIN_US
-    fun drag(mode: Int) = Modifier.pointerInput(item.id, mode) {
+    fun drag(mode: Int) = Modifier.pointerInput(id, mode) {
         detectHorizontalDragGestures(
-            onDragStart = { origin = current; acc = 0f },
+            onDragStart = { o0 = curStart; d0 = curDur; acc = 0f },
             onDragEnd = onCommit,
             onDragCancel = onCommit,
         ) { change, dx ->
             change.consume()
             acc += dx
             val d = (acc / pxPerUs).toLong()
-            val o = origin
-            onDraft(when (mode) {
-                0 -> o.copy(startUs = (o.startUs + d).coerceIn(0L, (projectUs - o.durationUs).coerceAtLeast(0L)))
-                1 -> {
-                    val dd = d.coerceIn(-o.startUs, o.durationUs - min)
-                    o.copy(startUs = o.startUs + dd, durationUs = o.durationUs - dd)
-                }
-                else -> o.copy(durationUs = (o.durationUs + d).coerceIn(min, (projectUs - o.startUs).coerceAtLeast(min)))
-            })
+            when (mode) {
+                0 -> onDraft((o0 + d).coerceIn(0L, (projectUs - d0).coerceAtLeast(0L)), d0)
+                1 -> { val dd = d.coerceIn(-o0, d0 - minUs); onDraft(o0 + dd, d0 - dd) }
+                else -> onDraft(o0, (d0 + d).coerceIn(minUs, (projectUs - o0).coerceAtLeast(minUs)))
+            }
         }
     }
     Box(
         Modifier
-            .offset(x = (item.startUs / 1e6f * dpPerSecond).dp)
-            .width((item.durationUs / 1e6f * dpPerSecond).dp.coerceAtLeast(6.dp))
+            .offset(x = (startUs / 1e6f * dpPerSecond).dp)
+            .width((durationUs / 1e6f * dpPerSecond).dp.coerceAtLeast(6.dp))
             .fillMaxHeight()
             .clip(shape)
-            .background(VV.TextBg)
+            .background(background)
             .clickable(onClick = onClick)
             .then(if (selected) drag(0) else Modifier)
     ) {
@@ -699,9 +732,9 @@ private fun TextBar(
             Modifier.align(Alignment.CenterStart).padding(start = if (selected) HANDLE_W + 3.dp else 4.dp, end = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(VVIcons.Text, null, tint = VV.Tally, modifier = Modifier.size(11.dp))
+            Icon(icon, null, tint = VV.Tally, modifier = Modifier.size(11.dp))
             Spacer(Modifier.width(3.dp))
-            Text(item.text.replace('\n', ' '), color = Color.White, fontSize = 10.sp, fontFamily = Plex, maxLines = 1)
+            Text(label, color = Color.White, fontSize = 10.sp, fontFamily = Plex, maxLines = 1)
         }
         if (selected) {
             Box(Modifier.fillMaxSize().border(2.dp, VV.Tally, shape))

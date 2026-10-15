@@ -128,6 +128,16 @@ class ScreenshotTest {
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/11_editor_testo.png")
     }
 
+    @Test fun editorLayerPanel() {
+        val vm = vm()
+        val l = it.fabriziodavi.vivovideo.model.Layer(uri = "file:///nofile/logo.png", name = "Logo", width = 800, height = 400, startUs = 0, durationUs = 5_000_000)
+        vm.setLayersForTest(listOf(l))
+        vm.selectLayer(l.id)
+        vm.toggleLayerMotion()
+        compose.setContent { VivoTheme { EditorScreen(vm, initialTool = Tool.LAYER) } }
+        compose.onRoot().captureRoboImage("build/outputs/roborazzi/12_editor_immagini.png")
+    }
+
     @Test fun home() {
         val vm = EditorViewModel(ApplicationProvider.getApplicationContext<Application>())
         compose.setContent { VivoTheme { HomeScreen(vm) } }
