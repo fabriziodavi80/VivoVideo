@@ -71,6 +71,32 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         private set
 
     var look by mutableStateOf(Look.NONE)
+    /** Conversione LOG → colori normali con la LUT tarata sul vivo X300 Ultra. */
+    var logMode by mutableStateOf(false)
+    var customLut by mutableStateOf<CubeLut?>(null)
+        private set
+    var lutError by mutableStateOf<String?>(null)
+        private set
+    private val builtInLog: CubeLut by lazy {
+        CubeLut.fromAsset(getApplication(), CubeLut.BUILT_IN_LOG, "vivo LOG → normale")
+    }
+
+    /** Catena colore: conversione LOG, poi LUT personalizzata, poi filtro. */
+    fun colorEffects(): List<Effect> = buildList {
+        if (logMode) add(builtInLog.toEffect())
+        customLut?.let { add(it.toEffect()) }
+        addAll(look.effects())
+    }
+
+    fun loadLut(uri: Uri) {
+        viewModelScope.launch {
+            val r = withContext(Dispatchers.IO) { runCatching { CubeLut.fromUri(getApplication(), uri) } }
+            r.onSuccess { customLut = it; lutError = null }
+                .onFailure { lutError = "LUT non valida: ${it.message}" }
+        }
+    }
+
+    fun clearLut() { customLut = null; lutError = null }
     var speed by mutableStateOf(SpeedMode.NORMAL)
     var size by mutableStateOf(OutputSize.ORIGINAL)
     var fps by mutableStateOf(OutputFps.ORIGINAL)
@@ -102,6 +128,8 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             result.onSuccess {
                 info = it
                 toneMapHdr = false
+                // I video LOG del vivo sono a 10 bit ma etichettati come SDR normali.
+                logMode = it.tenBit && !it.isHdr
             }.onFailure { infoError = it.message ?: it.toString() }
         }
     }
@@ -153,7 +181,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
         // --- Effetti video ---
         val videoEffects = mutableListOf<Effect>()
-        videoEffects += look.effects()
+        videoEffects += colorEffects()
         size.shortSide?.let { videoEffects += Presentation.createForShortSide(it) }
 
         val itemBuilder = EditedMediaItem.Builder(MediaItem.fromUri(uri))
@@ -248,12 +276,14 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                     }
                     saved.onSuccess { galleryUri ->
                         val details = buildString {
-                            append("Durata: ${formatDuration(exportResult.durationMs)}")
+                            append("Durata: ${"%.1f".format(exportResult.durationMs / 1000.0)} s")
                             append(" · ${"%.1f".format(exportResult.fileSizeBytes / 1_048_576.0)} MB")
                             append("\nTempo di esportazione: ${"%.1f".format(seconds)} s")
                             append("\nCodec: ${codec.label}, ${bitrate / 1_000_000} Mbps, max ${"%.0f".format(outFps)} fps")
                             if (src.isHdr) append(if (toSdr) " · convertito in SDR" else " · HDR mantenuto")
                             exportResult.videoEncoderName?.let { append("\nEncoder: $it ($modeLabel)") }
+                            if (logMode) append("\nColore: LOG convertito")
+                            customLut?.let { append("\nLUT: ${it.name}") }
                             if (nativeAudio) append("\nAudio: tono naturale (Signalsmith)")
                             if (log.isNotEmpty()) append("\nTentativi falliti prima: ${log.size}")
                         }

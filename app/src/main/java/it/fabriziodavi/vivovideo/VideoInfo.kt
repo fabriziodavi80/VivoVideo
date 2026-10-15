@@ -19,6 +19,7 @@ data class VideoInfo(
     val hdr: String?,
     val bitrate: Int?,
     val color: String? = null,
+    val tenBit: Boolean = false,
 ) {
     /** Dimensioni come appaiono a schermo (tenendo conto della rotazione). */
     val displayWidth get() = if (rotation % 180 == 0) width else height
@@ -30,7 +31,7 @@ data class VideoInfo(
         fps?.let { append(" · ${"%.0f".format(it)} fps") }
         codec?.let { append(" · ${codecLabel(it)}") }
         hdr?.let { append(" · $it") }
-        append(" · ${formatDuration(durationMs)}")
+        append(" · ${"%.1f".format(durationMs / 1000.0)} s")
         bitrate?.let { append(" · ${it / 1_000_000} Mbps") }
         color?.let { append("\nColore: $it") }
     }
@@ -75,6 +76,7 @@ fun readVideoInfo(context: Context, uri: Uri): VideoInfo {
     var codec: String? = null
     var hdr: String? = null
     var color: String? = null
+    var tenBit = false
     val extractor = MediaExtractor()
     try {
         extractor.setDataSource(context, uri, null)
@@ -97,6 +99,7 @@ fun readVideoInfo(context: Context, uri: Uri): VideoInfo {
             }
             if (mime == MediaFormat.MIMETYPE_VIDEO_DOLBY_VISION) hdr = "Dolby Vision"
             color = describeColor(format, mime)
+            tenBit = color?.contains("10 bit") == true
             break
         }
     } catch (_: Exception) {
@@ -105,7 +108,7 @@ fun readVideoInfo(context: Context, uri: Uri): VideoInfo {
         extractor.release()
     }
 
-    return VideoInfo(width, height, rotation, durationMs, fps, codec, hdr, bitrate, color)
+    return VideoInfo(width, height, rotation, durationMs, fps, codec, hdr, bitrate, color, tenBit)
 }
 
 /** Spazio colore, curva e profondità: serve a riconoscere i video LOG. */

@@ -100,6 +100,9 @@ private fun MainScreen(vm: MainViewModel) {
         if (uri != null) vm.onVideoPicked(uri)
     }
     val running = vm.exportState is ExportState.Running
+    val lutPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) vm.loadLut(uri)
+    }
 
     Box(
         Modifier
@@ -133,11 +136,27 @@ private fun MainScreen(vm: MainViewModel) {
             val uri = vm.sourceUri
             val info = vm.info
             if (uri != null) {
-                Preview(uri, vm.look, vm.speed, info, exporting = running)
+                val colorKey = "${vm.logMode}|${System.identityHashCode(vm.customLut)}|${vm.look}"
+                val effects = remember(colorKey) { vm.colorEffects() }
+                Preview(uri, effects, vm.speed, info, exporting = running)
             }
             if (info != null) {
                 Text(info.summary(), color = Color(0xFFB8BCC8), fontSize = 13.sp)
 
+                Section("Colore") {
+                    ToggleRow("Video LOG (converti in colori normali)", vm.logMode, !running) { vm.logMode = it }
+                    if (info.tenBit && !vm.logMode) Hint("Video a 10 bit: se l'hai girato in LOG attiva la conversione.")
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                        OutlinedButton(onClick = { lutPicker.launch(arrayOf("*/*")) }, enabled = !running) {
+                            Text(if (vm.customLut == null) "Carica LUT .cube" else "Cambia LUT")
+                        }
+                        vm.customLut?.let { lut ->
+                            Text(lut.name, color = Color(0xFFDDE0E8), modifier = Modifier.weight(1f), maxLines = 1)
+                            OutlinedButton(onClick = vm::clearLut, enabled = !running) { Text("Togli") }
+                        }
+                    }
+                    vm.lutError?.let { Text(it, color = Accent, fontSize = 13.sp) }
+                }
                 Section("Filtro") {
                     ChipRow(Look.entries, vm.look, { it.label }, !running) { vm.look = it }
                 }
@@ -211,18 +230,18 @@ private fun MainScreen(vm: MainViewModel) {
 }
 
 @Composable
-private fun Preview(uri: android.net.Uri, look: Look, speed: SpeedMode, info: VideoInfo?, exporting: Boolean) {
+private fun Preview(uri: android.net.Uri, effects: List<androidx.media3.common.Effect>, speed: SpeedMode, info: VideoInfo?, exporting: Boolean) {
     val context = LocalContext.current
     // Il player si ricrea quando cambia il video o il filtro.
-    val player = remember(uri, look) {
+    val player = remember(uri) {
         ExoPlayer.Builder(context).build().apply {
-            setVideoEffects(look.effects())
             setMediaItem(MediaItem.fromUri(uri))
             repeatMode = Player.REPEAT_MODE_ALL
             prepare()
         }
     }
     DisposableEffect(player) { onDispose { player.release() } }
+    LaunchedEffect(player, effects) { player.setVideoEffects(effects) }
     // Durante l'esportazione l'anteprima libera il decoder hardware:
     // con l'8K non c'è spazio per due decoder più l'encoder.
     LaunchedEffect(player, exporting) {
