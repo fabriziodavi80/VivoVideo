@@ -168,7 +168,8 @@ class Exporter(
                 val codecInfo = (cause as? MediaCodec.CodecException)?.let { " [codice ${it.errorCode}]" } ?: ""
                 log += "• $mode, ${bitrate / 1_000_000} Mbps: ${exportException.errorCodeName}$codecInfo"
                 val retryable = exportException.errorCode == ExportException.ERROR_CODE_ENCODER_INIT_FAILED ||
-                    exportException.errorCode == ExportException.ERROR_CODE_DECODER_INIT_FAILED
+                    exportException.errorCode == ExportException.ERROR_CODE_DECODER_INIT_FAILED ||
+                    exportException.errorCode == ExportException.ERROR_CODE_MUXING_TIMEOUT
                 if (retryable && step < 3 && !cancelled) {
                     onState(ExportState.Running(null, "Nuovo tentativo con impostazioni più prudenti…"))
                     handler.post { attempt(project, options, audio, attempt + 1, log, allowMulti) }
@@ -194,9 +195,8 @@ class Exporter(
         }
 
         val t = Transformer.Builder(context)
-            // Con molti effetti su video pesanti un fotogramma può richiedere molto: si aspetta fino a 3 minuti
-            // (resta il controllo per i blocchi veri).
-            .setMaxDelayBetweenMuxerSamplesMs(180_000)
+            // Se per un minuto non esce nulla la libreria si è inceppata (capita di rado): si riprova da capo.
+            .setMaxDelayBetweenMuxerSamplesMs(60_000)
             .setVideoMimeType(options.codec.mime)
             .setEncoderFactory(
                 DefaultEncoderFactory.Builder(context).setRequestedVideoEncoderSettings(settings.build()).build()
