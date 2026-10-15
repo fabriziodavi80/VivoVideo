@@ -3,9 +3,10 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
-- **Dissolvenza incrociata vera anche in anteprima**: dopo una modifica l'app la prepara in pochi secondi (scritta "Preparo la dissolvenza…" sull'anteprima), poi la mostra come nel video finale. Nel frattempo si vede un passaggio al nero.
-- Tolto l'interruttore "Anche nell'anteprima" (faceva bloccare il lettore).
-- I pezzi della dissolvenza mantengono zoom/keyframe, inquadratura ed effetti della loro clip.
+- Corretto lo **scontorno** delle immagini (verde/blu/bianco/nero), che poteva non applicarsi.
+- Corrette le **forme** delle immagini (cerchio, cuore, stella, arrotondata), che potevano non ritagliare.
+- Dietro le quinte: ogni versione ora passa 88 prove automatiche, comprese esportazioni vere e anteprima su un telefono Android simulato.
+- Dissolvenza incrociata vera anche in anteprima (preparata in anticipo, scritta "Preparo la dissolvenza…").
 
 ## Primi passi
 - Dalla schermata dei progetti tocca **Nuovo progetto** e scegli video e foto dalla galleria.

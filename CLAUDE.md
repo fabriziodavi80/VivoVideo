@@ -7,3 +7,6 @@
   si preparano in anticipo con Transformer (`CrossfadePreview`) e l'anteprima riproduce i pezzi pronti;
   i video sovrapposti in anteprima sono immagini ferme, veri solo in esportazione.
 - Media3 passa agli effetti il tempo del montaggio intero: usare `localTimeUs(t, startUs)`.
+- Prove: `app/src/test` (logica, Robolectric, schermate) nel job principale; `app/src/androidTest/DeviceTest.kt`
+  su emulatore x86_64 nel job `emulatore` (esportazioni vere, anteprima che scorre), esito nel ramo `emulator-logs`.
+  Aggiungere prove quando si aggiungono funzioni.
