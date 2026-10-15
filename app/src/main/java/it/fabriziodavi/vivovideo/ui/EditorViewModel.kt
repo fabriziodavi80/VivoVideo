@@ -28,6 +28,8 @@ import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.transformer.CompositionPlayer
 import it.fabriziodavi.vivovideo.CubeLut
+import it.fabriziodavi.vivovideo.decodeAudioRange
+import it.fabriziodavi.vivovideo.engine.BeatDetector
 import it.fabriziodavi.vivovideo.engine.CompositionFactory
 import it.fabriziodavi.vivovideo.engine.ExportOptions
 import it.fabriziodavi.vivovideo.engine.ExportState
@@ -40,6 +42,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+
+private const val SNAP_US = 150_000L
 
 class EditorViewModel(app: Application) : AndroidViewModel(app) {
 
@@ -231,6 +235,51 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         selectedMusicId = null
     }
 
+    /** Analizza il brano selezionato e ne segna i battiti. */
+    fun detectBeats() {
+        val t = selectedMusic ?: return
+        val ctx = getApplication<Application>()
+        viewModelScope.launch {
+            busy = "Analisi del ritmo…"
+            val r = withContext(Dispatchers.Default) {
+                runCatching {
+                    val stereo = decodeAudioRange(ctx, Uri.parse(t.uri), 0, t.sourceDurationUs) ?: return@runCatching null
+                    BeatDetector.detect(BeatDetector.toMono(stereo), 48_000)
+                }.getOrNull()
+            }
+            busy = null
+            if (r == null || r.beatsUs.size < 4) { message = "Non ho trovato un ritmo chiaro in questo brano."; return@launch }
+            update { p ->
+                val cur = p.music.firstOrNull { it.id == t.id } ?: return@update null
+                p.replaceMusic(cur.copy(beatsUs = r.beatsUs, bpm = r.bpm))
+            }
+        }
+    }
+
+    /** Sposta l'indicatore sul battito precedente o successivo. */
+    fun jumpBeat(dir: Int) {
+        val beats = project?.beatTimes() ?: return
+        val target = if (dir > 0) beats.firstOrNull { it > playheadUs + 10_000 } else beats.lastOrNull { it < playheadUs - 10_000 }
+        target?.let { pause(); seekTo(it) }
+    }
+
+    fun alignCutsToBeats() {
+        val p = project ?: return
+        val r = p.alignCutsToBeats()
+        if (r == null) { message = "I tagli sono già sul ritmo (o le clip non hanno abbastanza video per arrivare al battito)."; return }
+        update { r }
+    }
+
+    /** Divide i video su ogni battito del brano selezionato. */
+    fun splitOnBeats() {
+        val p = project ?: return
+        val t = selectedMusic ?: return
+        val r = p.splitAtBeats(t.startUs + 1, t.startUs + t.playUs(p.durationUs) - 1)
+        if (r == null) { message = "Nessun battito dentro i video."; return }
+        update { r }
+        message = "Video divisi in ${r.clips.size} clip a ritmo: elimina o sostituisci i pezzi che non ti servono."
+    }
+
     /** Divide il brano selezionato nel punto dell'indicatore. */
     fun splitMusicAtPlayhead() {
         val t = selectedMusic ?: return
@@ -256,7 +305,25 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     fun trimClip(id: String, startUs: Long, endUs: Long) {
         val c = project?.clips?.firstOrNull { it.id == id } ?: return
         if (c.trimStartUs == startUs && c.trimEndUs == endUs) return
-        update { it.replaceClip(c.copy(trimStartUs = startUs, trimEndUs = endUs)) }
+        update { p ->
+            val trimmed = p.replaceClip(c.copy(trimStartUs = startUs, trimEndUs = endUs))
+            snapClipEnd(trimmed, id, moveEnd = endUs != c.trimEndUs) ?: trimmed
+        }
+    }
+
+    /** Aggancia i tagli ai battiti della musica. */
+    var snapToBeats by mutableStateOf(true)
+
+    /** Se la fine della clip cade vicino a un battito, la porta esattamente sul battito. */
+    private fun snapClipEnd(p: Project, id: String, moveEnd: Boolean): Project? {
+        if (!snapToBeats) return null
+        val beats = p.beatTimes().ifEmpty { return null }
+        val i = p.clips.indexOfFirst { it.id == id }.takeIf { it >= 0 } ?: return null
+        val start = p.clipStartsUs()[i]
+        val end = start + p.clips[i].outputUs
+        val b = beats.minByOrNull { kotlin.math.abs(it - end) } ?: return null
+        if (kotlin.math.abs(b - end) > SNAP_US || b - start < 200_000) return null
+        return p.fitClipOutput(i, b - start, moveEnd)
     }
 
     // ---------------- Keyframe ----------------

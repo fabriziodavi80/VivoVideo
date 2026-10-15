@@ -180,8 +180,21 @@ data class MusicTrack(
     val volume: Float = 1f,
     val fadeInUs: Long = 0,
     val fadeOutUs: Long = 0,
+    /** Battiti rilevati (tempo nel file del brano) e tempo in BPM; vuoto = non ancora analizzato. */
+    val beatsUs: List<Long> = emptyList(),
+    val bpm: Float = 0f,
+    /** Usa un battito ogni N (1 = tutti, 2, 4 = uno per battuta). */
+    val beatEvery: Int = 1,
 ) {
     val endUs: Long get() = startUs + lengthUs
+
+    /** Battiti in uso, già sulla timeline del video, dentro la parte che suona. */
+    fun timelineBeats(projectUs: Long): List<Long> {
+        val play = playUs(projectUs)
+        return beatsUs.filterIndexed { i, _ -> i % beatEvery.coerceAtLeast(1) == 0 }
+            .map { startUs + it - offsetUs }
+            .filter { it >= startUs && it < startUs + play }
+    }
 
     /** Durata che suona davvero: si ferma alla fine del video. */
     fun playUs(projectUs: Long): Long = minOf(lengthUs, projectUs - startUs).coerceAtLeast(0)
@@ -230,6 +243,66 @@ data class Project(
     }
 
     fun replaceMusic(t: MusicTrack): Project = copy(music = music.map { if (it.id == t.id) t else it })
+
+    /** Tutti i battiti in uso sulla timeline, ordinati. */
+    fun beatTimes(): List<Long> = durationUs.let { d -> music.flatMap { it.timelineBeats(d) }.distinct().sorted() }
+
+    /**
+     * Cambia il taglio della clip [i] perché duri [targetOutUs] nel video finale,
+     * spostando la fine (o l'inizio) nel video originale. Ricerca binaria: vale anche con le curve di velocità.
+     */
+    fun fitClipOutput(i: Int, targetOutUs: Long, moveEnd: Boolean = true): Project? {
+        val c = clips.getOrNull(i) ?: return null
+        val min = 100_000L
+        fun out(v: Long) = (if (moveEnd) c.copy(trimEndUs = v) else c.copy(trimStartUs = v)).outputUs
+        var lo: Long; var hi: Long
+        if (moveEnd) { lo = c.trimStartUs + min; hi = c.sourceDurationUs } else { lo = 0; hi = c.trimEndUs - min }
+        if (lo > hi) return null
+        // Con la fine: più grande = più lunga. Con l'inizio: più grande = più corta.
+        val maxOut = if (moveEnd) out(hi) else out(lo)
+        val minOut = if (moveEnd) out(lo) else out(hi)
+        if (targetOutUs > maxOut + 20_000 || targetOutUs < minOut - 20_000) return null
+        repeat(40) {
+            val mid = (lo + hi) / 2
+            val longer = out(mid) < targetOutUs
+            if (longer == moveEnd) lo = mid else hi = mid
+        }
+        val v = (lo + hi) / 2
+        return replaceClip(if (moveEnd) c.copy(trimEndUs = v) else c.copy(trimStartUs = v))
+    }
+
+    /**
+     * Allinea ogni taglio fra le clip (e la fine del video) al battito più vicino,
+     * allungando o accorciando la clip prima del taglio. Restituisce null se non c'è nulla da allineare.
+     */
+    fun alignCutsToBeats(minClipUs: Long = 300_000): Project? {
+        val beats = beatTimes()
+        if (beats.isEmpty()) return null
+        var p = this
+        var changed = false
+        for (i in clips.indices) {
+            val start = p.clipStartsUs()[i]
+            val c = p.clips[i]
+            val end = start + c.outputUs
+            val maxEnd = start + c.copy(trimEndUs = c.sourceDurationUs).outputUs
+            val target = beats.filter { it >= start + minClipUs && it <= maxEnd }
+                .minByOrNull { kotlin.math.abs(it - end) } ?: continue
+            if (kotlin.math.abs(target - end) < 5_000) continue
+            p = p.fitClipOutput(i, target - start) ?: continue
+            changed = true
+        }
+        return if (changed) p else null
+    }
+
+    /** Divide i video su ogni battito fra [fromUs] e [toUs] (per montare un video lungo a ritmo). */
+    fun splitAtBeats(fromUs: Long = 0, toUs: Long = Long.MAX_VALUE): Project? {
+        var p = this
+        var n = 0
+        beatTimes().filter { it in fromUs..toUs }.forEach { b ->
+            p.splitAt(b)?.let { p = it; n++ }
+        }
+        return if (n > 0) p else null
+    }
 
     /** Inizio di ogni clip sulla timeline finale. */
     fun clipStartsUs(): List<Long> {

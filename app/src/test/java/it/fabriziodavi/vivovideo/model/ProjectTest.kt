@@ -151,4 +151,19 @@ class ProjectTest {
         assertEquals(1f, a.gainAt(3_000_000, p.durationUs), 0.001f)
         assertEquals(0.5f, a.gainAt(5_000_000, p.durationUs), 0.001f)
     }
+
+    @Test fun alignCutsLandOnBeats() {
+        val a = Clip(uri = "a", sourceDurationUs = 10_000_000, trimEndUs = 2_300_000)
+        val b = Clip(uri = "b", sourceDurationUs = 10_000_000, trimEndUs = 3_100_000, speed = ClipSpeed.SLOW)
+        val beats = (0 until 40).map { it * 500_000L }
+        val m = MusicTrack(uri = "m", name = "M", sourceDurationUs = 30_000_000, lengthUs = 30_000_000, beatsUs = beats, bpm = 120f)
+        val p = Project(name = "t", clips = listOf(a, b), music = listOf(m))
+        val r = p.alignCutsToBeats()
+        assertNotNull(r)
+        val starts = r!!.clipStartsUs()
+        val ends = r.clips.mapIndexed { i, c -> starts[i] + c.outputUs }
+        for (e in ends) assertTrue("taglio a $e", e % 500_000 < 2_000 || e % 500_000 > 498_000)
+        // Il primo taglio era a 2,3 s: il battito più vicino è 2,5 s.
+        assertEquals(2_500_000.0, ends[0].toDouble(), 2_000.0)
+    }
 }

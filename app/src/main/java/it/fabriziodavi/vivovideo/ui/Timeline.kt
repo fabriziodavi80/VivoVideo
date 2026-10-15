@@ -133,7 +133,7 @@ fun Timeline(
         ) {
             Row {
                 Spacer(Modifier.width(half))
-                Ruler(project.durationUs, dpPerSecond)
+                Ruler(project.durationUs, dpPerSecond, project.beatTimes())
                 Spacer(Modifier.width(half))
             }
             Spacer(Modifier.height(4.dp))
@@ -225,7 +225,7 @@ private fun Playhead(modifier: Modifier) {
 }
 
 @Composable
-private fun Ruler(durationUs: Long, dpPerSecond: Float) {
+private fun Ruler(durationUs: Long, dpPerSecond: Float, beats: List<Long> = emptyList()) {
     val measurer = rememberTextMeasurer()
     val style = TextStyle(fontFamily = Plex, fontSize = 10.sp, color = VV.Dim)
     // Etichetta ogni 1, 2, 5 o 10 secondi a seconda dello zoom; tacche intermedie.
@@ -255,6 +255,11 @@ private fun Ruler(durationUs: Long, dpPerSecond: Float) {
                 }
             }
             t += minorStep
+        }
+        // Battiti della musica: tacche arancioni sotto il righello.
+        beats.forEach { b ->
+            val x = b / 1e6f * pxPerS
+            drawLine(VV.Tally, Offset(x, size.height), Offset(x, size.height - 6.dp.toPx()), 2.dp.toPx())
         }
     }
 }
@@ -526,6 +531,11 @@ private fun MusicBar(
         Canvas(Modifier.fillMaxSize()) {
             val p = peaks
             val mid = size.height / 2
+            // Battiti: puntini arancioni in alto.
+            if (play > 0) track.timelineBeats(projectUs).forEach { b ->
+                val bx = (b - track.startUs).toFloat() / play * size.width
+                drawCircle(VV.Tally, 2.dp.toPx(), Offset(bx, 3.dp.toPx()))
+            }
             if (p == null || p.isEmpty() || play <= 0) {
                 drawLine(VV.Music.copy(alpha = 0.5f), Offset(0f, mid), Offset(size.width, mid), 1.dp.toPx())
                 return@Canvas

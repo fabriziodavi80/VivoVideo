@@ -2,6 +2,7 @@ package it.fabriziodavi.vivovideo.ui
 
 import it.fabriziodavi.vivovideo.model.ClipSpeed
 import it.fabriziodavi.vivovideo.model.Easing
+import kotlin.math.roundToInt
 import it.fabriziodavi.vivovideo.model.MusicTrack
 import it.fabriziodavi.vivovideo.model.SpeedInterp
 import it.fabriziodavi.vivovideo.model.SpeedLimits
@@ -686,6 +687,28 @@ private fun MusicPanel(vm: EditorViewModel, running: Boolean, onAdd: () -> Unit)
         Text(t.name, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
         Text(formatTime(t.playUs(total)), style = MaterialTheme.typography.bodySmall)
     }
+    PanelLabel("Ritmo")
+    if (t.beatsUs.isEmpty()) {
+        SecondaryButton("Rileva i battiti", onClick = { if (enabled) vm.detectBeats() })
+        Hint("Trova il tempo del brano e segna i battiti sulla timeline, per tagliare i video a ritmo.")
+    } else {
+        Text(
+            "${t.bpm.roundToInt()} BPM · ${t.timelineBeats(total).size} battiti nel video",
+            style = MaterialTheme.typography.bodyMedium,
+        )
+        Segmented(listOf(1, 2, 4), t.beatEvery, { if (it == 1) "Tutti" else "Ogni $it" }, enabled) { n ->
+            vm.updateMusic { it.copy(beatEvery = n) }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            SecondaryButton("◀ Battito", onClick = { vm.jumpBeat(-1) })
+            SecondaryButton("Battito ▶", onClick = { vm.jumpBeat(+1) })
+        }
+        SecondaryButton("Allinea i tagli al ritmo", onClick = { if (enabled) vm.alignCutsToBeats() })
+        SecondaryButton("Dividi i video sui battiti", onClick = { if (enabled) vm.splitOnBeats() })
+        ToggleRow("Aggancia i tagli ai battiti", vm.snapToBeats, enabled) { vm.snapToBeats = it }
+        Hint("Allinea: ogni cambio di clip cade sul battito più vicino. Dividi: taglia i video a ogni battito sotto il brano. Con l'aggancio, accorciando una clip la fine si ferma sul battito.")
+    }
+    PanelLabel("Brano")
     LabeledSlider("Volume", null, (t.volume * 100).toInt(), enabled, range = 0..200, format = { "$it%" }) { v ->
         vm.updateMusic { it.copy(volume = v / 100f) }
     }

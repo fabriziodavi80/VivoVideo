@@ -96,6 +96,7 @@ class ScreenshotTest {
         val t = it.fabriziodavi.vivovideo.model.MusicTrack(
             uri = "content://demo/music", name = "Sunset Drive", sourceDurationUs = 180_000_000,
             startUs = 1_000_000, lengthUs = 9_000_000, fadeOutUs = 2_000_000,
+            beatsUs = (0 until 400).map { it * 468_750L }, bpm = 128f,
         )
         val t2 = t.copy(id = "b", name = "Voce", startUs = 6_000_000, lengthUs = 4_000_000)
         vm.setMusicForTest(listOf(t, t2))
