@@ -18,7 +18,10 @@ class MainActivity : ComponentActivity() {
     private val vm: EditorViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Safety.install(this)
         super.onCreate(savedInstanceState)
+        // Se l'app era caduta, lo si dice (con il dettaglio) e si spengono le funzioni sperimentali coinvolte.
+        if (savedInstanceState == null) Safety.checkAfterStart(this)?.let { vm.message = it }
         // Barre di sistema sempre chiare su fondo scuro, anche se il telefono è in tema chiaro.
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
@@ -49,9 +52,15 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        vm.onAppStart()
+    }
+
     override fun onStop() {
         super.onStop()
         // Mette in pausa l'anteprima quando l'app va in secondo piano.
         vm.pause()
+        vm.onAppStop()
     }
 }

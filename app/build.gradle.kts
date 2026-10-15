@@ -54,6 +54,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     // Le schermate dell'app vengono "fotografate" nei test (Robolectric + Roborazzi).

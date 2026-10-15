@@ -44,6 +44,7 @@ import it.fabriziodavi.vivovideo.engine.ExportOptions
 import it.fabriziodavi.vivovideo.engine.ExportState
 import it.fabriziodavi.vivovideo.engine.Exporter
 import it.fabriziodavi.vivovideo.importPhoto
+import it.fabriziodavi.vivovideo.Safety
 import it.fabriziodavi.vivovideo.readAudioInfo
 import it.fabriziodavi.vivovideo.readVideoInfo
 import kotlinx.coroutines.Dispatchers
@@ -848,6 +849,28 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private var playerMulti = false
+
+    /** Anteprima con dissolvenze incrociate e video sovrapposti (sperimentale). */
+    var multiPreviewEnabled by mutableStateOf(Safety.multiPreview(app))
+        private set
+    var multiExportEnabled by mutableStateOf(Safety.multiExport(app))
+        private set
+
+    fun setMultiPreview(on: Boolean) {
+        multiPreviewEnabled = on
+        Safety.setMultiPreview(getApplication(), on)
+        multiFailed = false
+        rebuildPreview(playheadUs / 1000)
+    }
+
+    fun setMultiExport(on: Boolean) {
+        multiExportEnabled = on
+        Safety.setMultiExport(getApplication(), on)
+    }
+
+    /** In secondo piano non c'è rischio di crash dell'anteprima: si toglie il segnale; al ritorno si rimette. */
+    fun onAppStop() { if (playerMulti) Safety.pendingPreview(getApplication(), false) }
+    fun onAppStart() { if (playerMulti && player != null) Safety.pendingPreview(getApplication(), true) }
     /** Il compositore a più ingressi ha dato errore in anteprima: si usa il ripiego. */
     private var multiFailed = false
 
@@ -855,13 +878,16 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         val p = project ?: return
         if (exportState is ExportState.Running) return
         if (p.clips.isEmpty()) { releasePlayer(); playheadUs = 0; return }
-        val composition = runCatching { factory.build(p, exportOptions, forPreview = true, nativeAudio = null, allowMulti = !multiFailed) }
+        val allowMulti = multiPreviewEnabled && !multiFailed
+        val composition = runCatching { factory.build(p, exportOptions, forPreview = true, nativeAudio = null, allowMulti = allowMulti) }
             .getOrElse { previewError = "Anteprima non disponibile: ${it.message}"; return }
         // Con video sovrapposti o dissolvenze incrociate serve il compositore a più ingressi:
         // si ricrea il lettore se cambia modalità.
-        val multi = !multiFailed && (p.layers.any { it.isVideo } || p.crossfades().isNotEmpty())
+        val multi = allowMulti && (p.layers.any { it.isVideo } || p.crossfades().isNotEmpty())
         if (player != null && playerMulti != multi) releasePlayer()
         playerMulti = multi
+        // Se l'app cadesse con l'anteprima avanzata attiva, al riavvio la si spegne da sola.
+        Safety.pendingPreview(getApplication(), multi)
         val pl = player ?: CompositionPlayer.Builder(getApplication())
             .apply { if (multi) setVideoGraphFactory(androidx.media3.effect.MultipleInputVideoGraph.Factory()) }
             .build().also { np ->
@@ -874,6 +900,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                     if (playerMulti && !multiFailed) {
                         // Ripiego: anteprima senza compositore a più ingressi.
                         multiFailed = true
+                        Safety.pendingPreview(getApplication(), false)
                         handler.post {
                             rebuildPreview(playheadUs / 1000)
                             previewError = "Anteprima semplificata (dissolvenza incrociata mostrata come passaggio al nero, video sovrapposti nascosti). Dettaglio: $detail"
@@ -890,8 +917,21 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         }
         previewError = null
         val wasPlaying = pl.isPlaying
-        pl.setComposition(composition, positionMs.coerceIn(0, p.durationUs / 1000))
-        pl.prepare()
+        try {
+            pl.setComposition(composition, positionMs.coerceIn(0, p.durationUs / 1000))
+            pl.prepare()
+        } catch (e: Exception) {
+            // Errore immediato: con l'anteprima avanzata si ripiega su quella semplice.
+            if (multi && !multiFailed) {
+                multiFailed = true
+                releasePlayer()
+                rebuildPreview(positionMs)
+                previewError = "Anteprima semplificata. Dettaglio: ${e.javaClass.simpleName}: ${e.message?.take(160)}"
+            } else {
+                previewError = "Anteprima non disponibile: ${e.javaClass.simpleName}: ${e.message?.take(160)}"
+            }
+            return
+        }
         if (wasPlaying) pl.play()
     }
 
@@ -899,6 +939,8 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         handler.removeCallbacks(ticker)
         player?.release()
         player = null
+        if (playerMulti) Safety.pendingPreview(getApplication(), false)
+        playerMulti = false
         isPlaying = false
     }
 

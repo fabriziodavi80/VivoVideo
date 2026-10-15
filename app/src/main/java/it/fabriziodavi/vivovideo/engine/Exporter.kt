@@ -20,6 +20,7 @@ import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.ProgressHolder
 import androidx.media3.transformer.Transformer
 import androidx.media3.transformer.VideoEncoderSettings
+import it.fabriziodavi.vivovideo.Safety
 import it.fabriziodavi.vivovideo.model.Project
 import it.fabriziodavi.vivovideo.renderTimelineAudio
 import kotlinx.coroutines.CoroutineScope
@@ -78,11 +79,12 @@ class Exporter(
             if (cancelled) { audio?.delete(); return@launch }
             // Lascia all'anteprima il tempo di liberare il decoder hardware.
             delay(400)
-            attempt(project, options, audio, 0, mutableListOf())
+            attempt(project, options, audio, 0, mutableListOf(), allowMulti = Safety.multiExport(context))
         }
     }
 
     fun cancel() {
+        Safety.pendingExport(context, false)
         cancelled = true
         transformer?.cancel()
         transformer = null
@@ -97,6 +99,7 @@ class Exporter(
         if (cancelled) return
         val composition = factory.build(project, options, forPreview = false, nativeAudio = audio, allowMulti = allowMulti)
         val usesMulti = allowMulti && (project.layers.any { it.isVideo } || project.crossfades().isNotEmpty())
+        Safety.pendingExport(context, usesMulti)
         val (outW, outH) = factory.outputSize(project, options.size.shortSide)
         val maxClipFps = project.clips.maxOfOrNull { it.fps } ?: 30f
         val outFps = options.fps.max?.let { minOf(it.toFloat(), maxClipFps) } ?: maxClipFps
@@ -130,6 +133,7 @@ class Exporter(
 
         val listener = object : Transformer.Listener {
             override fun onCompleted(composition: Composition, exportResult: ExportResult) {
+                Safety.pendingExport(context, false)
                 handler.removeCallbacksAndMessages(null)
                 audio?.delete()
                 transformer = null
@@ -155,6 +159,7 @@ class Exporter(
             }
 
             override fun onError(composition: Composition, exportResult: ExportResult, exportException: ExportException) {
+                Safety.pendingExport(context, false)
                 handler.removeCallbacksAndMessages(null)
                 outFile.delete()
                 transformer = null
