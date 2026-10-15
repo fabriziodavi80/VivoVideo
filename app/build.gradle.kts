@@ -16,7 +16,7 @@ android {
         minSdk = 33
         targetSdk = 36
         versionCode = buildNumber
-        versionName = "0.1.$buildNumber"
+        versionName = "0.2.$buildNumber"
         // Solo il vivo X300 Ultra: basta l'architettura ARM a 64 bit.
         ndk { abiFilters += "arm64-v8a" }
     }
