@@ -9,7 +9,7 @@ import kotlin.math.sin
 import kotlin.random.Random
 
 class BeatDetectorTest {
-    /** Ritmo sintetico: cassa ogni battito + charleston in levare + rumore. */
+    /** Ritmo sintetico: cassa (con attacco) ogni battito + charleston più debole in levare + rumore. */
     private fun synth(bpm: Double, seconds: Double, offsetS: Double): FloatArray {
         val sr = 48_000
         val n = (seconds * sr).toInt()
@@ -23,11 +23,13 @@ class BeatDetectorTest {
                 val k = s0 + i; if (k >= n) break
                 val tt = i.toDouble() / sr
                 x[k] += (0.8 * sin(2 * Math.PI * 60 * tt) * exp(-tt * 30)).toFloat()
+                // Attacco della cassa (il "click" del battente), come in una cassa vera.
+                if (i < sr / 200) x[k] += (rnd.nextFloat() - 0.5f) * 0.8f * (1f - i / (sr / 200f))
             }
             val h = ((t + beat / 2) * sr).toInt()
             for (i in 0 until sr / 40) {
                 val k = h + i; if (k >= n) break
-                x[k] += ((rnd.nextFloat() - 0.5f) * 0.3f * exp(-i / 300.0)).toFloat()
+                x[k] += ((rnd.nextFloat() - 0.5f) * 0.12f * exp(-i / 300.0)).toFloat()
             }
             t += beat
         }
