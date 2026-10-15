@@ -178,6 +178,53 @@ data class ColorSettings(
     val lutName: String? = null,
 )
 
+enum class TextFont(val label: String) {
+    MODERNO("Moderno"), TITOLO("Titolo"), IMPATTO("Impatto"), POSTER("Poster"),
+    ELEGANTE("Elegante"), CORSIVO("Corsivo"), PENNARELLO("Pennarello"), MACCHINA("Macchina"),
+}
+
+enum class TextLook(val label: String) { SEMPLICE("Semplice"), CONTORNO("Contorno"), OMBRA("Ombra"), RIQUADRO("Riquadro") }
+
+enum class TextAnim(val label: String) {
+    NONE("Nessuna"), FADE("Dissolvenza"), POP("Pop"), SLIDE("Scorri"), ZOOM("Zoom"), TYPE("Macchina da scrivere"),
+}
+
+/** Testo sovrapposto al video, dal tempo [startUs] della timeline per [durationUs]. */
+@Serializable
+data class TextItem(
+    val id: String = UUID.randomUUID().toString(),
+    val text: String = "Testo",
+    val startUs: Long = 0,
+    val durationUs: Long = 3_000_000,
+    /** Centro del testo rispetto al centro del video, in frazioni del quadro (-0,5…0,5; y verso il basso). */
+    val x: Float = 0f,
+    val y: Float = 0f,
+    /** Altezza dei caratteri rispetto all'altezza del video. */
+    val size: Float = 0.06f,
+    val rotation: Float = 0f,
+    val color: Int = 0xFFFFFFFF.toInt(),
+    val font: TextFont = TextFont.MODERNO,
+    val look: TextLook = TextLook.OMBRA,
+    val animIn: TextAnim = TextAnim.FADE,
+    val animOut: TextAnim = TextAnim.FADE,
+) {
+    val endUs: Long get() = startUs + durationUs
+
+    companion object {
+        const val MIN_US = 300_000L
+    }
+}
+
+/** Distribuisce elementi su righe senza sovrapposizioni (ordinati per inizio). */
+fun <T> packLanes(items: List<T>, start: (T) -> Long, end: (T) -> Long): List<List<T>> {
+    val lanes = mutableListOf<MutableList<T>>()
+    items.sortedBy(start).forEach { t ->
+        val lane = lanes.firstOrNull { end(it.last()) <= start(t) }
+        if (lane != null) lane += t else lanes += mutableListOf(t)
+    }
+    return lanes
+}
+
 /** Brano musicale sulla timeline: suona da [startUs] per [lengthUs], partendo da [offsetUs] nel file. */
 @Serializable
 data class MusicTrack(
@@ -274,7 +321,10 @@ data class Project(
     val clips: List<Clip> = emptyList(),
     val color: ColorSettings = ColorSettings(),
     val music: List<MusicTrack> = emptyList(),
+    val texts: List<TextItem> = emptyList(),
 ) {
+    fun replaceText(t: TextItem): Project = copy(texts = texts.map { if (it.id == t.id) t else it })
+
     val durationUs: Long get() = clips.sumOf { it.outputUs }
 
     /** Brani che suonano davvero (dentro la durata del video). */

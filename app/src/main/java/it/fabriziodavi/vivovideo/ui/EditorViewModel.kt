@@ -1,5 +1,6 @@
 package it.fabriziodavi.vivovideo.ui
 
+import it.fabriziodavi.vivovideo.model.TextItem
 import it.fabriziodavi.vivovideo.model.TransitionSpec
 import it.fabriziodavi.vivovideo.model.Clip
 import it.fabriziodavi.vivovideo.model.ClipSpeed
@@ -70,12 +71,17 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     /** Clip selezionata; selezionarne una toglie la selezione dal brano musicale. */
     var selectedClipId: String?
         get() = selectedClipState
-        set(v) { selectedClipState = v; if (v != null) selectedMusicId = null }
-    /** Brano musicale selezionato; selezionarlo toglie la selezione dalla clip. */
+        set(v) { selectedClipState = v; if (v != null) { selectedMusicState = null; selectedTextState = null } }
+    /** Brano musicale selezionato; selezionarlo toglie le altre selezioni. */
     private var selectedMusicState by mutableStateOf<String?>(null)
     var selectedMusicId: String?
         get() = selectedMusicState
-        set(v) { selectedMusicState = v; if (v != null) selectedClipState = null }
+        set(v) { selectedMusicState = v; if (v != null) { selectedClipState = null; selectedTextState = null } }
+    /** Testo selezionato; selezionarlo toglie le altre selezioni. */
+    private var selectedTextState by mutableStateOf<String?>(null)
+    var selectedTextId: String?
+        get() = selectedTextState
+        set(v) { selectedTextState = v; if (v != null) { selectedClipState = null; selectedMusicState = null } }
     /** Anteprima a schermo intero (nasconde anche le barre di sistema). */
     var fullscreen by mutableStateOf(false)
     var message by mutableStateOf<String?>(null)
@@ -91,6 +97,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
 
     val selectedClip: Clip? get() = project?.clips?.firstOrNull { it.id == selectedClipId }
     val selectedMusic: MusicTrack? get() = project?.music?.firstOrNull { it.id == selectedMusicId }
+    val selectedText: TextItem? get() = project?.texts?.firstOrNull { it.id == selectedTextId }
 
     fun newProject(uris: List<Uri>) {
         val n = projects.size + 1
@@ -205,6 +212,72 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                 updateColor(keepUndo = false) { it.copy(denoise = 40) }
             }
         }
+    }
+
+    // ---------------- Testi ----------------
+
+    /** Nuovo testo dall'indicatore: 3 secondi (o fino alla fine del video). */
+    fun addText() {
+        val p = project ?: return
+        if (p.clips.isEmpty()) { message = "Aggiungi prima un video o una foto."; return }
+        val total = p.durationUs
+        val start = if (total - playheadUs < TextItem.MIN_US) 0L else playheadUs
+        val last = p.texts.lastOrNull()
+        // Il nuovo testo riprende lo stile dell'ultimo, così una serie di didascalie resta coerente.
+        val t = (last?.copy(id = java.util.UUID.randomUUID().toString(), text = "Testo") ?: TextItem())
+            .copy(startUs = start, durationUs = minOf(3_000_000L, total - start).coerceAtLeast(TextItem.MIN_US))
+        update { it.copy(texts = it.texts + t) }
+        selectedTextId = t.id
+    }
+
+    /** Seleziona un testo e porta l'indicatore dove si vede (dopo l'animazione di entrata). */
+    fun selectText(id: String) {
+        selectedTextId = id
+        val t = selectedText ?: return
+        if (playheadUs < t.startUs || playheadUs >= t.endUs) {
+            pause(); seekTo(t.startUs + minOf(500_000L, t.durationUs / 2))
+        }
+    }
+
+    /** Dimensioni del fotogramma dell'anteprima (per disegnare i riquadri dei testi). */
+    fun previewFrameSize(): Pair<Int, Int> = project?.let { factory.outputSize(it, 1080) } ?: (1080 to 1920)
+
+    private var rebuildJob: Job? = null
+    /** Aggiorna l'anteprima poco dopo l'ultima modifica (mentre si scrive non la ricarica a ogni lettera). */
+    private fun scheduleRebuild() {
+        rebuildJob?.cancel()
+        rebuildJob = viewModelScope.launch { delay(350); rebuildPreview(playheadUs / 1000) }
+    }
+
+    /** Modifica del testo selezionato; [typing] = scrittura in corso (senza annulla per ogni lettera). */
+    fun updateText(typing: Boolean = false, change: (TextItem) -> TextItem) {
+        val t = selectedText ?: return
+        update(keepUndo = !typing, rebuild = false) { it.replaceText(change(t)) }
+        scheduleRebuild()
+    }
+
+    /** Modifica di un testo qualsiasi (trascinamento sulla timeline). */
+    fun setText(t: TextItem) = update { it.replaceText(t) }
+
+    fun deleteText() {
+        val id = selectedTextId ?: return
+        update { p -> p.copy(texts = p.texts.filterNot { it.id == id }) }
+        selectedTextId = null
+    }
+
+    fun duplicateText() {
+        val t = selectedText ?: return
+        val copy = t.copy(id = java.util.UUID.randomUUID().toString(), startUs = t.endUs)
+        update { it.copy(texts = it.texts + copy) }
+        selectedTextId = copy.id
+    }
+
+    /** Applica lo stile del testo selezionato (font, colore, effetto, misura, animazioni) a tutti i testi. */
+    fun applyTextStyleToAll() {
+        val t = selectedText ?: return
+        update { p -> p.copy(texts = p.texts.map {
+            it.copy(font = t.font, look = t.look, color = t.color, size = t.size, animIn = t.animIn, animOut = t.animOut)
+        }) }
     }
 
     // ---------------- Musica ----------------

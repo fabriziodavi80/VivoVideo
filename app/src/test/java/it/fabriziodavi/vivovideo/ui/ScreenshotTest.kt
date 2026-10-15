@@ -118,6 +118,15 @@ class ScreenshotTest {
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/10_editor_foto.png")
     }
 
+    @Test fun editorTextPanel() {
+        val vm = vm()
+        vm.selectedClipId = null
+        vm.addText()
+        vm.updateText { it.copy(text = "Gita in montagna", font = it.fabriziodavi.vivovideo.model.TextFont.TITOLO, size = 0.09f, y = -0.3f) }
+        compose.setContent { VivoTheme { EditorScreen(vm, initialTool = Tool.TEXT) } }
+        compose.onRoot().captureRoboImage("build/outputs/roborazzi/11_editor_testo.png")
+    }
+
     @Test fun home() {
         val vm = EditorViewModel(ApplicationProvider.getApplicationContext<Application>())
         compose.setContent { VivoTheme { HomeScreen(vm) } }

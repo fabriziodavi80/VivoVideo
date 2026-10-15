@@ -1,5 +1,27 @@
 package it.fabriziodavi.vivovideo.ui
 
+import it.fabriziodavi.vivovideo.engine.TextRenderer
+
+import androidx.compose.runtime.rememberUpdatedState
+
+import androidx.compose.ui.platform.LocalDensity
+
+import androidx.compose.foundation.layout.BoxWithConstraints
+
+import androidx.compose.ui.graphics.PathEffect
+
+import androidx.compose.ui.graphics.drawscope.rotate
+
+import androidx.compose.material3.OutlinedTextFieldDefaults
+
+import it.fabriziodavi.vivovideo.model.TextAnim
+
+import it.fabriziodavi.vivovideo.model.TextLook
+
+import it.fabriziodavi.vivovideo.model.TextFont
+
+import it.fabriziodavi.vivovideo.model.TextItem
+
 import it.fabriziodavi.vivovideo.model.ClipSpeed
 import it.fabriziodavi.vivovideo.model.Easing
 import kotlin.math.roundToInt
@@ -102,7 +124,7 @@ enum class Tool(val label: String, val icon: () -> ImageVector, val future: Bool
     TRANSITION("Transizione", { VVIcons.Transition }),
     DURATION("Durata", { VVIcons.Speed }),
     FRAME("Inquadra", { VVIcons.Fullscreen }),
-    TEXT("Testo", { VVIcons.Text }, future = true),
+    TEXT("Testo", { VVIcons.Text }),
     MUSIC("Musica", { VVIcons.Music }),
     DUPLICATE("Duplica", { VVIcons.Copy }),
     MOVE_LEFT("Indietro", { VVIcons.MoveLeft }),
@@ -164,6 +186,10 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
             Tool.MOVE_LEFT -> vm.moveSelected(-1)
             Tool.MOVE_RIGHT -> vm.moveSelected(+1)
             Tool.DELETE -> vm.deleteSelected()
+            Tool.TEXT -> {
+                activeTool = Tool.TEXT
+                if (project.texts.isEmpty()) vm.addText()
+            }
             else -> activeTool = if (activeTool == t) null else t
         }
     }
@@ -227,6 +253,9 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
                             rotationZ = live.rotation
                         },
                     )
+                    // Testo selezionato: riquadro da trascinare, pizzicare e ruotare con le dita.
+                    val txt = vm.selectedText
+                    if (activeTool == Tool.TEXT && txt != null && !running) TextHandleOverlay(vm, txt)
                     if (gestures) {
                         val firstClip = project.clips.firstOrNull()
                         val videoAspect = if (firstClip != null && firstClip.height > 0) firstClip.width.toFloat() / firstClip.height else 16f / 9f
@@ -307,13 +336,16 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
             dpPerSecond = ZOOMS[zoom],
             onSeek = vm::seekTo,
             onScrubStart = vm::pause,
-            onSelect = { vm.selectedClipId = it; if (it == null) vm.selectedMusicId = null },
+            onSelect = { vm.selectedClipId = it; if (it == null) { vm.selectedMusicId = null; vm.selectedTextId = null } },
             onTrim = { id, s, e -> vm.trimClip(id, s, e) },
             onAdd = pickVideos,
             selectedMusicId = vm.selectedMusicId,
             onSelectMusic = { vm.selectedMusicId = it; activeTool = Tool.MUSIC },
             onMusicChange = vm::setMusic,
             onAddMusic = pickMusic,
+            selectedTextId = vm.selectedTextId,
+            onSelectText = { vm.selectText(it); activeTool = Tool.TEXT },
+            onTextChange = vm::setText,
         )
     }
 
@@ -336,6 +368,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
             Tool.DURATION -> PhotoPanel(vm, running)
             Tool.FRAME -> FramePanel(vm, running)
             Tool.MUSIC -> MusicPanel(vm, running, pickMusic)
+            Tool.TEXT -> TextPanel(vm, running)
             Tool.AUDIO -> AudioPanel(vm, running)
             Tool.COLOR -> ColorPanel(vm, running) { lutPicker.launch(arrayOf("*/*")) }
             Tool.EXPORT -> ExportPanel(vm) { uri ->
@@ -818,6 +851,131 @@ private fun FramePanel(vm: EditorViewModel, running: Boolean) {
         SecondaryButton("Reimposta", onClick = { if (enabled) { vm.setFrame(Transform()); vm.updateSelected { it.copy(fill = false) } } })
     }
     SecondaryButton("Applica a tutte le clip", onClick = { if (enabled) vm.applyFrameToAll() })
+}
+
+private val TEXT_COLORS = listOf(
+    0xFFFFFFFF, 0xFF111111, 0xFFF2B33D, 0xFFFFE14D, 0xFFFF5A4E, 0xFFFF7AB6, 0xFF5BC0FF, 0xFF4ADE80, 0xFFB794F6,
+).map { it.toInt() }
+
+@Composable
+private fun TextPanel(vm: EditorViewModel, running: Boolean) {
+    val p = vm.project ?: return
+    val t = vm.selectedText
+    val enabled = !running
+    if (t == null) {
+        if (p.texts.isNotEmpty()) {
+            PanelLabel("Testi nel progetto")
+            PillRow(p.texts, null as TextItem?, { it?.text?.lines()?.firstOrNull()?.take(18) ?: "" }, enabled) { x -> if (x != null) vm.selectText(x.id) }
+        }
+        SecondaryButton("Aggiungi testo", onClick = { if (enabled) vm.addText() })
+        Hint("Il testo parte dall'indicatore. Nella timeline lo sposti trascinandolo e ne cambi la durata con le maniglie.")
+        return
+    }
+    OutlinedTextField(
+        value = t.text,
+        onValueChange = { v -> vm.updateText(typing = true) { it.copy(text = v) } },
+        modifier = Modifier.fillMaxWidth(),
+        enabled = enabled,
+        textStyle = MaterialTheme.typography.bodyLarge,
+        minLines = 1, maxLines = 4,
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = VV.Tally, unfocusedBorderColor = VV.Line, cursorColor = VV.Tally,
+            focusedTextColor = VV.Text, unfocusedTextColor = VV.Text,
+        ),
+    )
+    PanelLabel("Carattere")
+    PillRow(TextFont.entries, t.font, { it.label }, enabled) { f -> vm.updateText { it.copy(font = f) } }
+    PanelLabel("Colore")
+    Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        TEXT_COLORS.forEach { c ->
+            Box(
+                Modifier.size(30.dp).clip(RoundedCornerShape(15.dp)).background(Color(c))
+                    .border(if (c == t.color) 3.dp else 1.dp, if (c == t.color) VV.Tally else VV.Line, RoundedCornerShape(15.dp))
+                    .clickable(enabled = enabled) { vm.updateText { it.copy(color = c) } }
+            )
+        }
+    }
+    PanelLabel("Stile")
+    Segmented(TextLook.entries, t.look, { it.label }, enabled) { l -> vm.updateText { it.copy(look = l) } }
+    LabeledSlider("Dimensione", null, (t.size * 1000).toInt(), enabled, range = 15..250, format = { "${it / 10}" }) { v ->
+        vm.updateText(typing = true) { it.copy(size = v / 1000f) }
+    }
+    PanelLabel("Posizione")
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        SecondaryButton("Alto", onClick = { vm.updateText { it.copy(x = 0f, y = -0.36f) } })
+        SecondaryButton("Centro", onClick = { vm.updateText { it.copy(x = 0f, y = 0f) } })
+        SecondaryButton("Basso", onClick = { vm.updateText { it.copy(x = 0f, y = 0.36f) } })
+    }
+    Hint("Oppure trascina, pizzica e ruota il riquadro sull'anteprima con le dita.")
+    PanelLabel("Animazione in entrata")
+    PillRow(TextAnim.entries, t.animIn, { it.label }, enabled) { a -> vm.updateText { it.copy(animIn = a) } }
+    PanelLabel("Animazione in uscita")
+    PillRow(TextAnim.entries.filter { it != TextAnim.TYPE }, t.animOut, { it.label }, enabled) { a -> vm.updateText { it.copy(animOut = a) } }
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        SecondaryButton("Duplica", onClick = { if (enabled) vm.duplicateText() })
+        SecondaryButton("Elimina", onClick = { if (enabled) vm.deleteText() })
+    }
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        SecondaryButton("Nuovo testo", onClick = { if (enabled) vm.addText() })
+        SecondaryButton("Stile a tutti", onClick = { if (enabled) vm.applyTextStyleToAll() })
+    }
+}
+
+/** Riquadro del testo selezionato sopra all'anteprima: si trascina, si pizzica (misura) e si ruota. */
+@Composable
+private fun TextHandleOverlay(vm: EditorViewModel, t: TextItem) {
+    val context = LocalContext.current
+    val (outW, outH) = vm.previewFrameSize()
+    val (bw, bh) = remember(t.text, t.font, t.look, t.size, outW, outH) {
+        TextRenderer.measure(context, t, outW, outH)
+    }
+    var live by remember { mutableStateOf(LiveTransform()) }
+    val current by rememberUpdatedState(t)
+    BoxWithConstraints(Modifier.fillMaxSize()) {
+        val density = LocalDensity.current
+        val wPx = with(density) { maxWidth.toPx() }
+        val hPx = with(density) { maxHeight.toPx() }
+        val aspect = outW.toFloat() / outH
+        val vw = minOf(wPx, hPx * aspect)
+        val vh = vw / aspect
+        val k = vw / outW
+        val cx = wPx / 2 + t.x * vw + live.pan.x
+        val cy = hPx / 2 + t.y * vh + live.pan.y
+        val boxW = bw * k * live.zoom
+        val boxH = bh * k * live.zoom
+        Canvas(Modifier.fillMaxSize()) {
+            rotate(t.rotation + live.rotation, Offset(cx, cy)) {
+                drawRect(
+                    VV.Tally, topLeft = Offset(cx - boxW / 2, cy - boxH / 2), size = androidx.compose.ui.geometry.Size(boxW, boxH),
+                    style = Stroke(2.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 8f))),
+                )
+            }
+        }
+        Box(
+            Modifier.fillMaxSize().pointerInput(t.id, vw) {
+                awaitEachGesture {
+                    awaitFirstDown(requireUnconsumed = false)
+                    var zoom = 1f; var pan = Offset.Zero; var rot = 0f
+                    do {
+                        val ev = awaitPointerEvent()
+                        zoom *= ev.calculateZoom(); pan += ev.calculatePan(); rot += ev.calculateRotation()
+                        live = LiveTransform(zoom, pan, rot)
+                        ev.changes.forEach { it.consume() }
+                    } while (ev.changes.any { it.pressed })
+                    if (zoom != 1f || pan != Offset.Zero || rot != 0f) {
+                        val b = current
+                        vm.updateText { it.copy(
+                            x = (b.x + pan.x / vw).coerceIn(-0.5f, 0.5f),
+                            y = (b.y + pan.y / vh).coerceIn(-0.5f, 0.5f),
+                            size = (b.size * zoom).coerceIn(0.015f, 0.25f),
+                            rotation = ((b.rotation + rot + 540f) % 360f) - 180f,
+                        ) }
+                    }
+                    live = LiveTransform()
+                }
+            }
+        )
+    }
 }
 
 @Composable

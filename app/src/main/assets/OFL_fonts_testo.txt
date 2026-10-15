@@ -1,0 +1,8 @@
+Font per i testi inclusi nell'app:
+- Bebas Neue (c) 2019 The Bebas Neue Project Authors — SIL Open Font License 1.1
+- Anton (c) 2020 The Anton Project Authors — SIL Open Font License 1.1
+- DM Serif Display (c) 2014-2017 Adobe Systems Incorporated — SIL Open Font License 1.1
+- Pacifico (c) 2018 The Pacifico Project Authors — SIL Open Font License 1.1
+- Archivo Black (c) 2017 The Archivo Black Project Authors — SIL Open Font License 1.1
+- Permanent Marker (c) 2010 Font Diner, Inc. — Apache License 2.0
+Testo completo delle licenze: https://openfontlicense.org e https://www.apache.org/licenses/LICENSE-2.0

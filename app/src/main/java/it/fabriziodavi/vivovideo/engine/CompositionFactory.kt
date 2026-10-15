@@ -8,6 +8,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.SpeedParameters
 import androidx.media3.common.audio.SpeedProvider
+import androidx.media3.effect.OverlayEffect
 import androidx.media3.effect.Presentation
 import androidx.media3.transformer.Composition
 import androidx.media3.transformer.EditedMediaItem
@@ -187,6 +188,12 @@ class CompositionFactory(private val context: Context) {
                 val outUs = project.transitionHalfUs(index)
                 if ((inSpec != null && inUs > 0) || (outSpec != null && outUs > 0)) {
                     add(TransitionEffect(startUs, clip.outputUs, inSpec?.type, inUs, outSpec?.type, outUs))
+                }
+                // Testi: livelli sopra a tutto (dopo inquadratura, keyframe e transizioni).
+                val endUs = startUs + clip.outputUs
+                val texts = project.texts.filter { t -> t.startUs < endUs && t.endUs > startUs && t.text.isNotBlank() }
+                if (texts.isNotEmpty()) {
+                    add(OverlayEffect(texts.map { t -> TimedTextOverlay(context, t, outW, outH) }))
                 }
             }
             if (clip.isPhoto) {

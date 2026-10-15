@@ -57,6 +57,8 @@ import androidx.compose.ui.unit.sp
 import it.fabriziodavi.vivovideo.model.Clip
 import it.fabriziodavi.vivovideo.model.ClipSpeed
 import it.fabriziodavi.vivovideo.model.MusicTrack
+import it.fabriziodavi.vivovideo.model.TextItem
+import it.fabriziodavi.vivovideo.model.packLanes
 import it.fabriziodavi.vivovideo.model.Project
 import kotlin.math.abs
 import kotlin.math.ceil
@@ -88,6 +90,9 @@ fun Timeline(
     onSelectMusic: (String) -> Unit = {},
     onMusicChange: (MusicTrack) -> Unit = {},
     onAddMusic: () -> Unit = {},
+    selectedTextId: String? = null,
+    onSelectText: (String) -> Unit = {},
+    onTextChange: (TextItem) -> Unit = {},
 ) {
     val density = LocalDensity.current
     val scroll = rememberScrollState()
@@ -117,12 +122,15 @@ fun Timeline(
     var musicDraft by remember { mutableStateOf<MusicTrack?>(null) }
     val music = project.music.map { if (it.id == musicDraft?.id) musicDraft!! else it }
     val lanes = project.musicLanes(music).ifEmpty { listOf(emptyList()) }
+    var textDraft by remember { mutableStateOf<TextItem?>(null) }
+    val texts = project.texts.map { if (it.id == textDraft?.id) textDraft!! else it }
+    val textLanes = packLanes(texts, { it.startUs }, { it.endUs })
     val noRipple = remember { MutableInteractionSource() }
 
     BoxWithConstraints(
         modifier
             .fillMaxWidth()
-            .height(RULER_H + VIDEO_H + AUDIO_H + 16.dp + (MUSIC_H + 3.dp) * lanes.size)
+            .height(RULER_H + VIDEO_H + AUDIO_H + 16.dp + (MUSIC_H + 3.dp) * (lanes.size + textLanes.size))
             .background(VV.Panel)
     ) {
         val half = maxWidth / 2
@@ -171,8 +179,30 @@ fun Timeline(
                 ) { Icon(VVIcons.Add, "Aggiungi video e foto", tint = VV.Text) }
                 Spacer(Modifier.width(half))
             }
-            // Righe della musica.
             val totalW = (project.durationUs / 1e6f * dpPerSecond).dp
+            // Righe dei testi.
+            textLanes.forEach { lane ->
+                Spacer(Modifier.height(3.dp))
+                Row {
+                    Spacer(Modifier.width(half))
+                    Box(Modifier.width(totalW).height(MUSIC_H)) {
+                        lane.forEach { t ->
+                            TextBar(
+                                item = t,
+                                projectUs = project.durationUs,
+                                selected = t.id == selectedTextId,
+                                dpPerSecond = dpPerSecond,
+                                pxPerUs = pxPerUs,
+                                onClick = { onSelectText(t.id) },
+                                onDraft = { textDraft = it },
+                                onCommit = { textDraft?.let(onTextChange); textDraft = null },
+                            )
+                        }
+                    }
+                    Spacer(Modifier.width(half))
+                }
+            }
+            // Righe della musica.
             lanes.forEachIndexed { li, lane ->
                 Spacer(Modifier.height(3.dp))
                 Row {
@@ -614,5 +644,75 @@ private fun MusicHandle(
         contentAlignment = Alignment.Center,
     ) {
         Box(Modifier.width(2.dp).height(10.dp).clip(RoundedCornerShape(1.dp)).background(VV.TallyInk))
+    }
+}
+
+
+/** Testo sulla timeline: tocco = seleziona; se selezionato si sposta e si allunga/accorcia dalle maniglie. */
+@Composable
+private fun TextBar(
+    item: TextItem,
+    projectUs: Long,
+    selected: Boolean,
+    dpPerSecond: Float,
+    pxPerUs: Float,
+    onClick: () -> Unit,
+    onDraft: (TextItem) -> Unit,
+    onCommit: () -> Unit,
+) {
+    val current by rememberUpdatedState(item)
+    var origin by remember { mutableStateOf(item) }
+    var acc by remember { mutableStateOf(0f) }
+    val shape = RoundedCornerShape(4.dp)
+    val min = TextItem.MIN_US
+    fun drag(mode: Int) = Modifier.pointerInput(item.id, mode) {
+        detectHorizontalDragGestures(
+            onDragStart = { origin = current; acc = 0f },
+            onDragEnd = onCommit,
+            onDragCancel = onCommit,
+        ) { change, dx ->
+            change.consume()
+            acc += dx
+            val d = (acc / pxPerUs).toLong()
+            val o = origin
+            onDraft(when (mode) {
+                0 -> o.copy(startUs = (o.startUs + d).coerceIn(0L, (projectUs - o.durationUs).coerceAtLeast(0L)))
+                1 -> {
+                    val dd = d.coerceIn(-o.startUs, o.durationUs - min)
+                    o.copy(startUs = o.startUs + dd, durationUs = o.durationUs - dd)
+                }
+                else -> o.copy(durationUs = (o.durationUs + d).coerceIn(min, (projectUs - o.startUs).coerceAtLeast(min)))
+            })
+        }
+    }
+    Box(
+        Modifier
+            .offset(x = (item.startUs / 1e6f * dpPerSecond).dp)
+            .width((item.durationUs / 1e6f * dpPerSecond).dp.coerceAtLeast(6.dp))
+            .fillMaxHeight()
+            .clip(shape)
+            .background(VV.TextBg)
+            .clickable(onClick = onClick)
+            .then(if (selected) drag(0) else Modifier)
+    ) {
+        Row(
+            Modifier.align(Alignment.CenterStart).padding(start = if (selected) HANDLE_W + 3.dp else 4.dp, end = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(VVIcons.Text, null, tint = VV.Tally, modifier = Modifier.size(11.dp))
+            Spacer(Modifier.width(3.dp))
+            Text(item.text.replace('\n', ' '), color = Color.White, fontSize = 10.sp, fontFamily = Plex, maxLines = 1)
+        }
+        if (selected) {
+            Box(Modifier.fillMaxSize().border(2.dp, VV.Tally, shape))
+            for (left in listOf(true, false)) {
+                Box(
+                    Modifier.align(if (left) Alignment.CenterStart else Alignment.CenterEnd)
+                        .width(HANDLE_W).fillMaxHeight().background(VV.Tally)
+                        .then(drag(if (left) 1 else 2)),
+                    contentAlignment = Alignment.Center,
+                ) { Box(Modifier.width(2.dp).height(10.dp).clip(RoundedCornerShape(1.dp)).background(VV.TallyInk)) }
+            }
+        }
     }
 }
