@@ -86,15 +86,18 @@ void main() {
   vec4 src = texture2D(uTexSampler, vTexSamplingCoord);
   vec3 c = src.rgb;
   float y = dot(c, vec3(0.2126, 0.7152, 0.0722));
-  // Toni chiari (cielo); i bianchi puri vengono risparmiati in parte.
-  float w = smoothstep(0.45, 0.8, y) * (1.0 - 0.55 * smoothstep(0.85, 1.0, y));
-  // Più colore ha il pixel, più lo ravviva; transizione morbida, nessuna soglia netta.
-  float chroma = max(c.r, max(c.g, c.b)) - min(c.r, min(c.g, c.b));
-  float cw = smoothstep(0.0, 0.25, chroma);
-  float d = 1.0 - 0.25 * uAmount * w;
-  float s = 1.0 + 0.6 * uAmount * w * cw;
-  float yd = y * d;
-  vec3 outc = vec3(yd) + (c * d - vec3(yd)) * s;
+  // Curva sulle alte luci che comprime soltanto (pendenza mai sopra 1):
+  // scurisce cielo e nuvole senza aumentarne il contrasto, quindi non fa
+  // emergere la grana di compressione del video. Il bianco scende al massimo a 0,86.
+  float k = 0.45;
+  float t = max((y - k) / (1.0 - k), 0.0);
+  float yo = y > k ? k + (1.0 - k) * t * (1.0 - 0.25 * uAmount * t) : y;
+  vec3 chroma = (c - vec3(y)) * (yo / max(y, 0.0001));
+  // Colore ravvivato solo dove ce n'è davvero (cielo azzurro), non sulle nuvole.
+  vec3 dc = abs(c - vec3(y));
+  float ch = max(dc.r, max(dc.g, dc.b));
+  float s = 1.0 + 0.35 * uAmount * smoothstep(0.45, 0.8, y) * smoothstep(0.06, 0.25, ch);
+  vec3 outc = vec3(yo) + chroma * s;
   // Dithering triangolare di ±1 livello su 255: rompe le bande senza vedersi.
   float n = rand(gl_FragCoord.xy) + rand(gl_FragCoord.yx + 17.0) - 1.0;
   outc += n / 255.0;
