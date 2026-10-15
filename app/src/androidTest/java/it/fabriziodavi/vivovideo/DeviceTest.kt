@@ -139,7 +139,7 @@ class DeviceTest {
             val done = CountDownLatch(1)
             val error = AtomicReference<String?>(null)
             main.post {
-                Transformer.Builder(ctx).setMaxDelayBetweenMuxerSamplesMs(180_000).setVideoMimeType(MimeTypes.VIDEO_H264)
+                Transformer.Builder(ctx).setMaxDelayBetweenMuxerSamplesMs(60_000).setVideoMimeType(MimeTypes.VIDEO_H264)
                     .addListener(object : Transformer.Listener {
                         override fun onCompleted(composition: Composition, exportResult: ExportResult) { done.countDown() }
                         override fun onError(composition: Composition, exportResult: ExportResult, exportException: ExportException) {
@@ -241,6 +241,32 @@ class DeviceTest {
         exportAndCheck(fullProject(), listOf(Layer(uri = videoC.toString(), name = "pip", width = W, height = H, isVideo = true,
             sourceDurationUs = 6_000_000, sourceStartUs = 1_000_000, startUs = 2_000_000, durationUs = 4_000_000,
             pose = Transform(x = -0.25f, y = -0.25f, scale = 0.4f), mask = LayerMask.ROUNDED, key = KeyColor.GREEN, volume = 0.5f)))
+    }
+
+    // ---- Prove mirate per isolare i blocchi ----
+
+    @Test fun bisectEffectsOnly() {
+        exportAndCheck(Project(name = "effetti", clips = allEffectsClips().map { it.copy(fadeInUs = 0) }), multi = false)
+    }
+
+    @Test fun bisectFadesOnly() {
+        exportAndCheck(Project(name = "dissolvenze", clips = listOf(
+            video("a", videoA, e = 3_000_000).copy(fadeInUs = 800_000),
+            video("b", videoB, e = 3_000_000).copy(fadeOutUs = 1_000_000, fadeColor = FadeColor.WHITE),
+        )), multi = false)
+    }
+
+    @Test fun bisectFullWithoutNewEffectsSingle() {
+        val p = fullProject()
+        exportAndCheck(p.copy(clips = p.clips.filterNot { it.id.startsWith("fx") }), multi = false)
+    }
+
+    @Test fun bisectEachEffectGroupSingle() {
+        FxType.entries.chunked(6).forEachIndexed { i, group ->
+            val c = video("g$i", videoB, s = 1_000_000, e = 2_000_000).copy(fx = group.map { ClipFx(it) })
+            try { exportAndCheck(Project(name = "gruppo$i", clips = listOf(c)), multi = false) }
+            catch (e: Throwable) { fail("gruppo $i (${group.joinToString { it.name }}): ${e.message}") }
+        }
     }
 
     @Test fun exportWithoutCompositor() {
