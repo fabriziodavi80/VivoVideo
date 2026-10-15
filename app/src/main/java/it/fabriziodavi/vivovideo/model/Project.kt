@@ -141,6 +141,8 @@ data class Clip(
     val fill: Boolean = false,
     /** Inquadratura fissa (zoom, posizione, rotazione), sotto ad eventuali keyframe. */
     val frame: Transform = Transform(),
+    /** Effetti video della clip. */
+    val fx: List<ClipFx> = emptyList(),
     val width: Int = 0,
     val height: Int = 0,
     val fps: Float = 30f,
@@ -177,6 +179,16 @@ data class ColorSettings(
     val lutPath: String? = null,
     val lutName: String? = null,
 )
+
+/** Effetti video per clip; [toggle] = acceso/spento senza intensità. */
+enum class FxType(val label: String, val toggle: Boolean = false, val defaultAmount: Float = 0.6f) {
+    BLUR("Sfocatura", defaultAmount = 0.4f), VIGNETTE("Vignettatura"), FILM("Pellicola"), BW("Bianco e nero", defaultAmount = 1f),
+    GLOW("Bagliore"), GLITCH("Glitch", defaultAmount = 0.5f), VHS("VHS"), SHAKE("Scossa", defaultAmount = 0.5f),
+    PULSE("Pulsa a ritmo"), PIXEL("Pixel", defaultAmount = 0.4f), MIRROR("Specchio", toggle = true, defaultAmount = 1f),
+}
+
+@Serializable
+data class ClipFx(val type: FxType, val amount: Float = type.defaultAmount)
 
 /** Movimenti pronti per foto (e video), come gli stili di diapositiva di ProShow. */
 enum class MotionStyle(val label: String) {

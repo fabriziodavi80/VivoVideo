@@ -4,7 +4,9 @@ import it.fabriziodavi.vivovideo.model.TextItem
 import it.fabriziodavi.vivovideo.model.TransitionSpec
 import it.fabriziodavi.vivovideo.model.Clip
 import it.fabriziodavi.vivovideo.model.ClipSpeed
+import it.fabriziodavi.vivovideo.model.ClipFx
 import it.fabriziodavi.vivovideo.model.ColorSettings
+import it.fabriziodavi.vivovideo.model.FxType
 import it.fabriziodavi.vivovideo.model.Easing
 import it.fabriziodavi.vivovideo.model.Keyframe
 import it.fabriziodavi.vivovideo.model.Keyframes
@@ -724,6 +726,21 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     fun updateSelected(change: (Clip) -> Clip) {
         val c = selectedClip ?: return
         update { it.replaceClip(change(c)) }
+    }
+
+    // ---------------- Effetti ----------------
+
+    fun toggleFx(type: FxType) = updateSelected { c ->
+        if (c.fx.any { it.type == type }) c.copy(fx = c.fx.filterNot { it.type == type }) else c.copy(fx = c.fx + ClipFx(type))
+    }
+
+    fun setFxAmount(type: FxType, amount: Float) = updateSelected { c ->
+        c.copy(fx = c.fx.map { if (it.type == type) it.copy(amount = amount) else it })
+    }
+
+    fun applyFxToAll() {
+        val c = selectedClip ?: return
+        update { p -> p.copy(clips = p.clips.map { it.copy(fx = c.fx) }) }
     }
 
     /** Inquadratura fissa della clip selezionata. */

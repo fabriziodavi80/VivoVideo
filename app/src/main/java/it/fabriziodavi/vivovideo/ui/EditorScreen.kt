@@ -1,5 +1,7 @@
 package it.fabriziodavi.vivovideo.ui
 
+import it.fabriziodavi.vivovideo.model.FxType
+
 import it.fabriziodavi.vivovideo.model.TextPreset
 
 import it.fabriziodavi.vivovideo.model.SlideshowOptions
@@ -132,7 +134,7 @@ enum class Tool(val label: String, val icon: () -> ImageVector, val future: Bool
     AUDIO("Audio", { VVIcons.Volume }),
     COLOR("Colore", { VVIcons.Palette }),
     KEYFRAME("Keyframe", { VVIcons.Keyframe }),
-    EFFECTS("Effetti", { VVIcons.Effects }, future = true),
+    EFFECTS("Effetti", { VVIcons.Effects }),
     TRANSITION("Transizione", { VVIcons.Transition }),
     DURATION("Durata", { VVIcons.Speed }),
     FRAME("Inquadra", { VVIcons.Fullscreen }),
@@ -148,14 +150,14 @@ enum class Tool(val label: String, val icon: () -> ImageVector, val future: Bool
 }
 
 private val CLIP_TOOLS = listOf(
-    Tool.SPLIT, Tool.SPEED, Tool.FRAME, Tool.TRANSITION, Tool.KEYFRAME, Tool.AUDIO, Tool.COLOR,
-    Tool.DUPLICATE, Tool.MOVE_LEFT, Tool.MOVE_RIGHT, Tool.DELETE, Tool.EFFECTS,
+    Tool.SPLIT, Tool.SPEED, Tool.FRAME, Tool.TRANSITION, Tool.EFFECTS, Tool.KEYFRAME, Tool.AUDIO, Tool.COLOR,
+    Tool.DUPLICATE, Tool.MOVE_LEFT, Tool.MOVE_RIGHT, Tool.DELETE,
 )
 private val PHOTO_TOOLS = listOf(
-    Tool.SPLIT, Tool.DURATION, Tool.FRAME, Tool.TRANSITION, Tool.KEYFRAME, Tool.COLOR,
-    Tool.DUPLICATE, Tool.MOVE_LEFT, Tool.MOVE_RIGHT, Tool.DELETE, Tool.EFFECTS,
+    Tool.SPLIT, Tool.DURATION, Tool.FRAME, Tool.TRANSITION, Tool.EFFECTS, Tool.KEYFRAME, Tool.COLOR,
+    Tool.DUPLICATE, Tool.MOVE_LEFT, Tool.MOVE_RIGHT, Tool.DELETE,
 )
-private val PROJECT_TOOLS = listOf(Tool.ADD, Tool.SLIDESHOW, Tool.SPLIT, Tool.TRANSITION, Tool.TEXT, Tool.LAYER, Tool.MUSIC, Tool.COLOR, Tool.EFFECTS)
+private val PROJECT_TOOLS = listOf(Tool.ADD, Tool.SLIDESHOW, Tool.SPLIT, Tool.TRANSITION, Tool.TEXT, Tool.LAYER, Tool.MUSIC, Tool.COLOR)
 
 @Composable
 fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
@@ -168,7 +170,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
     val clip = vm.selectedClip
 
     // Un pannello di clip si chiude se non c'è più una clip selezionata.
-    if (clip == null && (activeTool == Tool.SPEED || activeTool == Tool.AUDIO || activeTool == Tool.KEYFRAME || activeTool == Tool.DURATION || activeTool == Tool.FRAME)) activeTool = null
+    if (clip == null && (activeTool == Tool.SPEED || activeTool == Tool.AUDIO || activeTool == Tool.KEYFRAME || activeTool == Tool.DURATION || activeTool == Tool.FRAME || activeTool == Tool.EFFECTS)) activeTool = null
     // Foto e video hanno strumenti diversi.
     if (clip != null && clip.isPhoto && (activeTool == Tool.SPEED || activeTool == Tool.AUDIO)) activeTool = Tool.DURATION
     if (clip != null && !clip.isPhoto && activeTool == Tool.DURATION) activeTool = Tool.SPEED
@@ -398,6 +400,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
             Tool.TEXT -> TextPanel(vm, running)
             Tool.LAYER -> LayerPanel(vm, running, pickLayer)
             Tool.SLIDESHOW -> SlideshowPanel(vm, running)
+            Tool.EFFECTS -> EffectsPanel(vm, running)
             Tool.AUDIO -> AudioPanel(vm, running)
             Tool.COLOR -> ColorPanel(vm, running) { lutPicker.launch(arrayOf("*/*")) }
             Tool.EXPORT -> ExportPanel(vm) { uri ->
@@ -1162,6 +1165,34 @@ private fun SlideshowPanel(vm: EditorViewModel, running: Boolean) {
             }.padding(vertical = 13.dp),
         contentAlignment = Alignment.Center,
     ) { Text("Crea slideshow", style = MaterialTheme.typography.labelLarge, color = VV.TallyInk) }
+}
+
+@Composable
+private fun EffectsPanel(vm: EditorViewModel, running: Boolean) {
+    val clip = vm.selectedClip ?: return
+    val enabled = !running
+    Hint("Tocca un effetto per accenderlo o spegnerlo; puoi combinarne più di uno.")
+    Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        FxType.entries.forEach { t ->
+            val on = clip.fx.any { it.type == t }
+            Box(
+                Modifier.clip(RoundedCornerShape(18.dp)).background(if (on) VV.Tally else VV.Raised)
+                    .clickable(enabled = enabled) { vm.toggleFx(t) }.padding(horizontal = 14.dp, vertical = 9.dp)
+            ) { Text(t.label, style = MaterialTheme.typography.labelLarge, color = if (on) VV.TallyInk else VV.Text) }
+        }
+    }
+    clip.fx.filter { !it.type.toggle }.forEach { f ->
+        LabeledSlider(f.type.label, null, (f.amount * 100).toInt(), enabled, format = { "$it%" }) { v -> vm.setFxAmount(f.type, v / 100f) }
+    }
+    if (clip.fx.any { it.type == FxType.PULSE } && (vm.project?.beatTimes()?.isEmpty() != false)) {
+        Hint("\"Pulsa a ritmo\" usa i battiti della musica: aggiungi un brano e rileva i battiti dal pannello Musica.")
+    }
+    if (clip.fx.isNotEmpty()) {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            SecondaryButton("Applica a tutte le clip", onClick = { if (enabled) vm.applyFxToAll() })
+            SecondaryButton("Togli tutti", onClick = { if (enabled) vm.updateSelected { it.copy(fx = emptyList()) } })
+        }
+    }
 }
 
 @Composable

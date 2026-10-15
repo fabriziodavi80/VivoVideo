@@ -19,6 +19,7 @@ import it.fabriziodavi.vivovideo.DenoiseEffect
 import it.fabriziodavi.vivovideo.HighlightEffect
 import it.fabriziodavi.vivovideo.Look
 import it.fabriziodavi.vivovideo.model.Clip
+import it.fabriziodavi.vivovideo.model.FxType
 import it.fabriziodavi.vivovideo.model.Project
 import it.fabriziodavi.vivovideo.model.SpeedCurve
 import it.fabriziodavi.vivovideo.model.Transform
@@ -149,6 +150,7 @@ class CompositionFactory(private val context: Context) {
     ): Composition {
         val (outW, outH) = outputSize(project, if (forPreview) 1080 else options.size.shortSide)
         val starts = project.clipStartsUs()
+        val beats = project.beatTimes()
         val items = project.clips.mapIndexed { index, clip ->
             val startUs = starts[index]
             val mediaItem = if (clip.isPhoto) {
@@ -181,6 +183,7 @@ class CompositionFactory(private val context: Context) {
                     }
                     if (clip.keyframes.any { it.value.opacity != 1f }) add(KeyframeFade(clip, startUs))
                 }
+                if (clip.fx.isNotEmpty()) add(FxEffect(clip.fx, if (clip.fx.any { f -> f.type == FxType.PULSE }) beats else emptyList()))
                 // Transizioni: metà alla fine di questa clip, metà all'inizio della successiva.
                 val inSpec = project.clips.getOrNull(index - 1)?.transitionOut
                 val inUs = if (index > 0) project.transitionHalfUs(index - 1) else 0

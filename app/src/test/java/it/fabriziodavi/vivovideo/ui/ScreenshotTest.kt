@@ -138,6 +138,15 @@ class ScreenshotTest {
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/12_editor_immagini.png")
     }
 
+    @Test fun editorEffectsPanel() {
+        val vm = vm()
+        vm.selectedClipId = vm.project!!.clips[0].id
+        vm.toggleFx(it.fabriziodavi.vivovideo.model.FxType.VHS)
+        vm.toggleFx(it.fabriziodavi.vivovideo.model.FxType.VIGNETTE)
+        compose.setContent { VivoTheme { EditorScreen(vm, initialTool = Tool.EFFECTS) } }
+        compose.onRoot().captureRoboImage("build/outputs/roborazzi/13_editor_effetti.png")
+    }
+
     @Test fun home() {
         val vm = EditorViewModel(ApplicationProvider.getApplicationContext<Application>())
         compose.setContent { VivoTheme { HomeScreen(vm) } }
