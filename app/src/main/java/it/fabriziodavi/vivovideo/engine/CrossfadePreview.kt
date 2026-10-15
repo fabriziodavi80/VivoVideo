@@ -49,7 +49,8 @@ object CrossfadePreview {
         val a2 = part(a, a.outputUs - cf.beforeUs, a.outputUs)?.copy(transitionOut = a.transitionOut) ?: return@mapNotNull null
         val b1 = part(b, 0, cf.afterUs)?.copy(transitionOut = null) ?: return@mapNotNull null
         // Niente musica, testi o livelli: restano sopra, nell'anteprima normale.
-        val sub = Project(name = "dissolvenza", clips = listOf(a2, b1), color = p.color)
+        // Identificativi fissi: dividere una clip ne crea uno casuale, e la chiave cambierebbe ogni volta.
+        val sub = Project(name = "dissolvenza", clips = listOf(a2.copy(id = "a"), b1.copy(id = "b")), color = p.color)
         val local = Project.Crossfade(0, a2.outputUs, cf.beforeUs.coerceAtMost(a2.outputUs), cf.afterUs.coerceAtMost(b1.outputUs))
         val key = sha(Project.JSON.encodeToString(Project.serializer(), sub.copy(createdAt = 0, updatedAt = 0, id = "x")) + "|$local|${w}x$h")
         Job(key, sub, local, a2.outputUs + b1.outputUs, cf)
