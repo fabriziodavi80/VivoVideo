@@ -16,6 +16,15 @@ android {
         targetSdk = 36
         versionCode = buildNumber
         versionName = "0.1.$buildNumber"
+        // Solo il vivo X300 Ultra: basta l'architettura ARM a 64 bit.
+        ndk { abiFilters += "arm64-v8a" }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+            version = "3.22.1"
+        }
     }
 
     // App personale: la chiave sta nel repository così ogni versione

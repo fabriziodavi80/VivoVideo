@@ -56,7 +56,7 @@ enum class OutputCodec(val label: String, val mime: String) {
 
 sealed interface ExportState {
     data object Idle : ExportState
-    data class Running(val percent: Int?) : ExportState
+    data class Running(val percent: Int?, val label: String? = null) : ExportState
     data class Done(val uri: Uri, val details: String) : ExportState
     data class Failed(val message: String) : ExportState
 }
@@ -111,6 +111,43 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         val src = info ?: return
         if (exportState is ExportState.Running) return
         val context = getApplication<Application>()
+        exportState = ExportState.Running(null, "Preparazione…")
+        startedAt = SystemClock.elapsedRealtime()
+
+        val provider = speed.provider(src.durationMs * 1000)
+        // Audio di qualità: lo allunghiamo noi con Signalsmith Stretch.
+        val nativeAudio = keepAudio && keepPitch && provider != null
+        viewModelScope.launch {
+            var audioFile: File? = null
+            if (nativeAudio) {
+                exportState = ExportState.Running(null, "Elaborazione audio…")
+                val r = withContext(Dispatchers.Default) {
+                    runCatching { prepareStretchedAudio(context, uri, provider!!, src.durationMs * 1000) }
+                }
+                if (r.isFailure) {
+                    exportState = ExportState.Failed("Errore nell'elaborazione dell'audio: ${r.exceptionOrNull()}")
+                    return@launch
+                }
+                audioFile = r.getOrNull()
+            }
+            if (exportState !is ExportState.Running) { audioFile?.delete(); return@launch }
+            runAttempt(uri, src, provider, nativeAudio, audioFile, attempt = 0, log = mutableListOf())
+        }
+    }
+
+    /** Tentativi di encoder dal più veloce al più prudente (servono per l'8K). */
+    private val maxAttempts = 3
+
+    private fun runAttempt(
+        uri: Uri,
+        src: VideoInfo,
+        provider: androidx.media3.common.audio.SpeedProvider?,
+        nativeAudio: Boolean,
+        audioFile: File?,
+        attempt: Int,
+        log: MutableList<String>,
+    ) {
+        val context = getApplication<Application>()
 
         // --- Effetti video ---
         val videoEffects = mutableListOf<Effect>()
@@ -119,31 +156,35 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
         val itemBuilder = EditedMediaItem.Builder(MediaItem.fromUri(uri))
             .setEffects(Effects(emptyList(), videoEffects))
-            .setRemoveAudio(!keepAudio)
-        speed.provider(src.durationMs * 1000)?.let {
-            // Con keepPitch l'audio si allunga/accorcia senza cambiare tono.
-            itemBuilder.setSpeed(SpeedParameters(it, keepPitch && keepAudio))
+            .setRemoveAudio(!keepAudio || nativeAudio)
+        provider?.let {
+            // Effetto nastro: Media3 cambia la velocità anche dell'audio (tono incluso).
+            itemBuilder.setSpeed(SpeedParameters(it, false))
         }
         fps.max?.let { itemBuilder.setFrameRate(it) }
         val edited = itemBuilder.build()
 
-        val sequence = if (keepAudio) {
+        val sequences = mutableListOf<EditedMediaItemSequence>()
+        sequences += if (keepAudio && !nativeAudio) {
             EditedMediaItemSequence.withAudioAndVideoFrom(listOf(edited))
         } else {
             EditedMediaItemSequence.withVideoFrom(listOf(edited))
         }
+        if (audioFile != null) {
+            val audioItem = EditedMediaItem.Builder(MediaItem.fromUri(Uri.fromFile(audioFile))).build()
+            sequences += EditedMediaItemSequence.withAudioFrom(listOf(audioItem))
+        }
 
         // L'H.264 non trasporta bene l'HDR: in quel caso si converte sempre in SDR.
         val toSdr = src.isHdr && (toneMapHdr || codec == OutputCodec.H264)
-        val composition = Composition.Builder(sequence)
+        val composition = Composition.Builder(sequences)
             .setHdrMode(
                 if (toSdr) Composition.HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_OPEN_GL
                 else Composition.HDR_MODE_KEEP_HDR
             )
             .build()
 
-        // --- Encoder hardware con bitrate adatto alla risoluzione ---
-        // Bitrate proporzionale a pixel × fotogrammi (riferimento: 4K30 ≈ 45 Mbps in H.265).
+        // --- Bitrate proporzionale a pixel × fotogrammi (4K30 ≈ 45 Mbps in H.265) ---
         val srcShort = minOf(src.displayWidth, src.displayHeight).coerceAtLeast(1)
         val srcLong = maxOf(src.displayWidth, src.displayHeight).coerceAtLeast(1)
         val outShort = minOf(size.shortSide ?: srcShort, srcShort)
@@ -151,14 +192,24 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         val srcFps = src.fps ?: 30f
         val outFps = fps.max?.let { minOf(it.toFloat(), srcFps) } ?: srcFps
         val pixelsPerSec = outShort.toDouble() * outLong * outFps
+        val maxBitrate = if (attempt >= 2) 100_000_000.0 else 160_000_000.0
         var bitrate = (45_000_000 * pixelsPerSec / (3840.0 * 2160 * 30))
-            .coerceIn(8_000_000.0, 160_000_000.0).toInt()
-        if (codec == OutputCodec.H264) bitrate = (bitrate * 1.4).toInt()
+            .coerceIn(8_000_000.0, maxBitrate).toInt()
+        if (codec == OutputCodec.H264) bitrate = minOf((bitrate * 1.4).toInt(), maxBitrate.toInt())
+
+        // Con sorgenti oltre il 4K, decoder ed encoder insieme superano il budget
+        // hardware se si chiede la massima velocità: si parte già in modalità prudente.
+        val heavy = src.width.toLong() * src.height * srcFps > 3840L * 2160 * 120
+        val step = if (heavy) attempt + 1 else attempt
+        val settings = VideoEncoderSettings.Builder().setBitrate(bitrate)
+        val modeLabel = when (step) {
+            0 -> "massima velocità"
+            1 -> { settings.setEncoderPerformanceParameters(VideoEncoderSettings.RATE_UNSET, VideoEncoderSettings.RATE_UNSET); "velocità standard" }
+            else -> { settings.setEncoderPerformanceParameters(outFps.toInt().coerceAtLeast(1), 1); "tempo reale" }
+        }
 
         val encoderFactory = DefaultEncoderFactory.Builder(context)
-            .setRequestedVideoEncoderSettings(
-                VideoEncoderSettings.Builder().setBitrate(bitrate).build()
-            )
+            .setRequestedVideoEncoderSettings(settings.build())
             .build()
 
         val outFile = File(context.cacheDir, "export_${System.currentTimeMillis()}.mp4")
@@ -166,6 +217,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         val listener = object : Transformer.Listener {
             override fun onCompleted(composition: Composition, exportResult: ExportResult) {
                 handler.removeCallbacksAndMessages(null)
+                audioFile?.delete()
                 val seconds = (SystemClock.elapsedRealtime() - startedAt) / 1000.0
                 viewModelScope.launch {
                     val saved = withContext(Dispatchers.IO) {
@@ -178,7 +230,9 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                             append("\nTempo di esportazione: ${"%.1f".format(seconds)} s")
                             append("\nCodec: ${codec.label}, ${bitrate / 1_000_000} Mbps, max ${"%.0f".format(outFps)} fps")
                             if (src.isHdr) append(if (toSdr) " · convertito in SDR" else " · HDR mantenuto")
-                            exportResult.videoEncoderName?.let { append("\nEncoder: $it") }
+                            exportResult.videoEncoderName?.let { append("\nEncoder: $it ($modeLabel)") }
+                            if (nativeAudio) append("\nAudio: tono naturale (Signalsmith)")
+                            if (log.isNotEmpty()) append("\nTentativi falliti prima: ${log.size}")
                         }
                         exportState = ExportState.Done(galleryUri, details)
                     }.onFailure {
@@ -196,10 +250,23 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                 handler.removeCallbacksAndMessages(null)
                 outFile.delete()
                 transformer = null
-                val cause = exportException.cause?.let { "\nCausa: ${it.javaClass.simpleName}: ${it.message}" } ?: ""
+                val cause = exportException.cause
+                val codecInfo = (cause as? android.media.MediaCodec.CodecException)?.let {
+                    " [codice ${it.errorCode}, ${it.diagnosticInfo}]"
+                } ?: ""
+                log += "• $modeLabel, ${bitrate / 1_000_000} Mbps: ${exportException.errorCodeName}$codecInfo"
+                val retryable = exportException.errorCode == ExportException.ERROR_CODE_ENCODER_INIT_FAILED ||
+                    exportException.errorCode == ExportException.ERROR_CODE_DECODER_INIT_FAILED
+                if (retryable && attempt + 1 < maxAttempts && step < 2 && exportState is ExportState.Running) {
+                    exportState = ExportState.Running(null, "Nuovo tentativo con impostazioni più prudenti…")
+                    handler.post { runAttempt(uri, src, provider, nativeAudio, audioFile, attempt + 1, log) }
+                    return
+                }
+                audioFile?.delete()
+                val causeText = cause?.let { "\nCausa: ${it.javaClass.simpleName}: ${it.message}" } ?: ""
                 exportState = ExportState.Failed(
-                    "Errore ${exportException.errorCode} (${exportException.errorCodeName}): " +
-                        "${exportException.message}$cause"
+                    "Errore ${exportException.errorCode} (${exportException.errorCodeName})$causeText" +
+                        "\n\nTentativi:\n" + log.joinToString("\n")
                 )
             }
         }
@@ -210,12 +277,12 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             .addListener(listener)
             .build()
         transformer = t
-        startedAt = SystemClock.elapsedRealtime()
-        exportState = ExportState.Running(null)
+        if (exportState !is ExportState.Running) exportState = ExportState.Running(null)
         try {
             t.start(composition, outFile.absolutePath)
         } catch (e: Exception) {
             transformer = null
+            audioFile?.delete()
             exportState = ExportState.Failed("Impossibile avviare l'esportazione: ${e.message}")
             return
         }
@@ -224,13 +291,15 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     private fun pollProgress() {
         val holder = ProgressHolder()
+        handler.removeCallbacksAndMessages(null)
         handler.post(object : Runnable {
             override fun run() {
                 val t = transformer ?: return
                 val state = t.getProgress(holder)
                 if (exportState is ExportState.Running) {
                     exportState = ExportState.Running(
-                        if (state == Transformer.PROGRESS_STATE_AVAILABLE) holder.progress else null
+                        if (state == Transformer.PROGRESS_STATE_AVAILABLE) holder.progress else null,
+                        (exportState as ExportState.Running).label?.takeIf { it.startsWith("Nuovo") },
                     )
                 }
                 handler.postDelayed(this, 300)

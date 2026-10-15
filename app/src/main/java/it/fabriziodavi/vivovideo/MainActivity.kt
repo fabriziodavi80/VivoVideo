@@ -167,7 +167,8 @@ private fun MainScreen(vm: MainViewModel) {
                 when (val s = vm.exportState) {
                     is ExportState.Running -> {
                         Text(
-                            s.percent?.let { "Esportazione… $it%" } ?: "Esportazione in preparazione…",
+                            s.percent?.let { "Esportazione… $it%" + (s.label?.let { l -> "\n$l" } ?: "") }
+                                ?: (s.label ?: "Esportazione in preparazione…"),
                             color = Color.White,
                         )
                         LinearProgressIndicator(
