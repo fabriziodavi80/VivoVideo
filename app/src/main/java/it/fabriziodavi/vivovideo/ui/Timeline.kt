@@ -270,6 +270,30 @@ private fun ClipBox(
                 }
             }
         }
+        // Transizione verso la clip successiva: zona sfumata e simbolo sul bordo destro.
+        clip.transitionOut?.let { spec ->
+            val halfUs = minOf(spec.durationUs / 2, clip.outputUs / 2)
+            Canvas(Modifier.fillMaxSize()) {
+                val zone = (halfUs.toFloat() / clip.outputUs.coerceAtLeast(1)) * size.width
+                drawRect(
+                    androidx.compose.ui.graphics.Brush.horizontalGradient(
+                        listOf(Color.Transparent, VV.Tally.copy(alpha = 0.35f)),
+                        startX = size.width - zone, endX = size.width,
+                    ),
+                    topLeft = Offset(size.width - zone, 0f),
+                    size = androidx.compose.ui.geometry.Size(zone, size.height),
+                )
+                val cx = size.width - (if (selected) HANDLE_W.toPx() + 9.dp.toPx() else 9.dp.toPx())
+                val cy = size.height / 2
+                val r = 6.dp.toPx()
+                drawCircle(VV.TallyInk, r + 2.dp.toPx(), Offset(cx, cy))
+                val bow = Path().apply {
+                    moveTo(cx - r * 0.7f, cy - r * 0.6f); lineTo(cx, cy); lineTo(cx - r * 0.7f, cy + r * 0.6f); close()
+                    moveTo(cx + r * 0.7f, cy - r * 0.6f); lineTo(cx, cy); lineTo(cx + r * 0.7f, cy + r * 0.6f); close()
+                }
+                drawPath(bow, VV.Tally)
+            }
+        }
         if (selected) {
             Box(Modifier.fillMaxSize().border(2.dp, VV.Tally, shape))
             TrimHandle(Modifier.align(Alignment.CenterStart), left = true, clip, pxPerUs, onTrimDrag, onTrimEnd)

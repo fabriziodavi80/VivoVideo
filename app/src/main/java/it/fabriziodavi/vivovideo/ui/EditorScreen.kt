@@ -5,6 +5,8 @@ import it.fabriziodavi.vivovideo.model.Easing
 import it.fabriziodavi.vivovideo.model.SpeedInterp
 import it.fabriziodavi.vivovideo.model.SpeedLimits
 import it.fabriziodavi.vivovideo.model.SpeedPreset
+import it.fabriziodavi.vivovideo.model.TransitionSpec
+import it.fabriziodavi.vivovideo.model.TransitionType
 import android.content.Intent
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
@@ -93,7 +95,7 @@ enum class Tool(val label: String, val icon: () -> ImageVector, val future: Bool
     COLOR("Colore", { VVIcons.Palette }),
     KEYFRAME("Keyframe", { VVIcons.Keyframe }),
     EFFECTS("Effetti", { VVIcons.Effects }, future = true),
-    TRANSITION("Transizione", { VVIcons.Transition }, future = true),
+    TRANSITION("Transizione", { VVIcons.Transition }),
     TEXT("Testo", { VVIcons.Text }, future = true),
     MUSIC("Musica", { VVIcons.Music }, future = true),
     DUPLICATE("Duplica", { VVIcons.Copy }),
@@ -309,6 +311,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
         when (t) {
             Tool.SPEED -> SpeedPanel(vm, running)
             Tool.KEYFRAME -> KeyframePanel(vm, running)
+            Tool.TRANSITION -> TransitionPanel(vm, running)
             Tool.AUDIO -> AudioPanel(vm, running)
             Tool.COLOR -> ColorPanel(vm, running) { lutPicker.launch(arrayOf("*/*")) }
             Tool.EXPORT -> ExportPanel(vm) { uri ->
@@ -612,6 +615,36 @@ private fun KeyframePanel(vm: EditorViewModel, running: Boolean) {
     if (clip.keyframes.isNotEmpty()) {
         SecondaryButton("Togli tutti i keyframe della clip", onClick = vm::clearKeyframes)
     }
+}
+
+@Composable
+private fun TransitionPanel(vm: EditorViewModel, running: Boolean) {
+    val p = vm.project ?: return
+    val clip = vm.selectedClip ?: return
+    val index = p.clips.indexOfFirst { it.id == clip.id }
+    if (index < 0 || index == p.clips.lastIndex) {
+        Hint("Nessuna clip dopo questa: la transizione si applica tra la clip selezionata e la successiva.")
+        return
+    }
+    val spec = clip.transitionOut
+    PanelLabel("Verso la clip ${index + 2}")
+    val options: List<TransitionType?> = listOf(null) + TransitionType.entries
+    PillRow(options, spec?.type, { it?.label ?: "Nessuna" }, !running) { t ->
+        vm.setTransition(t?.let { TransitionSpec(it, spec?.durationUs ?: 500_000L) })
+    }
+    if (spec != null) {
+        val ms = (spec.durationUs / 1000).toInt()
+        LabeledSlider(
+            "Durata", null, ms / 100, !running, range = 2..20,
+            format = { String.format(java.util.Locale.ITALIAN, "%.1f s", it / 10f) },
+        ) { v -> vm.setTransition(spec.copy(durationUs = v * 100_000L)) }
+        val real = p.transitionHalfUs(index) * 2
+        if (real < spec.durationUs) {
+            Hint(String.format(java.util.Locale.ITALIAN, "Clip corte: durata effettiva %.1f s.", real / 1_000_000f))
+        }
+        SecondaryButton("Applica a tutti i tagli", onClick = { vm.setTransitionAll(spec) })
+    }
+    Hint("Metà effetto alla fine di questa clip, metà all'inizio della successiva.")
 }
 
 @Composable

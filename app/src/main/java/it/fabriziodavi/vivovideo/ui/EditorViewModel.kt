@@ -1,5 +1,6 @@
 package it.fabriziodavi.vivovideo.ui
 
+import it.fabriziodavi.vivovideo.model.TransitionSpec
 import it.fabriziodavi.vivovideo.model.Clip
 import it.fabriziodavi.vivovideo.model.ClipSpeed
 import it.fabriziodavi.vivovideo.model.ColorSettings
@@ -337,6 +338,13 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     fun updateSelected(change: (Clip) -> Clip) {
         val c = selectedClip ?: return
         update { it.replaceClip(change(c)) }
+    }
+
+    fun setTransition(spec: TransitionSpec?) = updateSelected { it.copy(transitionOut = spec) }
+
+    /** Stessa transizione su tutti i tagli del progetto. */
+    fun setTransitionAll(spec: TransitionSpec?) = update { p ->
+        p.copy(clips = p.clips.mapIndexed { i, c -> if (i < p.clips.lastIndex) c.copy(transitionOut = spec) else c })
     }
 
     fun updateColor(keepUndo: Boolean = true, change: (ColorSettings) -> ColorSettings) =

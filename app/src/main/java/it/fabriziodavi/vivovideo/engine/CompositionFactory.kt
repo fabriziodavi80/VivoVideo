@@ -115,7 +115,7 @@ class CompositionFactory(private val context: Context) {
         nativeAudio: File?,
     ): Composition {
         val (outW, outH) = outputSize(project, if (forPreview) 1080 else options.size.shortSide)
-        val items = project.clips.map { clip ->
+        val items = project.clips.mapIndexed { index, clip ->
             val mediaItem = MediaItem.Builder()
                 .setUri(Uri.parse(clip.uri))
                 .setClippingConfiguration(
@@ -133,6 +133,14 @@ class CompositionFactory(private val context: Context) {
                         add(KeyframeTransformation(clip, outW.toFloat() / outH))
                     }
                     if (clip.keyframes.any { it.value.opacity != 1f }) add(KeyframeFade(clip))
+                }
+                // Transizioni: metà alla fine di questa clip, metà all'inizio della successiva.
+                val inSpec = project.clips.getOrNull(index - 1)?.transitionOut
+                val inUs = if (index > 0) project.transitionHalfUs(index - 1) else 0
+                val outSpec = clip.transitionOut
+                val outUs = project.transitionHalfUs(index)
+                if ((inSpec != null && inUs > 0) || (outSpec != null && outUs > 0)) {
+                    add(TransitionEffect(clip.outputUs, inSpec?.type, inUs, outSpec?.type, outUs))
                 }
             }
             val b = EditedMediaItem.Builder(mediaItem)

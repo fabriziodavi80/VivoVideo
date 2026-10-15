@@ -11,6 +11,8 @@ import it.fabriziodavi.vivovideo.model.ClipSpeed
 import it.fabriziodavi.vivovideo.model.Keyframe
 import it.fabriziodavi.vivovideo.model.Project
 import it.fabriziodavi.vivovideo.model.Transform
+import it.fabriziodavi.vivovideo.model.TransitionSpec
+import it.fabriziodavi.vivovideo.model.TransitionType
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -79,6 +81,14 @@ class ScreenshotTest {
         }
         compose.setContent { VivoTheme { EditorScreen(vm, initialTool = Tool.KEYFRAME) } }
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/7_editor_keyframe.png")
+    }
+
+    @Test fun editorTransitionPanel() {
+        val vm = vm()
+        vm.selectedClipId = vm.project!!.clips[0].id
+        vm.setTransition(TransitionSpec(TransitionType.ZOOM, 800_000))
+        compose.setContent { VivoTheme { EditorScreen(vm, initialTool = Tool.TRANSITION) } }
+        compose.onRoot().captureRoboImage("build/outputs/roborazzi/8_editor_transizioni.png")
     }
 
     @Test fun home() {

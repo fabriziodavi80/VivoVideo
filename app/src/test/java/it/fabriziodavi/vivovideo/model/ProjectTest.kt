@@ -126,4 +126,13 @@ class ProjectTest {
         assertEquals(0.25f, SpeedInterp.valueAt(pts, 0.4f), 1e-3f)
         assertEquals(2f, SpeedInterp.valueAt(pts, 0.7f), 1e-3f)
     }
+
+    @Test fun transitionHalfIsClamped() {
+        val a = clip(4.0).copy(transitionOut = TransitionSpec(TransitionType.ZOOM, 800_000))
+        val b = clip(0.4)
+        val p = Project(name = "t").addClips(listOf(a, b))
+        assertEquals(200_000L, p.transitionHalfUs(0)) // metà della clip corta
+        assertEquals(0L, p.transitionHalfUs(1)) // ultima clip: nessuna successiva
+        assertEquals(p, Project.fromJson(p.toJson()))
+    }
 }

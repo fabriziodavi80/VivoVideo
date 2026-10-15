@@ -19,6 +19,20 @@ enum class ClipSpeed(val label: String) {
     RAMP("Curva");
 }
 
+/** Tipi di transizione. Agiscono sulla fine di una clip e sull'inizio della successiva. */
+@Serializable
+enum class TransitionType(val label: String) {
+    FADE_BLACK("Nero"),
+    FLASH("Flash"),
+    ZOOM("Zoom"),
+    BLUR("Sfocatura"),
+    WHIP("Scorrimento"),
+    SPIN("Rotazione"),
+}
+
+@Serializable
+data class TransitionSpec(val type: TransitionType, val durationUs: Long = 500_000)
+
 /** Andamento fra un keyframe e il successivo. */
 @Serializable
 enum class Easing(val label: String) {
@@ -119,6 +133,8 @@ data class Clip(
     val speedPoints: List<SpeedPoint> = emptyList(),
     /** Animazione di posizione, zoom, rotazione e opacità (tempi sul video originale della clip). */
     val keyframes: List<Keyframe> = emptyList(),
+    /** Transizione verso la clip successiva (null = taglio netto). */
+    val transitionOut: TransitionSpec? = null,
     val width: Int = 0,
     val height: Int = 0,
     val fps: Float = 30f,
@@ -180,6 +196,17 @@ data class Project(
     }
 
     fun touch() = copy(updatedAt = System.currentTimeMillis())
+
+    /**
+     * Durata effettiva di metà transizione su ciascun lato del taglio fra la clip [i] e la successiva:
+     * mai più di metà della clip più corta, così due transizioni non si sovrappongono.
+     */
+    fun transitionHalfUs(i: Int): Long {
+        val spec = clips.getOrNull(i)?.transitionOut ?: return 0
+        val next = clips.getOrNull(i + 1) ?: return 0
+        val half = spec.durationUs / 2
+        return minOf(half, clips[i].outputUs / 2, next.outputUs / 2).coerceAtLeast(0)
+    }
 
     // ---------------- Modifiche (restituiscono un nuovo progetto: undo facile) ----------------
 
