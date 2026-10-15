@@ -233,15 +233,16 @@ private fun MainScreen(vm: MainViewModel) {
 private fun Preview(uri: android.net.Uri, effects: List<androidx.media3.common.Effect>, speed: SpeedMode, info: VideoInfo?, exporting: Boolean) {
     val context = LocalContext.current
     // Il player si ricrea quando cambia il video o il filtro.
-    val player = remember(uri) {
+    // Il player si ricrea quando cambiano video o colori: gli effetti vanno impostati prima di prepare().
+    val player = remember(uri, effects) {
         ExoPlayer.Builder(context).build().apply {
+            setVideoEffects(effects)
             setMediaItem(MediaItem.fromUri(uri))
             repeatMode = Player.REPEAT_MODE_ALL
             prepare()
         }
     }
     DisposableEffect(player) { onDispose { player.release() } }
-    LaunchedEffect(player, effects) { player.setVideoEffects(effects) }
     // Durante l'esportazione l'anteprima libera il decoder hardware:
     // con l'8K non c'è spazio per due decoder più l'encoder.
     LaunchedEffect(player, exporting) {
