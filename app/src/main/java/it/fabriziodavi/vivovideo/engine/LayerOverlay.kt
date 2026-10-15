@@ -78,11 +78,11 @@ object LayerRenderer {
             c.drawPath(shapePath(l.shape, RectF(img.left - borderW, img.top - borderW, img.right + borderW, img.bottom + borderW), short), bp)
         }
         if (src != null) {
-            if (l.key != KeyColor.NONE) chromaKey(src, l.key, l.keyTolerance)
+            val keyed = if (l.key != KeyColor.NONE) chromaKey(src, l.key, l.keyTolerance) else src
             // Immagine ritagliata nella forma: disegnata in un livello a parte e mascherata (DST_IN).
             val layerBmp = Bitmap.createBitmap(bw, bh, Bitmap.Config.ARGB_8888)
             val lc = Canvas(layerBmp)
-            lc.drawBitmap(src, null, img, Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG))
+            lc.drawBitmap(keyed, null, img, Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG))
             val mp = Paint(Paint.ANTI_ALIAS_FLAG).apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.DST_IN) }
             if (l.shape == LayerMask.SOFT) {
                 // Ovale con bordo sfumato.
@@ -144,8 +144,9 @@ object LayerRenderer {
      * Scontorno: rende trasparenti i pixel vicini al colore di sfondo (verde/blu nel piano del colore,
      * bianco/nero sulla luminosità), con bordo morbido e riduzione dell'alone verde/blu.
      */
-    private fun chromaKey(b: Bitmap, key: KeyColor, tol: Float) {
-        if (!b.isMutable) return
+    private fun chromaKey(input: Bitmap, key: KeyColor, tol: Float): Bitmap {
+        // Serve un'immagine modificabile: se il decoder ne ha data una fissa, se ne fa una copia.
+        val b = if (input.isMutable && input.config == Bitmap.Config.ARGB_8888) input else input.copy(Bitmap.Config.ARGB_8888, true)
         val w = b.width; val h = b.height
         val px = IntArray(w * h)
         b.getPixels(px, 0, w, 0, 0, w, h)
@@ -172,6 +173,7 @@ object LayerRenderer {
             px[i] = (a shl 24) or ((r * 255).toInt() shl 16) or ((g * 255).toInt() shl 8) or (bl * 255).toInt()
         }
         b.setPixels(px, 0, w, 0, 0, w, h)
+        return b
     }
 
     private fun videoFrame(context: Context, l: Layer, w: Int, h: Int): Bitmap? = runCatching {

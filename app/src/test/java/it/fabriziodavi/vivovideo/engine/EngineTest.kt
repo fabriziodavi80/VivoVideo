@@ -229,11 +229,11 @@ class EngineTest {
         }
         // Scontorno verde: lo sfondo sparisce, il quadrato rosso resta.
         val keyed = LayerRenderer.prepare(app, Layer(uri = Uri.fromFile(f).toString(), width = 200, height = 100, key = KeyColor.GREEN), 1080, 1920).bitmap
-        assertEquals(0, Color.alpha(keyed.getPixel(3, 3)))
+        assertEquals("scontorno: angolo verde", 0, Color.alpha(keyed.getPixel(3, 3)))
         assertTrue(Color.alpha(keyed.getPixel(keyed.width / 2, keyed.height / 2)) > 200)
         // Cerchio: gli angoli sono trasparenti.
         val circle = LayerRenderer.prepare(app, Layer(uri = Uri.fromFile(f).toString(), width = 200, height = 100, mask = LayerMask.CIRCLE), 1080, 1920).bitmap
-        assertEquals(0, Color.alpha(circle.getPixel(1, 1)))
+        assertEquals("cerchio: angolo", 0, Color.alpha(circle.getPixel(1, 1)))
     }
 
     // ---------------- Dissolvenze preparate per l'anteprima ----------------
