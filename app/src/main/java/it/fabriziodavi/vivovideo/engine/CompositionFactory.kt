@@ -115,7 +115,9 @@ class CompositionFactory(private val context: Context) {
         nativeAudio: File?,
     ): Composition {
         val (outW, outH) = outputSize(project, if (forPreview) 1080 else options.size.shortSide)
+        val starts = project.clipStartsUs()
         val items = project.clips.mapIndexed { index, clip ->
+            val startUs = starts[index]
             val mediaItem = MediaItem.Builder()
                 .setUri(Uri.parse(clip.uri))
                 .setClippingConfiguration(
@@ -130,9 +132,9 @@ class CompositionFactory(private val context: Context) {
                 add(Presentation.createForWidthAndHeight(outW, outH, Presentation.LAYOUT_SCALE_TO_FIT))
                 if (clip.keyframes.isNotEmpty()) {
                     if (clip.keyframes.any { it.value.x != 0f || it.value.y != 0f || it.value.scale != 1f || it.value.rotation != 0f }) {
-                        add(KeyframeTransformation(clip, outW.toFloat() / outH))
+                        add(KeyframeTransformation(clip, outW.toFloat() / outH, startUs))
                     }
-                    if (clip.keyframes.any { it.value.opacity != 1f }) add(KeyframeFade(clip))
+                    if (clip.keyframes.any { it.value.opacity != 1f }) add(KeyframeFade(clip, startUs))
                 }
                 // Transizioni: metà alla fine di questa clip, metà all'inizio della successiva.
                 val inSpec = project.clips.getOrNull(index - 1)?.transitionOut
@@ -140,7 +142,7 @@ class CompositionFactory(private val context: Context) {
                 val outSpec = clip.transitionOut
                 val outUs = project.transitionHalfUs(index)
                 if ((inSpec != null && inUs > 0) || (outSpec != null && outUs > 0)) {
-                    add(TransitionEffect(clip.outputUs, inSpec?.type, inUs, outSpec?.type, outUs))
+                    add(TransitionEffect(startUs, clip.outputUs, inSpec?.type, inUs, outSpec?.type, outUs))
                 }
             }
             val b = EditedMediaItem.Builder(mediaItem)

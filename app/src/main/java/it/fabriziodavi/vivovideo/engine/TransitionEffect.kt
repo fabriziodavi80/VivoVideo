@@ -17,6 +17,7 @@ import it.fabriziodavi.vivovideo.model.TransitionType
  * La clip prima e quella dopo fanno ciascuna la propria metà, così il taglio sparisce nel movimento.
  */
 class TransitionEffect(
+    private val clipStartUs: Long,
     private val clipOutputUs: Long,
     private val inType: TransitionType?, private val inUs: Long,
     private val outType: TransitionType?, private val outUs: Long,
@@ -24,8 +25,9 @@ class TransitionEffect(
     override fun toGlShaderProgram(context: Context, useHdr: Boolean): GlShaderProgram =
         TransitionProgram(this, useHdr)
 
-    /** Valori dello shader per l'istante t (dall'inizio della clip, dopo la velocità). */
-    internal fun params(tUs: Long): Params {
+    /** Valori dello shader per l'istante t (tempo del montaggio, dopo la velocità). */
+    internal fun params(presentationTimeUs: Long): Params {
+        val tUs = localTimeUs(presentationTimeUs, clipStartUs)
         var p = Params()
         if (inType != null && inUs > 0 && tUs < inUs) {
             val e = 1f - smooth(tUs.toFloat() / inUs)
