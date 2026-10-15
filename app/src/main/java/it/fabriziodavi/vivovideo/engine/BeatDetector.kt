@@ -152,7 +152,8 @@ object BeatDetector {
         while (t >= 0) { beats += t.toLong(); t = back[t] }
         beats.reverse()
         // Scarta i battiti iniziali e finali senza musica (silenzio prima/dopo il brano).
-        val strong = local.sortedArray().let { it[it.size / 2] } * 0.5f
+        if (beats.isEmpty()) return beats
+        val strong = beats.map { local[it.toInt()] }.average().toFloat() * 0.25f
         val first = beats.indexOfFirst { local[it.toInt()] > strong }.coerceAtLeast(0)
         val last = beats.indexOfLast { local[it.toInt()] > strong }.let { if (it < 0) beats.lastIndex else it }
         return if (first <= last) beats.subList(first, last + 1) else beats
