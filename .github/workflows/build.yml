@@ -42,7 +42,13 @@ jobs:
         run: |
           VER="v0.3.${GITHUB_RUN_NUMBER}"
           cp app/build/outputs/apk/release/app-release.apk VivoVideo.apk
-          NOTES="${COMMIT_MSG:-Compilazione manuale}"
+          NEWS=$(awk '/^## Novità/{f=1;next} /^## /{f=0} f' app/src/main/assets/guida.md)
+          NOTES="${COMMIT_MSG:-Compilazione manuale}
+
+          Novità:
+          ${NEWS}
+
+          Guida completa: nell'app (pulsante ?) o https://github.com/${GITHUB_REPOSITORY}/blob/main/app/src/main/assets/guida.md"
           gh release create "$VER" VivoVideo.apk --title "VivoVideo $VER" --notes "$NOTES" --latest
 
       # Salva l'esito e il registro di compilazione nel ramo build-logs,

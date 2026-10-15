@@ -98,6 +98,8 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     var editEnd by mutableStateOf(false)
     /** Anteprima a schermo intero (nasconde anche le barre di sistema). */
     var fullscreen by mutableStateOf(false)
+    /** Guida aperta. */
+    var showGuide by mutableStateOf(false)
     var message by mutableStateOf<String?>(null)
     var busy by mutableStateOf<String?>(null)
         private set

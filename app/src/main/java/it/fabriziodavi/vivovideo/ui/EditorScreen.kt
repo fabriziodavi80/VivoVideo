@@ -239,6 +239,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
                 maxLines = 1, overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f).clickable(enabled = !running) { renaming = true }.padding(horizontal = 4.dp),
             )
+            IconBtn(VVIcons.Help, "Guida") { vm.pause(); vm.showGuide = true }
             IconBtn(VVIcons.Undo, "Annulla", enabled = vm.canUndo && !running, onClick = vm::undo)
             IconBtn(VVIcons.Redo, "Ripeti", enabled = vm.canRedo && !running, onClick = vm::redo)
             if (showExport) {

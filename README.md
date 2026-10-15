@@ -12,6 +12,11 @@ Ogni modifica al ramo `main` viene compilata automaticamente da GitHub Actions
 e pubblicata come nuova release. Tutte le versioni sono firmate con la stessa
 chiave, quindi si installano sopra la precedente.
 
+## Guida
+
+La guida d'uso è dentro l'app (pulsante **?**) e qui:
+[app/src/main/assets/guida.md](app/src/main/assets/guida.md). Si aggiorna a ogni versione.
+
 ## Stato
 
 Fase 1 – prova tecnica: import di un video, filtri colore GPU, velocità

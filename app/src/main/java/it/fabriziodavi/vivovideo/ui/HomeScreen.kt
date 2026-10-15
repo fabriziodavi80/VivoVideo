@@ -66,6 +66,7 @@ fun HomeScreen(vm: EditorViewModel) {
     Column(Modifier.fillMaxSize().background(VV.Canvas).safeDrawingPadding().padding(horizontal = 16.dp)) {
         Row(Modifier.fillMaxWidth().padding(top = 18.dp, bottom = 18.dp), verticalAlignment = Alignment.CenterVertically) {
             Text("VivoVideo", style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
+            IconBtn(VVIcons.Help, "Guida") { vm.showGuide = true }
             PrimaryButton("Nuovo progetto") {
                 picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
             }

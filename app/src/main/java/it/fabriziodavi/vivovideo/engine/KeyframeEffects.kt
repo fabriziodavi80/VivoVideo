@@ -19,7 +19,8 @@ private fun Clip.transformAt(presentationTimeUs: Long, startUs: Long): Transform
  * qui torna al tempo dall'inizio della clip.
  */
 internal fun localTimeUs(presentationTimeUs: Long, startUs: Long): Long =
-    (if (presentationTimeUs >= startUs) presentationTimeUs - startUs else presentationTimeUs).coerceAtLeast(0)
+    // Prima dell'inizio della clip (pezzo di dissolvenza incrociata) resta fermo sul primo istante.
+    (presentationTimeUs - startUs).coerceAtLeast(0)
 
 /** Matrice di una trasformazione in coordinate normalizzate, con rotazione in proporzioni reali. */
 private fun transformMatrix(t: Transform, aspect: Float): Matrix = Matrix().apply {

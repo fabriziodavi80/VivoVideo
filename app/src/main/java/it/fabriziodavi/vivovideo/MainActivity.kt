@@ -10,6 +10,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.LaunchedEffect
 import it.fabriziodavi.vivovideo.engine.ExportState
 import it.fabriziodavi.vivovideo.ui.EditorScreen
+import it.fabriziodavi.vivovideo.ui.GuideScreen
 import it.fabriziodavi.vivovideo.ui.EditorViewModel
 import it.fabriziodavi.vivovideo.ui.HomeScreen
 import it.fabriziodavi.vivovideo.ui.VivoTheme
@@ -47,7 +48,11 @@ class MainActivity : ComponentActivity() {
                     if (immersive) c.hide(androidx.core.view.WindowInsetsCompat.Type.systemBars())
                     else c.show(androidx.core.view.WindowInsetsCompat.Type.systemBars())
                 }
-                if (vm.project == null) HomeScreen(vm) else EditorScreen(vm)
+                when {
+                    vm.showGuide -> GuideScreen { vm.showGuide = false }
+                    vm.project == null -> HomeScreen(vm)
+                    else -> EditorScreen(vm)
+                }
             }
         }
     }

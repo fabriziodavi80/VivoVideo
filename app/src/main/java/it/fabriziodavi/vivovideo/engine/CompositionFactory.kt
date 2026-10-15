@@ -157,7 +157,12 @@ class CompositionFactory(private val context: Context) {
     private fun crossfadeSequence(project: Project, cfs: List<Project.Crossfade>, outW: Int, outH: Int, padToUs: Long): EditedMediaItemSequence {
         val b = EditedMediaItemSequence.Builder(setOf(C.TRACK_TYPE_VIDEO))
         var cursor = 0L
+        val starts = project.clipStartsUs()
+        val beats = project.beatTimes()
+        // Ogni pezzo ha gli stessi colori, inquadratura, keyframe ed effetti della sua clip: niente salti nella dissolvenza.
+        // (I keyframe prima dell'inizio o dopo la fine della clip restano fermi sul primo/ultimo valore.)
         fun piece(clip: Clip, fromUs: Long, lengthUs: Long) {
+            val clipStart = starts[project.clips.indexOf(clip)]
             val effects = buildList<Effect> {
                 addAll(colorEffects(clip, project))
                 add(Presentation.createForWidthAndHeight(
@@ -165,6 +170,11 @@ class CompositionFactory(private val context: Context) {
                     if (clip.fill) Presentation.LAYOUT_SCALE_TO_FIT_WITH_CROP else Presentation.LAYOUT_SCALE_TO_FIT,
                 ))
                 if (clip.frame != Transform()) add(FrameTransformation(clip.frame, outW.toFloat() / outH))
+                if (clip.keyframes.any { it.value.x != 0f || it.value.y != 0f || it.value.scale != 1f || it.value.rotation != 0f }) {
+                    add(KeyframeTransformation(clip, outW.toFloat() / outH, clipStart))
+                }
+                if (clip.keyframes.any { it.value.opacity != 1f }) add(KeyframeFade(clip, clipStart))
+                if (clip.fx.isNotEmpty()) add(FxEffect(clip.fx, beats))
             }
             val edited = if (clip.isPhoto) {
                 EditedMediaItem.Builder(
