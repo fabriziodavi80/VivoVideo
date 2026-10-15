@@ -1,5 +1,9 @@
 package it.fabriziodavi.vivovideo.ui
 
+import it.fabriziodavi.vivovideo.model.KeyColor
+
+import it.fabriziodavi.vivovideo.model.LayerMask
+
 import it.fabriziodavi.vivovideo.model.FxType
 
 import it.fabriziodavi.vivovideo.model.TextPreset
@@ -1102,10 +1106,18 @@ private fun LayerPanel(vm: EditorViewModel, running: Boolean, onAdd: () -> Unit)
         vm.setLayerPose(pose.copy(rotation = it.toFloat()))
     }
     MotionSection(vm, l.endPose != null, enabled, l.startUs, l.durationUs) { vm.toggleLayerMotion() }
-    PanelLabel("Cornice")
+    PanelLabel("Cornice e ombra")
     Segmented(LayerBorder.entries, l.border, { it.label }, enabled) { b -> vm.updateLayer { it.copy(border = b) } }
     ToggleRow("Ombra", l.shadow, enabled) { v -> vm.updateLayer { it.copy(shadow = v) } }
-    ToggleRow("Angoli arrotondati", l.rounded, enabled) { v -> vm.updateLayer { it.copy(rounded = v) } }
+    PanelLabel("Forma")
+    PillRow(LayerMask.entries, l.shape, { it.label }, enabled) { m -> vm.updateLayer { it.copy(mask = m, rounded = false) } }
+    PanelLabel("Scontorno (togli lo sfondo)")
+    PillRow(KeyColor.entries, l.key, { it.label }, enabled) { k -> vm.updateLayer { it.copy(key = k) } }
+    if (l.key != KeyColor.NONE) {
+        LabeledSlider("Tolleranza", "Alzala se resta un alone di sfondo, abbassala se sparisce anche il soggetto.", (l.keyTolerance * 100).toInt(), enabled, format = { "$it%" }) { v ->
+            vm.updateLayer { it.copy(keyTolerance = v / 100f) }
+        }
+    }
     PanelLabel("Animazione in entrata")
     PillRow(TextAnim.entries.filter { it != TextAnim.TYPE }, l.animIn, { it.label }, enabled) { a -> vm.updateLayer { it.copy(animIn = a) } }
     PanelLabel("Animazione in uscita")

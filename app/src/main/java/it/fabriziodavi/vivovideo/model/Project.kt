@@ -259,6 +259,14 @@ data class TextItem(
 
 enum class LayerBorder(val label: String) { NONE("Nessuno"), WHITE("Bianco"), BLACK("Nero") }
 
+/** Forma (maschera) dell'immagine. */
+enum class LayerMask(val label: String) {
+    NONE("Rettangolo"), ROUNDED("Arrotondata"), CIRCLE("Cerchio"), HEART("Cuore"), STAR("Stella"), SOFT("Sfumata"),
+}
+
+/** Scontorno: colore di sfondo da rendere trasparente. */
+enum class KeyColor(val label: String) { NONE("Nessuno"), GREEN("Verde"), BLUE("Blu"), WHITE("Bianco"), BLACK("Nero") }
+
 /**
  * Livello immagine (foto, logo, adesivo PNG con trasparenza) sopra al video.
  * [pose] = posizione iniziale (scala 1 = grande quanto il quadro), [endPose] = finale (movimento) o null.
@@ -279,8 +287,15 @@ data class Layer(
     val rounded: Boolean = false,
     val animIn: TextAnim = TextAnim.FADE,
     val animOut: TextAnim = TextAnim.FADE,
+    val mask: LayerMask = LayerMask.NONE,
+    val key: KeyColor = KeyColor.NONE,
+    /** Tolleranza dello scontorno (0..1). */
+    val keyTolerance: Float = 0.35f,
 ) {
     val endUs: Long get() = startUs + durationUs
+
+    /** Forma effettiva (il vecchio "angoli arrotondati" vale come forma arrotondata). */
+    val shape: LayerMask get() = if (mask == LayerMask.NONE && rounded) LayerMask.ROUNDED else mask
 
     /** Posizione al tempo [localUs] dall'inizio del livello (movimento morbido fra inizio e fine). */
     fun poseAt(localUs: Long): Transform {
