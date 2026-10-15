@@ -32,7 +32,7 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          gradle assembleRelease --no-daemon --stacktrace 2>&1 | tee build.log
+          gradle testReleaseUnitTest assembleRelease --no-daemon --stacktrace 2>&1 | tee build.log
 
       - name: Pubblica la release
         if: steps.build.outcome == 'success'
@@ -55,7 +55,7 @@ jobs:
         run: |
           mkdir -p /tmp/logs
           cp build.log /tmp/logs/build.log 2>/dev/null || echo "nessun registro" > /tmp/logs/build.log
-          grep -E "^e: |error:|FAILURE|What went wrong" -A3 /tmp/logs/build.log > /tmp/logs/errors.txt || true
+          grep -E "^e: |error:|FAILURE|What went wrong|FAILED|AssertionError|Exception" -A4 /tmp/logs/build.log > /tmp/logs/errors.txt || true
           echo "run=${GITHUB_RUN_NUMBER} sha=${GITHUB_SHA} outcome=${OUTCOME}" > /tmp/logs/status.txt
           cd /tmp/logs
           git init -q
