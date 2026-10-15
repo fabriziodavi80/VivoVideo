@@ -756,9 +756,28 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         c.copy(fx = c.fx.map { if (it.type == type) it.copy(amount = amount) else it })
     }
 
+    /** Il video si apre dal nero sulla prima clip e si chiude al nero sull'ultima. */
+    fun fadeVideoEnds(inUs: Long = 1_000_000, outUs: Long = 1_500_000) = update { p ->
+        if (p.clips.isEmpty()) return@update null
+        val first = p.clips.first().id
+        val last = p.clips.last().id
+        p.copy(clips = p.clips.map { c ->
+            var x = c
+            if (c.id == first) x = x.copy(fadeInUs = minOf(inUs, c.outputUs / 2))
+            if (c.id == last) x = x.copy(fadeOutUs = minOf(outUs, c.outputUs / 2))
+            x
+        })
+    }
+
     fun applyFxToAll() {
         val c = selectedClip ?: return
         update { p -> p.copy(clips = p.clips.map { it.copy(fx = c.fx) }) }
+    }
+
+    /** Copia le dissolvenze della clip selezionata (entrata, uscita, colore) su tutte le clip. */
+    fun applyFadesToAll() {
+        val c = selectedClip ?: return
+        update { p -> p.copy(clips = p.clips.map { it.copy(fadeInUs = minOf(c.fadeInUs, it.outputUs / 2), fadeOutUs = minOf(c.fadeOutUs, it.outputUs / 2), fadeColor = c.fadeColor, fadeAudio = c.fadeAudio) }) }
     }
 
     /** Inquadratura fissa della clip selezionata. */

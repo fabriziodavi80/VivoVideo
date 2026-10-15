@@ -65,6 +65,17 @@ fun renderTimelineAudio(context: Context, project: Project, onProgress: (Float) 
             // Lunghezza esatta della clip nel video: si completa con silenzio o si taglia.
             val needed = (target * OUT_CH).toInt()
             if (samples.size != needed) samples = samples.copyOf(needed)
+            // Dissolvenze in entrata/uscita della clip anche sull'audio.
+            if (clip.fadeAudio && (clip.fadeInUs > 0 || clip.fadeOutUs > 0)) {
+                val frames = samples.size / OUT_CH
+                val fin = (clip.fadeInUs * OUT_RATE / 1_000_000).toInt().coerceAtMost(frames)
+                val fout = (clip.fadeOutUs * OUT_RATE / 1_000_000).toInt().coerceAtMost(frames)
+                for (f in 0 until fin) { val g = f.toFloat() / fin; for (ch in 0 until OUT_CH) samples[f * OUT_CH + ch] *= g * g }
+                for (f in 0 until fout) {
+                    val g = f.toFloat() / fout
+                    for (ch in 0 until OUT_CH) samples[(frames - 1 - f) * OUT_CH + ch] *= g * g
+                }
+            }
             // Micro-dissolvenze (8 ms) agli estremi di ogni clip: niente "clic" sui tagli.
             val ramp = minOf(OUT_RATE * 8 / 1000, samples.size / OUT_CH / 2)
             for (f in 0 until ramp) {

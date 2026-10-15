@@ -145,6 +145,11 @@ data class Clip(
     val frame: Transform = Transform(),
     /** Effetti video della clip. */
     val fx: List<ClipFx> = emptyList(),
+    /** Dissolvenza in entrata/uscita (dal nero o dal bianco), in µs del video finale; anche sull'audio se [fadeAudio]. */
+    val fadeInUs: Long = 0,
+    val fadeOutUs: Long = 0,
+    val fadeColor: FadeColor = FadeColor.BLACK,
+    val fadeAudio: Boolean = true,
     /** Pezzo già elaborato (dissolvenza preparata per l'anteprima): niente colori né effetti da riapplicare. */
     val baked: Boolean = false,
     val width: Int = 0,
@@ -184,12 +189,49 @@ data class ColorSettings(
     val lutName: String? = null,
 )
 
-/** Effetti video per clip; [toggle] = acceso/spento senza intensità. */
-enum class FxType(val label: String, val toggle: Boolean = false, val defaultAmount: Float = 0.6f) {
-    BLUR("Sfocatura", defaultAmount = 0.4f), VIGNETTE("Vignettatura"), FILM("Pellicola"), BW("Bianco e nero", defaultAmount = 1f),
-    GLOW("Bagliore"), GLITCH("Glitch", defaultAmount = 0.5f), VHS("VHS"), SHAKE("Scossa", defaultAmount = 0.5f),
-    PULSE("Pulsa a ritmo"), PIXEL("Pixel", defaultAmount = 0.4f), MIRROR("Specchio", toggle = true, defaultAmount = 1f),
+/** Categorie degli effetti (per il pannello). */
+enum class FxCategory(val label: String) { COLOR("Colore"), STYLE("Stile"), OPTICS("Ottica"), SHAPE("Forma"), MOTION("Movimento") }
+
+/** Effetti video per clip; [toggle] = acceso/spento senza intensità. L'ordine non conta (salvati per nome). */
+enum class FxType(val label: String, val category: FxCategory, val toggle: Boolean = false, val defaultAmount: Float = 0.6f) {
+    // Colore
+    BW("Bianco e nero", FxCategory.COLOR, defaultAmount = 1f),
+    SEPIA("Seppia", FxCategory.COLOR, defaultAmount = 0.8f),
+    VIVID("Colori vivaci", FxCategory.COLOR, defaultAmount = 0.5f),
+    DUOTONE("Bicromia", FxCategory.COLOR, defaultAmount = 0.8f),
+    HUE("Arcobaleno", FxCategory.COLOR, defaultAmount = 0.5f),
+    POSTERIZE("Poster", FxCategory.COLOR, defaultAmount = 0.5f),
+    INVERT("Negativo", FxCategory.COLOR, toggle = true, defaultAmount = 1f),
+    // Stile
+    FILM("Pellicola", FxCategory.STYLE),
+    OLDFILM("Vecchio film", FxCategory.STYLE, defaultAmount = 0.7f),
+    VHS("VHS", FxCategory.STYLE),
+    GLITCH("Glitch", FxCategory.STYLE, defaultAmount = 0.5f),
+    CARTOON("Fumetto", FxCategory.STYLE, defaultAmount = 0.6f),
+    HALFTONE("Retino", FxCategory.STYLE, defaultAmount = 0.5f),
+    PIXEL("Pixel", FxCategory.STYLE, defaultAmount = 0.4f),
+    LIGHTLEAK("Luce calda", FxCategory.STYLE, defaultAmount = 0.6f),
+    GLOW("Bagliore", FxCategory.STYLE),
+    // Ottica
+    BLUR("Sfocatura", FxCategory.OPTICS, defaultAmount = 0.4f),
+    ZOOMBLUR("Sfocatura zoom", FxCategory.OPTICS, defaultAmount = 0.4f),
+    TILTSHIFT("Miniatura", FxCategory.OPTICS, defaultAmount = 0.6f),
+    VIGNETTE("Vignettatura", FxCategory.OPTICS),
+    FISHEYE("Grandangolo", FxCategory.OPTICS, defaultAmount = 0.5f),
+    CHROMA("Aberrazione", FxCategory.OPTICS, defaultAmount = 0.4f),
+    WAVE("Onde", FxCategory.OPTICS, defaultAmount = 0.4f),
+    // Forma
+    MIRROR("Specchio", FxCategory.SHAPE, toggle = true, defaultAmount = 1f),
+    KALEIDO("Caleidoscopio", FxCategory.SHAPE, defaultAmount = 0.5f),
+    GRID("Moltiplica", FxCategory.SHAPE, defaultAmount = 0.3f),
+    // Movimento
+    SHAKE("Scossa", FxCategory.MOTION, defaultAmount = 0.5f),
+    PULSE("Pulsa a ritmo", FxCategory.MOTION),
+    STROBE("Lampi a ritmo", FxCategory.MOTION, defaultAmount = 0.5f),
 }
+
+/** Colore delle dissolvenze in entrata/uscita della clip. */
+enum class FadeColor(val label: String) { BLACK("Nero"), WHITE("Bianco") }
 
 @Serializable
 data class ClipFx(val type: FxType, val amount: Float = type.defaultAmount)

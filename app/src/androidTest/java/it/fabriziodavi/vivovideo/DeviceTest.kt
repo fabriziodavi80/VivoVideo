@@ -34,6 +34,7 @@ import it.fabriziodavi.vivovideo.engine.Exporter
 import it.fabriziodavi.vivovideo.model.Clip
 import it.fabriziodavi.vivovideo.model.ClipFx
 import it.fabriziodavi.vivovideo.model.ClipSpeed
+import it.fabriziodavi.vivovideo.model.FadeColor
 import it.fabriziodavi.vivovideo.model.FxType
 import it.fabriziodavi.vivovideo.model.KeyColor
 import it.fabriziodavi.vivovideo.model.Keyframe
@@ -170,20 +171,25 @@ class DeviceTest {
     private fun photoClip(id: String) =
         Clip(id = id, uri = photo.toString(), sourceDurationUs = Clip.PHOTO_MAX_US, trimEndUs = 2_000_000, isPhoto = true, width = 800, height = 600)
 
+    /** Una clip breve per ogni gruppo di effetti: così lo shader con tutti gli effetti gira davvero. */
+    private fun allEffectsClips(): List<Clip> = FxType.entries.chunked(6).mapIndexed { i, group ->
+        video("fx$i", if (i % 2 == 0) videoB else videoC, s = 1_000_000, e = 2_200_000).copy(fx = group.map { ClipFx(it) }, fadeInUs = 300_000)
+    }
+
     private fun fullProject(): Project {
         val x = TransitionSpec(TransitionType.CROSSFADE, 1_000_000)
         return Project(
             name = "tutto",
             clips = listOf(
-                video("a", videoA, s = 500_000, e = 4_000_000).copy(transitionOut = x,
+                video("a", videoA, s = 500_000, e = 4_000_000).copy(transitionOut = x, fadeInUs = 800_000,
                     keyframes = listOf(Keyframe(0, Transform()), Keyframe(2_000_000, Transform(scale = 1.4f, rotation = 10f, opacity = 0.7f))),
                     fx = listOf(ClipFx(FxType.VHS), ClipFx(FxType.VIGNETTE), ClipFx(FxType.PULSE))),
                 video("b", videoB, s = 1_000_000, e = 5_000_000).copy(speed = ClipSpeed.RAMP, speedPoints = SpeedPreset.BULLET.points,
                     transitionOut = TransitionSpec(TransitionType.ZOOM), frame = Transform(scale = 1.2f), fill = true),
                 photoClip("p").copy(transitionOut = x, keyframes = listOf(Keyframe(0, Transform()), Keyframe(2_000_000, Transform(scale = 1.2f)))),
                 video("c", videoC, s = 1_000_000, e = 4_000_000).copy(transitionOut = TransitionSpec(TransitionType.SPIN), fx = listOf(ClipFx(FxType.GLITCH), ClipFx(FxType.BW))),
-                video("a2", videoA, s = 2_000_000, e = 5_000_000).copy(volume = 0.5f),
-            ),
+                video("a2", videoA, s = 2_000_000, e = 5_000_000).copy(volume = 0.5f, fadeOutUs = 1_000_000, fadeColor = FadeColor.WHITE),
+            ) + allEffectsClips(),
             music = listOf(MusicTrack(uri = music.toString(), name = "musica", sourceDurationUs = 30_000_000, fadeInUs = 1_000_000, fadeOutUs = 2_000_000,
                 beatsUs = (0 until 60).map { it * 500_000L }, bpm = 120f)),
             texts = listOf(

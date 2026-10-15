@@ -177,6 +177,29 @@ class EngineTest {
         assertEquals(0f, FxEffect(emptyList(), listOf(1_000_000)).pulseAt(1_000_000), 0f)
     }
 
+    @Test fun everyEffectHasItsUniformInTheShader() {
+        assertEquals(FxType.entries.toSet(), FX_UNIFORMS.keys)
+        FX_UNIFORMS.values.forEach { u -> assertTrue("$u manca nello shader", Regex("\\b$u\\b").findAll(FX_FRAGMENT).count() >= 2) }
+        assertEquals(FX_UNIFORMS.size, FX_UNIFORMS.values.toSet().size)
+    }
+
+    @Test fun clipFadesInAndOut() {
+        val fx = FxEffect(emptyList(), emptyList(), clipStartUs = 10_000_000, clipOutputUs = 4_000_000, fadeInUs = 1_000_000, fadeOutUs = 2_000_000)
+        assertEquals(1f, fx.fadeAt(10_000_000), 1e-3f)       // inizio: tutto nero
+        assertEquals(0.5f, fx.fadeAt(10_500_000), 1e-3f)     // a metà dell'entrata
+        assertEquals(0f, fx.fadeAt(11_500_000), 1e-3f)       // in mezzo: niente
+        assertEquals(0.5f, fx.fadeAt(13_000_000), 1e-3f)     // a metà dell'uscita
+        assertTrue(fx.fadeAt(13_999_000) > 0.99f)            // fine: tutto nero
+        assertEquals(0f, FxEffect(emptyList(), emptyList()).fadeAt(5_000_000), 0f)
+    }
+
+    @Test fun strobeOnBeats() {
+        val fx = FxEffect(listOf(ClipFx(FxType.STROBE)), listOf(1_000_000))
+        assertEquals(1f, fx.strobeAt(1_000_000), 1e-3f)
+        assertTrue(fx.strobeAt(1_150_000) < 0.1f)
+        assertEquals(0f, fx.strobeAt(900_000), 0f)
+    }
+
     @Test fun animationsStartAndEndInvisible() {
         TextAnim.entries.forEach { a ->
             val mid = animFactors(a, a, 1_000_000, 2_000_000)

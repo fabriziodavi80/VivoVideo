@@ -174,7 +174,9 @@ class CompositionFactory(private val context: Context) {
                     add(KeyframeTransformation(clip, outW.toFloat() / outH, clipStart))
                 }
                 if (clip.keyframes.any { it.value.opacity != 1f }) add(KeyframeFade(clip, clipStart))
-                if (clip.fx.isNotEmpty()) add(FxEffect(clip.fx, beats))
+                if (clip.fx.isNotEmpty() || clip.fadeInUs > 0 || clip.fadeOutUs > 0) {
+                    add(FxEffect(clip.fx, beats, clipStart, clip.outputUs, clip.fadeInUs, clip.fadeOutUs, clip.fadeColor))
+                }
             }
             val edited = if (clip.isPhoto) {
                 EditedMediaItem.Builder(
@@ -295,7 +297,10 @@ class CompositionFactory(private val context: Context) {
                     }
                     if (clip.keyframes.any { it.value.opacity != 1f }) add(KeyframeFade(clip, startUs))
                 }
-                if (clip.fx.isNotEmpty()) add(FxEffect(clip.fx, if (clip.fx.any { f -> f.type == FxType.PULSE }) beats else emptyList()))
+                if (clip.fx.isNotEmpty() || clip.fadeInUs > 0 || clip.fadeOutUs > 0) {
+                    val needsBeats = clip.fx.any { f -> f.type == FxType.PULSE || f.type == FxType.STROBE }
+                    add(FxEffect(clip.fx, if (needsBeats) beats else emptyList(), startUs, clip.outputUs, clip.fadeInUs, clip.fadeOutUs, clip.fadeColor))
+                }
                 // Transizioni: metà alla fine di questa clip, metà all'inizio della successiva.
                 // (la dissolvenza incrociata la fa il compositore, non questo effetto)
                 fun adapt(t: TransitionSpec?) = when {

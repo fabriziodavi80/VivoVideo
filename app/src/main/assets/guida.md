@@ -3,10 +3,8 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
-- Corretto lo **scontorno** delle immagini (verde/blu/bianco/nero), che poteva non applicarsi.
-- Corrette le **forme** delle immagini (cerchio, cuore, stella, arrotondata), che potevano non ritagliare.
-- Dietro le quinte: ogni versione ora passa 88 prove automatiche, comprese esportazioni vere e anteprima su un telefono Android simulato.
-- Dissolvenza incrociata vera anche in anteprima (preparata in anticipo, scritta "Preparo la dissolvenza…").
+- **Dissolvenze in entrata e in uscita** per ogni clip (dal/al nero o bianco, anche sull'audio), con il tasto **Apri e chiudi il video** per la prima e l'ultima clip.
+- **29 effetti** divisi in categorie: Colore, Stile, Ottica, Forma, Movimento. Nuovi: Seppia, Colori vivaci, Bicromia, Arcobaleno, Poster, Negativo, Vecchio film, Fumetto, Retino, Luce calda, Sfocatura zoom, Miniatura, Grandangolo, Aberrazione, Onde, Caleidoscopio, Moltiplica, Lampi a ritmo.
 
 ## Primi passi
 - Dalla schermata dei progetti tocca **Nuovo progetto** e scegli video e foto dalla galleria.
@@ -60,9 +58,15 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - Se un lato del taglio ha meno di 0,1 s di video in più, in anteprima resta il passaggio al nero (nel video esportato è comunque vera).
 
 ## Effetti
-- Strumento **Effetti** sulla clip: Sfocatura, Vignettatura, Pellicola, Bianco e nero, Bagliore, Glitch, VHS, Scossa, **Pulsa a ritmo**, Pixel, Specchio.
-- Si combinano; ognuno ha la sua intensità. **Applica a tutte le clip** per uniformare.
-- "Pulsa a ritmo" usa i battiti della musica.
+- Strumento **Effetti** sulla clip. In cima le **dissolvenze**: in entrata e in uscita (fino a metà clip), dal/al nero o bianco, anche sull'audio (l'audio sfuma nel video esportato).
+- **Apri e chiudi il video**: dissolvenza dal nero sulla prima clip e al nero sull'ultima, in un tocco. **A tutte le clip** copia le dissolvenze.
+- Effetti per categoria (tocca la categoria, poi l'effetto; il numero indica quanti ne hai accesi):
+- **Colore**: Bianco e nero, Seppia, Colori vivaci, Bicromia, Arcobaleno, Poster, Negativo.
+- **Stile**: Pellicola, Vecchio film, VHS, Glitch, Fumetto, Retino, Pixel, Luce calda, Bagliore.
+- **Ottica**: Sfocatura, Sfocatura zoom, Miniatura, Vignettatura, Grandangolo, Aberrazione, Onde.
+- **Forma**: Specchio, Caleidoscopio, Moltiplica.
+- **Movimento**: Scossa, **Pulsa a ritmo**, **Lampi a ritmo** (questi due usano i battiti della musica).
+- Si combinano liberamente; ognuno ha la sua intensità. **Applica a tutte le clip** per uniformare.
 
 ## Colore
 - **LOG**: le clip girate in LOG si convertono in colori normali (riconosciute da sole, interruttore nel pannello).

@@ -5,6 +5,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import it.fabriziodavi.vivovideo.model.Clip
 import it.fabriziodavi.vivovideo.model.ClipSpeed
+import it.fabriziodavi.vivovideo.model.FadeColor
 import it.fabriziodavi.vivovideo.model.FxType
 import it.fabriziodavi.vivovideo.model.Layer
 import it.fabriziodavi.vivovideo.model.MotionStyle
@@ -188,5 +189,19 @@ class EditorOpsTest {
             val off = end % 400_000
             assertTrue("taglio a $end", off < 3_000 || off > 397_000)
         }
+    }
+
+    @Test fun fadesOnVideoEndsAndToAll() {
+        val vm = vm()
+        vm.fadeVideoEnds()
+        val c = vm.project!!.clips
+        assertEquals(1_000_000L, c.first().fadeInUs)
+        assertEquals(1_500_000L, c.last().fadeOutUs)
+        assertEquals(0L, c[1].fadeInUs + c[1].fadeOutUs)
+        vm.selectedClipId = "a"
+        vm.updateSelected { it.copy(fadeOutUs = 3_000_000, fadeColor = FadeColor.WHITE) }
+        vm.applyFadesToAll()
+        // Mai più di metà clip.
+        assertTrue(vm.project!!.clips.all { it.fadeOutUs <= it.outputUs / 2 && it.fadeOutUs > 0 && it.fadeColor == FadeColor.WHITE })
     }
 }

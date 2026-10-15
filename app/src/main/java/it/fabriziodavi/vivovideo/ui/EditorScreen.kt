@@ -1,5 +1,9 @@
 package it.fabriziodavi.vivovideo.ui
 
+import it.fabriziodavi.vivovideo.model.FadeColor
+
+import it.fabriziodavi.vivovideo.model.FxCategory
+
 import it.fabriziodavi.vivovideo.model.KeyColor
 
 import it.fabriziodavi.vivovideo.model.LayerMask
@@ -1227,10 +1231,44 @@ private fun SlideshowPanel(vm: EditorViewModel, running: Boolean) {
 @Composable
 private fun EffectsPanel(vm: EditorViewModel, running: Boolean) {
     val clip = vm.selectedClip ?: return
+    val p = vm.project ?: return
     val enabled = !running
-    Hint("Tocca un effetto per accenderlo o spegnerlo; puoi combinarne più di uno.")
+    val secs = { v: Int -> if (v == 0) "No" else String.format(java.util.Locale.ITALIAN, "%.1f s", v / 10f) }
+    val maxTenths = (clip.outputUs / 2 / 100_000).toInt().coerceIn(1, 50)
+    PanelLabel("Dissolvenze della clip")
+    LabeledSlider("In entrata", null, (clip.fadeInUs / 100_000).toInt().coerceAtMost(maxTenths), enabled, range = 0..maxTenths, format = secs) { v ->
+        vm.updateSelected { it.copy(fadeInUs = v * 100_000L) }
+    }
+    LabeledSlider("In uscita", null, (clip.fadeOutUs / 100_000).toInt().coerceAtMost(maxTenths), enabled, range = 0..maxTenths, format = secs) { v ->
+        vm.updateSelected { it.copy(fadeOutUs = v * 100_000L) }
+    }
+    if (clip.fadeInUs > 0 || clip.fadeOutUs > 0) {
+        Segmented(FadeColor.entries, clip.fadeColor, { "Dal/al " + it.label.lowercase() }, enabled) { c -> vm.updateSelected { it.copy(fadeColor = c) } }
+        if (!clip.isPhoto) ToggleRow("Anche l'audio (nel video esportato)", clip.fadeAudio, enabled) { v -> vm.updateSelected { it.copy(fadeAudio = v) } }
+    }
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        SecondaryButton("Apri e chiudi il video", onClick = { if (enabled) vm.fadeVideoEnds() })
+        if (clip.fadeInUs > 0 || clip.fadeOutUs > 0) SecondaryButton("A tutte le clip", onClick = { if (enabled) vm.applyFadesToAll() })
+    }
+    Hint("\"Apri e chiudi il video\": dissolvenza dal nero sulla prima clip (1 s) e al nero sull'ultima (1,5 s).")
+
+    PanelLabel("Effetti")
+    var category by remember { mutableStateOf(FxCategory.COLOR) }
+    Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        FxCategory.entries.forEach { cat ->
+            val on = cat == category
+            val count = clip.fx.count { it.type.category == cat }
+            Box(
+                Modifier.clip(RoundedCornerShape(10.dp)).background(if (on) VV.Raised2 else VV.Canvas)
+                    .border(1.dp, if (on) VV.Tally else VV.Line, RoundedCornerShape(10.dp))
+                    .clickable { category = cat }.padding(horizontal = 12.dp, vertical = 7.dp)
+            ) {
+                Text(cat.label + if (count > 0) " · $count" else "", style = MaterialTheme.typography.labelMedium, color = if (on) VV.Tally else VV.Dim)
+            }
+        }
+    }
     Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        FxType.entries.forEach { t ->
+        FxType.entries.filter { it.category == category }.forEach { t ->
             val on = clip.fx.any { it.type == t }
             Box(
                 Modifier.clip(RoundedCornerShape(18.dp)).background(if (on) VV.Tally else VV.Raised)
@@ -1241,14 +1279,16 @@ private fun EffectsPanel(vm: EditorViewModel, running: Boolean) {
     clip.fx.filter { !it.type.toggle }.forEach { f ->
         LabeledSlider(f.type.label, null, (f.amount * 100).toInt(), enabled, format = { "$it%" }) { v -> vm.setFxAmount(f.type, v / 100f) }
     }
-    if (clip.fx.any { it.type == FxType.PULSE } && (vm.project?.beatTimes()?.isEmpty() != false)) {
-        Hint("\"Pulsa a ritmo\" usa i battiti della musica: aggiungi un brano e rileva i battiti dal pannello Musica.")
+    if (clip.fx.any { it.type == FxType.PULSE || it.type == FxType.STROBE } && p.beatTimes().isEmpty()) {
+        Hint("\"Pulsa a ritmo\" e \"Lampi a ritmo\" usano i battiti della musica: aggiungi un brano e rileva i battiti dal pannello Musica.")
     }
     if (clip.fx.isNotEmpty()) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             SecondaryButton("Applica a tutte le clip", onClick = { if (enabled) vm.applyFxToAll() })
             SecondaryButton("Togli tutti", onClick = { if (enabled) vm.updateSelected { it.copy(fx = emptyList()) } })
         }
+    } else {
+        Hint("Tocca un effetto per accenderlo o spegnerlo; si possono combinare anche di categorie diverse.")
     }
 }
 
