@@ -10,6 +10,7 @@ import it.fabriziodavi.vivovideo.model.Clip
 import it.fabriziodavi.vivovideo.model.ClipSpeed
 import it.fabriziodavi.vivovideo.model.Keyframe
 import it.fabriziodavi.vivovideo.model.Project
+import it.fabriziodavi.vivovideo.model.TextFont
 import it.fabriziodavi.vivovideo.model.Transform
 import it.fabriziodavi.vivovideo.model.TransitionSpec
 import it.fabriziodavi.vivovideo.model.TransitionType
@@ -122,7 +123,7 @@ class ScreenshotTest {
         val vm = vm()
         vm.selectedClipId = null
         vm.addText()
-        vm.updateText { it.copy(text = "Gita in montagna", font = it.fabriziodavi.vivovideo.model.TextFont.TITOLO, size = 0.09f, y = -0.3f) }
+        vm.updateText { it.copy(text = "Gita in montagna", font = TextFont.TITOLO, size = 0.09f, y = -0.3f) }
         compose.setContent { VivoTheme { EditorScreen(vm, initialTool = Tool.TEXT) } }
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/11_editor_testo.png")
     }
