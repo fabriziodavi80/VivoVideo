@@ -8,7 +8,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.takahirom.roborazzi.captureRoboImage
 import it.fabriziodavi.vivovideo.model.Clip
 import it.fabriziodavi.vivovideo.model.ClipSpeed
+import it.fabriziodavi.vivovideo.model.Keyframe
 import it.fabriziodavi.vivovideo.model.Project
+import it.fabriziodavi.vivovideo.model.Transform
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -71,8 +73,8 @@ class ScreenshotTest {
         vm.selectedClipId = c.id
         vm.updateSelected {
             it.copy(keyframes = listOf(
-                it.fabriziodavi.vivovideo.model.Keyframe(0, it.fabriziodavi.vivovideo.model.Transform()),
-                it.fabriziodavi.vivovideo.model.Keyframe(3_000_000, it.fabriziodavi.vivovideo.model.Transform(scale = 1.8f, x = 0.1f)),
+                Keyframe(0, Transform()),
+                Keyframe(3_000_000, Transform(scale = 1.8f, x = 0.1f)),
             ))
         }
         compose.setContent { VivoTheme { EditorScreen(vm, initialTool = Tool.KEYFRAME) } }
