@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.util.UUID
 import kotlin.math.PI
+import kotlin.math.abs
 import kotlin.math.cos
 
 /*
@@ -165,10 +166,15 @@ data class Project(
 
 /** Divide i punti di una curva nella posizione f (0..1), riscalando le due metà. */
 fun splitPoints(points: List<SpeedPoint>, f: Float): Pair<List<SpeedPoint>, List<SpeedPoint>> {
-    val atCut = SpeedPoint(0f, SpeedInterp.valueAt(points, f))
-    val left = points.filter { it.t < f }.map { it.copy(t = it.t / f) } + atCut.copy(t = 1f)
-    val right = listOf(atCut) + points.filter { it.t > f }.map { it.copy(t = (it.t - f) / (1 - f)) }
-    return left to right
+    // Oltre ai punti esistenti, campiona la curva originale dentro ogni metà:
+    // così ciascuna metà mantiene la stessa forma (e quindi la stessa durata).
+    fun half(from: Float, to: Float): List<SpeedPoint> {
+        val inner = points.filter { it.t > from && it.t < to }.map { it.t }
+        val samples = (1..3).map { from + (to - from) * it / 4f }.filter { s -> inner.none { abs(it - s) < (to - from) * 0.08f } }
+        val ts = (listOf(from, to) + inner + samples).sorted()
+        return ts.map { t -> SpeedPoint((t - from) / (to - from), SpeedInterp.valueAt(points, t)) }
+    }
+    return half(0f, f) to half(f, 1f)
 }
 
 /**
