@@ -133,7 +133,7 @@ private fun MainScreen(vm: MainViewModel) {
             val uri = vm.sourceUri
             val info = vm.info
             if (uri != null) {
-                Preview(uri, vm.look, vm.speed, info)
+                Preview(uri, vm.look, vm.speed, info, exporting = running)
             }
             if (info != null) {
                 Text(info.summary(), color = Color(0xFFB8BCC8), fontSize = 13.sp)
@@ -211,7 +211,7 @@ private fun MainScreen(vm: MainViewModel) {
 }
 
 @Composable
-private fun Preview(uri: android.net.Uri, look: Look, speed: SpeedMode, info: VideoInfo?) {
+private fun Preview(uri: android.net.Uri, look: Look, speed: SpeedMode, info: VideoInfo?, exporting: Boolean) {
     val context = LocalContext.current
     // Il player si ricrea quando cambia il video o il filtro.
     val player = remember(uri, look) {
@@ -223,6 +223,11 @@ private fun Preview(uri: android.net.Uri, look: Look, speed: SpeedMode, info: Vi
         }
     }
     DisposableEffect(player) { onDispose { player.release() } }
+    // Durante l'esportazione l'anteprima libera il decoder hardware:
+    // con l'8K non c'è spazio per due decoder più l'encoder.
+    LaunchedEffect(player, exporting) {
+        if (exporting) player.stop() else if (player.playbackState == Player.STATE_IDLE) player.prepare()
+    }
     LaunchedEffect(player, speed) {
         player.setPlaybackSpeed(
             when (speed) {

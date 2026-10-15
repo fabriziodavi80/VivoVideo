@@ -136,7 +136,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /** Tentativi di encoder dal più veloce al più prudente (servono per l'8K). */
-    private val maxAttempts = 3
+    private val maxAttempts = 4
 
     private fun runAttempt(
         uri: Uri,
@@ -192,21 +192,42 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         val srcFps = src.fps ?: 30f
         val outFps = fps.max?.let { minOf(it.toFloat(), srcFps) } ?: srcFps
         val pixelsPerSec = outShort.toDouble() * outLong * outFps
-        val maxBitrate = if (attempt >= 2) 100_000_000.0 else 160_000_000.0
+        val maxBitrate = if (attempt >= 1) 100_000_000.0 else 160_000_000.0
         var bitrate = (45_000_000 * pixelsPerSec / (3840.0 * 2160 * 30))
             .coerceIn(8_000_000.0, maxBitrate).toInt()
         if (codec == OutputCodec.H264) bitrate = minOf((bitrate * 1.4).toInt(), maxBitrate.toInt())
 
         // Con sorgenti oltre il 4K, decoder ed encoder insieme superano il budget
         // hardware se si chiede la massima velocità: si parte già in modalità prudente.
-        val heavy = src.width.toLong() * src.height * srcFps > 3840L * 2160 * 120
+        val heavy = src.width.toLong() * src.height * srcFps >= 3840L * 2160 * 120
+        // Scala dei tentativi: 0 massima velocità, 1 standard, 2 tempo reale (+ decoder senza
+        // operating rate), 3 decoder software (lento ma senza limiti hardware, per l'8K).
         val step = if (heavy) attempt + 1 else attempt
         val settings = VideoEncoderSettings.Builder().setBitrate(bitrate)
+        var softwareDecoder = false
         val modeLabel = when (step) {
             0 -> "massima velocità"
             1 -> { settings.setEncoderPerformanceParameters(VideoEncoderSettings.RATE_UNSET, VideoEncoderSettings.RATE_UNSET); "velocità standard" }
-            else -> { settings.setEncoderPerformanceParameters(outFps.toInt().coerceAtLeast(1), 1); "tempo reale" }
+            2 -> { settings.setEncoderPerformanceParameters(outFps.toInt().coerceAtLeast(1), 1); "tempo reale" }
+            else -> {
+                settings.setEncoderPerformanceParameters(outFps.toInt().coerceAtLeast(1), 1)
+                softwareDecoder = true
+                "decoder software (lento)"
+            }
         }
+        val decoderBuilder = androidx.media3.transformer.DefaultDecoderFactory.Builder(context)
+        if (softwareDecoder) {
+            decoderBuilder.setMediaCodecSelector { mime, secure, tunneling ->
+                val all = androidx.media3.exoplayer.mediacodec.MediaCodecUtil.getDecoderInfos(mime, secure, tunneling)
+                all.filter { it.softwareOnly }.ifEmpty { all }
+            }
+        }
+        val assetLoaderFactory = androidx.media3.transformer.DefaultAssetLoaderFactory(
+            context,
+            decoderBuilder.build(),
+            androidx.media3.common.util.Clock.DEFAULT,
+            null,
+        )
 
         val encoderFactory = DefaultEncoderFactory.Builder(context)
             .setRequestedVideoEncoderSettings(settings.build())
@@ -257,7 +278,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                 log += "• $modeLabel, ${bitrate / 1_000_000} Mbps: ${exportException.errorCodeName}$codecInfo"
                 val retryable = exportException.errorCode == ExportException.ERROR_CODE_ENCODER_INIT_FAILED ||
                     exportException.errorCode == ExportException.ERROR_CODE_DECODER_INIT_FAILED
-                if (retryable && attempt + 1 < maxAttempts && step < 2 && exportState is ExportState.Running) {
+                if (retryable && attempt + 1 < maxAttempts && step < 3 && exportState is ExportState.Running) {
                     exportState = ExportState.Running(null, "Nuovo tentativo con impostazioni più prudenti…")
                     handler.post { runAttempt(uri, src, provider, nativeAudio, audioFile, attempt + 1, log) }
                     return
@@ -274,6 +295,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         val t = Transformer.Builder(context)
             .setVideoMimeType(codec.mime)
             .setEncoderFactory(encoderFactory)
+            .setAssetLoaderFactory(assetLoaderFactory)
             .addListener(listener)
             .build()
         transformer = t
