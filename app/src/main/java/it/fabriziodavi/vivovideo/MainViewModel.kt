@@ -87,7 +87,8 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     fun colorEffects(): List<Effect> = buildList {
         if (logMode) add(builtInLog.toEffect())
         customLut?.let { add(it.toEffect()) }
-        if (highlights > 0) add(highlightEffect(highlights / 100f))
+        // Shader alte luci; con il LOG serve comunque per il dithering anti-bande.
+        if (highlights > 0 || logMode) add(HighlightEffect(highlights / 100f))
         addAll(look.effects())
     }
 
