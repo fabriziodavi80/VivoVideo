@@ -17,11 +17,20 @@ class ProjectTest {
         assertEquals(2_000_000L, clip(4.0, ClipSpeed.FAST).outputUs)
     }
 
-    @Test fun rampDurationMatchesIntegral() {
-        // ∫ dt / (a + b cos) su un periodo = 1/sqrt(a²-b²), a = 1,175, b = 0,825
-        val expected = 4.116667 / Math.sqrt(1.175 * 1.175 - 0.825 * 0.825)
-        val out = clip(4.116667, ClipSpeed.RAMP).outputUs / 1e6
-        assertTrue("ramp $out vs $expected", abs(out - expected) < 0.05)
+    @Test fun curvePassesThroughPointsWithoutOvershoot() {
+        val pts = SpeedPreset.BULLET.points
+        for (p in pts) assertTrue(abs(SpeedInterp.valueAt(pts, p.t) - p.speed) < 1e-3)
+        var t = 0f
+        while (t <= 1f) {
+            val v = SpeedInterp.valueAt(pts, t)
+            assertTrue("t=$t v=$v", v >= 0.3f - 1e-3 && v <= 3f + 1e-3)
+            t += 0.01f
+        }
+    }
+
+    @Test fun valleyDurationIsLonger() {
+        val out = clip(4.0, ClipSpeed.RAMP).outputUs / 1e6
+        assertTrue("valley $out", out > 4.0 && out < 8.0)
     }
 
     @Test fun inverseMapping() {
@@ -43,9 +52,13 @@ class ProjectTest {
         assertEquals(p.durationUs, s.durationUs)
     }
 
-    @Test fun splitRefusesRampAndEdges() {
+    @Test fun splitCurveKeepsTotalDurationClose() {
         val p = Project(name = "t").addClips(listOf(clip(4.0, ClipSpeed.RAMP)))
-        assertNull(p.splitAt(1_000_000))
+        val s = p.splitAt(p.durationUs / 2)!!
+        assertEquals(2, s.clips.size)
+        assertEquals(2, s.clips.count { it.speed == ClipSpeed.RAMP })
+        val diff = abs(s.durationUs - p.durationUs) / 1e6
+        assertTrue("diff $diff", diff < 0.15)
         val q = Project(name = "t").addClips(listOf(clip(4.0)))
         assertNull(q.splitAt(50_000))
         assertNotNull(q.splitAt(2_000_000))
@@ -68,7 +81,7 @@ class ProjectTest {
 
     @Test fun jsonRoundTrip() {
         val p = Project(name = "Gita", color = ColorSettings(look = "CINEMA", highlights = 30))
-            .addClips(listOf(clip(3.0, ClipSpeed.RAMP).copy(log = true, trimStartUs = 500_000)))
+            .addClips(listOf(clip(3.0, ClipSpeed.RAMP).copy(log = true, trimStartUs = 500_000, speedPoints = SpeedPreset.HERO.points)))
         assertEquals(p, Project.fromJson(p.toJson()))
     }
 }

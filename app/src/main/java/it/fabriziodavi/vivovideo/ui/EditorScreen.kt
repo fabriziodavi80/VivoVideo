@@ -66,6 +66,7 @@ import it.fabriziodavi.vivovideo.engine.OutputCodec
 import it.fabriziodavi.vivovideo.engine.OutputFps
 import it.fabriziodavi.vivovideo.engine.OutputSize
 import it.fabriziodavi.vivovideo.model.ClipSpeed
+import it.fabriziodavi.vivovideo.model.SpeedPreset
 import kotlin.math.ln
 
 private val ZOOMS = listOf(8f, 15f, 30f, 60f, 120f)
@@ -418,37 +419,41 @@ private fun EmptyState(onAdd: () -> Unit) {
 @Composable
 private fun SpeedPanel(vm: EditorViewModel, running: Boolean) {
     val clip = vm.selectedClip ?: return
+    val project = vm.project ?: return
     Segmented(listOf(ClipSpeed.SLOW, ClipSpeed.NORMAL, ClipSpeed.FAST, ClipSpeed.RAMP), clip.speed, { it.label }, !running) { s ->
         vm.updateSelected { it.copy(speed = s) }
     }
-    // Curva della velocità lungo la clip (scala logaritmica: 1× al centro).
-    val curve = remember(clip.speed, clip.trimStartUs, clip.trimEndUs) { clip.speedCurve() }
-    Canvas(Modifier.fillMaxWidth().height(76.dp).clip(RoundedCornerShape(8.dp)).background(VV.Raised)) {
-        val pad = 8.dp.toPx()
-        val h = size.height - 2 * pad
-        fun y(speed: Float): Float {
-            val v = (ln(speed) - ln(0.25f)) / (ln(4f) - ln(0.25f))
-            return pad + h * (1 - v)
+    if (clip.speed == ClipSpeed.RAMP) {
+        // Posizione dell'indicatore dentro questa clip (sul tempo originale), per orientarsi sulla curva.
+        val start = project.clipStartsUs()[project.clips.indexOf(clip)]
+        val inside = vm.playheadUs - start
+        val frac = if (inside in 0..clip.outputUs) clip.speedCurve().sourceTimeAt(inside).toFloat() / clip.trimmedUs else null
+        SpeedCurveEditor(
+            points = clip.curvePoints,
+            playFraction = frac,
+            enabled = !running,
+            onChange = { pts -> vm.updateSelected { it.copy(speedPoints = pts) } },
+        )
+        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            SpeedPreset.entries.forEach { preset ->
+                val on = clip.curvePoints == preset.points
+                Box(
+                    Modifier.clip(RoundedCornerShape(999.dp)).background(if (on) VV.Tally else VV.Raised)
+                        .clickable(enabled = !running) { vm.updateSelected { it.copy(speedPoints = preset.points) } }
+                        .padding(horizontal = 14.dp, vertical = 8.dp),
+                ) { Text(preset.label, style = MaterialTheme.typography.labelLarge, color = if (on) VV.TallyInk else VV.Text) }
+            }
         }
-        drawLine(VV.Line, Offset(0f, y(1f)), Offset(size.width, y(1f)), 1.dp.toPx())
-        val path = Path()
-        val n = 80
-        for (i in 0..n) {
-            val t = curve.durationUs * i / n
-            val x = pad + (size.width - 2 * pad) * i / n
-            val yy = y(curve.speedAt(t.coerceAtMost(curve.durationUs - 1)))
-            if (i == 0) path.moveTo(x, yy) else path.lineTo(x, yy)
-        }
-        drawPath(path, VV.Tally, style = Stroke(2.dp.toPx()))
+        Hint("Trascina i punti. Tocca uno spazio vuoto per aggiungerne uno, doppio tocco su un punto per toglierlo. Durata: " + formatTime(clip.outputUs))
+    } else {
+        Hint(
+            when (clip.speed) {
+                ClipSpeed.SLOW -> "Metà velocità per tutta la clip."
+                ClipSpeed.FAST -> "Doppia velocità per tutta la clip."
+                else -> "Velocità originale. Scegli \"Curva\" per disegnare uno speed ramp."
+            } + "  Durata: " + formatTime(clip.outputUs)
+        )
     }
-    Hint(
-        when (clip.speed) {
-            ClipSpeed.RAMP -> "2× all'inizio, 0,35× al centro, 2× alla fine. Con video a 100/120 fps il lento resta fluido."
-            ClipSpeed.SLOW -> "Metà velocità per tutta la clip."
-            ClipSpeed.FAST -> "Doppia velocità per tutta la clip."
-            ClipSpeed.NORMAL -> "Velocità originale."
-        } + "  Durata: " + formatTime(clip.outputUs)
-    )
 }
 
 @Composable

@@ -26,7 +26,7 @@ class ScreenshotTest {
         val vm = EditorViewModel(ApplicationProvider.getApplicationContext<Application>())
         val clips = listOf(
             Clip(uri = "content://demo/1", sourceDurationUs = 4_000_000, width = 2160, height = 3840, fps = 30f),
-            Clip(uri = "content://demo/2", sourceDurationUs = 4_100_000, speed = ClipSpeed.RAMP, log = true, width = 2160, height = 3840, fps = 120f),
+            Clip(uri = "content://demo/2", sourceDurationUs = 4_100_000, speed = ClipSpeed.RAMP, speedPoints = it.fabriziodavi.vivovideo.model.SpeedPreset.BULLET.points, log = true, width = 2160, height = 3840, fps = 120f),
             Clip(uri = "content://demo/3", sourceDurationUs = 3_000_000, muted = true, width = 2160, height = 3840),
         )
         vm.openProject(Project(name = "Gita in montagna", clips = clips), startPreview = false)

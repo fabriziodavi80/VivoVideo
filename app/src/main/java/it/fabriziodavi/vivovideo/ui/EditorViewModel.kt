@@ -166,10 +166,6 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     fun splitAtPlayhead() {
         val p = project ?: return
         val located = p.locate(playheadUs) ?: return
-        if (p.clips[located.first].speed == it.fabriziodavi.vivovideo.model.ClipSpeed.RAMP) {
-            message = "Le clip con la rampa non si possono dividere: prima imposta una velocità fissa."
-            return
-        }
         val result = p.splitAt(playheadUs)
         if (result == null) { message = "Sposta l'indicatore un po' più lontano dal bordo della clip."; return }
         update { result }

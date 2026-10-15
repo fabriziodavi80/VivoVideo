@@ -13,7 +13,28 @@ import kotlin.math.cos
 
 @Serializable
 enum class ClipSpeed(val label: String) {
-    NORMAL("1×"), SLOW("0,5×"), FAST("2×"), RAMP("Rampa");
+    NORMAL("1×"), SLOW("0,5×"), FAST("2×"),
+    /** Curva disegnata a mano (nei progetti vecchi era la "Rampa" fissa). */
+    RAMP("Curva");
+}
+
+/** Punto della curva di velocità: [t] posizione lungo la clip (0 inizio, 1 fine), [speed] velocità. */
+@Serializable
+data class SpeedPoint(val t: Float, val speed: Float)
+
+object SpeedLimits {
+    const val MIN = 0.2f
+    const val MAX = 5f
+}
+
+/** Curve pronte, come negli editor professionali. */
+enum class SpeedPreset(val label: String, val points: List<SpeedPoint>) {
+    VALLEY("Rallenty centrale", listOf(SpeedPoint(0f, 2f), SpeedPoint(0.5f, 0.35f), SpeedPoint(1f, 2f))),
+    HERO("Eroe", listOf(SpeedPoint(0f, 1f), SpeedPoint(0.38f, 1f), SpeedPoint(0.5f, 0.25f), SpeedPoint(0.62f, 1f), SpeedPoint(1f, 1f))),
+    BULLET("Proiettile", listOf(SpeedPoint(0f, 3f), SpeedPoint(0.42f, 0.3f), SpeedPoint(0.58f, 0.3f), SpeedPoint(1f, 3f))),
+    MONTAGE("Montaggio", listOf(SpeedPoint(0f, 0.5f), SpeedPoint(0.3f, 3f), SpeedPoint(0.7f, 3f), SpeedPoint(1f, 0.5f))),
+    FLASH_IN("Entrata lampo", listOf(SpeedPoint(0f, 4f), SpeedPoint(0.3f, 1f), SpeedPoint(1f, 1f))),
+    SLOW_END("Rallenty finale", listOf(SpeedPoint(0f, 1f), SpeedPoint(0.6f, 1f), SpeedPoint(1f, 0.25f))),
 }
 
 @Serializable
@@ -30,6 +51,8 @@ data class Clip(
     val muted: Boolean = false,
     /** Volume dell'audio originale: 1 = invariato, da 0 a 2. */
     val volume: Float = 1f,
+    /** Punti della curva quando [speed] è RAMP ("Curva"); vuota = preset "Rallenty centrale". */
+    val speedPoints: List<SpeedPoint> = emptyList(),
     val width: Int = 0,
     val height: Int = 0,
     val fps: Float = 30f,
@@ -37,7 +60,9 @@ data class Clip(
     val trimmedUs: Long get() = trimEndUs - trimStartUs
 
     /** Curva di velocità sul tempo della clip tagliata (0 = inizio del taglio). */
-    fun speedCurve(): SpeedCurve = SpeedCurve.forClip(speed, trimmedUs)
+    val curvePoints: List<SpeedPoint> get() = speedPoints.ifEmpty { SpeedPreset.VALLEY.points }
+
+    fun speedCurve(): SpeedCurve = SpeedCurve.forClip(speed, trimmedUs, curvePoints)
 
     /** Durata di questa clip nel video finale. */
     val outputUs: Long get() = speedCurve().outputDurationUs()
@@ -112,12 +137,18 @@ data class Project(
     fun splitAt(timeUs: Long, minPieceUs: Long = 100_000): Project? {
         val (index, offsetOut) = locate(timeUs) ?: return null
         val clip = clips[index]
-        if (clip.speed == ClipSpeed.RAMP) return null
         val offsetSrc = clip.speedCurve().sourceTimeAt(offsetOut)
         val cut = clip.trimStartUs + offsetSrc
         if (cut - clip.trimStartUs < minPieceUs || clip.trimEndUs - cut < minPieceUs) return null
-        val first = clip.copy(trimEndUs = cut)
-        val second = clip.copy(id = UUID.randomUUID().toString(), trimStartUs = cut)
+        var first = clip.copy(trimEndUs = cut)
+        var second = clip.copy(id = UUID.randomUUID().toString(), trimStartUs = cut)
+        if (clip.speed == ClipSpeed.RAMP) {
+            // La curva si divide in due: ogni metà conserva la sua parte di curva.
+            val f = offsetSrc.toFloat() / clip.trimmedUs
+            val (a, b) = splitPoints(clip.curvePoints, f)
+            first = first.copy(speedPoints = a)
+            second = second.copy(speedPoints = b)
+        }
         val list = clips.toMutableList()
         list[index] = first
         list.add(index + 1, second)
@@ -129,6 +160,51 @@ data class Project(
     companion object {
         val JSON = Json { ignoreUnknownKeys = true; encodeDefaults = true; prettyPrint = false }
         fun fromJson(text: String): Project = JSON.decodeFromString(serializer(), text)
+    }
+}
+
+/** Divide i punti di una curva nella posizione f (0..1), riscalando le due metà. */
+fun splitPoints(points: List<SpeedPoint>, f: Float): Pair<List<SpeedPoint>, List<SpeedPoint>> {
+    val atCut = SpeedPoint(0f, SpeedInterp.valueAt(points, f))
+    val left = points.filter { it.t < f }.map { it.copy(t = it.t / f) } + atCut.copy(t = 1f)
+    val right = listOf(atCut) + points.filter { it.t > f }.map { it.copy(t = (it.t - f) / (1 - f)) }
+    return left to right
+}
+
+/**
+ * Interpolazione morbida della curva (cubica monotona sul logaritmo della velocità):
+ * passa esattamente dai punti e non "rimbalza" mai oltre i loro valori.
+ */
+object SpeedInterp {
+    fun valueAt(points: List<SpeedPoint>, t: Float): Float {
+        val p = points.sortedBy { it.t }
+        if (p.isEmpty()) return 1f
+        if (p.size == 1 || t <= p.first().t) return p.first().speed
+        if (t >= p.last().t) return p.last().speed
+        val xs = p.map { it.t.toDouble() }
+        val ys = p.map { kotlin.math.ln(it.speed.toDouble()) }
+        val n = p.size
+        val d = DoubleArray(n - 1) { (ys[it + 1] - ys[it]) / (xs[it + 1] - xs[it]).coerceAtLeast(1e-6) }
+        val m = DoubleArray(n)
+        m[0] = d[0]; m[n - 1] = d[n - 2]
+        for (i in 1 until n - 1) m[i] = if (d[i - 1] * d[i] <= 0) 0.0 else (d[i - 1] + d[i]) / 2
+        // Fritsch–Carlson: evita sovraelongazioni.
+        for (i in 0 until n - 1) {
+            if (d[i] == 0.0) { m[i] = 0.0; m[i + 1] = 0.0; continue }
+            val a = m[i] / d[i]; val b = m[i + 1] / d[i]
+            val s = a * a + b * b
+            if (s > 9) { val k = 3 / kotlin.math.sqrt(s); m[i] = k * a * d[i]; m[i + 1] = k * b * d[i] }
+        }
+        var k = 0
+        while (k < n - 2 && t > xs[k + 1]) k++
+        val h = (xs[k + 1] - xs[k]).coerceAtLeast(1e-6)
+        val u = (t - xs[k]) / h
+        val h00 = 2 * u * u * u - 3 * u * u + 1
+        val h10 = u * u * u - 2 * u * u + u
+        val h01 = -2 * u * u * u + 3 * u * u
+        val h11 = u * u * u - u * u
+        val y = h00 * ys[k] + h10 * h * m[k] + h01 * ys[k + 1] + h11 * h * m[k + 1]
+        return kotlin.math.exp(y).toFloat().coerceIn(SpeedLimits.MIN, SpeedLimits.MAX)
     }
 }
 
@@ -200,11 +276,25 @@ class SpeedCurve(val segEndUs: LongArray, val speeds: FloatArray, val durationUs
             return SpeedCurve(ends, sp, durationUs)
         }
 
-        fun forClip(speed: ClipSpeed, durationUs: Long): SpeedCurve = when (speed) {
+        /** Curva disegnata, campionata a gradini di 40 ms (al centro di ogni gradino). */
+        fun fromPoints(points: List<SpeedPoint>, durationUs: Long): SpeedCurve {
+            val n = ((durationUs + RAMP_STEP_US - 1) / RAMP_STEP_US).toInt().coerceAtLeast(1)
+            val ends = LongArray(n)
+            val sp = FloatArray(n)
+            for (i in 0 until n) {
+                val start = i * RAMP_STEP_US
+                ends[i] = minOf(start + RAMP_STEP_US, durationUs)
+                val mid = (start + ends[i]) / 2.0 / durationUs
+                sp[i] = SpeedInterp.valueAt(points, mid.toFloat())
+            }
+            return SpeedCurve(ends, sp, durationUs)
+        }
+
+        fun forClip(speed: ClipSpeed, durationUs: Long, points: List<SpeedPoint> = SpeedPreset.VALLEY.points): SpeedCurve = when (speed) {
             ClipSpeed.NORMAL -> constant(1f, durationUs)
             ClipSpeed.SLOW -> constant(0.5f, durationUs)
             ClipSpeed.FAST -> constant(2f, durationUs)
-            ClipSpeed.RAMP -> ramp(durationUs)
+            ClipSpeed.RAMP -> fromPoints(points, durationUs)
         }
     }
 }
