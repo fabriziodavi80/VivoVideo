@@ -55,6 +55,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -106,10 +107,10 @@ enum class Tool(val label: String, val icon: () -> ImageVector, val future: Bool
 }
 
 private val CLIP_TOOLS = listOf(
-    Tool.SPLIT, Tool.SPEED, Tool.AUDIO, Tool.COLOR, Tool.KEYFRAME, Tool.EFFECTS, Tool.TRANSITION,
-    Tool.DUPLICATE, Tool.MOVE_LEFT, Tool.MOVE_RIGHT, Tool.DELETE,
+    Tool.SPLIT, Tool.SPEED, Tool.TRANSITION, Tool.KEYFRAME, Tool.AUDIO, Tool.COLOR,
+    Tool.DUPLICATE, Tool.MOVE_LEFT, Tool.MOVE_RIGHT, Tool.DELETE, Tool.EFFECTS,
 )
-private val PROJECT_TOOLS = listOf(Tool.ADD, Tool.SPLIT, Tool.COLOR, Tool.TEXT, Tool.MUSIC, Tool.EFFECTS)
+private val PROJECT_TOOLS = listOf(Tool.ADD, Tool.SPLIT, Tool.TRANSITION, Tool.COLOR, Tool.TEXT, Tool.MUSIC, Tool.EFFECTS)
 
 @Composable
 fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
@@ -620,6 +621,12 @@ private fun KeyframePanel(vm: EditorViewModel, running: Boolean) {
 @Composable
 private fun TransitionPanel(vm: EditorViewModel, running: Boolean) {
     val p = vm.project ?: return
+    // Nessuna clip selezionata: prende quella sotto l'indicatore.
+    if (vm.selectedClip == null) {
+        LaunchedEffect(Unit) {
+            p.locate(vm.playheadUs)?.let { (i, _) -> vm.selectedClipId = p.clips[i].id }
+        }
+    }
     val clip = vm.selectedClip ?: return
     val index = p.clips.indexOfFirst { it.id == clip.id }
     if (index < 0 || index == p.clips.lastIndex) {
