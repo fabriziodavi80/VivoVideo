@@ -147,13 +147,12 @@ private fun ClipBox(clip: Clip, width: Dp, selected: Boolean, onClick: () -> Uni
     val shape = RoundedCornerShape(6.dp)
     Box(
         Modifier
-            .padding(horizontal = 1.dp)
             .width(width)
             .height(TRACK_H)
             .clip(shape)
             .background(Surface2)
             .clickable(onClick = onClick)
-            .then(if (selected) Modifier.border(2.dp, Accent, shape) else Modifier)
+            .then(if (selected) Modifier.border(2.dp, Accent, shape) else Modifier.border(1.dp, Bg, shape))
     ) {
         Filmstrip(clip, width)
         // Etichette: durata e velocità

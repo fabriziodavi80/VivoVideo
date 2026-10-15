@@ -3,6 +3,7 @@
 package it.fabriziodavi.vivovideo.ui
 
 import android.content.Intent
+import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -85,11 +87,8 @@ fun EditorScreen(vm: EditorViewModel) {
         if (uri != null) vm.importLut(uri)
     }
 
-    Column(
-        Modifier.fillMaxSize().background(Bg).safeDrawingPadding()
-    ) {
-        // ---- Barra superiore ----
-        Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+    val topBar: @Composable () -> Unit = {
+        Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
             TextButton(onClick = { vm.closeProject() }, enabled = !running) { Text("‹ Progetti", color = TextMain) }
             Text(
                 project.name,
@@ -101,11 +100,10 @@ fun EditorScreen(vm: EditorViewModel) {
             TextButton(onClick = vm::undo, enabled = vm.canUndo && !running) { Text("↶", fontSize = 20.sp, color = if (vm.canUndo) TextMain else TextDim) }
             TextButton(onClick = vm::redo, enabled = vm.canRedo && !running) { Text("↷", fontSize = 20.sp, color = if (vm.canRedo) TextMain else TextDim) }
         }
-
-        // ---- Anteprima ----
-        val previewH = (LocalConfiguration.current.screenHeightDp * 0.34f).dp
+    }
+    val preview: @Composable (Modifier) -> Unit = { mod ->
         Box(
-            Modifier.fillMaxWidth().height(previewH).padding(horizontal = 12.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(10.dp)).background(Color.Black),
+            mod.clip(androidx.compose.foundation.shape.RoundedCornerShape(10.dp)).background(Color.Black),
             contentAlignment = Alignment.Center,
         ) {
             val player = vm.player
@@ -124,8 +122,8 @@ fun EditorScreen(vm: EditorViewModel) {
                 Text(it, color = Accent, fontSize = 12.sp, modifier = Modifier.align(Alignment.BottomCenter).padding(8.dp))
             }
         }
-
-        // ---- Riproduzione e tempo ----
+    }
+    val transport: @Composable () -> Unit = {
         Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
             Text("${formatTime(vm.playheadUs)} / ${formatTime(project.durationUs)}", color = TextMain, fontSize = 13.sp)
             Spacer(Modifier.weight(1f))
@@ -136,8 +134,8 @@ fun EditorScreen(vm: EditorViewModel) {
             TextButton(onClick = { if (zoom > 0) zoom-- }) { Text("−", fontSize = 20.sp, color = TextMain) }
             TextButton(onClick = { if (zoom < ZOOMS.lastIndex) zoom++ }) { Text("+", fontSize = 20.sp, color = TextMain) }
         }
-
-        // ---- Timeline ----
+    }
+    val timeline: @Composable () -> Unit = {
         Timeline(
             project = project,
             playheadUs = vm.playheadUs,
@@ -148,8 +146,8 @@ fun EditorScreen(vm: EditorViewModel) {
             onScrubStart = vm::pause,
             onSelect = { vm.selectedClipId = it },
         )
-
-        // ---- Strumenti ----
+    }
+    val tools: @Composable () -> Unit = {
         Row(
             Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -162,32 +160,59 @@ fun EditorScreen(vm: EditorViewModel) {
             Tool("⧉ Duplica", sel) { vm.duplicateSelected() }
             Tool("🗑 Elimina", sel) { vm.deleteSelected() }
         }
-
-        // ---- Pannelli ----
-        TabRow(
-            selectedTabIndex = tab,
-            containerColor = Bg,
-            contentColor = Color.White,
-            indicator = { pos -> TabRowDefaults.SecondaryIndicator(Modifier.tabIndicatorOffset(pos[tab]), color = Accent) },
-        ) {
-            listOf("Clip", "Colore", "Esporta").forEachIndexed { i, t ->
-                Tab(selected = tab == i, onClick = { tab = i }, text = { Text(t) })
-            }
-        }
-        Column(
-            Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()).padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
-        ) {
-            vm.busy?.let { Text(it, color = TextDim) }
-            when (tab) {
-                0 -> ClipPanel(vm, running)
-                1 -> ColorPanel(vm, running, onPickLut = { lutPicker.launch(arrayOf("*/*")) })
-                2 -> ExportPanel(vm) { uri ->
-                    val intent = Intent(Intent.ACTION_VIEW).setDataAndType(uri, "video/mp4")
-                        .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    runCatching { context.startActivity(intent) }
+    }
+    val panels: @Composable (Modifier) -> Unit = { mod ->
+        Column(mod) {
+            TabRow(
+                selectedTabIndex = tab,
+                containerColor = Bg,
+                contentColor = Color.White,
+                indicator = { pos -> TabRowDefaults.SecondaryIndicator(Modifier.tabIndicatorOffset(pos[tab]), color = Accent) },
+            ) {
+                listOf("Clip", "Colore", "Esporta").forEachIndexed { i, t ->
+                    Tab(selected = tab == i, onClick = { tab = i }, text = { Text(t) })
                 }
             }
+            Column(
+                Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()).padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
+            ) {
+                vm.busy?.let { Text(it, color = TextDim) }
+                when (tab) {
+                    0 -> ClipPanel(vm, running)
+                    1 -> ColorPanel(vm, running, onPickLut = { lutPicker.launch(arrayOf("*/*")) })
+                    2 -> ExportPanel(vm) { uri ->
+                        val intent = Intent(Intent.ACTION_VIEW).setDataAndType(uri, "video/mp4")
+                            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        runCatching { context.startActivity(intent) }
+                    }
+                }
+            }
+        }
+    }
+
+    val landscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+    Column(Modifier.fillMaxSize().background(Bg).safeDrawingPadding()) {
+        if (landscape) {
+            // Orizzontale: anteprima grande a sinistra, pannelli a destra, timeline sotto.
+            Row(Modifier.fillMaxWidth().weight(1f)) {
+                Column(Modifier.weight(0.62f).fillMaxHeight()) {
+                    topBar()
+                    preview(Modifier.fillMaxWidth().weight(1f).padding(horizontal = 12.dp))
+                    transport()
+                }
+                panels(Modifier.weight(0.38f).fillMaxHeight())
+            }
+            tools()
+            timeline()
+        } else {
+            topBar()
+            val previewH = (LocalConfiguration.current.screenHeightDp * 0.34f).dp
+            preview(Modifier.fillMaxWidth().height(previewH).padding(horizontal = 12.dp))
+            transport()
+            timeline()
+            tools()
+            panels(Modifier.fillMaxWidth().weight(1f))
         }
     }
 
