@@ -96,10 +96,13 @@ object LayerRenderer {
                 lc.drawRect(img.left - r, img.top - r, img.right + r, img.bottom + r, mp)
                 lc.restore()
             } else if (l.shape != LayerMask.NONE) {
-                val maskBmp = Bitmap.createBitmap(bw, bh, Bitmap.Config.ALPHA_8)
-                Canvas(maskBmp).drawPath(shape, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF000000.toInt() })
-                lc.drawBitmap(maskBmp, 0f, 0f, mp)
-                maskBmp.recycle()
+                // Forma: si ridisegna da zero riempiendo il contorno con l'immagine (bordi morbidi).
+                lc.drawColor(0, PorterDuff.Mode.CLEAR)
+                val shader = BitmapShader(keyed, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
+                shader.setLocalMatrix(Matrix().apply {
+                    setRectToRect(RectF(0f, 0f, keyed.width.toFloat(), keyed.height.toFloat()), img, Matrix.ScaleToFit.FILL)
+                })
+                lc.drawPath(shape, Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG).apply { this.shader = shader })
             }
             c.drawBitmap(layerBmp, 0f, 0f, null)
             layerBmp.recycle()
