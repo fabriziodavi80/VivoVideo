@@ -92,6 +92,7 @@ object SpeedLimits {
 
 /** Curve pronte, come negli editor professionali. */
 enum class SpeedPreset(val label: String, val points: List<SpeedPoint>) {
+    FLAT("Piatta 1×", listOf(SpeedPoint(0f, 1f), SpeedPoint(1f, 1f))),
     VALLEY("Rallenty centrale", listOf(SpeedPoint(0f, 2f), SpeedPoint(0.5f, 0.35f), SpeedPoint(1f, 2f))),
     HERO("Eroe", listOf(SpeedPoint(0f, 1f), SpeedPoint(0.38f, 1f), SpeedPoint(0.5f, 0.25f), SpeedPoint(0.62f, 1f), SpeedPoint(1f, 1f))),
     BULLET("Proiettile", listOf(SpeedPoint(0f, 3f), SpeedPoint(0.42f, 0.3f), SpeedPoint(0.58f, 0.3f), SpeedPoint(1f, 3f))),
@@ -237,6 +238,20 @@ data class Project(
         val JSON = Json { ignoreUnknownKeys = true; encodeDefaults = true; prettyPrint = false }
         fun fromJson(text: String): Project = JSON.decodeFromString(serializer(), text)
     }
+}
+
+object SpeedPoints {
+    /** Mette o aggiorna un punto in posizione t (entro [snap] riusa quello vicino; i bordi restano bordi). */
+    fun set(points: List<SpeedPoint>, t: Float, speed: Float, snap: Float = 0.02f): List<SpeedPoint> {
+        val s = speed.coerceIn(SpeedLimits.MIN, SpeedLimits.MAX)
+        val near = points.indices.minByOrNull { kotlin.math.abs(points[it].t - t) }
+            ?.takeIf { kotlin.math.abs(points[it].t - t) <= snap }
+        return if (near != null) points.mapIndexed { i, p -> if (i == near) p.copy(speed = s) else p }
+        else (points + SpeedPoint(t.coerceIn(0f, 1f), s)).sortedBy { it.t }
+    }
+
+    fun nearest(points: List<SpeedPoint>, t: Float, snap: Float = 0.02f): SpeedPoint? =
+        points.minByOrNull { kotlin.math.abs(it.t - t) }?.takeIf { kotlin.math.abs(it.t - t) <= snap }
 }
 
 /** Divide i punti di una curva nella posizione f (0..1), riscalando le due metà. */

@@ -478,6 +478,42 @@ private fun SpeedPanel(vm: EditorViewModel, running: Boolean) {
         val start = project.clipStartsUs()[project.clips.indexOf(clip)]
         val inside = vm.playheadUs - start
         val frac = if (inside in 0..clip.outputUs) clip.speedCurve().sourceTimeAt(inside).toFloat() / clip.trimmedUs else null
+        // Punti velocità sul fotogramma esatto: si sceglie il punto sulla timeline e lì si fissa la velocità.
+        val here = vm.speedPointAtPlayhead()
+        val f = vm.playheadFraction()
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconBtn(VVIcons.MoveLeft, "Punto precedente") { vm.jumpSpeedPoint(-1) }
+            Box(
+                Modifier.weight(1f).clip(RoundedCornerShape(12.dp)).background(if (here != null) VV.Tally else VV.Raised)
+                    .clickable(enabled = !running && f != null) { vm.toggleSpeedPointAtPlayhead() }.padding(vertical = 11.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    when {
+                        f == null -> "Porta l'indicatore nella clip"
+                        here == null -> "Aggiungi punto velocità qui"
+                        here.t == 0f || here.t == 1f -> "Punto di " + (if (here.t == 0f) "inizio" else "fine") + " clip"
+                        else -> "Togli il punto"
+                    },
+                    style = MaterialTheme.typography.labelLarge, color = if (here != null) VV.TallyInk else VV.Text,
+                )
+            }
+            IconBtn(VVIcons.MoveRight, "Punto successivo") { vm.jumpSpeedPoint(+1) }
+        }
+        if (f != null) {
+            val now = here?.speed ?: it.fabriziodavi.vivovideo.model.SpeedInterp.valueAt(clip.curvePoints, f)
+            val lnMin = kotlin.math.ln(it.fabriziodavi.vivovideo.model.SpeedLimits.MIN)
+            val lnMax = kotlin.math.ln(it.fabriziodavi.vivovideo.model.SpeedLimits.MAX)
+            fun toSlider(sp: Float) = ((kotlin.math.ln(sp) - lnMin) / (lnMax - lnMin) * 1000).toInt()
+            fun fromSlider(v: Int): Float {
+                val sp = kotlin.math.exp(lnMin + v / 1000f * (lnMax - lnMin))
+                return if (kotlin.math.abs(sp - 1f) < 0.04f) 1f else sp
+            }
+            LabeledSlider(
+                "Velocità in questo punto", null, toSlider(now), !running, range = 0..1000,
+                format = { "%.2f×".format(fromSlider(it)).replace('.', ',') },
+            ) { v -> vm.setSpeedAtPlayhead(fromSlider(v)) }
+        }
         SpeedCurveEditor(
             points = clip.curvePoints,
             playFraction = frac,
@@ -494,7 +530,7 @@ private fun SpeedPanel(vm: EditorViewModel, running: Boolean) {
                 ) { Text(preset.label, style = MaterialTheme.typography.labelLarge, color = if (on) VV.TallyInk else VV.Text) }
             }
         }
-        Hint("Trascina i punti. Tocca uno spazio vuoto per aggiungerne uno, doppio tocco su un punto per toglierlo. Durata: " + formatTime(clip.outputUs))
+        Hint("Scorri la timeline fino al fotogramma esatto e aggiungi lì un punto, oppure trascina i punti sul grafico (tocco su uno spazio vuoto per aggiungere, doppio tocco per togliere). Per partire da zero usa \"Piatta 1×\". Durata: " + formatTime(clip.outputUs))
     } else {
         Hint(
             when (clip.speed) {

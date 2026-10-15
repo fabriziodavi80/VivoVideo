@@ -244,6 +244,17 @@ private fun ClipBox(
             Badge(label)
             if (clip.log) Badge("LOG")
         }
+        // Punti velocità (pallini in basso) nella loro posizione sul video finale.
+        if (clip.speed == ClipSpeed.RAMP) {
+            val curve = clip.speedCurve()
+            Canvas(Modifier.fillMaxSize()) {
+                clip.curvePoints.forEach { p ->
+                    val x = (curve.outputTimeAt((p.t * clip.trimmedUs).toLong()).toFloat() / clip.outputUs.coerceAtLeast(1)) * size.width
+                    drawCircle(VV.TallyInk, 4.5.dp.toPx(), Offset(x.coerceIn(5.dp.toPx(), size.width - 5.dp.toPx()), size.height - 5.dp.toPx()))
+                    drawCircle(if (selected) VV.Tally else VV.Text, 3.dp.toPx(), Offset(x.coerceIn(5.dp.toPx(), size.width - 5.dp.toPx()), size.height - 5.dp.toPx()))
+                }
+            }
+        }
         // Rombi dei keyframe, nella loro posizione sul video finale.
         if (clip.keyframes.isNotEmpty()) {
             val curve = clip.speedCurve()

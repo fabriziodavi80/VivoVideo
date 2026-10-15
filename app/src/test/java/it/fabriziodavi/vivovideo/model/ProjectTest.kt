@@ -116,4 +116,14 @@ class ProjectTest {
         assertEquals(endOfFirst.scale, startOfSecond.scale, 1e-4f)
         assertEquals(2f, Keyframes.valueAt(s.clips[1].keyframes, s.clips[1].trimmedUs).scale, 1e-4f)
     }
+
+    @Test fun speedPointAtPlayhead() {
+        var pts = SpeedPreset.FLAT.points
+        pts = SpeedPoints.set(pts, 0.4f, 0.3f)
+        pts = SpeedPoints.set(pts, 0.41f, 0.25f) // vicino: aggiorna
+        pts = SpeedPoints.set(pts, 0.7f, 2f)
+        assertEquals(listOf(0f, 0.4f, 0.7f, 1f), pts.map { it.t })
+        assertEquals(0.25f, SpeedInterp.valueAt(pts, 0.4f), 1e-3f)
+        assertEquals(2f, SpeedInterp.valueAt(pts, 0.7f), 1e-3f)
+    }
 }

@@ -223,6 +223,66 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         updateSelected { cl -> cl.copy(keyframes = cl.keyframes.map { if (it == k) it.copy(easing = e) else it }) }
     }
 
+    // ---------------- Punti velocità sull'indicatore ----------------
+
+    /** Posizione (0..1 lungo la clip, sul video originale) dell'indicatore nella clip selezionata. */
+    fun playheadFraction(): Float? {
+        val c = selectedClip ?: return null
+        val t = playheadInSelected() ?: return null
+        return (t.toFloat() / c.trimmedUs).coerceIn(0f, 1f)
+    }
+
+    fun speedPointAtPlayhead(): it.fabriziodavi.vivovideo.model.SpeedPoint? {
+        val c = selectedClip ?: return null
+        val f = playheadFraction() ?: return null
+        return it.fabriziodavi.vivovideo.model.SpeedPoints.nearest(c.curvePoints, f)
+    }
+
+    /**
+     * Cambia la curva tenendo fermo il fotogramma sotto l'indicatore:
+     * con la nuova velocità lo stesso fotogramma cade in un altro istante del video finale.
+     */
+    private fun changeCurveKeepingFrame(newPoints: List<it.fabriziodavi.vivovideo.model.SpeedPoint>) {
+        val p = project ?: return
+        val c = selectedClip ?: return
+        val src = playheadInSelected()
+        val idx = p.clips.indexOf(c)
+        updateSelected { it.copy(speed = it.fabriziodavi.vivovideo.model.ClipSpeed.RAMP, speedPoints = newPoints) }
+        if (src != null) {
+            val np = project ?: return
+            val nc = np.clips[idx]
+            seekTo(np.clipStartsUs()[idx] + nc.speedCurve().outputTimeAt(src))
+        }
+    }
+
+    fun setSpeedAtPlayhead(speed: Float) {
+        val c = selectedClip ?: return
+        val f = playheadFraction()
+        if (f == null) { message = "Porta l'indicatore dentro la clip selezionata."; return }
+        changeCurveKeepingFrame(it.fabriziodavi.vivovideo.model.SpeedPoints.set(c.curvePoints, f, speed))
+    }
+
+    fun toggleSpeedPointAtPlayhead() {
+        val c = selectedClip ?: return
+        val f = playheadFraction() ?: run { message = "Porta l'indicatore dentro la clip selezionata."; return }
+        val near = it.fabriziodavi.vivovideo.model.SpeedPoints.nearest(c.curvePoints, f)
+        if (near != null && near.t > 0f && near.t < 1f) {
+            changeCurveKeepingFrame(c.curvePoints - near)
+        } else if (near == null) {
+            val now = it.fabriziodavi.vivovideo.model.SpeedInterp.valueAt(c.curvePoints, f)
+            changeCurveKeepingFrame(it.fabriziodavi.vivovideo.model.SpeedPoints.set(c.curvePoints, f, now))
+        }
+    }
+
+    fun jumpSpeedPoint(dir: Int) {
+        val p = project ?: return
+        val c = selectedClip ?: return
+        val start = p.clipStartsUs()[p.clips.indexOf(c)]
+        val times = c.curvePoints.map { start + c.speedCurve().outputTimeAt((it.t * c.trimmedUs).toLong()) }.sorted()
+        val target = if (dir > 0) times.firstOrNull { it > playheadUs + 20_000 } else times.lastOrNull { it < playheadUs - 20_000 }
+        target?.let { pause(); seekTo(it) }
+    }
+
     fun clearKeyframes() = updateSelected { it.copy(keyframes = emptyList()) }
 
     /** Salta al keyframe precedente (-1) o successivo (+1) della clip selezionata. */
