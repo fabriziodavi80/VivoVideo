@@ -92,12 +92,13 @@ class CompositionFactory(private val context: Context) {
         return listOf(p)
     }
 
-    /** Dimensioni del video finale: orientamento e proporzioni della prima clip. */
+    /** Dimensioni del video finale: orientamento e proporzioni del primo video (o della prima foto). */
     fun outputSize(project: Project, shortSide: Int?): Pair<Int, Int> {
-        val first = project.clips.firstOrNull() ?: return 1920 to 1080
+        // Il formato lo decide il primo video; con sole foto, la prima foto (al massimo in 4K).
+        val first = project.clips.firstOrNull { !it.isPhoto } ?: project.clips.firstOrNull() ?: return 1920 to 1080
         val w = first.width.coerceAtLeast(2)
         val h = first.height.coerceAtLeast(2)
-        val srcShort = minOf(w, h)
+        val srcShort = if (first.isPhoto) minOf(w, h, 2160) else minOf(w, h)
         val target = minOf(shortSide ?: srcShort, srcShort)
         fun even(v: Long) = (v / 2 * 2).toInt()
         val scale = target.toDouble() / srcShort
@@ -148,7 +149,13 @@ class CompositionFactory(private val context: Context) {
         val starts = project.clipStartsUs()
         val items = project.clips.mapIndexed { index, clip ->
             val startUs = starts[index]
-            val mediaItem = MediaItem.Builder()
+            val mediaItem = if (clip.isPhoto) {
+                MediaItem.Builder()
+                    .setUri(Uri.parse(clip.uri))
+                    .setMimeType(MimeTypes.IMAGE_JPEG)
+                    .setImageDurationMs(clip.trimmedUs / 1000)
+                    .build()
+            } else MediaItem.Builder()
                 .setUri(Uri.parse(clip.uri))
                 .setClippingConfiguration(
                     MediaItem.ClippingConfiguration.Builder()
@@ -159,7 +166,10 @@ class CompositionFactory(private val context: Context) {
                 .build()
             val effects = buildList {
                 addAll(colorEffects(clip, project))
-                add(Presentation.createForWidthAndHeight(outW, outH, Presentation.LAYOUT_SCALE_TO_FIT))
+                add(Presentation.createForWidthAndHeight(
+                    outW, outH,
+                    if (clip.fill) Presentation.LAYOUT_SCALE_TO_FIT_WITH_CROP else Presentation.LAYOUT_SCALE_TO_FIT,
+                ))
                 if (clip.keyframes.isNotEmpty()) {
                     if (clip.keyframes.any { it.value.x != 0f || it.value.y != 0f || it.value.scale != 1f || it.value.rotation != 0f }) {
                         add(KeyframeTransformation(clip, outW.toFloat() / outH, startUs))
@@ -174,6 +184,13 @@ class CompositionFactory(private val context: Context) {
                 if ((inSpec != null && inUs > 0) || (outSpec != null && outUs > 0)) {
                     add(TransitionEffect(startUs, clip.outputUs, inSpec?.type, inUs, outSpec?.type, outUs))
                 }
+            }
+            if (clip.isPhoto) {
+                return@mapIndexed EditedMediaItem.Builder(mediaItem)
+                    .setDurationUs(clip.trimmedUs)
+                    .setFrameRate(30)
+                    .setEffects(Effects(emptyList(), effects))
+                    .build()
             }
             val b = EditedMediaItem.Builder(mediaItem)
                 .setDurationUs(clip.sourceDurationUs)

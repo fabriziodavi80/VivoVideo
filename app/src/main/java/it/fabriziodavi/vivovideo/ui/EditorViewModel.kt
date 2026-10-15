@@ -36,6 +36,7 @@ import it.fabriziodavi.vivovideo.engine.CompositionFactory
 import it.fabriziodavi.vivovideo.engine.ExportOptions
 import it.fabriziodavi.vivovideo.engine.ExportState
 import it.fabriziodavi.vivovideo.engine.Exporter
+import it.fabriziodavi.vivovideo.importPhoto
 import it.fabriziodavi.vivovideo.readAudioInfo
 import it.fabriziodavi.vivovideo.readVideoInfo
 import kotlinx.coroutines.Dispatchers
@@ -159,12 +160,24 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         if (uris.isEmpty()) return
         val ctx = getApplication<Application>()
         viewModelScope.launch {
-            busy = "Lettura dei video…"
+            busy = "Lettura di video e foto…"
             val clips = withContext(Dispatchers.IO) {
                 uris.mapNotNull { uri ->
                     // Il permesso resta valido anche dopo il riavvio del telefono.
                     runCatching {
                         ctx.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    }
+                    if (ctx.contentResolver.getType(uri)?.startsWith("image/") == true) {
+                        return@mapNotNull runCatching {
+                            val photo = importPhoto(ctx, uri)
+                            Clip(
+                                uri = Uri.fromFile(photo.file).toString(),
+                                sourceDurationUs = Clip.PHOTO_MAX_US,
+                                trimEndUs = Clip.PHOTO_DEFAULT_US,
+                                isPhoto = true,
+                                width = photo.width, height = photo.height, fps = 30f,
+                            )
+                        }.getOrNull()
                     }
                     runCatching {
                         val info = readVideoInfo(ctx, uri)
@@ -180,7 +193,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                 }
             }
             busy = null
-            if (clips.size < uris.size) message = "${uris.size - clips.size} video non leggibili sono stati saltati."
+            if (clips.size < uris.size) message = "${uris.size - clips.size} file non leggibili sono stati saltati."
             if (clips.isEmpty()) return@launch
             val p = project ?: return@launch
             // Inserisce dopo la clip selezionata, o in fondo.
@@ -532,6 +545,23 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     fun updateSelected(change: (Clip) -> Clip) {
         val c = selectedClip ?: return
         update { it.replaceClip(change(c)) }
+    }
+
+    /** Durata di una foto. */
+    fun setPhotoDuration(us: Long) = updateSelected { c ->
+        val d = us.coerceIn(200_000, Clip.PHOTO_MAX_US)
+        // I keyframe seguono la nuova durata in proporzione.
+        val k = if (c.trimmedUs > 0) c.keyframes.map { it.copy(timeUs = it.timeUs * d / c.trimmedUs) } else c.keyframes
+        c.copy(trimStartUs = 0, trimEndUs = d, keyframes = k)
+    }
+
+    /** Zoom lento su tutta la foto (effetto Ken Burns), o lo toglie. */
+    fun toggleKenBurns() = updateSelected { c ->
+        if (c.keyframes.isNotEmpty()) c.copy(keyframes = emptyList())
+        else c.copy(keyframes = listOf(
+            Keyframe(0, Transform(), Easing.LINEAR),
+            Keyframe(c.trimmedUs, Transform(scale = 1.18f), Easing.LINEAR),
+        ))
     }
 
     fun setTransition(spec: TransitionSpec?) = updateSelected { it.copy(transitionOut = spec) }

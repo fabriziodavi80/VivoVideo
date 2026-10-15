@@ -47,7 +47,7 @@ fun renderTimelineAudio(context: Context, project: Project, onProgress: (Float) 
         out.write(ByteArray(44)) // intestazione scritta alla fine
         project.clips.forEachIndexed { i, clip ->
             val target = clip.outputUs * OUT_RATE / 1_000_000
-            val audio = if (clip.muted) null else runCatching {
+            val audio = if (clip.muted || clip.isPhoto) null else runCatching {
                 decodeAudioRange(context, Uri.parse(clip.uri), clip.trimStartUs, clip.trimEndUs)
             }.getOrNull()
             var samples: FloatArray = if (audio == null || audio.isEmpty()) FloatArray(0) else {

@@ -105,6 +105,19 @@ class ScreenshotTest {
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/9_editor_musica.png")
     }
 
+    @Test fun editorPhotoPanel() {
+        val vm = vm()
+        vm.openProject(
+            Project(name = "Foto", clips = listOf(
+                Clip(uri = "file:///nofile/photo_1.jpg", sourceDurationUs = Clip.PHOTO_MAX_US, trimEndUs = Clip.PHOTO_DEFAULT_US, isPhoto = true, width = 3072, height = 4096),
+                Clip(uri = "content://demo/1", sourceDurationUs = 4_000_000, width = 2160, height = 3840, fps = 30f),
+            )),
+            startPreview = false,
+        )
+        compose.setContent { VivoTheme { EditorScreen(vm, initialTool = Tool.DURATION) } }
+        compose.onRoot().captureRoboImage("build/outputs/roborazzi/10_editor_foto.png")
+    }
+
     @Test fun home() {
         val vm = EditorViewModel(ApplicationProvider.getApplicationContext<Application>())
         compose.setContent { VivoTheme { HomeScreen(vm) } }

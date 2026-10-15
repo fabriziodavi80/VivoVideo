@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.util.LruCache
+import it.fabriziodavi.vivovideo.decodePhotoThumb
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -28,12 +29,18 @@ object Thumbnails {
         return withContext(Dispatchers.IO) {
             lock.withLock {
                 cache.get(k)?.let { return@withLock it }
-                val r = retrievers[uri] ?: runCatching {
-                    MediaMetadataRetriever().apply { setDataSource(context, Uri.parse(uri)) }
-                }.getOrNull()?.also { retrievers[uri] = it } ?: return@withLock null
-                val frame = runCatching {
-                    r.getScaledFrameAtTime(timeUs, MediaMetadataRetriever.OPTION_CLOSEST_SYNC, heightPx * 2, heightPx)
-                }.getOrNull() ?: return@withLock null
+                val parsed = Uri.parse(uri)
+                val frame = if (parsed.scheme == "file" && parsed.path?.endsWith(".jpg") == true) {
+                    // Foto: si legge l'immagine.
+                    runCatching { decodePhotoThumb(parsed.path!!, heightPx) }.getOrNull() ?: return@withLock null
+                } else {
+                    val r = retrievers[uri] ?: runCatching {
+                        MediaMetadataRetriever().apply { setDataSource(context, parsed) }
+                    }.getOrNull()?.also { retrievers[uri] = it } ?: return@withLock null
+                    runCatching {
+                        r.getScaledFrameAtTime(timeUs, MediaMetadataRetriever.OPTION_CLOSEST_SYNC, heightPx * 2, heightPx)
+                    }.getOrNull() ?: return@withLock null
+                }
                 // Ritaglio centrale quadrato-ish per riempire la tessera.
                 val side = minOf(frame.width, frame.height)
                 val bmp = Bitmap.createBitmap(frame, (frame.width - side) / 2, (frame.height - side) / 2, side, side)

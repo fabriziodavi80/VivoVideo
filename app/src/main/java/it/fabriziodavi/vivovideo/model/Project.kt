@@ -135,6 +135,10 @@ data class Clip(
     val keyframes: List<Keyframe> = emptyList(),
     /** Transizione verso la clip successiva (null = taglio netto). */
     val transitionOut: TransitionSpec? = null,
+    /** Foto (immagine fissa): la durata è il taglio, niente velocità né audio. */
+    val isPhoto: Boolean = false,
+    /** Riempie il quadro tagliando i bordi, invece di mostrare bande nere. */
+    val fill: Boolean = false,
     val width: Int = 0,
     val height: Int = 0,
     val fps: Float = 30f,
@@ -154,6 +158,12 @@ data class Clip(
     val outputUs: Long get() = cachedOutputUs
 
     val isHeavy: Boolean get() = width.toLong() * height * fps >= 3840L * 2160 * 120
+
+    companion object {
+        /** "Durata del file" di una foto: il massimo a cui si può allungare. */
+        const val PHOTO_MAX_US = 60_000_000L
+        const val PHOTO_DEFAULT_US = 3_000_000L
+    }
 }
 
 @Serializable

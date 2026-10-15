@@ -99,6 +99,7 @@ enum class Tool(val label: String, val icon: () -> ImageVector, val future: Bool
     KEYFRAME("Keyframe", { VVIcons.Keyframe }),
     EFFECTS("Effetti", { VVIcons.Effects }, future = true),
     TRANSITION("Transizione", { VVIcons.Transition }),
+    DURATION("Durata", { VVIcons.Speed }),
     TEXT("Testo", { VVIcons.Text }, future = true),
     MUSIC("Musica", { VVIcons.Music }),
     DUPLICATE("Duplica", { VVIcons.Copy }),
@@ -110,6 +111,10 @@ enum class Tool(val label: String, val icon: () -> ImageVector, val future: Bool
 
 private val CLIP_TOOLS = listOf(
     Tool.SPLIT, Tool.SPEED, Tool.TRANSITION, Tool.KEYFRAME, Tool.AUDIO, Tool.COLOR,
+    Tool.DUPLICATE, Tool.MOVE_LEFT, Tool.MOVE_RIGHT, Tool.DELETE, Tool.EFFECTS,
+)
+private val PHOTO_TOOLS = listOf(
+    Tool.SPLIT, Tool.DURATION, Tool.TRANSITION, Tool.KEYFRAME, Tool.COLOR,
     Tool.DUPLICATE, Tool.MOVE_LEFT, Tool.MOVE_RIGHT, Tool.DELETE, Tool.EFFECTS,
 )
 private val PROJECT_TOOLS = listOf(Tool.ADD, Tool.SPLIT, Tool.TRANSITION, Tool.COLOR, Tool.TEXT, Tool.MUSIC, Tool.EFFECTS)
@@ -125,7 +130,10 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
     val clip = vm.selectedClip
 
     // Un pannello di clip si chiude se non c'è più una clip selezionata.
-    if (clip == null && (activeTool == Tool.SPEED || activeTool == Tool.AUDIO || activeTool == Tool.KEYFRAME)) activeTool = null
+    if (clip == null && (activeTool == Tool.SPEED || activeTool == Tool.AUDIO || activeTool == Tool.KEYFRAME || activeTool == Tool.DURATION)) activeTool = null
+    // Foto e video hanno strumenti diversi.
+    if (clip != null && clip.isPhoto && (activeTool == Tool.SPEED || activeTool == Tool.AUDIO)) activeTool = Tool.DURATION
+    if (clip != null && !clip.isPhoto && activeTool == Tool.DURATION) activeTool = Tool.SPEED
 
     BackHandler {
         when {
@@ -143,7 +151,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
         if (uri != null) { vm.addMusic(uri); activeTool = Tool.MUSIC }
     }
     val pickMusic = { musicPicker.launch(arrayOf("audio/*")) }
-    val pickVideos = { picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.VideoOnly)) }
+    val pickVideos = { picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo)) }
 
     fun onTool(t: Tool) {
         if (t.future) { vm.message = "\"${t.label}\" arriverà nelle prossime versioni: lo spazio è già pronto."; return }
@@ -307,7 +315,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
         )
     }
 
-    val tools = if (clip != null) CLIP_TOOLS else PROJECT_TOOLS
+    val tools = when { clip == null -> PROJECT_TOOLS; clip.isPhoto -> PHOTO_TOOLS; else -> CLIP_TOOLS }
     val toolbar: @Composable () -> Unit = {
         Row(
             Modifier.fillMaxWidth().background(VV.Canvas).horizontalScroll(rememberScrollState())
@@ -323,6 +331,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
             Tool.SPEED -> SpeedPanel(vm, running)
             Tool.KEYFRAME -> KeyframePanel(vm, running)
             Tool.TRANSITION -> TransitionPanel(vm, running)
+            Tool.DURATION -> PhotoPanel(vm, running)
             Tool.MUSIC -> MusicPanel(vm, running, pickMusic)
             Tool.AUDIO -> AudioPanel(vm, running)
             Tool.COLOR -> ColorPanel(vm, running) { lutPicker.launch(arrayOf("*/*")) }
@@ -481,9 +490,9 @@ private fun EmptyState(onAdd: () -> Unit) {
         Box(
             Modifier.size(52.dp).clip(CircleShape).border(1.dp, VV.Line, CircleShape).clickable(onClick = onAdd),
             contentAlignment = Alignment.Center,
-        ) { Icon(VVIcons.Add, "Aggiungi video", tint = VV.Text) }
+        ) { Icon(VVIcons.Add, "Aggiungi video e foto", tint = VV.Text) }
         Spacer(Modifier.height(10.dp))
-        Text("Aggiungi i video da montare", style = MaterialTheme.typography.bodySmall)
+        Text("Aggiungi video e foto da montare", style = MaterialTheme.typography.bodySmall)
     }
 }
 
@@ -768,6 +777,19 @@ private fun MusicPanel(vm: EditorViewModel, running: Boolean, onAdd: () -> Unit)
         SecondaryButton("Elimina brano", onClick = { if (enabled) vm.deleteMusic() })
     }
     Hint("Tocca il brano nella timeline per selezionarlo: trascinalo per spostarlo, usa le maniglie per accorciarlo. Le dissolvenze si sentono nel video esportato.")
+}
+
+@Composable
+private fun PhotoPanel(vm: EditorViewModel, running: Boolean) {
+    val clip = vm.selectedClip ?: return
+    val enabled = !running
+    LabeledSlider(
+        "Durata della foto", null, (clip.trimmedUs / 100_000).toInt(), enabled, range = 2..150,
+        format = { String.format(java.util.Locale.ITALIAN, "%.1f s", it / 10f) },
+    ) { v -> vm.setPhotoDuration(v * 100_000L) }
+    ToggleRow("Zoom lento (effetto Ken Burns)", clip.keyframes.isNotEmpty(), enabled) { vm.toggleKenBurns() }
+    ToggleRow("Riempi il quadro (taglia i bordi)", clip.fill, enabled) { v -> vm.updateSelected { it.copy(fill = v) } }
+    Hint("Lo zoom lento usa due keyframe: puoi personalizzarlo dallo strumento Keyframe. Con il taglio a ritmo, la durata si può anche agganciare ai battiti trascinando la maniglia destra.")
 }
 
 @Composable

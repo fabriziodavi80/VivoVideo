@@ -67,13 +67,13 @@ fun HomeScreen(vm: EditorViewModel) {
         Row(Modifier.fillMaxWidth().padding(top = 18.dp, bottom = 18.dp), verticalAlignment = Alignment.CenterVertically) {
             Text("VivoVideo", style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
             PrimaryButton("Nuovo progetto") {
-                picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.VideoOnly))
+                picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
             }
         }
         if (vm.projects.isEmpty()) {
             Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
                 Text(
-                    "Crea un progetto scegliendo uno o più video dalla galleria.",
+                    "Crea un progetto scegliendo video e foto dalla galleria.",
                     style = MaterialTheme.typography.bodyMedium, color = VV.Dim,
                 )
             }

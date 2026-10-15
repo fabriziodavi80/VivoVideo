@@ -168,7 +168,7 @@ fun Timeline(
                         .background(VV.Raised)
                         .clickable(onClick = onAdd),
                     contentAlignment = Alignment.Center,
-                ) { Icon(VVIcons.Add, "Aggiungi video", tint = VV.Text) }
+                ) { Icon(VVIcons.Add, "Aggiungi video e foto", tint = VV.Text) }
                 Spacer(Modifier.width(half))
             }
             // Righe della musica.
@@ -290,6 +290,7 @@ private fun ClipBox(
                 if (clip.speed != ClipSpeed.NORMAL) append(clip.speed.label).append("  ")
                 append("%.1f".format(clip.outputUs / 1e6).replace('.', ','))
             }
+            if (clip.isPhoto) Badge("FOTO")
             Badge(label)
             if (clip.log) Badge("LOG")
         }
@@ -458,11 +459,11 @@ private fun AudioLane(clip: Clip, width: Dp) {
             .width((width - 2.dp).coerceAtLeast(4.dp))
             .height(AUDIO_H)
             .clip(RoundedCornerShape(4.dp))
-            .background(if (clip.muted) VV.Raised else VV.WaveBg)
+            .background(if (clip.muted || clip.isPhoto) VV.Raised else VV.WaveBg)
     ) {
         val p = peaks
         val mid = size.height / 2
-        if (clip.muted || p == null || p.isEmpty()) {
+        if (clip.muted || clip.isPhoto || p == null || p.isEmpty()) {
             drawLine(VV.Faint, Offset(0f, mid), Offset(size.width, mid), 1.dp.toPx())
             return@Canvas
         }
