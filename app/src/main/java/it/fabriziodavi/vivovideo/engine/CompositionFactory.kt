@@ -25,6 +25,7 @@ import it.fabriziodavi.vivovideo.model.FxType
 import it.fabriziodavi.vivovideo.model.Project
 import it.fabriziodavi.vivovideo.model.SpeedCurve
 import it.fabriziodavi.vivovideo.model.Transform
+import it.fabriziodavi.vivovideo.model.TransitionType
 import java.io.File
 
 enum class OutputSize(val label: String, val shortSide: Int?) {
@@ -111,8 +112,8 @@ class CompositionFactory(private val context: Context) {
     }
 
     /** Una riga di video sovrapposti: pause fino a ogni video, video senza audio alla misura "adattata". */
-    private fun videoLayerSequence(lane: List<Layer>, outW: Int, outH: Int): EditedMediaItemSequence {
-        val b = EditedMediaItemSequence.Builder(setOf(C.TRACK_TYPE_VIDEO))
+    private fun videoLayerSequence(lane: List<Layer>, outW: Int, outH: Int, keepAudio: Boolean): EditedMediaItemSequence {
+        val b = EditedMediaItemSequence.Builder(if (keepAudio) setOf(C.TRACK_TYPE_AUDIO, C.TRACK_TYPE_VIDEO) else setOf(C.TRACK_TYPE_VIDEO))
         var cursor = 0L
         lane.forEach { l ->
             if (l.startUs - cursor > 1_000) b.addGap(l.startUs - cursor)
@@ -129,11 +130,56 @@ class CompositionFactory(private val context: Context) {
             b.addItem(
                 EditedMediaItem.Builder(item)
                     .setDurationUs(l.sourceDurationUs)
-                    .setRemoveAudio(true)
-                    .setEffects(Effects(emptyList(), listOf(Presentation.createForWidthAndHeight(lw, lh, Presentation.LAYOUT_SCALE_TO_FIT))))
+                    .setRemoveAudio(!keepAudio || l.muted)
+                    .setEffects(Effects(
+                        if (keepAudio && !l.muted) volumeProcessors(l.volume) else emptyList(),
+                        listOf(Presentation.createForWidthAndHeight(lw, lh, Presentation.LAYOUT_SCALE_TO_FIT)),
+                    ))
                     .build()
             )
             cursor = maxOf(cursor, l.startUs) + l.durationUs
+        }
+        return b.build()
+    }
+
+    /**
+     * Seconda traccia per le dissolvenze incrociate: prima del taglio la testa della clip successiva,
+     * dopo il taglio la coda della precedente, entrambe a tutto quadro; la trasparenza la regola il compositore.
+     */
+    private fun crossfadeSequence(project: Project, cfs: List<Project.Crossfade>, outW: Int, outH: Int): EditedMediaItemSequence {
+        val b = EditedMediaItemSequence.Builder(setOf(C.TRACK_TYPE_VIDEO))
+        var cursor = 0L
+        fun piece(clip: Clip, fromUs: Long, lengthUs: Long) {
+            val effects = buildList<Effect> {
+                addAll(colorEffects(clip, project))
+                add(Presentation.createForWidthAndHeight(
+                    outW, outH,
+                    if (clip.fill) Presentation.LAYOUT_SCALE_TO_FIT_WITH_CROP else Presentation.LAYOUT_SCALE_TO_FIT,
+                ))
+                if (clip.frame != Transform()) add(FrameTransformation(clip.frame, outW.toFloat() / outH))
+            }
+            val edited = if (clip.isPhoto) {
+                EditedMediaItem.Builder(
+                    MediaItem.Builder().setUri(Uri.parse(clip.uri)).setMimeType(MimeTypes.IMAGE_JPEG)
+                        .setImageDurationMs((lengthUs / 1000).coerceAtLeast(1)).build()
+                ).setDurationUs(lengthUs).setFrameRate(30)
+            } else {
+                EditedMediaItem.Builder(
+                    MediaItem.Builder().setUri(Uri.parse(clip.uri)).setClippingConfiguration(
+                        MediaItem.ClippingConfiguration.Builder().setStartPositionUs(fromUs).setEndPositionUs(fromUs + lengthUs).build()
+                    ).build()
+                ).setDurationUs(clip.sourceDurationUs)
+            }
+            b.addItem(edited.setRemoveAudio(true).setEffects(Effects(emptyList(), effects)).build())
+            cursor += lengthUs
+        }
+        cfs.forEach { cf ->
+            val a = project.clips[cf.index]
+            val next = project.clips[cf.index + 1]
+            val from = cf.cutUs - cf.beforeUs
+            if (from - cursor > 1_000) { b.addGap(from - cursor); cursor = from }
+            if (cf.beforeUs > 0) piece(next, next.trimStartUs - cf.beforeUs, cf.beforeUs)
+            if (cf.afterUs > 0) piece(a, a.trimEndUs, cf.afterUs)
         }
         return b.build()
     }
@@ -182,7 +228,8 @@ class CompositionFactory(private val context: Context) {
         val starts = project.clipStartsUs()
         val beats = project.beatTimes()
         val videoLayers = project.layers.filter { it.isVideo }
-        val multi = videoLayers.isNotEmpty()
+        val crossfades = project.crossfades()
+        val multi = videoLayers.isNotEmpty() || crossfades.isNotEmpty()
         // Con video sovrapposti, testi e immagini vanno sopra a tutto: effetti dell'intera composizione.
         fun overlaysFor(fromUs: Long, toUs: Long): List<androidx.media3.effect.TextureOverlay> {
             val texts = project.texts.filter { t -> t.startUs < toUs && t.endUs > fromUs && t.text.isNotBlank() }
@@ -224,9 +271,10 @@ class CompositionFactory(private val context: Context) {
                 }
                 if (clip.fx.isNotEmpty()) add(FxEffect(clip.fx, if (clip.fx.any { f -> f.type == FxType.PULSE }) beats else emptyList()))
                 // Transizioni: metà alla fine di questa clip, metà all'inizio della successiva.
-                val inSpec = project.clips.getOrNull(index - 1)?.transitionOut
+                // (la dissolvenza incrociata la fa il compositore, non questo effetto)
+                val inSpec = project.clips.getOrNull(index - 1)?.transitionOut?.takeIf { it.type != TransitionType.CROSSFADE }
                 val inUs = if (index > 0) project.transitionHalfUs(index - 1) else 0
-                val outSpec = clip.transitionOut
+                val outSpec = clip.transitionOut?.takeIf { it.type != TransitionType.CROSSFADE }
                 val outUs = project.transitionHalfUs(index)
                 if ((inSpec != null && inUs > 0) || (outSpec != null && outUs > 0)) {
                     add(TransitionEffect(startUs, clip.outputUs, inSpec?.type, inUs, outSpec?.type, outUs))
@@ -266,7 +314,8 @@ class CompositionFactory(private val context: Context) {
                 if (audioInMain) setOf(C.TRACK_TYPE_AUDIO, C.TRACK_TYPE_VIDEO) else setOf(C.TRACK_TYPE_VIDEO)
             ).addItems(mainItems(light = true, removeAudio = !audioInMain)).build()
             val lanes = packLanes(videoLayers, { it.startUs }, { it.endUs })
-            lanes.forEach { lane -> sequences += videoLayerSequence(lane, outW, outH) }
+            lanes.forEach { lane -> sequences += videoLayerSequence(lane, outW, outH, keepAudio = audioInMain) }
+            if (crossfades.isNotEmpty()) sequences += crossfadeSequence(project, crossfades, outW, outH)
             sequences += EditedMediaItemSequence.Builder(setOf(C.TRACK_TYPE_VIDEO))
                 .addItems(mainItems(light = false, removeAudio = true)).build()
             if (nativeAudio != null) {
@@ -280,7 +329,7 @@ class CompositionFactory(private val context: Context) {
             val ov = overlaysFor(0, Long.MAX_VALUE)
             return Composition.Builder(sequences)
                 .setHdrMode(Composition.HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_OPEN_GL)
-                .setVideoCompositorSettings(LayerCompositorSettings(outW, outH, lanes))
+                .setVideoCompositorSettings(LayerCompositorSettings(outW, outH, lanes, crossfades))
                 .setEffects(Effects(emptyList(), if (ov.isEmpty()) emptyList() else listOf(OverlayEffect(ov))))
                 .build()
         }

@@ -737,13 +737,21 @@ private fun TransitionPanel(vm: EditorViewModel, running: Boolean) {
             "Durata", null, ms / 100, !running, range = 2..20,
             format = { String.format(java.util.Locale.ITALIAN, "%.1f s", it / 10f) },
         ) { v -> vm.setTransition(spec.copy(durationUs = v * 100_000L)) }
-        val real = p.transitionHalfUs(index) * 2
+        val cross = spec.type == TransitionType.CROSSFADE
+        val real = if (cross) p.crossfades().firstOrNull { it.index == index }?.let { it.beforeUs + it.afterUs } ?: 0L
+            else p.transitionHalfUs(index) * 2
         if (real < spec.durationUs) {
-            Hint(String.format(java.util.Locale.ITALIAN, "Clip corte: durata effettiva %.1f s.", real / 1_000_000f))
+            Hint(
+                if (cross && real == 0L) "Non c'è video oltre il taglio da usare: allunga le clip con le maniglie (o scegli un'altra transizione)."
+                else String.format(java.util.Locale.ITALIAN, if (cross) "Poco video oltre il taglio: durata effettiva %.1f s." else "Clip corte: durata effettiva %.1f s.", real / 1_000_000f)
+            )
         }
         SecondaryButton("Applica a tutti i tagli", onClick = { vm.setTransitionAll(spec) })
     }
-    Hint("Metà effetto alla fine di questa clip, metà all'inizio della successiva.")
+    Hint(
+        if (spec?.type == TransitionType.CROSSFADE) "Incrociata: le due clip si sovrappongono usando i fotogrammi prima e dopo il taglio, senza cambiare la durata del video."
+        else "Metà effetto alla fine di questa clip, metà all'inizio della successiva."
+    )
 }
 
 @Composable
@@ -1107,7 +1115,12 @@ private fun LayerPanel(vm: EditorViewModel, running: Boolean, onAdd: () -> Unit)
     }
     MotionSection(vm, l.endPose != null, enabled, l.startUs, l.durationUs) { vm.toggleLayerMotion() }
     if (l.isVideo) {
-        Hint("Video sovrapposto: senza audio. Forme, cornici e scontorno per ora valgono solo per le immagini.")
+        PanelLabel("Audio del video sovrapposto")
+        ToggleRow("Disattiva l'audio", l.muted, enabled) { v -> vm.updateLayer { it.copy(muted = v) } }
+        if (!l.muted) LabeledSlider("Volume", null, (l.volume * 100).toInt(), enabled, range = 0..200, format = { "$it%" }) { v ->
+            vm.updateLayer { it.copy(volume = v / 100f) }
+        }
+        Hint("Forme, cornici e scontorno per ora valgono solo per le immagini.")
     } else {
         PanelLabel("Cornice e ombra")
         Segmented(LayerBorder.entries, l.border, { it.label }, enabled) { b -> vm.updateLayer { it.copy(border = b) } }

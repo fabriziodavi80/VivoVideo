@@ -48,6 +48,7 @@ class TransitionEffect(
 
     /** e = intensità, 1 esattamente sul taglio. */
     private fun shape(t: TransitionType, e: Float, entering: Boolean): Params = when (t) {
+        TransitionType.CROSSFADE -> Params() // fatta dal compositore (due clip sovrapposte)
         TransitionType.FADE_BLACK -> Params(black = e)
         TransitionType.FLASH -> Params(white = e * e, zoom = 1f + 0.04f * e)
         TransitionType.ZOOM -> Params(zoom = 1f + 0.6f * e * e, blur = 0.035f * e, blurMode = 2)

@@ -22,6 +22,8 @@ enum class ClipSpeed(val label: String) {
 /** Tipi di transizione. Agiscono sulla fine di una clip e sull'inizio della successiva. */
 @Serializable
 enum class TransitionType(val label: String) {
+    /** Dissolvenza incrociata vera: le due clip si sovrappongono (usa i fotogrammi oltre il taglio). */
+    CROSSFADE("Incrociata"),
     FADE_BLACK("Nero"),
     FLASH("Flash"),
     ZOOM("Zoom"),
@@ -289,6 +291,9 @@ data class Layer(
     val animOut: TextAnim = TextAnim.FADE,
     /** Video sovrapposto (picture-in-picture) invece di immagine. */
     val isVideo: Boolean = false,
+    /** Audio del video sovrapposto. */
+    val muted: Boolean = false,
+    val volume: Float = 1f,
     /** Video: punto di partenza nel file e durata del file. */
     val sourceStartUs: Long = 0,
     val sourceDurationUs: Long = 0,
@@ -466,6 +471,34 @@ data class Project(
     val layers: List<Layer> = emptyList(),
 ) {
     fun replaceLayer(l: Layer): Project = copy(layers = layers.map { if (it.id == l.id) l else it })
+
+    /**
+     * Dissolvenze incrociate: per il taglio dopo la clip [index], quanto prima del taglio si vede già
+     * l'inizio della clip successiva ([beforeUs], dal materiale prima del suo punto d'ingresso) e quanto
+     * dopo si vede ancora la fine della clip precedente ([afterUs], dal materiale oltre il suo punto d'uscita).
+     */
+    data class Crossfade(val index: Int, val cutUs: Long, val beforeUs: Long, val afterUs: Long)
+
+    fun crossfades(): List<Crossfade> {
+        val starts = clipStartsUs()
+        return clips.indices.mapNotNull { i ->
+            val spec = clips[i].transitionOut ?: return@mapNotNull null
+            if (spec.type != TransitionType.CROSSFADE) return@mapNotNull null
+            val a = clips[i]
+            val b = clips.getOrNull(i + 1) ?: return@mapNotNull null
+            val half = spec.durationUs / 2
+            // Materiale disponibile: le foto non finiscono mai; i video hanno i margini fuori dal taglio.
+            val headRoom = if (b.isPhoto) Long.MAX_VALUE else b.trimStartUs
+            val tailRoom = if (a.isPhoto) Long.MAX_VALUE else a.sourceDurationUs - a.trimEndUs
+            var before = minOf(half, headRoom, a.outputUs / 2)
+            var after = minOf(half, tailRoom, b.outputUs / 2)
+            // Se manca materiale da un lato, si usa di più l'altro.
+            if (before < half) after = minOf(spec.durationUs - before, tailRoom, b.outputUs / 2)
+            if (after < half) before = minOf(spec.durationUs - after, headRoom, a.outputUs / 2)
+            if (before + after < 100_000) return@mapNotNull null
+            Crossfade(i, starts[i] + a.outputUs, before.coerceAtLeast(0), after.coerceAtLeast(0))
+        }
+    }
 
     fun replaceText(t: TextItem): Project = copy(texts = texts.map { if (it.id == t.id) t else it })
 

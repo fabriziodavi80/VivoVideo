@@ -67,12 +67,18 @@ fun renderTimelineAudio(context: Context, project: Project, onProgress: (Float) 
             if (samples.size != needed) samples = samples.copyOf(needed)
             writePcm16(out, samples)
             frames += target
-            onProgress((i + 1f) / project.clips.size * if (project.music.isEmpty()) 1f else 0.6f)
+            onProgress((i + 1f) / project.clips.size * if (project.music.isEmpty() && project.layers.none { it.isVideo }) 1f else 0.6f)
         }
     }
     RandomAccessFile(file, "rw").use { raf ->
         raf.write(wavHeader(frames))
-        val tracks = project.audibleMusic()
+        // Musica + audio dei video sovrapposti (trattati come brani, con micro-dissolvenze contro i clic).
+        val tracks = project.audibleMusic() + project.layers.filter { it.isVideo && !it.muted && it.startUs < project.durationUs }.map { l ->
+            MusicTrack(
+                uri = l.uri, name = l.name, sourceDurationUs = l.sourceDurationUs, startUs = l.startUs,
+                offsetUs = l.sourceStartUs, lengthUs = l.durationUs, volume = l.volume, fadeInUs = 30_000, fadeOutUs = 30_000,
+            )
+        }
         tracks.forEachIndexed { k, t ->
             mixTrack(context, raf, frames, t, project.durationUs)
             onProgress(0.6f + 0.4f * (k + 1) / tracks.size)

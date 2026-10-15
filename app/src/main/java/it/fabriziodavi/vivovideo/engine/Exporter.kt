@@ -57,7 +57,7 @@ class Exporter(
         scope.launch {
             // Colonna sonora calcolata in proprio se c'è musica (mix con dissolvenze)
             // o se qualche clip cambia velocità (tono naturale).
-            val needsNative = project.audibleMusic().isNotEmpty() ||
+            val needsNative = project.audibleMusic().isNotEmpty() || project.layers.any { it.isVideo && !it.muted } ||
                 (options.keepPitch && project.clips.any { c -> !c.muted && c.speedCurve().speeds.any { it != 1f } })
             var audio: File? = null
             if (needsNative) {

@@ -198,4 +198,19 @@ class ProjectTest {
         assertNotNull(p.clips[0].transitionOut)
         assertNull(p.clips.last().transitionOut)
     }
+
+    @Test fun crossfadeUsesHandles() {
+        // a: fine tagliata a 4 s di 10 (6 s di coda); b: inizio a 0,2 s (poca testa).
+        val a = Clip(uri = "a", sourceDurationUs = 10_000_000, trimEndUs = 4_000_000, transitionOut = TransitionSpec(TransitionType.CROSSFADE, 1_000_000))
+        val b = Clip(uri = "b", sourceDurationUs = 10_000_000, trimStartUs = 200_000, trimEndUs = 5_000_000)
+        val cf = Project(name = "x", clips = listOf(a, b)).crossfades().single()
+        assertEquals(4_000_000L, cf.cutUs)
+        assertEquals(200_000L, cf.beforeUs)
+        assertEquals(800_000L, cf.afterUs)
+        // Fra foto la dissolvenza è sempre piena.
+        val pa = Clip(uri = "p", sourceDurationUs = Clip.PHOTO_MAX_US, trimEndUs = 3_000_000, isPhoto = true, transitionOut = TransitionSpec(TransitionType.CROSSFADE, 1_000_000))
+        val pcf = Project(name = "y", clips = listOf(pa, pa.copy(id = "q", transitionOut = null))).crossfades().single()
+        assertEquals(500_000L, pcf.beforeUs)
+        assertEquals(500_000L, pcf.afterUs)
+    }
 }
