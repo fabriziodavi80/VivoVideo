@@ -130,6 +130,8 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                 }
                 audioFile = r.getOrNull()
             }
+            // Lascia all'anteprima il tempo di liberare il decoder hardware.
+            kotlinx.coroutines.delay(400)
             if (exportState !is ExportState.Running) { audioFile?.delete(); return@launch }
             runAttempt(uri, src, provider, nativeAudio, audioFile, attempt = 0, log = mutableListOf())
         }
