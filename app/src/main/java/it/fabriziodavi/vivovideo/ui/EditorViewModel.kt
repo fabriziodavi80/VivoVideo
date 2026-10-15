@@ -1,5 +1,17 @@
 package it.fabriziodavi.vivovideo.ui
 
+import it.fabriziodavi.vivovideo.model.Clip
+import it.fabriziodavi.vivovideo.model.ClipSpeed
+import it.fabriziodavi.vivovideo.model.ColorSettings
+import it.fabriziodavi.vivovideo.model.Easing
+import it.fabriziodavi.vivovideo.model.Keyframe
+import it.fabriziodavi.vivovideo.model.Keyframes
+import it.fabriziodavi.vivovideo.model.Project
+import it.fabriziodavi.vivovideo.model.ProjectStore
+import it.fabriziodavi.vivovideo.model.SpeedInterp
+import it.fabriziodavi.vivovideo.model.SpeedPoint
+import it.fabriziodavi.vivovideo.model.SpeedPoints
+import it.fabriziodavi.vivovideo.model.Transform
 import android.app.Application
 import android.content.Intent
 import android.net.Uri
@@ -18,10 +30,10 @@ import it.fabriziodavi.vivovideo.engine.CompositionFactory
 import it.fabriziodavi.vivovideo.engine.ExportOptions
 import it.fabriziodavi.vivovideo.engine.ExportState
 import it.fabriziodavi.vivovideo.engine.Exporter
-import it.fabriziodavi.vivovideo.model.Clip
-import it.fabriziodavi.vivovideo.model.ColorSettings
-import it.fabriziodavi.vivovideo.model.Project
-import it.fabriziodavi.vivovideo.model.ProjectStore
+import Clip
+import ColorSettings
+import Project
+import ProjectStore
 import it.fabriziodavi.vivovideo.readVideoInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -190,20 +202,20 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         return c.speedCurve().sourceTimeAt(out)
     }
 
-    fun transformAtPlayhead(): it.fabriziodavi.vivovideo.model.Transform {
-        val c = selectedClip ?: return it.fabriziodavi.vivovideo.model.Transform()
+    fun transformAtPlayhead(): Transform {
+        val c = selectedClip ?: return Transform()
         val t = playheadInSelected() ?: 0L
-        return it.fabriziodavi.vivovideo.model.Keyframes.valueAt(c.keyframes, t)
+        return Keyframes.valueAt(c.keyframes, t)
     }
 
     /** Cambia la trasformazione nel punto dell'indicatore: crea il keyframe se non c'è. */
-    fun setTransformAtPlayhead(value: it.fabriziodavi.vivovideo.model.Transform) {
+    fun setTransformAtPlayhead(value: Transform) {
         val t = playheadInSelected()
         if (t == null) { message = "Porta l'indicatore dentro la clip selezionata per mettere un keyframe."; return }
-        updateSelected { c -> c.copy(keyframes = it.fabriziodavi.vivovideo.model.Keyframes.set(c.keyframes, t, value)) }
+        updateSelected { c -> c.copy(keyframes = Keyframes.set(c.keyframes, t, value)) }
     }
 
-    fun keyframeAtPlayhead(): it.fabriziodavi.vivovideo.model.Keyframe? {
+    fun keyframeAtPlayhead(): Keyframe? {
         val c = selectedClip ?: return null
         val t = playheadInSelected() ?: return null
         return c.keyframes.firstOrNull { kotlin.math.abs(it.timeUs - t) <= 40_000 }
@@ -216,7 +228,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         else setTransformAtPlayhead(transformAtPlayhead())
     }
 
-    fun setEasingAtPlayhead(e: it.fabriziodavi.vivovideo.model.Easing) {
+    fun setEasingAtPlayhead(e: Easing) {
         val c = selectedClip ?: return
         val t = playheadInSelected() ?: return
         val k = c.keyframes.filter { it.timeUs <= t + 40_000 }.maxByOrNull { it.timeUs } ?: return
@@ -232,22 +244,22 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         return (t.toFloat() / c.trimmedUs).coerceIn(0f, 1f)
     }
 
-    fun speedPointAtPlayhead(): it.fabriziodavi.vivovideo.model.SpeedPoint? {
+    fun speedPointAtPlayhead(): SpeedPoint? {
         val c = selectedClip ?: return null
         val f = playheadFraction() ?: return null
-        return it.fabriziodavi.vivovideo.model.SpeedPoints.nearest(c.curvePoints, f)
+        return SpeedPoints.nearest(c.curvePoints, f)
     }
 
     /**
      * Cambia la curva tenendo fermo il fotogramma sotto l'indicatore:
      * con la nuova velocità lo stesso fotogramma cade in un altro istante del video finale.
      */
-    private fun changeCurveKeepingFrame(newPoints: List<it.fabriziodavi.vivovideo.model.SpeedPoint>) {
+    private fun changeCurveKeepingFrame(newPoints: List<SpeedPoint>) {
         val p = project ?: return
         val c = selectedClip ?: return
         val src = playheadInSelected()
         val idx = p.clips.indexOf(c)
-        updateSelected { it.copy(speed = it.fabriziodavi.vivovideo.model.ClipSpeed.RAMP, speedPoints = newPoints) }
+        updateSelected { it.copy(speed = ClipSpeed.RAMP, speedPoints = newPoints) }
         if (src != null) {
             val np = project ?: return
             val nc = np.clips[idx]
@@ -259,18 +271,18 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         val c = selectedClip ?: return
         val f = playheadFraction()
         if (f == null) { message = "Porta l'indicatore dentro la clip selezionata."; return }
-        changeCurveKeepingFrame(it.fabriziodavi.vivovideo.model.SpeedPoints.set(c.curvePoints, f, speed))
+        changeCurveKeepingFrame(SpeedPoints.set(c.curvePoints, f, speed))
     }
 
     fun toggleSpeedPointAtPlayhead() {
         val c = selectedClip ?: return
         val f = playheadFraction() ?: run { message = "Porta l'indicatore dentro la clip selezionata."; return }
-        val near = it.fabriziodavi.vivovideo.model.SpeedPoints.nearest(c.curvePoints, f)
+        val near = SpeedPoints.nearest(c.curvePoints, f)
         if (near != null && near.t > 0f && near.t < 1f) {
             changeCurveKeepingFrame(c.curvePoints - near)
         } else if (near == null) {
-            val now = it.fabriziodavi.vivovideo.model.SpeedInterp.valueAt(c.curvePoints, f)
-            changeCurveKeepingFrame(it.fabriziodavi.vivovideo.model.SpeedPoints.set(c.curvePoints, f, now))
+            val now = SpeedInterp.valueAt(c.curvePoints, f)
+            changeCurveKeepingFrame(SpeedPoints.set(c.curvePoints, f, now))
         }
     }
 

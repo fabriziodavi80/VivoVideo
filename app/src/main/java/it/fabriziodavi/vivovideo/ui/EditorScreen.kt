@@ -1,5 +1,10 @@
 package it.fabriziodavi.vivovideo.ui
 
+import it.fabriziodavi.vivovideo.model.ClipSpeed
+import it.fabriziodavi.vivovideo.model.Easing
+import it.fabriziodavi.vivovideo.model.SpeedInterp
+import it.fabriziodavi.vivovideo.model.SpeedLimits
+import it.fabriziodavi.vivovideo.model.SpeedPreset
 import android.content.Intent
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
@@ -72,8 +77,8 @@ import it.fabriziodavi.vivovideo.engine.ExportState
 import it.fabriziodavi.vivovideo.engine.OutputCodec
 import it.fabriziodavi.vivovideo.engine.OutputFps
 import it.fabriziodavi.vivovideo.engine.OutputSize
-import it.fabriziodavi.vivovideo.model.ClipSpeed
-import it.fabriziodavi.vivovideo.model.SpeedPreset
+import ClipSpeed
+import SpeedPreset
 import kotlin.math.ln
 
 private val ZOOMS = listOf(8f, 15f, 30f, 60f, 120f)
@@ -501,9 +506,9 @@ private fun SpeedPanel(vm: EditorViewModel, running: Boolean) {
             IconBtn(VVIcons.MoveRight, "Punto successivo") { vm.jumpSpeedPoint(+1) }
         }
         if (f != null) {
-            val now = here?.speed ?: it.fabriziodavi.vivovideo.model.SpeedInterp.valueAt(clip.curvePoints, f)
-            val lnMin = kotlin.math.ln(it.fabriziodavi.vivovideo.model.SpeedLimits.MIN)
-            val lnMax = kotlin.math.ln(it.fabriziodavi.vivovideo.model.SpeedLimits.MAX)
+            val now = here?.speed ?: SpeedInterp.valueAt(clip.curvePoints, f)
+            val lnMin = kotlin.math.ln(SpeedLimits.MIN)
+            val lnMax = kotlin.math.ln(SpeedLimits.MAX)
             fun toSlider(sp: Float) = ((kotlin.math.ln(sp) - lnMin) / (lnMax - lnMin) * 1000).toInt()
             fun fromSlider(v: Int): Float {
                 val sp = kotlin.math.exp(lnMin + v / 1000f * (lnMax - lnMin))
@@ -597,7 +602,7 @@ private fun KeyframePanel(vm: EditorViewModel, running: Boolean) {
         PanelLabel("Andamento verso il keyframe successivo")
         val t = vm.playheadInSelected() ?: 0L
         val current = clip.keyframes.filter { it.timeUs <= t + 40_000 }.maxByOrNull { it.timeUs }?.easing
-        Segmented(it.fabriziodavi.vivovideo.model.Easing.entries, current ?: it.fabriziodavi.vivovideo.model.Easing.SMOOTH, { it.label }, !running && current != null) {
+        Segmented(Easing.entries, current ?: Easing.SMOOTH, { it.label }, !running && current != null) {
             vm.setEasingAtPlayhead(it)
         }
     }
