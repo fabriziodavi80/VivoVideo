@@ -115,7 +115,7 @@ jobs:
           disable-animations: true
           script: |
             adb logcat -c || true
-            (adb logcat -v time > logcat.txt &) ; set -o pipefail ; gradle connectedDebugAndroidTest --no-daemon 2>&1 | tee device.log
+            (adb logcat -v time > logcat.txt &) ; gradle connectedDebugAndroidTest --no-daemon > device.log 2>&1
 
       - name: Salva l'esito
         if: always()
