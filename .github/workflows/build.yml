@@ -40,7 +40,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           COMMIT_MSG: ${{ github.event.head_commit.message }}
         run: |
-          VER="v0.2.${GITHUB_RUN_NUMBER}"
+          VER="v0.3.${GITHUB_RUN_NUMBER}"
           cp app/build/outputs/apk/release/app-release.apk VivoVideo.apk
           NOTES="${COMMIT_MSG:-Compilazione manuale}"
           gh release create "$VER" VivoVideo.apk --title "VivoVideo $VER" --notes "$NOTES" --latest
