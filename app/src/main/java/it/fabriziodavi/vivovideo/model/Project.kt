@@ -458,7 +458,8 @@ data class Project(
     fun replaceMusic(t: MusicTrack): Project = copy(music = music.map { if (it.id == t.id) t else it })
 
     /** Tutti i battiti in uso sulla timeline, ordinati. */
-    fun beatTimes(): List<Long> = durationUs.let { d -> music.flatMap { it.timelineBeats(d) }.distinct().sorted() }
+    fun beatTimes(withinVideo: Boolean = true): List<Long> =
+        (if (withinVideo) durationUs else Long.MAX_VALUE / 4).let { d -> music.flatMap { it.timelineBeats(d) }.distinct().sorted() }
 
     /**
      * Cambia il taglio della clip [i] perché duri [targetOutUs] nel video finale,
@@ -489,7 +490,8 @@ data class Project(
      * allungando o accorciando la clip prima del taglio. Restituisce null se non c'è nulla da allineare.
      */
     fun alignCutsToBeats(minClipUs: Long = 300_000): Project? {
-        val beats = beatTimes()
+        // Tutta la musica conta: allungando una clip il video può arrivare a battiti oltre la fine attuale.
+        val beats = beatTimes(withinVideo = false)
         if (beats.isEmpty()) return null
         var p = this
         var changed = false
@@ -512,7 +514,7 @@ data class Project(
      * e transizioni fra tutte le clip. A ritmo, anche i tagli dei video si allineano ai battiti.
      */
     fun slideshow(o: SlideshowOptions, seed: Int = 7): Project {
-        val beats = beatTimes()
+        val beats = beatTimes(withinVideo = false)
         val rnd = kotlin.random.Random(seed)
         var q = this
         var prev: MotionStyle? = null
