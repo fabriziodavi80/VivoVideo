@@ -5,6 +5,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 ## Novità di questa versione
 - **Dissolvenze in entrata e in uscita** per ogni clip (dal/al nero o bianco, anche sull'audio), con il tasto **Apri e chiudi il video** per la prima e l'ultima clip.
 - Se l'esportazione resta ferma per un minuto (raro inceppamento del motore video), l'app riprova da sola.
+- Se l'anteprima si ferma da sola mentre è in riproduzione, dopo 4 secondi l'app la ricarica da quel punto e riparte.
 - **29 effetti** divisi in categorie: Colore, Stile, Ottica, Forma, Movimento. Nuovi: Seppia, Colori vivaci, Bicromia, Arcobaleno, Poster, Negativo, Vecchio film, Fumetto, Retino, Luce calda, Sfocatura zoom, Miniatura, Grandangolo, Aberrazione, Onde, Caleidoscopio, Moltiplica, Lampi a ritmo.
 
 ## Primi passi

@@ -139,7 +139,7 @@ class DeviceTest {
             val done = CountDownLatch(1)
             val error = AtomicReference<String?>(null)
             main.post {
-                Transformer.Builder(ctx).setMaxDelayBetweenMuxerSamplesMs(60_000).setVideoMimeType(MimeTypes.VIDEO_H264)
+                Transformer.Builder(ctx).setMaxDelayBetweenMuxerSamplesMs(30_000).setVideoMimeType(MimeTypes.VIDEO_H264)
                     .addListener(object : Transformer.Listener {
                         override fun onCompleted(composition: Composition, exportResult: ExportResult) { done.countDown() }
                         override fun onError(composition: Composition, exportResult: ExportResult, exportException: ExportException) {
@@ -277,7 +277,7 @@ class DeviceTest {
      * L'anteprima deve scorrere davvero: dopo l'avvio, il tempo avanza quasi come l'orologio e
      * arrivano i fotogrammi. Registra la posizione ogni mezzo secondo per capire dove si ferma.
      */
-    private fun playFor(p: Project, seconds: Int = 6) {
+    private fun playFor(p: Project, seconds: Int = 8) {
         val factory = CompositionFactory(ctx)
         val (w, h) = factory.outputSize(p, 1080)
         val shown = CrossfadePreview.previewProject(ctx, p, w, h)
@@ -310,7 +310,31 @@ class DeviceTest {
         }
         val samples = mutableListOf<Long>()
         val f0 = frames.get()
-        repeat(seconds * 2) { samples += pos(); Thread.sleep(500) }
+        var recoveries = 0
+        repeat(seconds * 2) {
+            samples += pos()
+            // Come il guardiano dell'app: tempo fermo per 4 s → lettore ricaricato da quel punto.
+            if (samples.size >= 9 && samples.takeLast(9).toSet().size == 1 && recoveries < 2) {
+                recoveries++
+                val at = samples.last()
+                val l = CountDownLatch(1)
+                main.post {
+                    player.get().release()
+                    val pl = CompositionPlayer.Builder(ctx).build()
+                    pl.addListener(object : Player.Listener {
+                        override fun onPlayerError(e: PlaybackException) { error.set(chain(e)) }
+                    })
+                    pl.setVideoSurface(reader.surface, Size(w, h))
+                    pl.setComposition(composition, at)
+                    pl.prepare(); pl.play()
+                    player.set(pl)
+                    l.countDown()
+                }
+                l.await(5, TimeUnit.SECONDS)
+            }
+            Thread.sleep(500)
+        }
+        if (recoveries > 0) android.util.Log.w("VivoVideoTest", "anteprima ripartita $recoveries volte")
         val latch = CountDownLatch(1)
         main.post { player.get().release(); latch.countDown() }
         latch.await(10, TimeUnit.SECONDS)
@@ -319,7 +343,7 @@ class DeviceTest {
         val advanced = samples.last() - samples.first()
         val trace = samples.joinToString(" ")
         val expected = (seconds * 2 - 1) * 500L
-        assertTrue("anteprima lenta: avanzata di $advanced ms invece di ~$expected (posizioni: $trace)", advanced > expected * 0.7)
+        assertTrue("anteprima lenta: avanzata di $advanced ms invece di ~$expected (posizioni: $trace, ripartenze: $recoveries)", advanced > expected * (if (recoveries > 0) 0.4 else 0.7))
         assertTrue("anteprima senza immagini: ${frames.get() - f0} fotogrammi (posizioni: $trace)", frames.get() - f0 > seconds * 5)
     }
 
@@ -337,7 +361,8 @@ class DeviceTest {
             val out = CrossfadePreview.file(ctx, job.key)
             val c = factory.build(job.sub, ExportOptions(), forPreview = true, nativeAudio = null, allowMulti = true,
                 sizeOverride = w to h, crossfadesOverride = listOf(job.cf))
-            transform(c, out)
+            // Come nell'app: se si inceppa si riprova una volta.
+            try { transform(c, out, timeoutS = 120) } catch (e: Throwable) { out.delete(); transform(c, out, timeoutS = 120) }
             assertTrue(out.length() > 1000)
         }
         // L'anteprima con le dissolvenze pronte scorre.

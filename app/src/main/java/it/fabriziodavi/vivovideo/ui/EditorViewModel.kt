@@ -867,9 +867,35 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             player?.let { p ->
                 playheadUs = p.currentPosition * 1000
                 isPlaying = p.isPlaying
+                watchStall(p)
             }
             handler.postDelayed(this, 50)
         }
+    }
+
+    // Guardiano dell'anteprima: se in riproduzione il tempo resta fermo troppo a lungo
+    // (raro inceppamento del motore video), si ricarica il lettore da quel punto e si riparte.
+    private var stallPos = -1L
+    private var stallSince = 0L
+    private var stallRecoveries = 0
+    var previewRecovered by mutableStateOf(0)
+        private set
+
+    private fun watchStall(p: CompositionPlayer) {
+        val wantsToPlay = p.playWhenReady && p.playbackState != Player.STATE_ENDED && p.playbackState != Player.STATE_IDLE
+        val now = android.os.SystemClock.elapsedRealtime()
+        val pos = p.currentPosition
+        if (!wantsToPlay || pos != stallPos) { stallPos = pos; stallSince = now; return }
+        if (now - stallSince < 4_000) return
+        stallSince = now
+        if (stallRecoveries >= 3) return // ripetuto: si lascia com'è (l'utente vede l'errore o riprova)
+        stallRecoveries++
+        previewRecovered++
+        releasePlayer()
+        rebuildPreview(pos)
+        player?.play()
+        // Dopo un po' di riproduzione regolare il conteggio si azzera.
+        handler.postDelayed({ if (stallPos != pos) stallRecoveries = 0 }, 20_000)
     }
 
     private var playerMulti = false
@@ -1041,7 +1067,8 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                 sizeOverride = w to h, crossfadesOverride = listOf(job.cf))
         }.getOrElse { failedSegments += job.key; segQueue.removeFirstOrNull(); nextSegment(false); return }
         val t = Transformer.Builder(ctx)
-            .setMaxDelayBetweenMuxerSamplesMs(60_000)
+            // Un pezzo dura un secondo: se per 20 s non esce nulla si è inceppato e si riprova.
+            .setMaxDelayBetweenMuxerSamplesMs(20_000)
             .setVideoMimeType(androidx.media3.common.MimeTypes.VIDEO_H264)
             .addListener(object : Transformer.Listener {
                 override fun onCompleted(composition: androidx.media3.transformer.Composition, exportResult: androidx.media3.transformer.ExportResult) {
