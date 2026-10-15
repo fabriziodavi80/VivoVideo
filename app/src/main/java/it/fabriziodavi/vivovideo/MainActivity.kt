@@ -1,74 +1,26 @@
-@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
-
 package it.fabriziodavi.vivovideo
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
-import androidx.compose.material3.Switch
-import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.media3.common.MediaItem
-import androidx.media3.common.Player
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.ui.PlayerView
-
-private val Accent = Color(0xFFFF4D6D)
-private val Bg = Color(0xFF0E0F13)
-private val Surface = Color(0xFF181A21)
+import it.fabriziodavi.vivovideo.engine.ExportState
+import it.fabriziodavi.vivovideo.ui.Accent
+import it.fabriziodavi.vivovideo.ui.Bg
+import it.fabriziodavi.vivovideo.ui.EditorScreen
+import it.fabriziodavi.vivovideo.ui.EditorViewModel
+import it.fabriziodavi.vivovideo.ui.HomeScreen
+import it.fabriziodavi.vivovideo.ui.Surface
 
 class MainActivity : ComponentActivity() {
+    private val vm: EditorViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -83,7 +35,6 @@ class MainActivity : ComponentActivity() {
                     secondaryContainer = Accent.copy(alpha = 0.25f),
                 )
             ) {
-                val vm: MainViewModel = viewModel()
                 // Schermo acceso durante l'esportazione.
                 LaunchedEffect(vm.exportState) {
                     if (vm.exportState is ExportState.Running) {
@@ -92,281 +43,14 @@ class MainActivity : ComponentActivity() {
                         window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                     }
                 }
-                MainScreen(vm)
+                if (vm.project == null) HomeScreen(vm) else EditorScreen(vm)
             }
         }
     }
-}
 
-@Composable
-private fun MainScreen(vm: MainViewModel) {
-    val context = LocalContext.current
-    val picker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-        if (uri != null) vm.onVideoPicked(uri)
+    override fun onStop() {
+        super.onStop()
+        // Mette in pausa l'anteprima quando l'app va in secondo piano.
+        vm.pause()
     }
-    val running = vm.exportState is ExportState.Running
-    val lutPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        if (uri != null) vm.loadLut(uri)
-    }
-
-    Box(
-        Modifier
-            .fillMaxSize()
-            .background(Bg)
-    ) {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .safeDrawingPadding()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("VivoVideo", fontSize = 26.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                Spacer(Modifier.padding(4.dp))
-                Text("prova tecnica", fontSize = 13.sp, color = Accent)
-            }
-
-            Button(
-                onClick = {
-                    picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.VideoOnly))
-                },
-                enabled = !running,
-                modifier = Modifier.fillMaxWidth(),
-            ) { Text(if (vm.sourceUri == null) "Scegli un video" else "Cambia video") }
-
-            vm.infoError?.let { Text("Impossibile leggere il video: $it", color = Accent) }
-
-            val uri = vm.sourceUri
-            val info = vm.info
-            if (uri != null) {
-                val colorKey = "${vm.logMode}|${System.identityHashCode(vm.customLut)}|${vm.look}|${vm.highlights}|${vm.denoise}"
-                val effects = remember(colorKey) { vm.colorEffects() }
-                Preview(uri, effects, vm.speed, info, exporting = running)
-            }
-            if (info != null) {
-                Text(info.summary(), color = Color(0xFFB8BCC8), fontSize = 13.sp)
-
-                Section("Colore") {
-                    ToggleRow("Video LOG (converti in colori normali)", vm.logMode, !running) { vm.logMode = it }
-                    if (info.tenBit && !vm.logMode) Hint("Video a 10 bit: se l'hai girato in LOG attiva la conversione.")
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                        OutlinedButton(onClick = { lutPicker.launch(arrayOf("*/*")) }, enabled = !running) {
-                            Text(if (vm.customLut == null) "Carica LUT .cube" else "Cambia LUT")
-                        }
-                        vm.customLut?.let { lut ->
-                            Text(lut.name, color = Color(0xFFDDE0E8), modifier = Modifier.weight(1f), maxLines = 1)
-                            OutlinedButton(onClick = vm::clearLut, enabled = !running) { Text("Togli") }
-                        }
-                    }
-                    vm.lutError?.let { Text(it, color = Accent, fontSize = 13.sp) }
-                    LabeledSlider("Alte luci / cielo", "Scurisce le zone chiare e ne recupera il colore.", vm.highlights, !running) { vm.highlights = it }
-                    LabeledSlider("Riduzione rumore", "Leviga cielo e zone uniformi mantenendo i bordi. Utile sui LOG.", vm.denoise, !running) { vm.denoise = it }
-                }
-                Section("Filtro") {
-                    ChipRow(Look.entries, vm.look, { it.label }, !running) { vm.look = it }
-                }
-                Section("Velocità") {
-                    ChipRow(SpeedMode.entries, vm.speed, { it.label }, !running) { vm.speed = it }
-                    if (vm.speed == SpeedMode.RAMP) {
-                        Hint("Veloce (2×) → lento (0,35×) al centro → veloce. Si vede nel video esportato, non nell'anteprima.")
-                    }
-                }
-                Section("Esportazione") {
-                    ChipRow(OutputSize.entries, vm.size, { it.label }, !running) { vm.size = it }
-                    ChipRow(OutputFps.entries, vm.fps, { "fps: " + it.label }, !running) { vm.fps = it }
-                    ChipRow(OutputCodec.entries, vm.codec, { it.label }, !running) { vm.codec = it }
-                    ToggleRow("Mantieni l'audio", vm.keepAudio, !running) { vm.keepAudio = it }
-                    if (vm.keepAudio && vm.speed != SpeedMode.NORMAL) {
-                        ToggleRow("Mantieni il tono dell'audio", vm.keepPitch, !running) { vm.keepPitch = it }
-                        Hint(
-                            if (vm.keepPitch) "L'audio segue la velocità ma voci e suoni restano naturali."
-                            else "Effetto nastro: rallentando l'audio diventa più grave, accelerando più acuto."
-                        )
-                    }
-                    if (info.isHdr) {
-                        ToggleRow("Converti HDR in SDR", vm.toneMapHdr, !running) { vm.toneMapHdr = it }
-                    }
-                }
-
-                when (val s = vm.exportState) {
-                    is ExportState.Running -> {
-                        Text(
-                            s.percent?.let { "Esportazione… $it%" + (s.label?.let { l -> "\n$l" } ?: "") }
-                                ?: (s.label ?: "Esportazione in preparazione…"),
-                            color = Color.White,
-                        )
-                        LinearProgressIndicator(
-                            progress = { (s.percent ?: 0) / 100f },
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                        OutlinedButton(onClick = vm::cancelExport, modifier = Modifier.fillMaxWidth()) {
-                            Text("Annulla")
-                        }
-                    }
-                    else -> Button(
-                        onClick = vm::startExport,
-                        modifier = Modifier.fillMaxWidth().height(52.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Accent),
-                    ) { Text("Esporta", fontSize = 17.sp, fontWeight = FontWeight.SemiBold) }
-                }
-
-                when (val s = vm.exportState) {
-                    is ExportState.Done -> ResultCard("Fatto! Salvato in Film/VivoVideo", s.details) {
-                        OutlinedButton(onClick = {
-                            val intent = Intent(Intent.ACTION_VIEW)
-                                .setDataAndType(s.uri, "video/mp4")
-                                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                            runCatching { context.startActivity(intent) }
-                        }) { Text("Apri il video") }
-                    }
-                    is ExportState.Failed -> ResultCard("Qualcosa non ha funzionato", s.message) {
-                        Hint("Fai uno screenshot di questo messaggio e mandalo a Claude.")
-                    }
-                    else -> {}
-                }
-            }
-
-            Section("Encoder del telefono") {
-                Hint(vm.encoderSummary)
-            }
-            Hint("Versione ${BuildConfigInfo.versionName(context)}")
-        }
-    }
-}
-
-@Composable
-private fun Preview(uri: android.net.Uri, effects: List<androidx.media3.common.Effect>, speed: SpeedMode, info: VideoInfo?, exporting: Boolean) {
-    val context = LocalContext.current
-    // Il player si ricrea quando cambia il video o il filtro.
-    // Il player si ricrea quando cambiano video o colori: gli effetti vanno impostati prima di prepare().
-    val player = remember(uri, effects) {
-        ExoPlayer.Builder(context).build().apply {
-            setVideoEffects(effects)
-            setMediaItem(MediaItem.fromUri(uri))
-            repeatMode = Player.REPEAT_MODE_ALL
-            prepare()
-        }
-    }
-    DisposableEffect(player) { onDispose { player.release() } }
-    // Durante l'esportazione l'anteprima libera il decoder hardware:
-    // con l'8K non c'è spazio per due decoder più l'encoder.
-    LaunchedEffect(player, exporting) {
-        if (exporting) player.stop() else if (player.playbackState == Player.STATE_IDLE) player.prepare()
-    }
-    LaunchedEffect(player, speed) {
-        player.setPlaybackSpeed(
-            when (speed) {
-                SpeedMode.SLOW -> 0.5f
-                SpeedMode.FAST -> 2f
-                else -> 1f
-            }
-        )
-    }
-    val ratio = info?.let {
-        if (it.displayWidth > 0 && it.displayHeight > 0) it.displayWidth.toFloat() / it.displayHeight else null
-    } ?: (16f / 9f)
-    Box(
-        Modifier
-            .fillMaxWidth()
-            .aspectRatio(maxOf(ratio, 0.75f))
-            .clip(RoundedCornerShape(12.dp))
-            .background(Color.Black),
-        contentAlignment = Alignment.Center,
-    ) {
-        AndroidView(
-            factory = { ctx -> PlayerView(ctx).apply { useController = true } },
-            update = { it.player = player },
-            modifier = Modifier.fillMaxSize(),
-        )
-    }
-}
-
-@Composable
-private fun Section(title: String, content: @Composable () -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(title, color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
-        content()
-    }
-}
-
-@Composable
-private fun <T> ChipRow(
-    items: List<T>,
-    selected: T,
-    label: (T) -> String,
-    enabled: Boolean,
-    onSelect: (T) -> Unit,
-) {
-    Row(
-        Modifier.horizontalScroll(rememberScrollState()),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        items.forEach { item ->
-            FilterChip(
-                selected = item == selected,
-                onClick = { onSelect(item) },
-                label = { Text(label(item)) },
-                enabled = enabled,
-                colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = Accent,
-                    selectedLabelColor = Color.White,
-                ),
-            )
-        }
-    }
-}
-
-@Composable
-private fun ToggleRow(label: String, checked: Boolean, enabled: Boolean, onChange: (Boolean) -> Unit) {
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Text(label, color = Color(0xFFDDE0E8), modifier = Modifier.weight(1f))
-        Switch(checked = checked, onCheckedChange = onChange, enabled = enabled)
-    }
-}
-
-@Composable
-private fun Hint(text: String) {
-    Text(text, color = Color(0xFF8A8F9C), fontSize = 12.sp)
-}
-
-@Composable
-private fun ResultCard(title: String, body: String, actions: @Composable () -> Unit) {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = Surface),
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(title, color = Color.White, fontWeight = FontWeight.SemiBold)
-            SelectionContainer { Text(body, color = Color(0xFFB8BCC8), fontSize = 13.sp) }
-            actions()
-        }
-    }
-}
-
-private object BuildConfigInfo {
-    fun versionName(context: android.content.Context): String =
-        runCatching {
-            context.packageManager.getPackageInfo(context.packageName, 0).versionName
-        }.getOrNull() ?: "?"
-}
-
-@Composable
-private fun LabeledSlider(label: String, hint: String, value: Int, enabled: Boolean, onChange: (Int) -> Unit) {
-    // Il valore si applica quando sollevi il dito, così l'anteprima non si ricrea a ogni pixel.
-    var local by remember(value) { mutableFloatStateOf(value.toFloat()) }
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Text(label, color = Color(0xFFDDE0E8), modifier = Modifier.weight(1f))
-        Text(local.toInt().toString(), color = Color(0xFF8A8F9C), fontSize = 13.sp)
-    }
-    Slider(
-        value = local,
-        onValueChange = { local = it },
-        onValueChangeFinished = { onChange(local.toInt()) },
-        valueRange = 0f..100f,
-        enabled = enabled,
-        colors = SliderDefaults.colors(thumbColor = Accent, activeTrackColor = Accent),
-    )
-    Hint(hint)
 }
