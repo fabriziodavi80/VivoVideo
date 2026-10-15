@@ -312,11 +312,22 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             val layer = withContext(Dispatchers.IO) {
                 runCatching {
                     val mime = ctx.contentResolver.getType(uri).orEmpty()
-                    val alpha = mime.contains("png") || mime.contains("webp") || mime.contains("gif")
-                    val img = importPhoto(ctx, uri, "layers", keepAlpha = alpha)
                     val (name, _) = runCatching { readAudioInfo(ctx, uri) }.getOrDefault("Immagine" to 0L)
                     val total = p.durationUs
                     val start = if (total - playheadUs < Layer.MIN_US) 0L else playheadUs
+                    if (mime.startsWith("video/")) {
+                        // Video sovrapposto: si usa il file originale.
+                        runCatching { ctx.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
+                        val info = readVideoInfo(ctx, uri)
+                        val src = info.durationMs * 1000
+                        return@runCatching Layer(
+                            uri = uri.toString(), name = name, width = info.displayWidth, height = info.displayHeight,
+                            isVideo = true, sourceDurationUs = src,
+                            startUs = start, durationUs = minOf(src, total - start).coerceAtLeast(Layer.MIN_US),
+                        )
+                    }
+                    val alpha = mime.contains("png") || mime.contains("webp") || mime.contains("gif")
+                    val img = importPhoto(ctx, uri, "layers", keepAlpha = alpha)
                     Layer(
                         uri = Uri.fromFile(img.file).toString(), name = name, width = img.width, height = img.height,
                         startUs = start, durationUs = minOf(4_000_000L, total - start).coerceAtLeast(Layer.MIN_US),
@@ -835,13 +846,21 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    private var playerMulti = false
+
     private fun rebuildPreview(positionMs: Long) {
         val p = project ?: return
         if (exportState is ExportState.Running) return
         if (p.clips.isEmpty()) { releasePlayer(); playheadUs = 0; return }
         val composition = runCatching { factory.build(p, exportOptions, forPreview = true, nativeAudio = null) }
             .getOrElse { previewError = "Anteprima non disponibile: ${it.message}"; return }
-        val pl = player ?: CompositionPlayer.Builder(getApplication()).build().also { np ->
+        // Con video sovrapposti serve il compositore a più ingressi: si ricrea il lettore se cambia modalità.
+        val multi = p.layers.any { it.isVideo }
+        if (player != null && playerMulti != multi) releasePlayer()
+        playerMulti = multi
+        val pl = player ?: CompositionPlayer.Builder(getApplication())
+            .apply { if (multi) setVideoGraphFactory(androidx.media3.effect.MultipleInputVideoGraph.Factory()) }
+            .build().also { np ->
             np.addListener(object : Player.Listener {
                 override fun onPlayerError(error: PlaybackException) {
                     previewError = "Errore anteprima: ${error.errorCodeName} ${error.message ?: ""}"

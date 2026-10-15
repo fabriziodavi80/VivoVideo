@@ -196,11 +196,19 @@ fun Timeline(
                         lane.forEach { l ->
                             RangeBar(
                                 id = l.id, startUs = l.startUs, durationUs = l.durationUs,
-                                label = l.name, icon = VVIcons.Layers, background = VV.LayerBg,
+                                label = l.name, icon = if (l.isVideo) VVIcons.Movie else VVIcons.Layers, background = VV.LayerBg,
                                 minUs = Layer.MIN_US, projectUs = project.durationUs,
                                 selected = l.id == selectedLayerId, dpPerSecond = dpPerSecond, pxPerUs = pxPerUs,
                                 onClick = { onSelectLayer(l.id) },
-                                onDraft = { st, du -> layerDraft = l.copy(startUs = st, durationUs = du) },
+                                onDraft = { st, du ->
+                                    val orig = project.layers.firstOrNull { it.id == l.id } ?: l
+                                    layerDraft = if (!orig.isVideo) orig.copy(startUs = st, durationUs = du) else {
+                                        // Video: la maniglia sinistra taglia anche l'inizio del file; la durata non supera il file.
+                                        val trimLeft = st != orig.startUs && du != orig.durationUs
+                                        val ss = if (trimLeft) (orig.sourceStartUs + st - orig.startUs).coerceAtLeast(0L) else orig.sourceStartUs
+                                        orig.copy(startUs = st, durationUs = minOf(du, orig.sourceDurationUs - ss).coerceAtLeast(Layer.MIN_US), sourceStartUs = ss)
+                                    }
+                                },
                                 onCommit = { layerDraft?.let(onLayerChange); layerDraft = null },
                             )
                         }

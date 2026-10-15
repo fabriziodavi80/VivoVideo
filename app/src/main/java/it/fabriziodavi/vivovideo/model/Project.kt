@@ -287,6 +287,11 @@ data class Layer(
     val rounded: Boolean = false,
     val animIn: TextAnim = TextAnim.FADE,
     val animOut: TextAnim = TextAnim.FADE,
+    /** Video sovrapposto (picture-in-picture) invece di immagine. */
+    val isVideo: Boolean = false,
+    /** Video: punto di partenza nel file e durata del file. */
+    val sourceStartUs: Long = 0,
+    val sourceDurationUs: Long = 0,
     val mask: LayerMask = LayerMask.NONE,
     val key: KeyColor = KeyColor.NONE,
     /** Tolleranza dello scontorno (0..1). */

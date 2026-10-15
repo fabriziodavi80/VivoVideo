@@ -143,7 +143,7 @@ enum class Tool(val label: String, val icon: () -> ImageVector, val future: Bool
     DURATION("Durata", { VVIcons.Speed }),
     FRAME("Inquadra", { VVIcons.Fullscreen }),
     TEXT("Testo", { VVIcons.Text }),
-    LAYER("Immagini", { VVIcons.Layers }),
+    LAYER("Livelli", { VVIcons.Layers }),
     SLIDESHOW("Slideshow", { VVIcons.Movie }),
     MUSIC("Musica", { VVIcons.Music }),
     DUPLICATE("Duplica", { VVIcons.Copy }),
@@ -198,7 +198,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
     val layerPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) { vm.addLayer(uri); activeTool = Tool.LAYER }
     }
-    val pickLayer = { layerPicker.launch(arrayOf("image/*")) }
+    val pickLayer = { layerPicker.launch(arrayOf("image/*", "video/*")) }
     val pickVideos = { picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo)) }
 
     fun onTool(t: Tool) {
@@ -1089,8 +1089,8 @@ private fun LayerPanel(vm: EditorViewModel, running: Boolean, onAdd: () -> Unit)
             PanelLabel("Immagini nel progetto")
             PillRow(p.layers, null as Layer?, { it?.name?.take(18) ?: "" }, enabled) { x -> if (x != null) vm.selectLayer(x.id) }
         }
-        SecondaryButton("Aggiungi immagine", onClick = { if (enabled) onAdd() })
-        Hint("Foto, loghi o adesivi PNG con trasparenza sopra al video, dall'indicatore. Nella timeline li sposti e ne cambi la durata con le maniglie.")
+        SecondaryButton("Aggiungi immagine o video", onClick = { if (enabled) onAdd() })
+        Hint("Foto, loghi, adesivi PNG con trasparenza o altri video (picture-in-picture) sopra al video, dall'indicatore. Nella timeline li sposti e ne cambi la durata con le maniglie.")
         return
     }
     val pose = vm.editedLayerPose() ?: l.pose
@@ -1106,16 +1106,20 @@ private fun LayerPanel(vm: EditorViewModel, running: Boolean, onAdd: () -> Unit)
         vm.setLayerPose(pose.copy(rotation = it.toFloat()))
     }
     MotionSection(vm, l.endPose != null, enabled, l.startUs, l.durationUs) { vm.toggleLayerMotion() }
-    PanelLabel("Cornice e ombra")
-    Segmented(LayerBorder.entries, l.border, { it.label }, enabled) { b -> vm.updateLayer { it.copy(border = b) } }
-    ToggleRow("Ombra", l.shadow, enabled) { v -> vm.updateLayer { it.copy(shadow = v) } }
-    PanelLabel("Forma")
-    PillRow(LayerMask.entries, l.shape, { it.label }, enabled) { m -> vm.updateLayer { it.copy(mask = m, rounded = false) } }
-    PanelLabel("Scontorno (togli lo sfondo)")
-    PillRow(KeyColor.entries, l.key, { it.label }, enabled) { k -> vm.updateLayer { it.copy(key = k) } }
-    if (l.key != KeyColor.NONE) {
-        LabeledSlider("Tolleranza", "Alzala se resta un alone di sfondo, abbassala se sparisce anche il soggetto.", (l.keyTolerance * 100).toInt(), enabled, format = { "$it%" }) { v ->
-            vm.updateLayer { it.copy(keyTolerance = v / 100f) }
+    if (l.isVideo) {
+        Hint("Video sovrapposto: senza audio. Forme, cornici e scontorno per ora valgono solo per le immagini.")
+    } else {
+        PanelLabel("Cornice e ombra")
+        Segmented(LayerBorder.entries, l.border, { it.label }, enabled) { b -> vm.updateLayer { it.copy(border = b) } }
+        ToggleRow("Ombra", l.shadow, enabled) { v -> vm.updateLayer { it.copy(shadow = v) } }
+        PanelLabel("Forma")
+        PillRow(LayerMask.entries, l.shape, { it.label }, enabled) { m -> vm.updateLayer { it.copy(mask = m, rounded = false) } }
+        PanelLabel("Scontorno (togli lo sfondo)")
+        PillRow(KeyColor.entries, l.key, { it.label }, enabled) { k -> vm.updateLayer { it.copy(key = k) } }
+        if (l.key != KeyColor.NONE) {
+            LabeledSlider("Tolleranza", "Alzala se resta un alone di sfondo, abbassala se sparisce anche il soggetto.", (l.keyTolerance * 100).toInt(), enabled, format = { "$it%" }) { v ->
+                vm.updateLayer { it.copy(keyTolerance = v / 100f) }
+            }
         }
     }
     PanelLabel("Animazione in entrata")

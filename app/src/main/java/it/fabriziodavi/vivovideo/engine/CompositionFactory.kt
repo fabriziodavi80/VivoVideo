@@ -19,6 +19,8 @@ import it.fabriziodavi.vivovideo.DenoiseEffect
 import it.fabriziodavi.vivovideo.HighlightEffect
 import it.fabriziodavi.vivovideo.Look
 import it.fabriziodavi.vivovideo.model.Clip
+import it.fabriziodavi.vivovideo.model.Layer
+import it.fabriziodavi.vivovideo.model.packLanes
 import it.fabriziodavi.vivovideo.model.FxType
 import it.fabriziodavi.vivovideo.model.Project
 import it.fabriziodavi.vivovideo.model.SpeedCurve
@@ -108,6 +110,34 @@ class CompositionFactory(private val context: Context) {
         return even((w * scale).toLong()) to even((h * scale).toLong())
     }
 
+    /** Una riga di video sovrapposti: pause fino a ogni video, video senza audio alla misura "adattata". */
+    private fun videoLayerSequence(lane: List<Layer>, outW: Int, outH: Int): EditedMediaItemSequence {
+        val b = EditedMediaItemSequence.Builder(setOf(C.TRACK_TYPE_VIDEO))
+        var cursor = 0L
+        lane.forEach { l ->
+            if (l.startUs - cursor > 1_000) b.addGap(l.startUs - cursor)
+            val item = MediaItem.Builder()
+                .setUri(Uri.parse(l.uri))
+                .setClippingConfiguration(
+                    MediaItem.ClippingConfiguration.Builder()
+                        .setStartPositionUs(l.sourceStartUs)
+                        .setEndPositionUs(l.sourceStartUs + l.durationUs)
+                        .build()
+                )
+                .build()
+            val (lw, lh) = LayerCompositorSettings.layerFrameSize(l, outW, outH)
+            b.addItem(
+                EditedMediaItem.Builder(item)
+                    .setDurationUs(l.sourceDurationUs)
+                    .setRemoveAudio(true)
+                    .setEffects(Effects(emptyList(), listOf(Presentation.createForWidthAndHeight(lw, lh, Presentation.LAYOUT_SCALE_TO_FIT))))
+                    .build()
+            )
+            cursor = maxOf(cursor, l.startUs) + l.durationUs
+        }
+        return b.build()
+    }
+
     private fun musicSequences(project: Project): List<EditedMediaItemSequence> {
         val total = project.durationUs
         return project.musicLanes(project.audibleMusic()).map { lane ->
@@ -151,7 +181,16 @@ class CompositionFactory(private val context: Context) {
         val (outW, outH) = outputSize(project, if (forPreview) 1080 else options.size.shortSide)
         val starts = project.clipStartsUs()
         val beats = project.beatTimes()
-        val items = project.clips.mapIndexed { index, clip ->
+        val videoLayers = project.layers.filter { it.isVideo }
+        val multi = videoLayers.isNotEmpty()
+        // Con video sovrapposti, testi e immagini vanno sopra a tutto: effetti dell'intera composizione.
+        fun overlaysFor(fromUs: Long, toUs: Long): List<androidx.media3.effect.TextureOverlay> {
+            val texts = project.texts.filter { t -> t.startUs < toUs && t.endUs > fromUs && t.text.isNotBlank() }
+            val layers = project.layers.filter { l -> !l.isVideo && l.startUs < toUs && l.endUs > fromUs }
+            return layers.map { l -> LayerOverlay(l, outW, outH) } + texts.map { t -> TimedTextOverlay(context, t, outW, outH) }
+        }
+        /** Clip della traccia principale; [light] = solo per i tempi (invisibile, senza effetti). */
+        fun mainItems(light: Boolean, removeAudio: Boolean) = project.clips.mapIndexed { index, clip ->
             val startUs = starts[index]
             val mediaItem = if (clip.isPhoto) {
                 MediaItem.Builder()
@@ -168,7 +207,7 @@ class CompositionFactory(private val context: Context) {
                         .build()
                 )
                 .build()
-            val effects = buildList {
+            val effects = if (light) listOf(Presentation.createForWidthAndHeight(outW, outH, Presentation.LAYOUT_SCALE_TO_FIT)) else buildList {
                 addAll(colorEffects(clip, project))
                 add(Presentation.createForWidthAndHeight(
                     outW, outH,
@@ -192,16 +231,10 @@ class CompositionFactory(private val context: Context) {
                 if ((inSpec != null && inUs > 0) || (outSpec != null && outUs > 0)) {
                     add(TransitionEffect(startUs, clip.outputUs, inSpec?.type, inUs, outSpec?.type, outUs))
                 }
-                // Testi: livelli sopra a tutto (dopo inquadratura, keyframe e transizioni).
-                val endUs = startUs + clip.outputUs
-                val texts = project.texts.filter { t -> t.startUs < endUs && t.endUs > startUs && t.text.isNotBlank() }
-                val layers = project.layers.filter { l -> l.startUs < endUs && l.endUs > startUs }
-                if (texts.isNotEmpty() || layers.isNotEmpty()) {
-                    // Immagini sotto, testi sopra.
-                    add(OverlayEffect(
-                        layers.map { l -> LayerOverlay(l, outW, outH) } +
-                            texts.map { t -> TimedTextOverlay(context, t, outW, outH) }
-                    ))
+                // Testi e immagini: livelli sopra a tutto (dopo inquadratura, keyframe e transizioni).
+                if (!multi) {
+                    val ov = overlaysFor(startUs, startUs + clip.outputUs)
+                    if (ov.isNotEmpty()) add(OverlayEffect(ov))
                 }
             }
             if (clip.isPhoto) {
@@ -214,7 +247,7 @@ class CompositionFactory(private val context: Context) {
             val b = EditedMediaItem.Builder(mediaItem)
                 .setDurationUs(clip.sourceDurationUs)
                 .setEffects(Effects(volumeProcessors(clip.volume), effects))
-                .setRemoveAudio(nativeAudio != null || clip.muted)
+                .setRemoveAudio(removeAudio || clip.muted)
             val curve = clip.speedCurve()
             if (curve.speeds.any { it != 1f }) {
                 val pitch = forPreview || options.keepPitch
@@ -225,6 +258,33 @@ class CompositionFactory(private val context: Context) {
         }
 
         val sequences = mutableListOf<EditedMediaItemSequence>()
+        if (multi) {
+            // Il compositore disegna la prima sequenza sopra a tutte e ne usa i tempi: la prima è una copia
+            // invisibile della traccia principale (tempi e audio), poi i video sovrapposti, in fondo la traccia visibile.
+            val audioInMain = nativeAudio == null
+            sequences += EditedMediaItemSequence.Builder(
+                if (audioInMain) setOf(C.TRACK_TYPE_AUDIO, C.TRACK_TYPE_VIDEO) else setOf(C.TRACK_TYPE_VIDEO)
+            ).addItems(mainItems(light = true, removeAudio = !audioInMain)).build()
+            val lanes = packLanes(videoLayers, { it.startUs }, { it.endUs })
+            lanes.forEach { lane -> sequences += videoLayerSequence(lane, outW, outH) }
+            sequences += EditedMediaItemSequence.Builder(setOf(C.TRACK_TYPE_VIDEO))
+                .addItems(mainItems(light = false, removeAudio = true)).build()
+            if (nativeAudio != null) {
+                val audioItem = EditedMediaItem.Builder(MediaItem.fromUri(Uri.fromFile(nativeAudio)))
+                    .setDurationUs(project.durationUs)
+                    .build()
+                sequences += EditedMediaItemSequence.Builder(setOf(C.TRACK_TYPE_AUDIO)).addItem(audioItem).build()
+            } else {
+                sequences += musicSequences(project)
+            }
+            val ov = overlaysFor(0, Long.MAX_VALUE)
+            return Composition.Builder(sequences)
+                .setHdrMode(Composition.HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_OPEN_GL)
+                .setVideoCompositorSettings(LayerCompositorSettings(outW, outH, lanes))
+                .setEffects(Effects(emptyList(), if (ov.isEmpty()) emptyList() else listOf(OverlayEffect(ov))))
+                .build()
+        }
+        val items = mainItems(light = false, removeAudio = nativeAudio != null)
         if (nativeAudio != null) {
             sequences += EditedMediaItemSequence.Builder(setOf(C.TRACK_TYPE_VIDEO)).addItems(items).build()
             val audioItem = EditedMediaItem.Builder(MediaItem.fromUri(Uri.fromFile(nativeAudio)))
