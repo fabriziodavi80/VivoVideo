@@ -20,6 +20,7 @@ android {
         versionName = "0.3.$buildNumber"
         // Solo il vivo X300 Ultra: basta l'architettura ARM a 64 bit.
         ndk { abiFilters += "arm64-v8a" }
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     externalNativeBuild {
@@ -41,6 +42,10 @@ android {
     }
 
     buildTypes {
+        // La versione di prova gira anche sull'emulatore (x86_64) per le prove automatiche.
+        debug {
+            ndk { abiFilters += "x86_64" }
+        }
         release {
             isMinifyEnabled = false
             signingConfig = signingConfigs.getByName("vivo")
@@ -102,4 +107,9 @@ dependencies {
     testImplementation("io.github.takahirom.roborazzi:roborazzi-compose:1.74.0")
     testImplementation("androidx.test.ext:junit:1.2.1")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+
+    androidTestImplementation("androidx.test:runner:1.6.2")
+    androidTestImplementation("androidx.test:core:1.6.1")
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("junit:junit:4.13.2")
 }

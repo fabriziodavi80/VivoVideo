@@ -74,3 +74,66 @@ jobs:
           git add .
           git commit -qm "Build ${GITHUB_RUN_NUMBER}: ${OUTCOME}"
           git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" build-logs
+
+  # Prove vere su un emulatore Android: esportazioni complete, anteprima che scorre, dissolvenze preparate.
+  # Gira in parallelo alla compilazione (non ritarda la release); l'esito va nel ramo emulator-logs.
+  emulatore:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.14.3"
+
+      - name: Abilita KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Compila le prove
+        run: gradle assembleDebug assembleDebugAndroidTest --no-daemon
+
+      - name: Prove sull'emulatore
+        id: device
+        continue-on-error: true
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          ram-size: 4096M
+          disk-size: 4096M
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot
+          disable-animations: true
+          script: |
+            adb logcat -c || true
+            (adb logcat -v time > logcat.txt &) ; gradle connectedDebugAndroidTest --no-daemon 2>&1 | tee device.log
+
+      - name: Salva l'esito
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          OUTCOME: ${{ steps.device.outcome }}
+        run: |
+          mkdir -p /tmp/elogs/tests
+          cp device.log /tmp/elogs/ 2>/dev/null || echo "nessun registro" > /tmp/elogs/device.log
+          find app/build -path "*androidTest-results*" -name "*.xml" -exec cp {} /tmp/elogs/tests/ \; 2>/dev/null || true
+          grep -E "VivoVideo|AndroidRuntime|FATAL|Media3|ExoPlayer|Transformer|TestRunner" logcat.txt | tail -400 > /tmp/elogs/logcat.txt 2>/dev/null || true
+          grep -E "FAILED|AssertionError|Exception|tests completed|BUILD" -A3 /tmp/elogs/device.log > /tmp/elogs/errors.txt || true
+          echo "run=${GITHUB_RUN_NUMBER} sha=${GITHUB_SHA} outcome=${OUTCOME}" > /tmp/elogs/status.txt
+          cd /tmp/elogs
+          git init -q
+          git checkout -q -b emulator-logs
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add .
+          git commit -qm "Emulatore ${GITHUB_RUN_NUMBER}: ${OUTCOME}"
+          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" emulator-logs
