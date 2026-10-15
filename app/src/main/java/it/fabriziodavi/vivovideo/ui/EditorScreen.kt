@@ -323,6 +323,14 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
                 project.clips.isEmpty() -> EmptyState(onAdd = pickVideos)
                 running -> Text("Anteprima in pausa durante l'esportazione", style = MaterialTheme.typography.bodySmall)
             }
+            if (vm.preparing > 0) {
+                Text(
+                    "Preparo ${if (vm.preparing == 1) "la dissolvenza" else "${vm.preparing} dissolvenze"}…",
+                    color = Color.White, fontSize = 12.sp,
+                    modifier = Modifier.align(Alignment.TopStart).padding(8.dp)
+                        .background(Color(0x99000000), RoundedCornerShape(6.dp)).padding(horizontal = 8.dp, vertical = 4.dp),
+                )
+            }
             vm.previewError?.let {
                 Text(it, color = VV.Danger, fontSize = 12.sp, modifier = Modifier.align(Alignment.TopCenter).padding(8.dp))
             }
@@ -1134,7 +1142,7 @@ private fun LayerPanel(vm: EditorViewModel, running: Boolean, onAdd: () -> Unit)
     }
     MotionSection(vm, l.endPose != null, enabled, l.startUs, l.durationUs) { vm.toggleLayerMotion() }
     if (l.isVideo) {
-        if (!vm.multiPreviewEnabled) Hint("In anteprima il video sovrapposto si vede come immagine ferma; nel video esportato si muove.")
+        Hint("In anteprima il video sovrapposto si vede come immagine ferma; nel video esportato si muove.")
         PanelLabel("Audio del video sovrapposto")
         ToggleRow("Disattiva l'audio", l.muted, enabled) { v -> vm.updateLayer { it.copy(muted = v) } }
         if (!l.muted) LabeledSlider("Volume", null, (l.volume * 100).toInt(), enabled, range = 0..200, format = { "$it%" }) { v ->
@@ -1289,8 +1297,7 @@ private fun ExportPanel(vm: EditorViewModel, onOpen: (android.net.Uri) -> Unit) 
     ToggleRow("Audio a tono naturale nei cambi di velocità", o.keepPitch, !running) { vm.exportOptions = o.copy(keepPitch = it) }
     PanelLabel("Sperimentale: dissolvenze incrociate e video sovrapposti")
     ToggleRow("Nel video esportato", vm.multiExportEnabled, !running) { vm.setMultiExport(it) }
-    ToggleRow("Anche nell'anteprima (può bloccarsi)", vm.multiPreviewEnabled, !running) { vm.setMultiPreview(it) }
-    Hint("In anteprima, di serie, la dissolvenza incrociata si vede come passaggio al nero e i video sovrapposti come immagine ferma: nel video esportato sono veri. Se l'app si chiude per un errore, queste opzioni si spengono da sole.")
+    Hint("In anteprima la dissolvenza incrociata si prepara in anticipo (pochi secondi dopo una modifica) e i video sovrapposti si vedono come immagine ferma. Se l'app si chiude per un errore, questa opzione si spegne da sola.")
     when (state) {
         is ExportState.Running -> {
             Text(state.label + (state.percent?.let { "  $it%" } ?: ""), style = MaterialTheme.typography.bodyMedium)

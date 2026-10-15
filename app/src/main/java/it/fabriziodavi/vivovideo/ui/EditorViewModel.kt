@@ -34,6 +34,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.transformer.CompositionPlayer
+import androidx.media3.transformer.Transformer
+import it.fabriziodavi.vivovideo.engine.CrossfadePreview
 import it.fabriziodavi.vivovideo.CubeLut
 import it.fabriziodavi.vivovideo.decodeAudioRange
 import it.fabriziodavi.vivovideo.engine.BeatDetector
@@ -133,6 +135,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun closeProject() {
+        cancelPrerender()
         fullscreen = false
         project?.let { store.save(it) }
         releasePlayer()
@@ -880,8 +883,10 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         val p = project ?: return
         if (exportState is ExportState.Running) return
         if (p.clips.isEmpty()) { releasePlayer(); playheadUs = 0; return }
-        val allowMulti = multiPreviewEnabled && !multiFailed
-        val composition = runCatching { factory.build(p, exportOptions, forPreview = true, nativeAudio = null, allowMulti = allowMulti) }
+        val allowMulti = false // l'anteprima con più video insieme si blocca sul telefono: dissolvenze preparate in anticipo
+        val (fw, fh) = previewFrameSize()
+        val shown = runCatching { CrossfadePreview.previewProject(getApplication(), p, fw, fh) }.getOrDefault(p)
+        val composition = runCatching { factory.build(shown, exportOptions, forPreview = true, nativeAudio = null, allowMulti = allowMulti) }
             .getOrElse { previewError = "Anteprima non disponibile: ${it.message}"; return }
         // Con video sovrapposti o dissolvenze incrociate serve il compositore a più ingressi:
         // si ricrea il lettore se cambia modalità.
@@ -919,6 +924,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         }
         previewError = null
         val wasPlaying = pl.isPlaying
+        schedulePrerender()
         try {
             pl.setComposition(composition, positionMs.coerceIn(0, p.durationUs / 1000))
             pl.prepare()
@@ -971,9 +977,101 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
 
     private val exporter = Exporter(app, viewModelScope, factory) { exportState = it }
 
+    // ---------------- Dissolvenze preparate per l'anteprima ----------------
+
+    /** Dissolvenze in preparazione (0 = nessuna). */
+    var preparing by mutableStateOf(0)
+        private set
+    private val segQueue = ArrayDeque<CrossfadePreview.Job>()
+    private var segTransformer: Transformer? = null
+    private var segSchedule: Job? = null
+    private val failedSegments = mutableSetOf<String>()
+    private var segProduced = false
+
+    /** Dopo una modifica (con calma) prepara le dissolvenze incrociate che mancano. */
+    private fun schedulePrerender() {
+        segSchedule?.cancel()
+        segSchedule = viewModelScope.launch {
+            delay(900)
+            val p = project ?: return@launch
+            if (exportState is ExportState.Running) return@launch
+            val (w, h) = previewFrameSize()
+            val ctx = getApplication<Application>()
+            val jobs = runCatching { CrossfadePreview.jobs(p, w, h) }.getOrDefault(emptyList())
+                .filter { !CrossfadePreview.file(ctx, it.key).exists() && it.key !in failedSegments }
+            segQueue.clear()
+            segQueue.addAll(jobs)
+            preparing = segQueue.size
+            if (segQueue.isNotEmpty() && segTransformer == null) nextSegment(retry = false)
+        }
+    }
+
+    private fun nextSegment(retry: Boolean) {
+        val ctx = getApplication<Application>()
+        val job = segQueue.firstOrNull()
+        if (job == null) {
+            preparing = 0
+            segTransformer = null
+            if (segProduced) { segProduced = false; rebuildPreview(playheadUs / 1000) }
+            return
+        }
+        val (w, h) = previewFrameSize()
+        val tmp = File(CrossfadePreview.dir(ctx), "${job.key}.tmp.mp4")
+        val composition = runCatching {
+            factory.build(job.sub, ExportOptions(), forPreview = true, nativeAudio = null, allowMulti = true,
+                sizeOverride = w to h, crossfadesOverride = listOf(job.cf))
+        }.getOrElse { failedSegments += job.key; segQueue.removeFirstOrNull(); nextSegment(false); return }
+        val t = Transformer.Builder(ctx)
+            .setVideoMimeType(androidx.media3.common.MimeTypes.VIDEO_H264)
+            .addListener(object : Transformer.Listener {
+                override fun onCompleted(composition: androidx.media3.transformer.Composition, exportResult: androidx.media3.transformer.ExportResult) {
+                    tmp.renameTo(CrossfadePreview.file(ctx, job.key))
+                    CrossfadePreview.trim(ctx)
+                    segProduced = true
+                    segTransformer = null
+                    if (segQueue.firstOrNull()?.key == job.key) segQueue.removeFirst()
+                    preparing = segQueue.size
+                    nextSegment(false)
+                }
+
+                override fun onError(
+                    composition: androidx.media3.transformer.Composition,
+                    exportResult: androidx.media3.transformer.ExportResult,
+                    exportException: androidx.media3.transformer.ExportException,
+                ) {
+                    tmp.delete()
+                    segTransformer = null
+                    if (!retry) {
+                        // Forse mancano decoder: si libera l'anteprima e si riprova una volta.
+                        releasePlayer()
+                        nextSegment(true)
+                        return
+                    }
+                    failedSegments += job.key
+                    if (segQueue.firstOrNull()?.key == job.key) segQueue.removeFirst()
+                    preparing = segQueue.size
+                    if (segQueue.isEmpty()) rebuildPreview(playheadUs / 1000) else nextSegment(false)
+                }
+            })
+            .build()
+        segTransformer = t
+        runCatching { t.start(composition, tmp.absolutePath) }.onFailure {
+            segTransformer = null; failedSegments += job.key; segQueue.removeFirstOrNull(); nextSegment(false)
+        }
+    }
+
+    private fun cancelPrerender() {
+        segSchedule?.cancel()
+        segQueue.clear()
+        segTransformer?.cancel()
+        segTransformer = null
+        preparing = 0
+    }
+
     fun startExport() {
         val p = project ?: return
         if (p.clips.isEmpty() || exportState is ExportState.Running) return
+        cancelPrerender()
         store.save(p)
         // Libera il decoder dell'anteprima: con 4K/8K non ci sono risorse per entrambi.
         val pos = playheadUs

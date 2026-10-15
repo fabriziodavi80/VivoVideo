@@ -82,7 +82,7 @@ class CompositionFactory(private val context: Context) {
     }
 
     /** Catena colore di una clip: LOG → LUT → riduzione rumore → alte luci → filtro. */
-    fun colorEffects(clip: Clip, project: Project): List<Effect> = buildList {
+    fun colorEffects(clip: Clip, project: Project): List<Effect> = if (clip.baked) emptyList() else buildList {
         val c = project.color
         if (clip.log) add(builtInLog.toEffect())
         customLut(project)?.let { add(it.toEffect()) }
@@ -244,12 +244,16 @@ class CompositionFactory(private val context: Context) {
         nativeAudio: File?,
         /** false = niente compositore a più ingressi (ripiego): dissolvenza incrociata → passaggio al nero, video sovrapposti esclusi. */
         allowMulti: Boolean = true,
+        /** Dimensioni imposte (pezzi preparati per l'anteprima: stesse misure dell'anteprima). */
+        sizeOverride: Pair<Int, Int>? = null,
+        /** Dissolvenze da usare al posto di quelle calcolate (pezzi preparati). */
+        crossfadesOverride: List<Project.Crossfade>? = null,
     ): Composition {
-        val (outW, outH) = outputSize(project, if (forPreview) 1080 else options.size.shortSide)
+        val (outW, outH) = sizeOverride ?: outputSize(project, if (forPreview) 1080 else options.size.shortSide)
         val starts = project.clipStartsUs()
         val beats = project.beatTimes()
         val videoLayers = project.layers.filter { it.isVideo }
-        val crossfades = project.crossfades()
+        val crossfades = crossfadesOverride ?: project.crossfades()
         val multi = allowMulti && (videoLayers.isNotEmpty() || crossfades.isNotEmpty())
         // Con video sovrapposti, testi e immagini vanno sopra a tutto: effetti dell'intera composizione.
         fun overlaysFor(fromUs: Long, toUs: Long): List<androidx.media3.effect.TextureOverlay> {

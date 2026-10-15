@@ -145,6 +145,8 @@ data class Clip(
     val frame: Transform = Transform(),
     /** Effetti video della clip. */
     val fx: List<ClipFx> = emptyList(),
+    /** Pezzo già elaborato (dissolvenza preparata per l'anteprima): niente colori né effetti da riapplicare. */
+    val baked: Boolean = false,
     val width: Int = 0,
     val height: Int = 0,
     val fps: Float = 30f,

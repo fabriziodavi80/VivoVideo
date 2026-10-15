@@ -3,11 +3,9 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
-- Dissolvenza incrociata più fedele: i due pezzi sovrapposti mantengono anche zoom/keyframe, inquadratura ed effetti della loro clip.
-- In anteprima la dissolvenza incrociata si vede come passaggio al nero e i video sovrapposti come immagine ferma; nel video esportato sono veri.
-- Forme, cornici e scontorno anche per i video sovrapposti.
-- Niente "clic" audio sui tagli fra le clip.
-- Questa guida (pulsante ? nell'editor e nella schermata dei progetti).
+- **Dissolvenza incrociata vera anche in anteprima**: dopo una modifica l'app la prepara in pochi secondi (scritta "Preparo la dissolvenza…" sull'anteprima), poi la mostra come nel video finale. Nel frattempo si vede un passaggio al nero.
+- Tolto l'interruttore "Anche nell'anteprima" (faceva bloccare il lettore).
+- I pezzi della dissolvenza mantengono zoom/keyframe, inquadratura ed effetti della loro clip.
 
 ## Primi passi
 - Dalla schermata dei progetti tocca **Nuovo progetto** e scegli video e foto dalla galleria.
@@ -57,7 +55,8 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - **Incrociata**: le due clip si sovrappongono (vera dissolvenza). Usa i fotogrammi oltre il taglio: se una clip non ne ha, la dissolvenza si accorcia (il pannello lo indica). Fra foto è sempre piena.
 - Altre: Nero, Flash, Zoom, Sfocatura, Scorrimento, Rotazione (metà alla fine di una clip, metà all'inizio della successiva).
 - **Applica a tutti i tagli** per uniformare.
-- Nota: in anteprima l'Incrociata si vede come passaggio al nero; quella vera è nel video esportato.
+- In anteprima l'Incrociata si prepara da sola pochi secondi dopo ogni modifica (scritta "Preparo la dissolvenza…"); finché non è pronta si vede un passaggio al nero.
+- Se un lato del taglio ha meno di 0,1 s di video in più, in anteprima resta il passaggio al nero (nel video esportato è comunque vera).
 
 ## Effetti
 - Strumento **Effetti** sulla clip: Sfocatura, Vignettatura, Pellicola, Bianco e nero, Bagliore, Glitch, VHS, Scossa, **Pulsa a ritmo**, Pixel, Specchio.
@@ -102,7 +101,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 ## Esportare
 - **Esporta** in alto: risoluzione (Originale, 4K, 1080p), fotogrammi al secondo, codec (**H.265** consigliato, H.264 più compatibile).
 - Il video finito va in galleria, cartella Movies/VivoVideo.
-- **Sperimentale**: "Nel video esportato" attiva dissolvenze incrociate vere e video sovrapposti (acceso di serie); "Anche nell'anteprima" li mostra veri anche in anteprima ma può bloccarsi.
+- **Sperimentale**: "Nel video esportato" attiva dissolvenze incrociate vere e video sovrapposti (acceso di serie).
 
 ## Se qualcosa va storto
 - Se l'app si chiude per un errore, alla riapertura compare un messaggio con il dettaglio: mandane uno screenshot.
