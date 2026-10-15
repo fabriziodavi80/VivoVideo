@@ -77,8 +77,6 @@ import it.fabriziodavi.vivovideo.engine.ExportState
 import it.fabriziodavi.vivovideo.engine.OutputCodec
 import it.fabriziodavi.vivovideo.engine.OutputFps
 import it.fabriziodavi.vivovideo.engine.OutputSize
-import ClipSpeed
-import SpeedPreset
 import kotlin.math.ln
 
 private val ZOOMS = listOf(8f, 15f, 30f, 60f, 120f)

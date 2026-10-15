@@ -30,10 +30,6 @@ import it.fabriziodavi.vivovideo.engine.CompositionFactory
 import it.fabriziodavi.vivovideo.engine.ExportOptions
 import it.fabriziodavi.vivovideo.engine.ExportState
 import it.fabriziodavi.vivovideo.engine.Exporter
-import Clip
-import ColorSettings
-import Project
-import ProjectStore
 import it.fabriziodavi.vivovideo.readVideoInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
