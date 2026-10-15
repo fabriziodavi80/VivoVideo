@@ -55,6 +55,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -135,10 +136,12 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
     }
 
     val landscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+    var fullscreen by remember { mutableStateOf(false) }
+    BackHandler(enabled = fullscreen) { fullscreen = false }
 
-    val topBar: @Composable (Boolean) -> Unit = { showExport ->
+    val titleRow: @Composable (Boolean) -> Unit = { showExport ->
         Row(
-            Modifier.fillMaxWidth().height(52.dp).padding(start = 4.dp, end = 10.dp),
+            Modifier.fillMaxWidth().height(48.dp).padding(start = 2.dp, end = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             IconBtn(VVIcons.Back, "Progetti", enabled = !running) { vm.closeProject() }
@@ -151,14 +154,30 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
             IconBtn(VVIcons.Undo, "Annulla", enabled = vm.canUndo && !running, onClick = vm::undo)
             IconBtn(VVIcons.Redo, "Ripeti", enabled = vm.canRedo && !running, onClick = vm::redo)
             if (showExport) {
-                Spacer(Modifier.width(6.dp))
+                Spacer(Modifier.width(4.dp))
                 ExportPill(enabled = project.clips.isNotEmpty()) { activeTool = Tool.EXPORT }
             }
         }
     }
 
-    val preview: @Composable (Modifier) -> Unit = { mod ->
-        Box(mod.clip(RoundedCornerShape(8.dp)).background(Color.Black), contentAlignment = Alignment.Center) {
+    val playButton: @Composable (Dp) -> Unit = { size ->
+        Box(
+            Modifier.size(size).clip(CircleShape)
+                .background(if (vm.player != null) VV.Text else VV.Raised)
+                .clickable(enabled = vm.player != null, onClick = vm::togglePlay),
+            contentAlignment = Alignment.Center,
+        ) { Icon(if (vm.isPlaying) VVIcons.Pause else VVIcons.Play, "Riproduci", tint = VV.Canvas) }
+    }
+    val timecode: @Composable () -> Unit = {
+        Row(verticalAlignment = Alignment.Bottom) {
+            Text(formatTime(vm.playheadUs), style = MaterialTheme.typography.labelLarge, color = Color.White)
+            Text("  /  " + formatTime(project.durationUs), style = MaterialTheme.typography.labelMedium, color = VV.Dim)
+        }
+    }
+
+    /** Anteprima a tutto spazio; con [overlay] i comandi stanno sopra al video. */
+    val preview: @Composable (Modifier, Boolean) -> Unit = { mod, overlay ->
+        Box(mod.background(Color.Black), contentAlignment = Alignment.Center) {
             val player = vm.player
             when {
                 player != null -> AndroidView(
@@ -170,23 +189,32 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
                 running -> Text("Anteprima in pausa durante l'esportazione", style = MaterialTheme.typography.bodySmall)
             }
             vm.previewError?.let {
-                Text(it, color = VV.Danger, fontSize = 12.sp, modifier = Modifier.align(Alignment.BottomCenter).padding(8.dp))
+                Text(it, color = VV.Danger, fontSize = 12.sp, modifier = Modifier.align(Alignment.TopCenter).padding(8.dp))
+            }
+            if (overlay) {
+                Box(
+                    Modifier.align(Alignment.BottomCenter).fillMaxWidth()
+                        .background(androidx.compose.ui.graphics.Brush.verticalGradient(listOf(Color.Transparent, Color(0xB3000000))))
+                        .padding(horizontal = 14.dp, vertical = 8.dp)
+                ) {
+                    Box(Modifier.align(Alignment.CenterStart)) { timecode() }
+                    Box(Modifier.align(Alignment.Center)) { playButton(40.dp) }
+                    Box(Modifier.align(Alignment.CenterEnd)) {
+                        IconBtn(if (fullscreen) VVIcons.FullscreenExit else VVIcons.Fullscreen, "Schermo intero", tint = Color.White) { fullscreen = !fullscreen }
+                    }
+                }
+            } else if (project.clips.isNotEmpty()) {
+                Box(Modifier.align(Alignment.TopEnd).padding(4.dp)) {
+                    IconBtn(VVIcons.Fullscreen, "Schermo intero", tint = Color.White) { fullscreen = true }
+                }
             }
         }
     }
 
     val transport: @Composable () -> Unit = {
-        Box(Modifier.fillMaxWidth().height(52.dp).padding(horizontal = 14.dp)) {
-            Row(Modifier.align(Alignment.CenterStart), verticalAlignment = Alignment.Bottom) {
-                Text(formatTime(vm.playheadUs), style = MaterialTheme.typography.labelLarge)
-                Text("  /  " + formatTime(project.durationUs), style = MaterialTheme.typography.labelMedium, color = VV.Dim)
-            }
-            Box(
-                Modifier.align(Alignment.Center).size(42.dp).clip(CircleShape)
-                    .background(if (vm.player != null) VV.Text else VV.Raised)
-                    .clickable(enabled = vm.player != null, onClick = vm::togglePlay),
-                contentAlignment = Alignment.Center,
-            ) { Icon(if (vm.isPlaying) VVIcons.Pause else VVIcons.Play, "Riproduci", tint = VV.Canvas) }
+        Box(Modifier.fillMaxWidth().height(46.dp).padding(horizontal = 12.dp)) {
+            Box(Modifier.align(Alignment.CenterStart)) { timecode() }
+            Box(Modifier.align(Alignment.Center)) { playButton(38.dp) }
             Row(Modifier.align(Alignment.CenterEnd)) {
                 IconBtn(VVIcons.Remove, "Riduci zoom", tint = VV.Dim) { if (zoom > 0) zoom-- }
                 IconBtn(VVIcons.Add, "Aumenta zoom", tint = VV.Dim) { if (zoom < ZOOMS.lastIndex) zoom++ }
@@ -208,84 +236,90 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
         )
     }
 
+    val tools = if (clip != null) CLIP_TOOLS else PROJECT_TOOLS
     val toolbar: @Composable () -> Unit = {
-        val tools = if (clip != null) CLIP_TOOLS else PROJECT_TOOLS
         Row(
             Modifier.fillMaxWidth().background(VV.Canvas).horizontalScroll(rememberScrollState())
-                .padding(horizontal = 6.dp, vertical = 6.dp),
-            horizontalArrangement = Arrangement.spacedBy(2.dp),
+                .padding(horizontal = 4.dp, vertical = 2.dp),
+            horizontalArrangement = Arrangement.spacedBy(0.dp),
         ) {
-            tools.forEach { t ->
-                ToolButton(t, active = activeTool == t, enabled = !running) { onTool(t) }
-            }
+            tools.forEach { t -> ToolButton(t, active = activeTool == t, enabled = !running) { onTool(t) } }
         }
     }
 
-    val panel: @Composable (Modifier) -> Unit = { mod ->
-        val t = activeTool
-        Column(mod.background(VV.Panel)) {
-            if (t == null) {
-                Box(Modifier.fillMaxSize().padding(20.dp), contentAlignment = Alignment.Center) {
-                    Hint(if (clip == null) "Tocca una clip per modificarla, oppure scegli uno strumento qui sotto." else "Scegli uno strumento qui sotto.")
-                }
-            } else {
-                Row(Modifier.fillMaxWidth().padding(start = 16.dp, end = 6.dp, top = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(t.label, style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
-                    if (clip != null && t != Tool.EXPORT && t != Tool.COLOR) {
-                        val i = project.clips.indexOf(clip) + 1
-                        Text("Clip $i di ${project.clips.size}", style = MaterialTheme.typography.bodySmall)
-                    }
-                    IconBtn(VVIcons.Check, "Chiudi", enabled = !running) { activeTool = null }
-                }
-                Column(
-                    Modifier.fillMaxWidth().weight(1f, fill = false).verticalScroll(rememberScrollState())
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(14.dp),
-                ) {
-                    when (t) {
-                        Tool.SPEED -> SpeedPanel(vm, running)
-                        Tool.AUDIO -> AudioPanel(vm, running)
-                        Tool.COLOR -> ColorPanel(vm, running) { lutPicker.launch(arrayOf("*/*")) }
-                        Tool.EXPORT -> ExportPanel(vm) { uri ->
-                            val intent = Intent(Intent.ACTION_VIEW).setDataAndType(uri, "video/mp4")
-                                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                            runCatching { context.startActivity(intent) }
-                        }
-                        else -> {}
-                    }
-                }
+    val panelBody: @Composable (Tool) -> Unit = { t ->
+        when (t) {
+            Tool.SPEED -> SpeedPanel(vm, running)
+            Tool.AUDIO -> AudioPanel(vm, running)
+            Tool.COLOR -> ColorPanel(vm, running) { lutPicker.launch(arrayOf("*/*")) }
+            Tool.EXPORT -> ExportPanel(vm) { uri ->
+                val intent = Intent(Intent.ACTION_VIEW).setDataAndType(uri, "video/mp4")
+                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                runCatching { context.startActivity(intent) }
             }
+            else -> {}
+        }
+    }
+    val panelHeader: @Composable (Tool) -> Unit = { t ->
+        Row(Modifier.fillMaxWidth().padding(start = 16.dp, end = 4.dp, top = 2.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(t.label, style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
+            if (clip != null && t != Tool.EXPORT && t != Tool.COLOR) {
+                Text("Clip ${project.clips.indexOf(clip) + 1} di ${project.clips.size}", style = MaterialTheme.typography.bodySmall)
+            }
+            IconBtn(VVIcons.Check, "Chiudi", enabled = !running) { activeTool = null }
         }
     }
 
-    Column(Modifier.fillMaxSize().background(VV.Canvas).safeDrawingPadding()) {
+    Column(Modifier.fillMaxSize().background(if (fullscreen) Color.Black else VV.Canvas).then(if (landscape || fullscreen) Modifier else Modifier.safeDrawingPadding())) {
         vm.busy?.let { LinearProgressIndicator(Modifier.fillMaxWidth().height(2.dp), color = VV.Tally, trackColor = VV.Canvas) }
-        if (landscape) {
-            Row(Modifier.fillMaxWidth().weight(1f)) {
-                Column(Modifier.weight(1f).fillMaxHeight()) {
-                    topBar(false)
-                    preview(Modifier.fillMaxWidth().weight(1f).padding(horizontal = 10.dp))
-                    transport()
-                }
-                Column(Modifier.width(340.dp).fillMaxHeight().background(VV.Panel)) {
-                    Row(Modifier.fillMaxWidth().height(52.dp).padding(horizontal = 10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.End) {
-                        ExportPill(enabled = project.clips.isNotEmpty()) { activeTool = Tool.EXPORT }
+        when {
+            fullscreen -> preview(Modifier.fillMaxSize(), true)
+            landscape -> {
+                // Orizzontale: il video occupa tutta l'altezza disponibile; strumenti e pannelli a destra.
+                Row(Modifier.fillMaxWidth().weight(1f)) {
+                    preview(Modifier.weight(1f).fillMaxHeight(), true)
+                    Column(Modifier.width(300.dp).fillMaxHeight().background(VV.Panel)) {
+                        titleRow(false)
+                        val t = activeTool
+                        if (t != null) {
+                            panelHeader(t)
+                            Column(
+                                Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 6.dp),
+                                verticalArrangement = Arrangement.spacedBy(12.dp),
+                            ) { panelBody(t) }
+                        } else {
+                            ToolGrid(tools, activeTool, !running, Modifier.weight(1f)) { onTool(it) }
+                            Box(Modifier.fillMaxWidth().padding(10.dp), contentAlignment = Alignment.Center) {
+                                ExportPill(enabled = project.clips.isNotEmpty()) { activeTool = Tool.EXPORT }
+                            }
+                        }
                     }
-                    panel(Modifier.fillMaxWidth().weight(1f))
+                }
+                Row(Modifier.fillMaxWidth().background(VV.Panel), verticalAlignment = Alignment.CenterVertically) {
+                    Box(Modifier.weight(1f)) { timeline() }
+                    Column {
+                        IconBtn(VVIcons.Add, "Aumenta zoom", tint = VV.Dim) { if (zoom < ZOOMS.lastIndex) zoom++ }
+                        IconBtn(VVIcons.Remove, "Riduci zoom", tint = VV.Dim) { if (zoom > 0) zoom-- }
+                    }
                 }
             }
-            Box(Modifier.fillMaxWidth().height(1.dp).background(VV.Line))
-            timeline()
-            toolbar()
-        } else {
-            topBar(true)
-            preview(Modifier.fillMaxWidth().weight(1f).padding(horizontal = 10.dp))
-            transport()
-            Box(Modifier.fillMaxWidth().height(1.dp).background(VV.Line))
-            timeline()
-            Box(Modifier.fillMaxWidth().height(1.dp).background(VV.Line))
-            if (activeTool != null) panel(Modifier.fillMaxWidth().heightIn(max = 330.dp))
-            toolbar()
+            else -> {
+                titleRow(true)
+                preview(Modifier.fillMaxWidth().weight(1f), false)
+                transport()
+                timeline()
+                activeTool?.let { t ->
+                    Column(Modifier.fillMaxWidth().heightIn(max = 270.dp).background(VV.Panel)) {
+                        Box(Modifier.fillMaxWidth().height(1.dp).background(VV.Line))
+                        panelHeader(t)
+                        Column(
+                            Modifier.fillMaxWidth().weight(1f, fill = false).verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 6.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                        ) { panelBody(t) }
+                    }
+                }
+                toolbar()
+            }
         }
     }
 
@@ -330,6 +364,19 @@ private fun ExportPill(enabled: Boolean, onClick: () -> Unit) {
         Icon(VVIcons.Export, null, tint = if (enabled) VV.TallyInk else VV.Faint, modifier = Modifier.size(18.dp))
         Spacer(Modifier.width(6.dp))
         Text("Esporta", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold, color = if (enabled) VV.TallyInk else VV.Faint)
+    }
+}
+
+/** Strumenti a griglia (colonna destra in orizzontale). */
+@Composable
+private fun ToolGrid(tools: List<Tool>, active: Tool?, enabled: Boolean, modifier: Modifier, onClick: (Tool) -> Unit) {
+    Column(modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 8.dp, vertical = 4.dp)) {
+        tools.chunked(4).forEach { row ->
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                row.forEach { t -> ToolButton(t, active == t, enabled) { onClick(t) } }
+                repeat(4 - row.size) { Spacer(Modifier.width(64.dp)) }
+            }
+        }
     }
 }
 

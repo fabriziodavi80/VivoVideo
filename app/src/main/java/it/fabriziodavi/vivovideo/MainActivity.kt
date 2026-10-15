@@ -34,6 +34,16 @@ class MainActivity : ComponentActivity() {
                         window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                     }
                 }
+                // In orizzontale nell'editor le barre di sistema si nascondono (riappaiono scorrendo dal bordo).
+                val landscape = androidx.compose.ui.platform.LocalConfiguration.current.orientation ==
+                    android.content.res.Configuration.ORIENTATION_LANDSCAPE
+                val immersive = landscape && vm.project != null
+                LaunchedEffect(immersive) {
+                    val c = androidx.core.view.WindowCompat.getInsetsController(window, window.decorView)
+                    c.systemBarsBehavior = androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                    if (immersive) c.hide(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+                    else c.show(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+                }
                 if (vm.project == null) HomeScreen(vm) else EditorScreen(vm)
             }
         }

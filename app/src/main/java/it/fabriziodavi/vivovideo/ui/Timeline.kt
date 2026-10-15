@@ -61,9 +61,9 @@ import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
-private val VIDEO_H = 54.dp
-private val AUDIO_H = 22.dp
-private val RULER_H = 24.dp
+private val VIDEO_H = 48.dp
+private val AUDIO_H = 18.dp
+private val RULER_H = 20.dp
 private val HANDLE_W = 14.dp
 
 /**
@@ -112,7 +112,7 @@ fun Timeline(
     BoxWithConstraints(
         modifier
             .fillMaxWidth()
-            .height(RULER_H + VIDEO_H + AUDIO_H + 22.dp)
+            .height(RULER_H + VIDEO_H + AUDIO_H + 16.dp)
             .background(VV.Panel)
     ) {
         val half = maxWidth / 2
@@ -126,7 +126,7 @@ fun Timeline(
                 Ruler(project.durationUs, dpPerSecond)
                 Spacer(Modifier.width(half))
             }
-            Spacer(Modifier.height(6.dp))
+            Spacer(Modifier.height(4.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Spacer(Modifier.width(half))
                 project.clips.forEach { original ->
@@ -146,7 +146,7 @@ fun Timeline(
                                 trimDraft = null
                             },
                         )
-                        Spacer(Modifier.height(4.dp))
+                        Spacer(Modifier.height(3.dp))
                         AudioLane(clip, w)
                     }
                 }

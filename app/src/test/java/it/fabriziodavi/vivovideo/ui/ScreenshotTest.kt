@@ -58,6 +58,13 @@ class ScreenshotTest {
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/4_editor_orizzontale.png")
     }
 
+    @Config(qualifiers = "w915dp-h412dp-land-xxhdpi")
+    @Test fun editorLandscapeTools() {
+        val vm = vm(); vm.selectedClipId = vm.project!!.clips[1].id
+        compose.setContent { VivoTheme { EditorScreen(vm) } }
+        compose.onRoot().captureRoboImage("build/outputs/roborazzi/6_editor_orizzontale_strumenti.png")
+    }
+
     @Test fun home() {
         val vm = EditorViewModel(ApplicationProvider.getApplicationContext<Application>())
         compose.setContent { VivoTheme { HomeScreen(vm) } }
