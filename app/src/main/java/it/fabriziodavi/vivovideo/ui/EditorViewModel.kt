@@ -282,6 +282,13 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    /** Porta l'indicatore all'inizio della clip selezionata. */
+    fun seekToSelectedStart() {
+        val p = project ?: return
+        val c = selectedClip ?: return
+        pause(); seekTo(p.clipStartsUs()[p.clips.indexOf(c)] + 1_000)
+    }
+
     fun jumpSpeedPoint(dir: Int) {
         val p = project ?: return
         val c = selectedClip ?: return

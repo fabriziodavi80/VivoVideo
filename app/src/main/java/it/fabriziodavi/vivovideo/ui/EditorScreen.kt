@@ -488,12 +488,12 @@ private fun SpeedPanel(vm: EditorViewModel, running: Boolean) {
             IconBtn(VVIcons.MoveLeft, "Punto precedente") { vm.jumpSpeedPoint(-1) }
             Box(
                 Modifier.weight(1f).clip(RoundedCornerShape(12.dp)).background(if (here != null) VV.Tally else VV.Raised)
-                    .clickable(enabled = !running && f != null) { vm.toggleSpeedPointAtPlayhead() }.padding(vertical = 11.dp),
+                    .clickable(enabled = !running) { if (f == null) vm.seekToSelectedStart() else vm.toggleSpeedPointAtPlayhead() }.padding(vertical = 11.dp),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
                     when {
-                        f == null -> "Porta l'indicatore nella clip"
+                        f == null -> "Vai all'inizio della clip"
                         here == null -> "Aggiungi punto velocità qui"
                         here.t == 0f || here.t == 1f -> "Punto di " + (if (here.t == 0f) "inizio" else "fine") + " clip"
                         else -> "Togli il punto"
