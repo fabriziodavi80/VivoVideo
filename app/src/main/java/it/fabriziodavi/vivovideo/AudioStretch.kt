@@ -59,6 +59,7 @@ fun renderTimelineAudio(context: Context, project: Project, onProgress: (Float) 
                     NativeStretch.stretch(audio, OUT_CH, OUT_RATE, ends, sp)
                 }
             }
+            if (clip.volume != 1f) for (k in samples.indices) samples[k] *= clip.volume
             // Lunghezza esatta della clip nel video: si completa con silenzio o si taglia.
             val needed = (target * OUT_CH).toInt()
             if (samples.size != needed) samples = samples.copyOf(needed)

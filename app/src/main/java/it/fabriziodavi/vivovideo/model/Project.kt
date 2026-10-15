@@ -28,6 +28,8 @@ data class Clip(
     /** Video girato in LOG: applica la conversione colore. */
     val log: Boolean = false,
     val muted: Boolean = false,
+    /** Volume dell'audio originale: 1 = invariato, da 0 a 2. */
+    val volume: Float = 1f,
     val width: Int = 0,
     val height: Int = 0,
     val fps: Float = 30f,

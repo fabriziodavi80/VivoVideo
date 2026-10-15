@@ -5,36 +5,27 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.graphics.Color
 import it.fabriziodavi.vivovideo.engine.ExportState
-import it.fabriziodavi.vivovideo.ui.Accent
-import it.fabriziodavi.vivovideo.ui.Bg
 import it.fabriziodavi.vivovideo.ui.EditorScreen
 import it.fabriziodavi.vivovideo.ui.EditorViewModel
 import it.fabriziodavi.vivovideo.ui.HomeScreen
-import it.fabriziodavi.vivovideo.ui.Surface
+import it.fabriziodavi.vivovideo.ui.VivoTheme
 
 class MainActivity : ComponentActivity() {
     private val vm: EditorViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        // Barre di sistema sempre chiare su fondo scuro, anche se il telefono è in tema chiaro.
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
+        )
         setContent {
-            MaterialTheme(
-                colorScheme = darkColorScheme(
-                    primary = Accent,
-                    onPrimary = Color.White,
-                    background = Bg,
-                    surface = Surface,
-                    surfaceVariant = Surface,
-                    secondaryContainer = Accent.copy(alpha = 0.25f),
-                )
-            ) {
+            VivoTheme {
                 // Schermo acceso durante l'esportazione.
                 LaunchedEffect(vm.exportState) {
                     if (vm.exportState is ExportState.Running) {

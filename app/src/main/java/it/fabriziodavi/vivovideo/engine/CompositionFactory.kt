@@ -81,6 +81,17 @@ class CompositionFactory(private val context: Context) {
         addAll(runCatching { Look.valueOf(c.look) }.getOrDefault(Look.NONE).effects())
     }
 
+    private fun volumeProcessors(volume: Float): List<androidx.media3.common.audio.AudioProcessor> {
+        if (volume == 1f) return emptyList()
+        val p = androidx.media3.common.audio.ChannelMixingAudioProcessor()
+        for (ch in 1..2) {
+            p.putChannelMixingMatrix(
+                androidx.media3.common.audio.ChannelMixingMatrix.createForConstantGain(ch, ch).scaleBy(volume)
+            )
+        }
+        return listOf(p)
+    }
+
     /** Dimensioni del video finale: orientamento e proporzioni della prima clip. */
     fun outputSize(project: Project, shortSide: Int?): Pair<Int, Int> {
         val first = project.clips.firstOrNull() ?: return 1920 to 1080
@@ -118,7 +129,7 @@ class CompositionFactory(private val context: Context) {
                 Presentation.createForWidthAndHeight(outW, outH, Presentation.LAYOUT_SCALE_TO_FIT)
             val b = EditedMediaItem.Builder(mediaItem)
                 .setDurationUs(clip.sourceDurationUs)
-                .setEffects(Effects(emptyList(), effects))
+                .setEffects(Effects(volumeProcessors(clip.volume), effects))
                 .setRemoveAudio(nativeAudio != null || clip.muted)
             val curve = clip.speedCurve()
             if (curve.speeds.any { it != 1f }) {

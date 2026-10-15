@@ -176,6 +176,12 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         selectedClipId = result.clips[located.first + 1].id
     }
 
+    fun trimClip(id: String, startUs: Long, endUs: Long) {
+        val c = project?.clips?.firstOrNull { it.id == id } ?: return
+        if (c.trimStartUs == startUs && c.trimEndUs == endUs) return
+        update { it.replaceClip(c.copy(trimStartUs = startUs, trimEndUs = endUs)) }
+    }
+
     fun deleteSelected() {
         val id = selectedClipId ?: return
         val p = project ?: return

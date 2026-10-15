@@ -1,11 +1,14 @@
 package it.fabriziodavi.vivovideo.ui
 
+import android.graphics.Bitmap
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,28 +17,33 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import it.fabriziodavi.vivovideo.describeEncoders
 import it.fabriziodavi.vivovideo.model.Project
 import java.text.SimpleDateFormat
@@ -55,51 +63,85 @@ fun HomeScreen(vm: EditorViewModel) {
     }
     val encoders = remember { runCatching { describeEncoders() }.getOrDefault("") }
 
-    Column(Modifier.fillMaxSize().background(Bg).safeDrawingPadding().padding(16.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("VivoVideo", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.White)
-        }
-        Spacer(Modifier.height(16.dp))
-        Button(
-            onClick = { picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.VideoOnly)) },
-            modifier = Modifier.fillMaxWidth().height(52.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Accent),
-        ) { Text("+ Nuovo progetto", fontSize = 17.sp, fontWeight = FontWeight.SemiBold) }
-        Spacer(Modifier.height(16.dp))
-        if (vm.projects.isEmpty()) {
-            Hint("Nessun progetto. Crea il primo scegliendo uno o più video.")
-        }
-        LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            items(vm.projects, key = { it.id }) { p ->
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = Surface),
-                    modifier = Modifier.fillMaxWidth().clickable { vm.openProject(p) },
-                ) {
-                    Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Column(Modifier.weight(1f)) {
-                            Text(p.name, color = Color.White, fontWeight = FontWeight.SemiBold)
-                            Text(
-                                "${p.clips.size} clip · ${formatTime(p.durationUs)} · " +
-                                    SimpleDateFormat("d MMM HH:mm", Locale.ITALY).format(Date(p.updatedAt)),
-                                color = TextDim, fontSize = 12.sp,
-                            )
-                        }
-                        TextButton(onClick = { toDelete = p }) { Text("Elimina", color = TextDim) }
-                    }
-                }
+    Column(Modifier.fillMaxSize().background(VV.Canvas).safeDrawingPadding().padding(horizontal = 16.dp)) {
+        Row(Modifier.fillMaxWidth().padding(top = 18.dp, bottom = 18.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text("VivoVideo", style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
+            PrimaryButton("Nuovo progetto") {
+                picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.VideoOnly))
             }
         }
-        Hint("Encoder: " + encoders.replace("\n", " · "))
-        Hint("Versione $version")
+        if (vm.projects.isEmpty()) {
+            Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
+                Text(
+                    "Crea un progetto scegliendo uno o più video dalla galleria.",
+                    style = MaterialTheme.typography.bodyMedium, color = VV.Dim,
+                )
+            }
+        } else {
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(160.dp),
+                modifier = Modifier.weight(1f),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                items(vm.projects, key = { it.id }) { p -> ProjectCard(p, onOpen = { vm.openProject(p) }, onDelete = { toDelete = p }) }
+            }
+        }
+        Text(
+            "Versione $version   ·   " + encoders.lines().firstOrNull().orEmpty(),
+            style = MaterialTheme.typography.bodySmall, color = VV.Faint,
+            maxLines = 1, overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.padding(vertical = 10.dp),
+        )
     }
 
     toDelete?.let { p ->
         AlertDialog(
             onDismissRequest = { toDelete = null },
-            title = { Text("Eliminare \"${p.name}\"?") },
-            text = { Text("Si cancella solo il progetto: i video originali e quelli esportati restano in galleria.") },
-            confirmButton = { TextButton(onClick = { vm.deleteProject(p.id); toDelete = null }) { Text("Elimina") } },
-            dismissButton = { TextButton(onClick = { toDelete = null }) { Text("Annulla") } },
+            containerColor = VV.Raised,
+            title = { Text("Eliminare “${p.name}”?", style = MaterialTheme.typography.titleSmall) },
+            text = { Text("Si cancella solo il progetto: i video originali e quelli esportati restano in galleria.", style = MaterialTheme.typography.bodyMedium) },
+            confirmButton = { TextButton(onClick = { vm.deleteProject(p.id); toDelete = null }) { Text("Elimina", color = VV.Danger) } },
+            dismissButton = { TextButton(onClick = { toDelete = null }) { Text("Annulla", color = VV.Dim) } },
         )
+    }
+}
+
+@Composable
+private fun ProjectCard(p: Project, onOpen: () -> Unit, onDelete: () -> Unit) {
+    val context = LocalContext.current
+    val first = p.clips.firstOrNull()
+    val cover by produceState<Bitmap?>(null, first?.uri) {
+        if (first != null) value = Thumbnails.get(context, first.uri, first.trimStartUs + 500_000, 320)
+    }
+    Column(Modifier.clip(RoundedCornerShape(12.dp)).clickable(onClick = onOpen)) {
+        Box(
+            Modifier.fillMaxWidth().height(110.dp).clip(RoundedCornerShape(12.dp)).background(VV.Raised),
+            contentAlignment = Alignment.Center,
+        ) {
+            cover?.let {
+                Image(it.asImageBitmap(), null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+            } ?: Icon(VVIcons.Movie, null, tint = VV.Faint)
+            Text(
+                formatTime(p.durationUs),
+                style = MaterialTheme.typography.labelMedium,
+                modifier = Modifier.align(Alignment.BottomEnd).padding(6.dp)
+                    .background(androidx.compose.ui.graphics.Color(0x9E000000), RoundedCornerShape(4.dp))
+                    .padding(horizontal = 5.dp, vertical = 1.dp),
+            )
+        }
+        Row(Modifier.padding(top = 8.dp), verticalAlignment = Alignment.Top) {
+            Column(Modifier.weight(1f)) {
+                Text(p.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(
+                    "${p.clips.size} clip, " + SimpleDateFormat("d MMM HH:mm", Locale.ITALY).format(Date(p.updatedAt)),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+            Box(Modifier.size(32.dp).clip(RoundedCornerShape(8.dp)).clickable(onClick = onDelete), contentAlignment = Alignment.Center) {
+                Icon(VVIcons.Delete, "Elimina progetto", tint = VV.Faint, modifier = Modifier.size(18.dp))
+            }
+        }
+        Spacer(Modifier.width(1.dp))
     }
 }
