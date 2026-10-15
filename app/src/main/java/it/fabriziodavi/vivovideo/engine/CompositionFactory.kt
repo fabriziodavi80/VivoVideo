@@ -244,8 +244,9 @@ class CompositionFactory(private val context: Context) {
         // Con video sovrapposti, testi e immagini vanno sopra a tutto: effetti dell'intera composizione.
         fun overlaysFor(fromUs: Long, toUs: Long): List<androidx.media3.effect.TextureOverlay> {
             val texts = project.texts.filter { t -> t.startUs < toUs && t.endUs > fromUs && t.text.isNotBlank() }
-            val layers = project.layers.filter { l -> !l.isVideo && l.startUs < toUs && l.endUs > fromUs }
-            return layers.map { l -> LayerOverlay(l, outW, outH) } + texts.map { t -> TimedTextOverlay(context, t, outW, outH) }
+            // Senza compositore, i video sovrapposti si vedono come immagine ferma (posizione e movimento restano veri).
+            val layers = project.layers.filter { l -> (!l.isVideo || !multi) && l.startUs < toUs && l.endUs > fromUs }
+            return layers.map { l -> LayerOverlay(context, l, outW, outH) } + texts.map { t -> TimedTextOverlay(context, t, outW, outH) }
         }
         /** Clip della traccia principale; [light] = solo per i tempi (invisibile, senza effetti). */
         fun mainItems(light: Boolean, removeAudio: Boolean) = project.clips.mapIndexed { index, clip ->

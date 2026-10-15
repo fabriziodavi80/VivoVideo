@@ -40,7 +40,7 @@ object Safety {
         val p = prefs(context)
         val notes = mutableListOf<String>()
         if (p.getBoolean("pending_preview", false)) {
-            p.edit().putBoolean("pending_preview", false).putBoolean("multi_preview", false).commit()
+            p.edit().putBoolean("pending_preview", false).putBoolean("multi_preview_v2", false).commit()
             notes += "L'anteprima con dissolvenze incrociate e video sovrapposti è stata disattivata (si riattiva da Esporta)."
         }
         if (p.getBoolean("pending_export", false)) {
@@ -57,8 +57,9 @@ object Safety {
         }
     }
 
-    fun multiPreview(c: Context) = prefs(c).getBoolean("multi_preview", true)
-    fun setMultiPreview(c: Context, on: Boolean) = prefs(c).edit().putBoolean("multi_preview", on).apply()
+    // Chiave nuova: l'anteprima avanzata si blocca sul telefono, quindi riparte spenta per tutti.
+    fun multiPreview(c: Context) = prefs(c).getBoolean("multi_preview_v2", false)
+    fun setMultiPreview(c: Context, on: Boolean) = prefs(c).edit().putBoolean("multi_preview_v2", on).apply()
     fun multiExport(c: Context) = prefs(c).getBoolean("multi_export", true)
     fun setMultiExport(c: Context, on: Boolean) = prefs(c).edit().putBoolean("multi_export", on).apply()
 

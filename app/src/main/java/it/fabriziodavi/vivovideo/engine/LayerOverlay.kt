@@ -42,9 +42,9 @@ object LayerRenderer {
     /** Margine attorno all'immagine (bordo e ombra), in frazione del lato corto. */
     fun padFraction(l: Layer): Float = (if (l.border != LayerBorder.NONE) 0.025f else 0f) + (if (l.shadow) 0.06f else 0f)
 
-    fun prepare(l: Layer, frameW: Int, frameH: Int): Prepared {
+    fun prepare(context: Context, l: Layer, frameW: Int, frameH: Int): Prepared {
         val maxScale = max(l.pose.scale, l.endPose?.scale ?: 0f).coerceIn(0.05f, 1.5f)
-        val key = "${l.uri}|${l.border}|${l.shadow}|${l.shape}|${l.key}|${l.keyTolerance}|$frameW|$frameH|${(maxScale * 20).toInt()}"
+        val key = "${l.uri}|${l.sourceStartUs}|${l.border}|${l.shadow}|${l.shape}|${l.key}|${l.keyTolerance}|$frameW|$frameH|${(maxScale * 20).toInt()}"
         cache.get(key)?.let { return it }
         val (cw, ch) = containSize(l, frameW, frameH)
         // Lato lungo al massimo 4096 (limite pratico delle texture).
@@ -53,7 +53,8 @@ object LayerRenderer {
         if (longSide > 4096f) base *= 4096f / longSide
         val iw = (cw * base).toInt().coerceAtLeast(2)
         val ih = (ch * base).toInt().coerceAtLeast(2)
-        val src = decode(Uri.parse(l.uri).path ?: "", iw, ih)
+        // Video sovrapposto mostrato come immagine ferma (anteprima): un fotogramma vicino all'inizio.
+        val src = if (l.isVideo) videoFrame(context, l, iw, ih) else decode(Uri.parse(l.uri).path ?: "", iw, ih)
         val short = min(iw, ih).toFloat()
         val borderW = if (l.border != LayerBorder.NONE) short * 0.025f else 0f
         val shadowPad = if (l.shadow) short * 0.06f else 0f
@@ -173,6 +174,15 @@ object LayerRenderer {
         b.setPixels(px, 0, w, 0, 0, w, h)
     }
 
+    private fun videoFrame(context: Context, l: Layer, w: Int, h: Int): Bitmap? = runCatching {
+        val r = android.media.MediaMetadataRetriever()
+        try {
+            r.setDataSource(context, Uri.parse(l.uri))
+            r.getScaledFrameAtTime(l.sourceStartUs + 300_000, android.media.MediaMetadataRetriever.OPTION_CLOSEST_SYNC, w, h)
+                ?.copy(Bitmap.Config.ARGB_8888, true)
+        } finally { r.release() }
+    }.getOrNull()
+
     private fun decode(path: String, w: Int, h: Int): Bitmap? {
         val b = BitmapFactory.Options().apply { inJustDecodeBounds = true }
         BitmapFactory.decodeFile(path, b)
@@ -185,11 +195,12 @@ object LayerRenderer {
 
 /** Livello immagine sopra al video, con movimento (inizio → fine) e animazioni di entrata/uscita. */
 class LayerOverlay(
+    private val context: Context,
     private val layer: Layer,
     private val frameW: Int,
     private val frameH: Int,
 ) : BitmapOverlay() {
-    private val prepared by lazy { LayerRenderer.prepare(layer, frameW, frameH) }
+    private val prepared by lazy { LayerRenderer.prepare(context, layer, frameW, frameH) }
 
     override fun getBitmap(presentationTimeUs: Long): Bitmap = prepared.bitmap
 

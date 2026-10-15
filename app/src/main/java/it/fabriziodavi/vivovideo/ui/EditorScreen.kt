@@ -1133,6 +1133,7 @@ private fun LayerPanel(vm: EditorViewModel, running: Boolean, onAdd: () -> Unit)
     }
     MotionSection(vm, l.endPose != null, enabled, l.startUs, l.durationUs) { vm.toggleLayerMotion() }
     if (l.isVideo) {
+        if (!vm.multiPreviewEnabled) Hint("In anteprima il video sovrapposto si vede come immagine ferma; nel video esportato si muove.")
         PanelLabel("Audio del video sovrapposto")
         ToggleRow("Disattiva l'audio", l.muted, enabled) { v -> vm.updateLayer { it.copy(muted = v) } }
         if (!l.muted) LabeledSlider("Volume", null, (l.volume * 100).toInt(), enabled, range = 0..200, format = { "$it%" }) { v ->
@@ -1286,9 +1287,9 @@ private fun ExportPanel(vm: EditorViewModel, onOpen: (android.net.Uri) -> Unit) 
     Segmented(OutputCodec.entries, o.codec, { it.label }, !running) { vm.exportOptions = o.copy(codec = it) }
     ToggleRow("Audio a tono naturale nei cambi di velocità", o.keepPitch, !running) { vm.exportOptions = o.copy(keepPitch = it) }
     PanelLabel("Sperimentale: dissolvenze incrociate e video sovrapposti")
-    ToggleRow("Nell'anteprima", vm.multiPreviewEnabled, !running) { vm.setMultiPreview(it) }
     ToggleRow("Nel video esportato", vm.multiExportEnabled, !running) { vm.setMultiExport(it) }
-    Hint("Se spenti, la dissolvenza incrociata diventa un passaggio al nero e i video sovrapposti non compaiono. Se l'app si chiude per un errore, si spengono da soli.")
+    ToggleRow("Anche nell'anteprima (può bloccarsi)", vm.multiPreviewEnabled, !running) { vm.setMultiPreview(it) }
+    Hint("In anteprima, di serie, la dissolvenza incrociata si vede come passaggio al nero e i video sovrapposti come immagine ferma: nel video esportato sono veri. Se l'app si chiude per un errore, queste opzioni si spengono da sole.")
     when (state) {
         is ExportState.Running -> {
             Text(state.label + (state.percent?.let { "  $it%" } ?: ""), style = MaterialTheme.typography.bodyMedium)
