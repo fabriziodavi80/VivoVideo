@@ -273,7 +273,8 @@ class DeviceTest {
         val m = MusicTrack(uri = music.toString(), name = "musica", sourceDurationUs = 30_000_000, lengthUs = 30_000_000,
             beatsUs = (1 until 60).map { it * 500_000L }, bpm = 120f)
         listOf(AutoStyle.CINEMA, AutoStyle.ENERGICO).forEach { s ->
-            exportAndCheck(AutoEdit.build("auto ${s.label}", srcs, m, AutoOptions(style = s, title = "Prova", subtitle = "Ottobre 2026")))
+            // Senza compositore a più ingressi: l'emulatore regge pochi decodificatori insieme (il telefono sì).
+            exportAndCheck(AutoEdit.build("auto ${s.label}", srcs, m, AutoOptions(style = s, title = "Prova", subtitle = "Ottobre 2026")), multi = false)
         }
     }
 
