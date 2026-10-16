@@ -71,6 +71,21 @@ fun HomeScreen(vm: EditorViewModel) {
                 picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
             }
         }
+        // Video automatico: in evidenza, sopra ai progetti.
+        Row(
+            Modifier.fillMaxWidth().padding(bottom = 16.dp).clip(RoundedCornerShape(14.dp))
+                .background(androidx.compose.ui.graphics.Brush.horizontalGradient(listOf(VV.Raised2, VV.Raised)))
+                .clickable { vm.showAuto = true }.padding(14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(Modifier.size(44.dp).clip(RoundedCornerShape(12.dp)).background(VV.Tally), contentAlignment = Alignment.Center) {
+                Icon(VVIcons.Effects, null, tint = VV.TallyInk)
+            }
+            Column(Modifier.weight(1f).padding(start = 12.dp)) {
+                Text("Video automatico", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                Text("Scegli uno o più album: musica, tagli a ritmo, transizioni ed effetti li fa l'app.", style = MaterialTheme.typography.bodySmall)
+            }
+        }
         if (vm.projects.isEmpty()) {
             Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
                 Text(

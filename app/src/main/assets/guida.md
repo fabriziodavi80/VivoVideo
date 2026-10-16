@@ -3,10 +3,17 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
-- **Apri e chiudi il video** ora è un interruttore: acceso si illumina in ambra, toccandolo di nuovo toglie le due dissolvenze. Anche Alto/Centro/Basso del testo mostrano la posizione scelta.
-- I pulsanti **Applica a tutte le clip / a tutti i tagli / Stile a tutti i testi** restano in ambra finché tutte le clip (o i testi) hanno la stessa scelta; se ne ritocchi una si spengono.
-- **TAP a tempo che taglia**: in Audio → Battiti, con "Taglia le clip a ogni tocco" acceso, ogni tocco a tempo segna anche un taglio del video. I tagli si fanno tutti insieme quando metti in pausa (così l'ascolto non si interrompe) e un solo Annulla li toglie.
-- Effetti, transizioni e testi **Wow** (versione precedente): categoria Wow in Effetti, transizioni Glitch/Prisma/Luce/Cerchio/Pixel/Scossa, animazioni lettera per lettera, stili Glitch/Onda/Oro/Cascata.
+- **Video automatico** (in cima alla schermata dei progetti): scegli **uno o più album** della galleria, uno **stile** (Cinema, Energico, Ricordi, Elegante, Viaggio), un brano e la durata. L'app sceglie le scene lungo tutto il periodo, le taglia sui battiti e aggiunge transizioni, effetti, titolo e apertura/chiusura. Poi si ritocca tutto nell'editor.
+- Pulsanti "a tutte" e "Apri e chiudi il video" illuminati quando la scelta è attiva; TAP a tempo che taglia anche le clip.
+
+## Video automatico
+- Dalla schermata dei progetti tocca **Video automatico**. La prima volta l'app chiede di leggere foto e video: scegli **Consenti tutto** per vedere gli album interi (con "solo alcune foto" si vedono solo quelle).
+- **1. Album**: tocca gli album da usare (anche più d'uno); sotto vedi quante foto e video ci sono e il periodo.
+- **2. Stile**: **Cinema** (bande nere, look da film, dissolvenze incrociate), **Energico** (tagli veloci, colpi a ritmo, glitch e zoom), **Ricordi** (pellicola e luce calda), **Elegante** (bokeh, polvere d'oro, titolo dorato), **Viaggio** (scorrimenti, colori vivaci, raggi di luce).
+- **3. Musica** (consigliata): con un brano le scene cambiano sui battiti (rilevati da soli) e l'audio dei video si spegne; senza, restano i suoni originali.
+- **4. Durata**: 30 s, 1, 2 o 3 minuti, **Come il brano** o **Tutto**. Le scene sono prese a intervalli regolari dal primo all'ultimo giorno, in ordine di data; dei video si usa un tratto centrale.
+- **5. Titolo**: proposto con il nome degli album, con sotto il periodo (es. "Luglio – Agosto 2026").
+- **Crea il video**: il progetto si apre nell'editor già montato. Tutto resta ritoccabile (scene, transizioni, effetti, testi, musica); poi Esporta.
 
 ## Primi passi
 - Dalla schermata dei progetti tocca **Nuovo progetto** e scegli video e foto dalla galleria.

@@ -3,6 +3,10 @@ package it.fabriziodavi.vivovideo.ui
 import it.fabriziodavi.vivovideo.model.TextItem
 import it.fabriziodavi.vivovideo.model.TransitionSpec
 import it.fabriziodavi.vivovideo.model.Clip
+import it.fabriziodavi.vivovideo.model.AutoEdit
+import it.fabriziodavi.vivovideo.model.AutoItem
+import it.fabriziodavi.vivovideo.model.AutoOptions
+import it.fabriziodavi.vivovideo.media.GalleryItem
 import it.fabriziodavi.vivovideo.model.ClipSpeed
 import it.fabriziodavi.vivovideo.model.ClipFx
 import it.fabriziodavi.vivovideo.model.ColorSettings
@@ -184,42 +188,41 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
 
     // ---------------- Clip ----------------
 
+    /** Legge un video o una foto e ne fa una clip (null se il file non si legge). */
+    private fun importClip(ctx: Application, uri: Uri): Clip? {
+        // Il permesso resta valido anche dopo il riavvio del telefono.
+        runCatching { ctx.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
+        if (ctx.contentResolver.getType(uri)?.startsWith("image/") == true) {
+            return runCatching {
+                val photo = importPhoto(ctx, uri)
+                Clip(
+                    uri = Uri.fromFile(photo.file).toString(),
+                    sourceDurationUs = Clip.PHOTO_MAX_US,
+                    trimEndUs = Clip.PHOTO_DEFAULT_US,
+                    isPhoto = true,
+                    width = photo.width, height = photo.height, fps = 30f,
+                )
+            }.getOrNull()
+        }
+        return runCatching {
+            val info = readVideoInfo(ctx, uri)
+            Clip(
+                uri = uri.toString(),
+                sourceDurationUs = info.durationMs * 1000,
+                log = info.tenBit && !info.isHdr,
+                width = info.displayWidth,
+                height = info.displayHeight,
+                fps = info.fps ?: 30f,
+            )
+        }.getOrNull()
+    }
+
     fun addClips(uris: List<Uri>) {
         if (uris.isEmpty()) return
         val ctx = getApplication<Application>()
         viewModelScope.launch {
             busy = "Lettura di video e foto…"
-            val clips = withContext(Dispatchers.IO) {
-                uris.mapNotNull { uri ->
-                    // Il permesso resta valido anche dopo il riavvio del telefono.
-                    runCatching {
-                        ctx.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    }
-                    if (ctx.contentResolver.getType(uri)?.startsWith("image/") == true) {
-                        return@mapNotNull runCatching {
-                            val photo = importPhoto(ctx, uri)
-                            Clip(
-                                uri = Uri.fromFile(photo.file).toString(),
-                                sourceDurationUs = Clip.PHOTO_MAX_US,
-                                trimEndUs = Clip.PHOTO_DEFAULT_US,
-                                isPhoto = true,
-                                width = photo.width, height = photo.height, fps = 30f,
-                            )
-                        }.getOrNull()
-                    }
-                    runCatching {
-                        val info = readVideoInfo(ctx, uri)
-                        Clip(
-                            uri = uri.toString(),
-                            sourceDurationUs = info.durationMs * 1000,
-                            log = info.tenBit && !info.isHdr,
-                            width = info.displayWidth,
-                            height = info.displayHeight,
-                            fps = info.fps ?: 30f,
-                        )
-                    }.getOrNull()
-                }
-            }
+            val clips = withContext(Dispatchers.IO) { uris.mapNotNull { importClip(ctx, it) } }
             busy = null
             if (clips.size < uris.size) message = "${uris.size - clips.size} file non leggibili sono stati saltati."
             if (clips.isEmpty()) return@launch
@@ -408,45 +411,98 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     // ---------------- Musica ----------------
 
     /** Aggiunge un brano che parte dall'indicatore (o dall'inizio, se l'indicatore è in fondo). */
+    /** Legge un brano (anche MIDI, convertito in WAV con i battiti esatti). Dall'inizio, a tutta lunghezza. */
+    private suspend fun readMusic(ctx: Application, uri: Uri): MusicTrack? = withContext(Dispatchers.IO) {
+        runCatching { ctx.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
+        runCatching {
+            val (name, infoUs) = readAudioInfo(ctx, uri)
+            val head = ctx.contentResolver.openInputStream(uri)?.use { s -> ByteArray(16).also { s.read(it) } }
+            val bytes = if (head != null && Midi.isMidi(head)) ctx.contentResolver.openInputStream(uri)?.use { it.readBytes() } else null
+            if (bytes != null) {
+                // MIDI: lo suona il sintetizzatore di Android e lo si salva come WAV;
+                // tempo e battiti si leggono esatti dal file.
+                withContext(Dispatchers.Main) { busy = "Conversione del MIDI…" }
+                val pcm = decodeAudioRange(ctx, uri, 0, Long.MAX_VALUE / 4) ?: error("MIDI non riproducibile")
+                if (pcm.size < 2 * 4800) error("MIDI vuoto")
+                val dir = File(ctx.filesDir, "music").apply { mkdirs() }
+                val wav = File(dir, "midi_${System.currentTimeMillis()}.wav")
+                writeWavFile(wav, pcm)
+                val durUs = pcm.size / 2 * 1_000_000L / 48_000
+                val midi = Midi.parse(bytes)
+                MusicTrack(
+                    uri = Uri.fromFile(wav).toString(), name = name, sourceDurationUs = durUs, lengthUs = durUs,
+                    beatsUs = midi?.beatsUs?.filter { it < durUs }.orEmpty(),
+                    bpm = midi?.bpm ?: 0f,
+                )
+            } else {
+                MusicTrack(uri = uri.toString(), name = name, sourceDurationUs = infoUs, lengthUs = infoUs)
+            }
+        }.getOrNull()?.takeIf { it.sourceDurationUs > 0 }
+    }
+
+    /** Battiti di un brano (null se non c'è un ritmo chiaro). */
+    private suspend fun findBeats(ctx: Application, t: MusicTrack): BeatDetector.Result? = withContext(Dispatchers.Default) {
+        runCatching {
+            val stereo = decodeAudioRange(ctx, Uri.parse(t.uri), 0, t.sourceDurationUs) ?: return@runCatching null
+            BeatDetector.detect(BeatDetector.toMono(stereo), 48_000)
+        }.getOrNull()?.takeIf { it.beatsUs.size >= 4 }
+    }
+
+    // ---------------- Video automatico ----------------
+
+    var showAuto by mutableStateOf(false)
+
+    /**
+     * Crea un progetto completo dagli elementi della galleria scelti: seleziona, importa, analizza il ritmo
+     * del brano e monta con la regia dello stile scelto. [fitMusic] = durata come il brano.
+     */
+    fun autoCreate(items: List<GalleryItem>, musicUri: Uri?, options: AutoOptions, fitMusic: Boolean) {
+        val ctx = getApplication<Application>()
+        viewModelScope.launch {
+            var music: MusicTrack? = null
+            if (musicUri != null) {
+                busy = "Lettura del brano…"
+                music = readMusic(ctx, musicUri)
+                if (music == null) { busy = null; message = "Questo file audio non si può leggere."; return@launch }
+            }
+            val o = music?.let { m -> if (fitMusic) options.copy(targetUs = m.sourceDurationUs) else null } ?: options
+            val picked = AutoEdit.pick(items.map { AutoItem(it.isVideo, it.durationMs * 1000, it.dateMs) }, o.style, o.targetUs).map { items[it] }
+            if (picked.isEmpty()) { busy = null; message = "Negli album scelti non ci sono foto o video."; return@launch }
+            val clips = ArrayList<Clip>()
+            picked.forEachIndexed { i, it ->
+                busy = "Preparo foto e video… ${i + 1} di ${picked.size}"
+                withContext(Dispatchers.IO) { importClip(ctx, it.uri) }?.let { c -> clips += c }
+            }
+            if (clips.isEmpty()) { busy = null; message = "Non sono riuscito a leggere le foto e i video scelti."; return@launch }
+            val m0 = music
+            if (m0 != null && m0.beatsUs.isEmpty()) {
+                busy = "Analisi del ritmo…"
+                val r = findBeats(ctx, m0)
+                if (r != null) music = m0.copy(beatsUs = r.beatsUs, bpm = r.bpm)
+            }
+            busy = "Montaggio…"
+            val name = options.title.ifBlank { "Video automatico" }.take(40)
+            var p = withContext(Dispatchers.Default) { AutoEdit.build(name, clips, music, o) }
+            if (clips.any { it.log }) p = p.copy(color = p.color.copy(denoise = 40))
+            busy = null
+            showAuto = false
+            store.save(p)
+            openProject(p)
+            message = "Video pronto: ${p.clips.size} scene, ${formatTime(p.durationUs)}." +
+                (if (clips.size < picked.size) " ${picked.size - clips.size} file non leggibili saltati." else "") +
+                " Guardalo in anteprima, ritocca quello che vuoi ed esporta."
+        }
+    }
+
     fun addMusic(uri: Uri) {
         val ctx = getApplication<Application>()
         val p = project ?: return
         if (p.clips.isEmpty()) { message = "Aggiungi prima un video."; return }
         viewModelScope.launch {
             busy = "Lettura del brano…"
-            val track = withContext(Dispatchers.IO) {
-                runCatching { ctx.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
-                runCatching {
-                    val (name, infoUs) = readAudioInfo(ctx, uri)
-                    val total = p.durationUs
-                    val start = if (total - playheadUs < 1_000_000) 0L else playheadUs
-                    val head = ctx.contentResolver.openInputStream(uri)?.use { s -> ByteArray(16).also { s.read(it) } }
-                    val bytes = if (head != null && Midi.isMidi(head)) ctx.contentResolver.openInputStream(uri)?.use { it.readBytes() } else null
-                    if (bytes != null) {
-                        // MIDI: lo suona il sintetizzatore di Android e lo si salva come WAV;
-                        // tempo e battiti si leggono esatti dal file.
-                        withContext(Dispatchers.Main) { busy = "Conversione del MIDI…" }
-                        val pcm = decodeAudioRange(ctx, uri, 0, Long.MAX_VALUE / 4) ?: error("MIDI non riproducibile")
-                        if (pcm.size < 2 * 4800) error("MIDI vuoto")
-                        val dir = File(ctx.filesDir, "music").apply { mkdirs() }
-                        val wav = File(dir, "midi_${System.currentTimeMillis()}.wav")
-                        writeWavFile(wav, pcm)
-                        val durUs = pcm.size / 2 * 1_000_000L / 48_000
-                        val midi = Midi.parse(bytes)
-                        MusicTrack(
-                            uri = Uri.fromFile(wav).toString(), name = name, sourceDurationUs = durUs,
-                            startUs = start, lengthUs = minOf(durUs, total - start),
-                            beatsUs = midi?.beatsUs?.filter { it < durUs }.orEmpty(),
-                            bpm = midi?.bpm ?: 0f,
-                        )
-                    } else {
-                        MusicTrack(
-                            uri = uri.toString(), name = name, sourceDurationUs = infoUs,
-                            startUs = start, lengthUs = minOf(infoUs, total - start),
-                        )
-                    }
-                }.getOrNull()
-            }
+            val total = p.durationUs
+            val start = if (total - playheadUs < 1_000_000) 0L else playheadUs
+            val track = readMusic(ctx, uri)?.let { it.copy(startUs = start, lengthUs = minOf(it.sourceDurationUs, total - start)) }
             busy = null
             if (track == null || track.sourceDurationUs <= 0) { message = "Questo file audio non si può leggere."; return@launch }
             update { it.copy(music = it.music + track) }
@@ -477,14 +533,9 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         val ctx = getApplication<Application>()
         viewModelScope.launch {
             busy = "Analisi del ritmo…"
-            val r = withContext(Dispatchers.Default) {
-                runCatching {
-                    val stereo = decodeAudioRange(ctx, Uri.parse(t.uri), 0, t.sourceDurationUs) ?: return@runCatching null
-                    BeatDetector.detect(BeatDetector.toMono(stereo), 48_000)
-                }.getOrNull()
-            }
+            val r = findBeats(ctx, t)
             busy = null
-            if (r == null || r.beatsUs.size < 4) { message = "Non ho trovato un ritmo chiaro in questo brano."; return@launch }
+            if (r == null) { message = "Non ho trovato un ritmo chiaro in questo brano."; return@launch }
             update { p ->
                 val cur = p.music.firstOrNull { it.id == t.id } ?: return@update null
                 p.replaceMusic(cur.copy(beatsUs = r.beatsUs, bpm = r.bpm))

@@ -167,6 +167,12 @@ class ScreenshotTest {
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/16_editor_musica_ritmo.png")
     }
 
+    @Test fun autoVideo() {
+        val vm = EditorViewModel(ApplicationProvider.getApplicationContext<Application>())
+        compose.setContent { VivoTheme { AutoScreen(vm) } }
+        compose.onRoot().captureRoboImage("build/outputs/roborazzi/17_video_automatico.png")
+    }
+
     @Test fun guide() {
         compose.setContent { VivoTheme { GuideScreen {} } }
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/14_guida.png")

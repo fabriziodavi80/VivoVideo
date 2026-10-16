@@ -45,6 +45,9 @@ import it.fabriziodavi.vivovideo.model.MusicTrack
 import it.fabriziodavi.vivovideo.model.Project
 import it.fabriziodavi.vivovideo.model.SpeedPreset
 import it.fabriziodavi.vivovideo.model.TextAnim
+import it.fabriziodavi.vivovideo.model.AutoEdit
+import it.fabriziodavi.vivovideo.model.AutoOptions
+import it.fabriziodavi.vivovideo.model.AutoStyle
 import it.fabriziodavi.vivovideo.model.TextItem
 import it.fabriziodavi.vivovideo.model.TextLook
 import it.fabriziodavi.vivovideo.model.Transform
@@ -219,6 +222,17 @@ class DeviceTest {
                     animOut = if (a.inOnly) TextAnim.FADE else a, look = TextLook.entries[i % TextLook.entries.size], gradientTo = if (i % 2 == 0) Color.MAGENTA else null)
             },
         )
+    }
+
+    /** Video automatico con musica e battiti: tutte le regie si esportano. */
+    @Test fun exportAutoVideo() {
+        val srcs = listOf(video("a", videoA), photoClip("p1"), video("b", videoB), photoClip("p2"), video("c", videoC))
+            .map { it.copy(trimStartUs = 0, trimEndUs = it.sourceDurationUs.coerceAtMost(Clip.PHOTO_MAX_US)) }
+        val m = MusicTrack(uri = music.toString(), name = "musica", sourceDurationUs = 30_000_000, lengthUs = 30_000_000,
+            beatsUs = (1 until 60).map { it * 500_000L }, bpm = 120f)
+        listOf(AutoStyle.CINEMA, AutoStyle.ENERGICO).forEach { s ->
+            exportAndCheck(AutoEdit.build("auto ${s.label}", srcs, m, AutoOptions(style = s, title = "Prova", subtitle = "Ottobre 2026")))
+        }
     }
 
     @Test fun exportWowTransitionsAndTexts() {
