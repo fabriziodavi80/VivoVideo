@@ -237,16 +237,21 @@ object TextRenderer {
      * Testo con le lettere animate una per una ([progress] 0→1 lungo l'entrata o l'uscita).
      * L'immagine ha margini più larghi, così le lettere possono uscire dalla riga mentre si muovono.
      */
-    fun renderLetters(context: Context, item: TextItem, frameW: Int, frameH: Int, anim: TextAnim, entering: Boolean, progress: Float): Bitmap {
+    fun renderLetters(
+        context: Context, item: TextItem, frameW: Int, frameH: Int, anim: TextAnim, entering: Boolean, progress: Float,
+        reuse: Bitmap? = null,
+    ): Bitmap {
         val key = baseKey(item, frameW, frameH) + "|L|$anim|$entering|${(progress * 1000).toInt()}"
-        cache.get(key)?.let { return it }
+        if (reuse == null) cache.get(key)?.let { return it }
         val p = prepare(context, item, frameW, frameH, Int.MAX_VALUE)
         val ts = p.paint.textSize
         val exX = (ts * 0.4f).toInt()
         val exY = (ts * 1.1f).toInt()
         val bw = p.width + 2 * p.pad + 2 * exX
         val bh = p.layout.height + 2 * p.pad + 2 * exY
-        val bmp = Bitmap.createBitmap(bw.coerceAtLeast(2), bh.coerceAtLeast(2), Bitmap.Config.ARGB_8888)
+        // Fotogrammi in sequenza: si riusa l'immagine passata (stessa misura) invece di crearne una nuova.
+        val bmp = reuse?.takeIf { it.isMutable && it.width == bw.coerceAtLeast(2) && it.height == bh.coerceAtLeast(2) }?.apply { eraseColor(0) }
+            ?: Bitmap.createBitmap(bw.coerceAtLeast(2), bh.coerceAtLeast(2), Bitmap.Config.ARGB_8888)
         val c = Canvas(bmp)
         val light = isLight(item.color)
         if (item.look == TextLook.RIQUADRO) {
@@ -271,7 +276,7 @@ object TextRenderer {
                 c.restore()
             }
         }
-        return keep(key, bmp)
+        return if (reuse != null) bmp else keep(key, bmp)
     }
 
     /** Glitch: il testo a strisce spostate, con i bordi rossi e azzurri sfasati ([amount] 0…1). */
@@ -443,17 +448,35 @@ class TimedTextOverlay(
     private val frameH: Int,
 ) : BitmapOverlay() {
 
+    // Due immagini che si alternano per i fotogrammi lettera per lettera (il motore ricarica l'immagine solo se cambia).
+    private val spare = arrayOfNulls<Bitmap>(2)
+    private var flip = 0
+    private var lastLetters: Triple<TextAnim, Boolean, Float>? = null
+    private var lastBitmap: Bitmap? = null
+
+    private fun letters(anim: TextAnim, entering: Boolean, progress: Float): Bitmap {
+        val k = Triple(anim, entering, progress)
+        val last = lastBitmap
+        if (k == lastLetters && last != null) return last
+        flip = 1 - flip
+        val b = TextRenderer.renderLetters(context, item, frameW, frameH, anim, entering, progress, reuse = spare[flip])
+        spare[flip] = b
+        lastLetters = k
+        lastBitmap = b
+        return b
+    }
+
     override fun getBitmap(presentationTimeUs: Long): Bitmap {
         val local = presentationTimeUs - item.startUs
         val dur = item.durationUs
         // Lettera per lettera (uscita prima: se il testo è corto vince la fine).
         if (item.animOut.letters) {
             val ou = lettersOutUs(item)
-            if (local > dur - ou) return TextRenderer.renderLetters(context, item, frameW, frameH, item.animOut, false, quant((local - (dur - ou)).toFloat() / ou))
+            if (local > dur - ou) return letters(item.animOut, false, quant((local - (dur - ou)).toFloat() / ou))
         }
         if (item.animIn.letters) {
             val iu = lettersInUs(item)
-            if (local < iu) return TextRenderer.renderLetters(context, item, frameW, frameH, item.animIn, true, quant(local.coerceAtLeast(0).toFloat() / iu))
+            if (local < iu) return letters(item.animIn, true, quant(local.coerceAtLeast(0).toFloat() / iu))
         }
         val g = minOf(GLITCH_US, dur / 2).coerceAtLeast(1)
         if (item.animOut == TextAnim.GLITCH && local > dur - g) {
