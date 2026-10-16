@@ -945,6 +945,8 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             .build().also { np ->
             np.addListener(object : Player.Listener {
                 override fun onPlayerError(error: PlaybackException) {
+                    // Un lettore già chiuso (o in chiusura) non conta: per esempio "release timeout" su un telefono lento.
+                    if (player !== np) return
                     // Catena delle cause: serve per capire cosa non va sul telefono.
                     val chain = generateSequence(error.cause) { it.cause }.take(3)
                         .joinToString(" ← ") { "${it.javaClass.simpleName}: ${it.message?.take(120) ?: ""}" }
@@ -990,8 +992,9 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
 
     private fun releasePlayer() {
         handler.removeCallbacks(ticker)
-        player?.release()
+        val old = player
         player = null
+        old?.release()
         if (playerMulti) Safety.pendingPreview(getApplication(), false)
         playerMulti = false
         isPlaying = false

@@ -361,11 +361,13 @@ class DeviceTest {
             Thread.sleep(500)
         }
         if (recoveries > 0) android.util.Log.w("VivoVideoTest", "anteprima ripartita $recoveries volte")
+        // Gli errori durante la chiusura del lettore (come "release timeout" sull'emulatore lento) non contano, come nell'app.
+        val playError = error.get()
         val latch = CountDownLatch(1)
         main.post { player.get().release(); latch.countDown() }
         latch.await(10, TimeUnit.SECONDS)
         reader.close()
-        error.get()?.let { fail("anteprima: $it") }
+        playError?.let { fail("anteprima: $it") }
         val advanced = samples.last() - samples.first()
         val trace = samples.joinToString(" ")
         val expected = (seconds * 2 - 1) * 500L
