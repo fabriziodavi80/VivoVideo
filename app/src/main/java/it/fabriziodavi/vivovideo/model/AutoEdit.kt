@@ -1,5 +1,6 @@
 package it.fabriziodavi.vivovideo.model
 
+import kotlinx.serialization.Serializable
 import kotlin.random.Random
 
 /**
@@ -71,6 +72,7 @@ enum class AutoStyle(
 /** Un elemento della galleria candidato al video automatico. */
 data class AutoItem(val isVideo: Boolean, val durationUs: Long, val dateMs: Long)
 
+@Serializable
 data class AutoOptions(
     val style: AutoStyle = AutoStyle.CINEMA,
     /** Durata desiderata (0 = usa tutto quello che è stato scelto). */
@@ -78,6 +80,27 @@ data class AutoOptions(
     val title: String = "",
     val subtitle: String = "",
     val seed: Int = 7,
+    /** 0 = prima proposta; dalle successive cambiano anche le scene scelte e il punto dei video. */
+    val variant: Int = 0,
+)
+
+/** Un elemento della galleria da cui è nato il video automatico. */
+@Serializable
+data class AutoSource(val uri: String, val isVideo: Boolean, val durationUs: Long, val dateMs: Long) {
+    fun item() = AutoItem(isVideo, durationUs, dateMs)
+}
+
+/**
+ * Come è nato un video automatico: serve per chiedere altre proposte. [imported] = clip già importate
+ * (per indirizzo originale), così le proposte successive non rileggono le stesse foto.
+ */
+@Serializable
+data class AutoRecipe(
+    val sources: List<AutoSource>,
+    val options: AutoOptions,
+    val music: MusicTrack? = null,
+    val round: Int = 1,
+    val imported: Map<String, Clip> = emptyMap(),
 )
 
 object AutoEdit {
@@ -88,7 +111,7 @@ object AutoEdit {
      * Quali elementi usare per stare nella durata: indici in ordine di data, presi a intervalli regolari
      * (così il video racconta tutto il periodo, non solo l'inizio).
      */
-    fun pick(items: List<AutoItem>, style: AutoStyle, targetUs: Long): List<Int> {
+    fun pick(items: List<AutoItem>, style: AutoStyle, targetUs: Long, variant: Int = 0): List<Int> {
         if (items.isEmpty()) return emptyList()
         val order = items.indices.sortedBy { items[it].dateMs }
         val videoShare = items.count { it.isVideo }.toFloat() / items.size
@@ -96,7 +119,21 @@ object AutoEdit {
             else (targetUs / style.averageSlotUs(videoShare).coerceAtLeast(1)).toInt().coerceAtLeast(2)
         val n = minOf(wanted, order.size, MAX_ITEMS)
         if (n >= order.size) return order
-        return (0 until n).map { k -> order[(k.toLong() * (order.size - 1) / (n - 1).coerceAtLeast(1)).toInt()] }.distinct()
+        if (variant == 0 || n < 3) return (0 until n).map { k -> order[(k.toLong() * (order.size - 1) / (n - 1).coerceAtLeast(1)).toInt()] }.distinct()
+        // Altre proposte: primo e ultimo restano, in mezzo si sceglie a caso dentro ogni tratto del periodo.
+        val rnd = Random(variant * 7919 + 13)
+        val size = order.size
+        return (0 until n).map { k ->
+            when (k) {
+                0 -> order.first()
+                n - 1 -> order.last()
+                else -> {
+                    val lo = (k.toLong() * size / n).toInt().coerceIn(1, size - 2)
+                    val hi = ((k + 1).toLong() * size / n).toInt().coerceIn(lo + 1, size - 1)
+                    order[rnd.nextInt(lo, hi)]
+                }
+            }
+        }.distinct()
     }
 
     /**
@@ -132,7 +169,8 @@ object AutoEdit {
                 prevMotion = m
                 src.copy(trimStartUs = 0, trimEndUs = len, keyframes = m.keyframes(len))
             } else {
-                val start = ((src.sourceDurationUs - len) * 0.4).toLong().coerceAtLeast(0)
+                val pos = if (o.variant == 0) 0.4 else 0.2 + rnd.nextDouble() * 0.45
+                val start = ((src.sourceDurationUs - len) * pos).toLong().coerceAtLeast(0)
                 src.copy(trimStartUs = start, trimEndUs = start + len, speed = ClipSpeed.NORMAL, keyframes = emptyList())
             }
             c = c.copy(fill = true, muted = music != null || c.muted, fx = style.fx, fadeInUs = 0, fadeOutUs = 0, transitionOut = null)
@@ -151,7 +189,7 @@ object AutoEdit {
                 prevT = type
                 c = c.copy(transitionOut = TransitionSpec(type, minOf(style.transitionUs, c.outputUs / 2, clips[i + 1].outputUs / 2)))
             }
-            if (style.accents.isNotEmpty() && i % 3 == 1) {
+            if (style.accents.isNotEmpty() && i % 3 == 1 + (o.variant % 2)) {
                 val a = style.accents[(i / 3) % style.accents.size]
                 c = c.copy(fx = c.fx.filter { it.type != a.type } + a)
             }

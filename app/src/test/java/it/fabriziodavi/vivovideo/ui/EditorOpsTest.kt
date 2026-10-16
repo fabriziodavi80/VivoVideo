@@ -4,6 +4,13 @@ import android.app.Application
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import it.fabriziodavi.vivovideo.model.Clip
+import it.fabriziodavi.vivovideo.model.AutoEdit
+import it.fabriziodavi.vivovideo.model.AutoOptions
+import it.fabriziodavi.vivovideo.model.AutoRecipe
+import it.fabriziodavi.vivovideo.model.AutoSource
+import it.fabriziodavi.vivovideo.model.AutoStyle
+import android.os.Looper
+import org.robolectric.Shadows.shadowOf
 import it.fabriziodavi.vivovideo.model.ClipSpeed
 import it.fabriziodavi.vivovideo.model.FadeColor
 import it.fabriziodavi.vivovideo.model.FxType
@@ -249,5 +256,34 @@ class EditorOpsTest {
         vm.tapCuts = false
         vm.seekTo(1_500_000); vm.tapBeat()
         assertEquals(0, vm.pendingCutCount)
+    }
+
+    @Test fun anotherProposalRebuildsAndUndoGoesBack() {
+        val vm = vm()
+        // Fonti già importate: la nuova proposta non deve rileggere nulla.
+        val srcs = (0 until 30).map { i -> AutoSource("content://media/$i", i % 4 == 0, if (i % 4 == 0) 9_000_000 else 0, i * 1000L) }
+        val imported = srcs.associate { s ->
+            s.uri to (if (s.isVideo) Clip(uri = s.uri, sourceDurationUs = 9_000_000, trimEndUs = 9_000_000, width = 1920, height = 1080)
+            else Clip(uri = s.uri, sourceDurationUs = Clip.PHOTO_MAX_US, trimEndUs = Clip.PHOTO_DEFAULT_US, isPhoto = true, width = 4000, height = 3000))
+        }
+        val o = AutoOptions(style = AutoStyle.CINEMA, targetUs = 30_000_000, title = "Estate")
+        val first = AutoEdit.build("Estate", AutoEdit.pick(srcs.map { it.item() }, o.style, o.targetUs).map { imported.getValue(srcs[it].uri) }, null, o)
+        vm.openProject(first.copy(auto = AutoRecipe(srcs, o, null, round = 1, imported = imported)), startPreview = false)
+        val before = vm.project!!
+        vm.anotherProposal(AutoStyle.ENERGICO)
+        repeat(200) { if (vm.project!!.auto!!.round == 1) { shadowOf(Looper.getMainLooper()).idle(); Thread.sleep(10) } }
+        val p = vm.project!!
+        assertEquals(2, p.auto!!.round)
+        assertEquals(AutoStyle.ENERGICO, p.auto!!.options.style)
+        assertEquals(before.id, p.id)                      // stesso progetto
+        assertTrue(p.clips.map { it.uri } != before.clips.map { it.uri } || p.clips.map { it.outputUs } != before.clips.map { it.outputUs })
+        assertTrue(p.clips.all { c -> c.fx.any { it.type == FxType.HIT } })   // regia Energico
+        assertEquals("Estate", p.texts.first().text)
+        // A mano si può sempre intervenire, e Annulla torna alla proposta di prima.
+        vm.selectedClipId = p.clips[0].id
+        vm.deleteSelected()
+        vm.undo(); vm.undo()
+        assertEquals(1, vm.project!!.auto!!.round)
+        assertEquals(before.clips, vm.project!!.clips)
     }
 }

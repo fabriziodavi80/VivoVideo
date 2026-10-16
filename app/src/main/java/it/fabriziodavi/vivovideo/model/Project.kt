@@ -565,6 +565,8 @@ data class Project(
     val music: List<MusicTrack> = emptyList(),
     val texts: List<TextItem> = emptyList(),
     val layers: List<Layer> = emptyList(),
+    /** Se il progetto è un video automatico: come rifarlo (per "Altra proposta"). */
+    val auto: AutoRecipe? = null,
 ) {
     fun replaceLayer(l: Layer): Project = copy(layers = layers.map { if (it.id == l.id) l else it })
 

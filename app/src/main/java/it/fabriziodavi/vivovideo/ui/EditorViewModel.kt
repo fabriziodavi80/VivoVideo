@@ -4,8 +4,10 @@ import it.fabriziodavi.vivovideo.model.TextItem
 import it.fabriziodavi.vivovideo.model.TransitionSpec
 import it.fabriziodavi.vivovideo.model.Clip
 import it.fabriziodavi.vivovideo.model.AutoEdit
-import it.fabriziodavi.vivovideo.model.AutoItem
 import it.fabriziodavi.vivovideo.model.AutoOptions
+import it.fabriziodavi.vivovideo.model.AutoRecipe
+import it.fabriziodavi.vivovideo.model.AutoSource
+import it.fabriziodavi.vivovideo.model.AutoStyle
 import it.fabriziodavi.vivovideo.media.GalleryItem
 import it.fabriziodavi.vivovideo.model.ClipSpeed
 import it.fabriziodavi.vivovideo.model.ClipFx
@@ -466,13 +468,13 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                 if (music == null) { busy = null; message = "Questo file audio non si può leggere."; return@launch }
             }
             val o = music?.let { m -> if (fitMusic) options.copy(targetUs = m.sourceDurationUs) else null } ?: options
-            val picked = AutoEdit.pick(items.map { AutoItem(it.isVideo, it.durationMs * 1000, it.dateMs) }, o.style, o.targetUs).map { items[it] }
+            // Le fonti si ricordano (al massimo 1500, distribuite nel tempo) per poter fare altre proposte.
+            val all = if (items.size <= 1500) items else (0 until 1500).map { items[(it.toLong() * (items.size - 1) / 1499).toInt()] }
+            val sources = all.map { AutoSource(it.uri.toString(), it.isVideo, it.durationMs * 1000, it.dateMs) }
+            val picked = AutoEdit.pick(sources.map { it.item() }, o.style, o.targetUs).map { sources[it] }
             if (picked.isEmpty()) { busy = null; message = "Negli album scelti non ci sono foto o video."; return@launch }
-            val clips = ArrayList<Clip>()
-            picked.forEachIndexed { i, it ->
-                busy = "Preparo foto e video… ${i + 1} di ${picked.size}"
-                withContext(Dispatchers.IO) { importClip(ctx, it.uri) }?.let { c -> clips += c }
-            }
+            val imported = importSources(ctx, picked, emptyMap())
+            val clips = picked.mapNotNull { imported[it.uri] }
             if (clips.isEmpty()) { busy = null; message = "Non sono riuscito a leggere le foto e i video scelti."; return@launch }
             val m0 = music
             if (m0 != null && m0.beatsUs.isEmpty()) {
@@ -482,7 +484,8 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             }
             busy = "Montaggio…"
             val name = options.title.ifBlank { "Video automatico" }.take(40)
-            var p = withContext(Dispatchers.Default) { AutoEdit.build(name, clips, music, o) }
+            val built = withContext(Dispatchers.Default) { AutoEdit.build(name, clips, music, o) }
+            var p = built.copy(auto = AutoRecipe(sources, o, music, round = 1, imported = imported))
             if (clips.any { it.log }) p = p.copy(color = p.color.copy(denoise = 40))
             busy = null
             showAuto = false
@@ -491,6 +494,46 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             message = "Video pronto: ${p.clips.size} scene, ${formatTime(p.durationUs)}." +
                 (if (clips.size < picked.size) " ${picked.size - clips.size} file non leggibili saltati." else "") +
                 " Guardalo in anteprima, ritocca quello che vuoi ed esporta."
+        }
+    }
+
+    /** Importa le fonti che mancano (con avanzamento) e restituisce tutte quelle importate, per indirizzo. */
+    private suspend fun importSources(ctx: Application, picked: List<AutoSource>, known: Map<String, Clip>): Map<String, Clip> {
+        val out = HashMap(known)
+        val missing = picked.filter { it.uri !in out }
+        missing.forEachIndexed { i, src ->
+            busy = "Preparo foto e video… ${i + 1} di ${missing.size}"
+            withContext(Dispatchers.IO) { importClip(ctx, Uri.parse(src.uri)) }?.let { out[src.uri] = it }
+        }
+        return out
+    }
+
+    /**
+     * Altra proposta del video automatico (anche con un altro stile): scene, tagli, transizioni ed effetti nuovi.
+     * È una modifica come le altre: Annulla torna alla proposta di prima.
+     */
+    fun anotherProposal(style: AutoStyle? = null) {
+        val ctx = getApplication<Application>()
+        val p = project ?: return
+        val r = p.auto ?: return
+        if (busy != null) return
+        viewModelScope.launch {
+            val round = r.round + 1
+            val o = r.options.copy(style = style ?: r.options.style, seed = r.options.seed + 7919 * round, variant = round)
+            val picked = AutoEdit.pick(r.sources.map { it.item() }, o.style, o.targetUs, variant = round).map { r.sources[it] }
+            val imported = importSources(ctx, picked, r.imported)
+            val clips = picked.mapNotNull { imported[it.uri] }
+            busy = "Nuova proposta…"
+            val built = withContext(Dispatchers.Default) { AutoEdit.build(p.name, clips, r.music, o) }
+            busy = null
+            if (built.clips.isEmpty()) { message = "Non sono riuscito a leggere le foto e i video degli album."; return@launch }
+            pause()
+            update { cur ->
+                cur.copy(clips = built.clips, texts = built.texts, music = built.music,
+                    auto = r.copy(options = o, round = round, imported = imported))
+            }
+            selectedClipId = null
+            seekTo(0)
         }
     }
 

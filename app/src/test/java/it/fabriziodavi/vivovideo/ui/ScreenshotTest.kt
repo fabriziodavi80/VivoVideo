@@ -173,6 +173,16 @@ class ScreenshotTest {
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/17_video_automatico.png")
     }
 
+    @Test fun autoProposalBar() {
+        val vm = vm()
+        val p = vm.project!!
+        val o = it.fabriziodavi.vivovideo.model.AutoOptions(style = it.fabriziodavi.vivovideo.model.AutoStyle.ELEGANTE)
+        vm.openProject(p.copy(auto = it.fabriziodavi.vivovideo.model.AutoRecipe(emptyList(), o, round = 3)), startPreview = false)
+        vm.selectedClipId = null
+        compose.setContent { VivoTheme { EditorScreen(vm) } }
+        compose.onRoot().captureRoboImage("build/outputs/roborazzi/18_proposta_automatica.png")
+    }
+
     @Test fun guide() {
         compose.setContent { VivoTheme { GuideScreen {} } }
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/14_guida.png")

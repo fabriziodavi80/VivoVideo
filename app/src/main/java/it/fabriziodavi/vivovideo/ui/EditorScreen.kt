@@ -1,6 +1,7 @@
 package it.fabriziodavi.vivovideo.ui
 
 import it.fabriziodavi.vivovideo.model.FadeColor
+import it.fabriziodavi.vivovideo.model.AutoStyle
 
 import it.fabriziodavi.vivovideo.model.FxCategory
 
@@ -541,6 +542,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
                 preview(Modifier.fillMaxWidth().weight(1f), false)
                 transport()
                 timeline()
+                if (activeTool == null && project.auto != null) AutoBar(vm, !running)
                 activeTool?.let { t ->
                     Column(Modifier.fillMaxWidth().heightIn(max = 340.dp).background(VV.Panel)) {
                         Box(Modifier.fillMaxWidth().height(1.dp).background(VV.Line))
@@ -686,6 +688,60 @@ private fun SeekBar(vm: EditorViewModel, durationUs: Long) {
             thumbColor = VV.Tally, activeTrackColor = VV.Tally, inactiveTrackColor = Color(0x66FFFFFF),
         ),
     )
+}
+
+/**
+ * Barra del video automatico: quale proposta è, "Altra proposta" (scene, tagli ed effetti nuovi)
+ * e "Stile" per rifarla con un'altra regia. Annulla torna alla proposta di prima.
+ */
+@Composable
+private fun AutoBar(vm: EditorViewModel, enabled: Boolean) {
+    val r = vm.project?.auto ?: return
+    var choose by remember { mutableStateOf(false) }
+    val idle = enabled && vm.busy == null
+    Row(
+        Modifier.fillMaxWidth().background(VV.Panel).padding(start = 14.dp, end = 8.dp, top = 6.dp, bottom = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(VVIcons.Effects, null, tint = VV.Tally, modifier = Modifier.size(18.dp))
+        Spacer(Modifier.width(8.dp))
+        Column(Modifier.weight(1f)) {
+            Text("Proposta ${r.round}", style = MaterialTheme.typography.labelLarge)
+            Text(r.options.style.label, style = MaterialTheme.typography.bodySmall)
+        }
+        Box(
+            Modifier.clip(RoundedCornerShape(999.dp)).background(VV.Raised).clickable(enabled = idle) { choose = true }
+                .padding(horizontal = 14.dp, vertical = 8.dp),
+        ) { Text("Stile", style = MaterialTheme.typography.labelLarge) }
+        Spacer(Modifier.width(8.dp))
+        Box(
+            Modifier.clip(RoundedCornerShape(999.dp)).background(if (idle) VV.Tally else VV.Raised).clickable(enabled = idle) { vm.anotherProposal() }
+                .padding(horizontal = 14.dp, vertical = 8.dp),
+        ) { Text("Altra proposta", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold, color = if (idle) VV.TallyInk else VV.Faint) }
+    }
+    if (choose) {
+        AlertDialog(
+            onDismissRequest = { choose = false },
+            containerColor = VV.Raised,
+            title = { Text("Rifai con lo stile…", style = MaterialTheme.typography.titleSmall) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    AutoStyle.entries.forEach { st ->
+                        val on = st == r.options.style
+                        Column(
+                            Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(if (on) VV.Raised2 else VV.Panel)
+                                .border(if (on) 2.dp else 0.dp, if (on) VV.Tally else Color.Transparent, RoundedCornerShape(10.dp))
+                                .clickable { choose = false; vm.anotherProposal(st) }.padding(10.dp),
+                        ) {
+                            Text(st.label, style = MaterialTheme.typography.labelLarge, color = if (on) VV.Tally else VV.Text)
+                            Text(st.description, style = MaterialTheme.typography.bodySmall)
+                        }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { choose = false }) { Text("Chiudi", color = VV.Dim) } },
+        )
+    }
 }
 
 /** Schede in cima a un pannello. */

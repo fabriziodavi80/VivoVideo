@@ -89,4 +89,35 @@ class AutoEditTest {
         assertEquals("Luglio – Agosto 2026", dateRangeLabel(d(2026, Calendar.JULY), d(2026, Calendar.AUGUST)))
         assertEquals("2024 – 2026", dateRangeLabel(d(2024, Calendar.MAY), d(2026, Calendar.AUGUST)))
     }
+
+    @Test fun otherProposalsChangeScenesButKeepThePeriod() {
+        val items = (0 until 200).map { AutoItem(isVideo = it % 5 == 0, durationUs = 8_000_000, dateMs = it * 1000L) }
+        val first = AutoEdit.pick(items, AutoStyle.CINEMA, 60_000_000)
+        val second = AutoEdit.pick(items, AutoStyle.CINEMA, 60_000_000, variant = 2)
+        val third = AutoEdit.pick(items, AutoStyle.CINEMA, 60_000_000, variant = 3)
+        assertTrue(first != second && second != third)
+        listOf(second, third).forEach { v ->
+            assertEquals(0, v.first()); assertEquals(199, v.last())     // sempre dal primo all'ultimo giorno
+            assertEquals(v.sorted(), v)                                  // in ordine
+            assertTrue(abs(v.size - first.size) <= 2)                    // durata simile
+        }
+        // Anche montaggio diverso: transizioni o punto dei video.
+        val a = AutoEdit.build("x", sources(), null, AutoOptions(seed = 7))
+        val b = AutoEdit.build("x", sources(), null, AutoOptions(seed = 7 + 7919 * 2, variant = 2))
+        assertTrue(a.clips.map { it.transitionOut to it.trimStartUs } != b.clips.map { it.transitionOut to it.trimStartUs })
+    }
+
+    @Test fun recipeIsSavedWithTheProject() {
+        val r = AutoRecipe(
+            sources = listOf(AutoSource("content://media/1", true, 5_000_000, 1L)),
+            options = AutoOptions(style = AutoStyle.ELEGANTE, targetUs = 30_000_000, title = "T", variant = 2),
+            music = MusicTrack(uri = "content://m", name = "M", sourceDurationUs = 9_000_000, beatsUs = listOf(1, 2)),
+            round = 3, imported = mapOf("content://media/1" to video(1)),
+        )
+        val p = Project(name = "auto", auto = r)
+        val back = Project.JSON.decodeFromString(Project.serializer(), Project.JSON.encodeToString(Project.serializer(), p))
+        assertEquals(r, back.auto)
+        // I progetti vecchi (senza ricetta) si leggono ancora.
+        assertNull(Project.JSON.decodeFromString(Project.serializer(), """{"name":"vecchio"}""").auto)
+    }
 }

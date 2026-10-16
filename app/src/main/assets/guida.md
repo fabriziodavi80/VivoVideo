@@ -3,7 +3,7 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
-- **Video automatico** (in cima alla schermata dei progetti): scegli **uno o più album** della galleria, uno **stile** (Cinema, Energico, Ricordi, Elegante, Viaggio), un brano e la durata. L'app sceglie le scene lungo tutto il periodo, le taglia sui battiti e aggiunge transizioni, effetti, titolo e apertura/chiusura. Poi si ritocca tutto nell'editor.
+- **Video automatico** (in cima alla schermata dei progetti): scegli **uno o più album** della galleria, uno **stile** (Cinema, Energico, Ricordi, Elegante, Viaggio), un brano e la durata. L'app sceglie le scene lungo tutto il periodo, le taglia sui battiti e aggiunge transizioni, effetti, titolo e apertura/chiusura. Se non ti piace, **Altra proposta** ne prepara un'altra (anche con un altro stile), quante volte vuoi; puoi sempre ritoccare a mano.
 - Pulsanti "a tutte" e "Apri e chiudi il video" illuminati quando la scelta è attiva; TAP a tempo che taglia anche le clip.
 
 ## Video automatico
@@ -14,6 +14,8 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - **4. Durata**: 30 s, 1, 2 o 3 minuti, **Come il brano** o **Tutto**. Le scene sono prese a intervalli regolari dal primo all'ultimo giorno, in ordine di data; dei video si usa un tratto centrale.
 - **5. Titolo**: proposto con il nome degli album, con sotto il periodo (es. "Luglio – Agosto 2026").
 - **Crea il video**: il progetto si apre nell'editor già montato. Tutto resta ritoccabile (scene, transizioni, effetti, testi, musica); poi Esporta.
+- **Altre proposte**: nell'editor di un video automatico c'è la barra **Proposta N**. **Altra proposta** rifà il montaggio da capo (altre scene lungo il periodo, altri punti dei video, altre transizioni ed effetti) quante volte vuoi; **Stile** lo rifà con un'altra regia. **Annulla** torna alla proposta di prima.
+- Ogni proposta resta ritoccabile a mano; ma attenzione: chiedendo un'altra proposta i ritocchi fatti a mano si perdono (si recuperano con Annulla). La barra si nasconde quando è aperto un pannello.
 
 ## Primi passi
 - Dalla schermata dei progetti tocca **Nuovo progetto** e scegli video e foto dalla galleria.
