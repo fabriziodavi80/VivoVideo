@@ -744,6 +744,25 @@ private fun AutoBar(vm: EditorViewModel, enabled: Boolean) {
     }
 }
 
+/** Crediti dei brani presi in rete, da copiare nella descrizione del video. */
+@Composable
+private fun CreditsBox(credits: List<String>) {
+    if (credits.isEmpty()) return
+    val ctx = LocalContext.current
+    val text = "Musica ed effetti:\n" + credits.joinToString("\n")
+    Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(VV.Raised).padding(12.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Text("Crediti da mettere nella descrizione del video", style = MaterialTheme.typography.labelLarge, color = VV.Tally)
+        SelectionContainer { Text(credits.joinToString("\n"), style = MaterialTheme.typography.bodySmall) }
+        SecondaryButton("Copia i crediti", onClick = {
+            val cm = ctx.getSystemService(android.content.ClipboardManager::class.java)
+            cm?.setPrimaryClip(android.content.ClipData.newPlainText("Crediti", text))
+        })
+    }
+}
+
 /** Schede in cima a un pannello. */
 @Composable
 private fun PanelTabs(tabs: List<String>, selected: Int, onSelect: (Int) -> Unit) {
@@ -990,8 +1009,12 @@ private fun MusicPanel(vm: EditorViewModel, running: Boolean, tab: Int, onAdd: (
     }
     val t = vm.selectedMusic
     if (t == null) {
-        Hint("Scegli un brano dal telefono (MP3, M4A, WAV, FLAC, anche MIDI): parte dal punto dell'indicatore e si ferma alla fine del video.")
-        PrimaryButton("Aggiungi musica", Modifier.fillMaxWidth(), enabled = enabled, onClick = onAdd)
+        Hint("Scegli un brano dal telefono (MP3, M4A, WAV, FLAC, anche MIDI) o dalla libreria di musica libera: parte dal punto dell'indicatore e si ferma alla fine del video.")
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            PrimaryButton("Libreria online", Modifier.weight(1f), enabled = enabled) { vm.openLibrary(effects = false) }
+            SecondaryButton("Dal telefono", Modifier.weight(1f), onClick = { if (enabled) onAdd() })
+        }
+        SecondaryButton("Effetti sonori", Modifier.fillMaxWidth(), onClick = { if (enabled) vm.openLibrary(effects = true) })
         return
     }
     val total = p.durationUs
@@ -1037,7 +1060,13 @@ private fun MusicPanel(vm: EditorViewModel, running: Boolean, tab: Int, onAdd: (
                 SecondaryButton("Dividi qui", onClick = { if (enabled) vm.splitMusicAtPlayhead() })
                 SecondaryButton("Elimina brano", onClick = { if (enabled) vm.deleteMusic() })
             }
-            SecondaryButton("Aggiungi un altro brano", onClick = { if (enabled) onAdd() })
+            PanelLabel("Aggiungi")
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                SecondaryButton("Libreria", Modifier.weight(1f), onClick = { if (enabled) vm.openLibrary(effects = false) })
+                SecondaryButton("Effetti sonori", Modifier.weight(1f), onClick = { if (enabled) vm.openLibrary(effects = true) })
+            }
+            SecondaryButton("Brano dal telefono", Modifier.fillMaxWidth(), onClick = { if (enabled) onAdd() })
+            CreditsBox(p.credits())
             Hint("Nella timeline: tocca il brano per selezionarlo, trascinalo per spostarlo, usa le maniglie per accorciarlo. Le dissolvenze si sentono nel video esportato.")
         }
         1 -> {
@@ -1592,11 +1621,14 @@ private fun ExportPanel(vm: EditorViewModel, onOpen: (android.net.Uri) -> Unit) 
             )
             SecondaryButton("Annulla", onClick = vm::cancelExport)
         }
-        is ExportState.Done -> ResultBox("Salvato in Film/VivoVideo", state.details) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                PrimaryButton("Apri il video") { onOpen(state.uri) }
-                SecondaryButton("Chiudi", onClick = vm::dismissExportResult)
+        is ExportState.Done -> {
+            ResultBox("Salvato in Film/VivoVideo", state.details) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    PrimaryButton("Apri il video") { onOpen(state.uri) }
+                    SecondaryButton("Chiudi", onClick = vm::dismissExportResult)
+                }
             }
+            CreditsBox(vm.project?.credits().orEmpty())
         }
         is ExportState.Failed -> ResultBox("L'esportazione non è riuscita", state.message) {
             Hint("Fai uno screenshot di questo messaggio e mandalo a Claude.")

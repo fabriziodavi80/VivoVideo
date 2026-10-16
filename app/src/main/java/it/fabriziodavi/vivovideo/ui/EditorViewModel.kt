@@ -3,6 +3,8 @@ package it.fabriziodavi.vivovideo.ui
 import it.fabriziodavi.vivovideo.model.TextItem
 import it.fabriziodavi.vivovideo.model.TransitionSpec
 import it.fabriziodavi.vivovideo.model.Clip
+import it.fabriziodavi.vivovideo.online.Library
+import it.fabriziodavi.vivovideo.online.OnlineTrack
 import it.fabriziodavi.vivovideo.model.AutoEdit
 import it.fabriziodavi.vivovideo.model.AutoOptions
 import it.fabriziodavi.vivovideo.model.AutoRecipe
@@ -413,6 +415,40 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     // ---------------- Musica ----------------
 
     /** Aggiunge un brano che parte dall'indicatore (o dall'inizio, se l'indicatore è in fondo). */
+    // ---------------- Libreria in rete ----------------
+
+    /** Libreria aperta: per musica o effetti, e se il brano va al video automatico invece che al progetto. */
+    data class LibraryRequest(val effects: Boolean, val forAuto: Boolean = false)
+    var library by mutableStateOf<LibraryRequest?>(null)
+    /** Brano scelto in libreria per il video automatico (lo raccoglie la sua schermata). */
+    var autoMusicPicked by mutableStateOf<Uri?>(null)
+    /** Nome e crediti dei file scaricati, per indirizzo: li usa la lettura del brano. */
+    private val onlineInfo = HashMap<String, Pair<String, String>>()
+    var downloading by mutableStateOf<String?>(null)
+        private set
+
+    fun openLibrary(effects: Boolean, forAuto: Boolean = false) {
+        pause()
+        library = LibraryRequest(effects, forAuto)
+    }
+
+    /** Scarica il brano scelto e lo mette nel progetto (dall'indicatore) o lo passa al video automatico. */
+    fun useOnline(t: OnlineTrack) {
+        val req = library ?: return
+        val ctx = getApplication<Application>()
+        if (downloading != null) return
+        viewModelScope.launch {
+            downloading = t.id
+            val f = runCatching { Library.download(ctx, t) }
+            downloading = null
+            val file = f.getOrElse { message = "Non sono riuscito a scaricare \"${t.title}\": ${it.message}"; return@launch }
+            val uri = Uri.fromFile(file)
+            onlineInfo[uri.toString()] = (if (t.artist.isBlank()) t.title else "${t.title} – ${t.artist}") to t.credit
+            library = null
+            if (req.forAuto) autoMusicPicked = uri else addMusic(uri)
+        }
+    }
+
     /** Legge un brano (anche MIDI, convertito in WAV con i battiti esatti). Dall'inizio, a tutta lunghezza. */
     private suspend fun readMusic(ctx: Application, uri: Uri): MusicTrack? = withContext(Dispatchers.IO) {
         runCatching { ctx.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
@@ -439,7 +475,9 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             } else {
                 MusicTrack(uri = uri.toString(), name = name, sourceDurationUs = infoUs, lengthUs = infoUs)
             }
-        }.getOrNull()?.takeIf { it.sourceDurationUs > 0 }
+        }.getOrNull()?.takeIf { it.sourceDurationUs > 0 }?.let { t ->
+            onlineInfo[uri.toString()]?.let { (name, credit) -> t.copy(name = name, credit = credit) } ?: t
+        }
     }
 
     /** Battiti di un brano (null se non c'è un ritmo chiaro). */

@@ -11,6 +11,8 @@ import androidx.compose.runtime.LaunchedEffect
 import it.fabriziodavi.vivovideo.engine.ExportState
 import it.fabriziodavi.vivovideo.ui.EditorScreen
 import it.fabriziodavi.vivovideo.ui.AutoScreen
+import it.fabriziodavi.vivovideo.ui.LibraryScreen
+import androidx.compose.foundation.layout.fillMaxSize
 import it.fabriziodavi.vivovideo.ui.GuideScreen
 import it.fabriziodavi.vivovideo.ui.EditorViewModel
 import it.fabriziodavi.vivovideo.ui.HomeScreen
@@ -49,11 +51,15 @@ class MainActivity : ComponentActivity() {
                     if (immersive) c.hide(androidx.core.view.WindowInsetsCompat.Type.systemBars())
                     else c.show(androidx.core.view.WindowInsetsCompat.Type.systemBars())
                 }
-                when {
-                    vm.showGuide -> GuideScreen { vm.showGuide = false }
-                    vm.project == null && vm.showAuto -> AutoScreen(vm)
-                    vm.project == null -> HomeScreen(vm)
-                    else -> EditorScreen(vm)
+                // La libreria si apre sopra alla schermata da cui la si chiama (che resta com'era).
+                androidx.compose.foundation.layout.Box(androidx.compose.ui.Modifier.fillMaxSize()) {
+                    when {
+                        vm.showGuide -> GuideScreen { vm.showGuide = false }
+                        vm.project == null && vm.showAuto -> AutoScreen(vm)
+                        vm.project == null -> HomeScreen(vm)
+                        else -> EditorScreen(vm)
+                    }
+                    if (vm.library != null) LibraryScreen(vm)
                 }
             }
         }

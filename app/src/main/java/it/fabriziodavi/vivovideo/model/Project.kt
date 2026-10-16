@@ -490,6 +490,8 @@ data class MusicTrack(
     val beatShiftUs: Long = 0,
     /** Battiti segnati a mano (tempo nel file del brano). */
     val markersUs: List<Long> = emptyList(),
+    /** Per i brani presi in rete: autore, licenza e pagina da citare. */
+    val credit: String? = null,
     /** Battiti automatici tolti a mano. */
     val hiddenUs: List<Long> = emptyList(),
 ) {
@@ -786,6 +788,9 @@ data class Project(
     fun textStyleOnAll(t: TextItem): Boolean = texts.size > 1 && texts.all {
         it.font == t.font && it.look == t.look && it.color == t.color && it.size == t.size && it.animIn == t.animIn && it.animOut == t.animOut
     }
+
+    /** Crediti dei brani ed effetti presi in rete (da mettere nella descrizione del video). */
+    fun credits(): List<String> = music.mapNotNull { it.credit }.distinct()
 
     /** Il video si apre dal nero/bianco e si chiude (prima clip con entrata, ultima con uscita). */
     fun videoEndsFaded(): Boolean = clips.isNotEmpty() && clips.first().fadeInUs > 0 && clips.last().fadeOutUs > 0

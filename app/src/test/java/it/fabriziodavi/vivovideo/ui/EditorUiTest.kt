@@ -79,7 +79,7 @@ class EditorUiTest {
         val vm = vm(); show(vm)
         bar("Audio").performClick()
         listOf("Brano", "Ritmo", "Battiti", "Clip").forEach { compose.onNodeWithText(it).assertIsDisplayed() }
-        compose.onAllNodesWithText("Aggiungi musica").assertCountEquals(2) // nel pannello e sotto la timeline
+        compose.onNodeWithText("Libreria online").assertIsDisplayed()
         compose.onNodeWithText("Clip").performClick()
         compose.onNodeWithText("Disattiva l'audio della clip").assertIsDisplayed()
         assertNotNull(vm.selectedClipId)
@@ -126,5 +126,15 @@ class EditorUiTest {
         compose.onNodeWithContentDescription("Avanzamento").performTouchInput { click(centerLeft + androidx.compose.ui.geometry.Offset(width * 0.5f, 0f)) }
         // A metà barra: circa a metà del video (12 s).
         assertTrue("indicatore a ${vm.playheadUs}", vm.playheadUs in 4_000_000L..8_000_000L)
+    }
+
+    @Test fun audioOpensTheOnlineLibrary() {
+        val vm = vm(); show(vm)
+        bar("Audio").performClick()
+        compose.onNodeWithText("Libreria online").performClick()
+        assertEquals(false, vm.library?.effects)
+        vm.library = null
+        compose.onNodeWithText("Effetti sonori").performClick()
+        assertEquals(true, vm.library?.effects)
     }
 }

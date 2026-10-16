@@ -183,6 +183,22 @@ class ScreenshotTest {
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/18_proposta_automatica.png")
     }
 
+    @Test fun musicLibrary() {
+        val vm = vm()
+        vm.openLibrary(effects = false)
+        val state = LibraryState().apply {
+            searched = true
+            results = listOf(
+                it.fabriziodavi.vivovideo.online.OnlineTrack(it.fabriziodavi.vivovideo.online.LibrarySource.OPENVERSE, "1", "Summer Breeze", "Mario Rossi", 184_000,
+                    "https://x/1.mp3", "https://x/1.mp3", it.fabriziodavi.vivovideo.online.LicenseInfo.fromCode("by", "4.0"), "https://x/1"),
+                it.fabriziodavi.vivovideo.online.OnlineTrack(it.fabriziodavi.vivovideo.online.LibrarySource.OPENVERSE, "2", "Epic Journey", "Band", 215_000,
+                    "https://x/2.mp3", "https://x/2.mp3", it.fabriziodavi.vivovideo.online.LicenseInfo.fromCode("cc0"), "https://x/2"),
+            )
+        }
+        compose.setContent { VivoTheme { LibraryScreen(vm, state, autoSearch = false) } }
+        compose.onRoot().captureRoboImage("build/outputs/roborazzi/19_libreria_musica.png")
+    }
+
     @Test fun guide() {
         compose.setContent { VivoTheme { GuideScreen {} } }
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/14_guida.png")

@@ -3,19 +3,16 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
-- **Video automatico** (in cima alla schermata dei progetti): scegli **uno o più album** della galleria, uno **stile** (Cinema, Energico, Ricordi, Elegante, Viaggio), un brano e la durata. L'app sceglie le scene lungo tutto il periodo, le taglia sui battiti e aggiunge transizioni, effetti, titolo e apertura/chiusura. Se non ti piace, **Altra proposta** ne prepara un'altra (anche con un altro stile), quante volte vuoi; puoi sempre ritoccare a mano.
-- Pulsanti "a tutte" e "Apri e chiudi il video" illuminati quando la scelta è attiva; TAP a tempo che taglia anche le clip.
+- **Libreria di musica ed effetti sonori liberi** (Audio → Brano → **Libreria online** / **Effetti sonori**, e nel Video automatico): cerchi o tocchi un'atmosfera, ascolti l'anteprima e tocchi **Usa**. Funziona subito con **Openverse**; con i codici gratuiti di **Jamendo** e **Freesound** (icona in alto a destra nella libreria) la scelta diventa molto più ampia.
+- **Crediti automatici**: autore e licenza di ogni brano preso in rete si salvano nel progetto; li copi da Audio → Brano o dopo l'esportazione, per la descrizione del video.
+- Video automatico con **Altra proposta** e cambio di stile.
 
-## Video automatico
-- Dalla schermata dei progetti tocca **Video automatico**. La prima volta l'app chiede di leggere foto e video: scegli **Consenti tutto** per vedere gli album interi (con "solo alcune foto" si vedono solo quelle).
-- **1. Album**: tocca gli album da usare (anche più d'uno); sotto vedi quante foto e video ci sono e il periodo.
-- **2. Stile**: **Cinema** (bande nere, look da film, dissolvenze incrociate), **Energico** (tagli veloci, colpi a ritmo, glitch e zoom), **Ricordi** (pellicola e luce calda), **Elegante** (bokeh, polvere d'oro, titolo dorato), **Viaggio** (scorrimenti, colori vivaci, raggi di luce).
-- **3. Musica** (consigliata): con un brano le scene cambiano sui battiti (rilevati da soli) e l'audio dei video si spegne; senza, restano i suoni originali.
-- **4. Durata**: 30 s, 1, 2 o 3 minuti, **Come il brano** o **Tutto**. Le scene sono prese a intervalli regolari dal primo all'ultimo giorno, in ordine di data; dei video si usa un tratto centrale.
-- **5. Titolo**: proposto con il nome degli album, con sotto il periodo (es. "Luglio – Agosto 2026").
-- **Crea il video**: il progetto si apre nell'editor già montato. Tutto resta ritoccabile (scene, transizioni, effetti, testi, musica); poi Esporta.
-- **Altre proposte**: nell'editor di un video automatico c'è la barra **Proposta N**. **Altra proposta** rifà il montaggio da capo (altre scene lungo il periodo, altri punti dei video, altre transizioni ed effetti) quante volte vuoi; **Stile** lo rifà con un'altra regia. **Annulla** torna alla proposta di prima.
-- Ogni proposta resta ritoccabile a mano; ma attenzione: chiedendo un'altra proposta i ritocchi fatti a mano si perdono (si recuperano con Annulla). La barra si nasconde quando è aperto un pannello.
+## Musica ed effetti dalla rete
+- **Audio → Brano → Libreria online** (musica) o **Effetti sonori**. Il brano si scarica e parte dall'indicatore, come uno scelto dal telefono (battiti, volume, dissolvenze: tutto uguale). Gli effetti sonori si mettono nel punto dell'indicatore e si spostano nella timeline.
+- Cerca in inglese (gli archivi sono internazionali) o tocca un'atmosfera pronta: Epica, Allegra, Rilassante, Cinematografica… / Whoosh, Applausi, Pioggia, Passi…
+- **Servizi**: **Openverse** (senza codici), **Jamendo** (musica: centinaia di migliaia di brani, anche "solo strumentali"), **Freesound** (effetti sonori). Per Jamendo e Freesound tocca l'icona in alto a destra e incolla i codici gratuiti: restano solo sul telefono.
+- **Licenze**: l'app mostra solo brani che si possono mettere sotto un video (niente licenze "ND"). Con **Solo licenze per uso commerciale** spariscono anche quelli "NC": accendilo se pensi di guadagnare col video. Jamendo è gratuito solo per uso non commerciale.
+- **Crediti**: molte licenze chiedono di citare l'autore. L'app li salva da sola: **Copia i crediti** in Audio → Brano o dopo l'esportazione, e incollali nella descrizione.
 
 ## Primi passi
 - Dalla schermata dei progetti tocca **Nuovo progetto** e scegli video e foto dalla galleria.
@@ -93,7 +90,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - **Audio → scheda Clip**: volume (0–200%) o audio disattivato della clip selezionata (o sotto l'indicatore).
 
 ## Musica
-- **Audio → scheda Brano** (o "Aggiungi musica" sotto la timeline): MP3, M4A, WAV, FLAC… e anche **MIDI** (convertiti in audio dal sintetizzatore di Android).
+- **Audio → scheda Brano** (o "Aggiungi musica" sotto la timeline): **Libreria online**, **Effetti sonori** o **Dal telefono**: MP3, M4A, WAV, FLAC… e anche **MIDI** (convertiti in audio dal sintetizzatore di Android).
 - Il brano parte dall'indicatore. Nella timeline: tocca per selezionare, trascina per spostare, maniglie per accorciare.
 - Volume, dissolvenze in entrata/uscita (si sentono nel video esportato), **Parti dal punto del brano**, Dividi, Elimina.
 

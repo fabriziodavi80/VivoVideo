@@ -113,6 +113,10 @@ fun AutoScreen(vm: EditorViewModel) {
     val musicPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) { musicUri = uri; if (duration == 0L) duration = FIT_MUSIC }
     }
+    // Brano scelto nella libreria in rete.
+    LaunchedEffect(vm.autoMusicPicked) {
+        vm.autoMusicPicked?.let { musicUri = it; vm.autoMusicPicked = null; if (duration == 0L) duration = FIT_MUSIC }
+    }
     val musicName = remember(musicUri) {
         musicUri?.let { u ->
             runCatching { ctx.contentResolver.query(u, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c -> if (c.moveToFirst()) c.getString(0) else null } }
@@ -197,7 +201,10 @@ fun AutoScreen(vm: EditorViewModel) {
 
             Section("3", "Musica")
             if (musicUri == null) {
-                SecondaryButton("Scegli un brano (consigliato)", Modifier.fillMaxWidth(), onClick = { musicPicker.launch(arrayOf("audio/*")) })
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    PrimaryButton("Libreria online", Modifier.weight(1f)) { vm.openLibrary(effects = false, forAuto = true) }
+                    SecondaryButton("Dal telefono", Modifier.weight(1f), onClick = { musicPicker.launch(arrayOf("audio/*")) })
+                }
                 Hint("Con la musica i tagli cadono sui battiti e l'audio dei video si spegne. Senza, restano i suoni originali.")
             } else {
                 Row(verticalAlignment = Alignment.CenterVertically) {
