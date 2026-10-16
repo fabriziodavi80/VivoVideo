@@ -56,6 +56,7 @@ import it.fabriziodavi.vivovideo.online.LibrarySource
 import it.fabriziodavi.vivovideo.online.MUSIC_MOODS
 import it.fabriziodavi.vivovideo.online.OnlineTrack
 import it.fabriziodavi.vivovideo.online.SFX_WORDS
+import it.fabriziodavi.vivovideo.online.friendlyError
 
 /** Stato della ricerca (fuori dalla schermata, così le prove possono mostrare risultati finti). */
 class LibraryState {
@@ -120,7 +121,7 @@ fun LibraryScreen(vm: EditorViewModel, state: LibraryState = remember { LibraryS
         state.loading = false; state.searched = true
         r.onSuccess { state.results = it }.onFailure {
             state.results = emptyList()
-            state.error = (it.message ?: it.javaClass.simpleName).let { m -> if (it is java.net.UnknownHostException) "Nessuna connessione a internet." else m }
+            state.error = friendlyError(it, source)
         }
     }
 

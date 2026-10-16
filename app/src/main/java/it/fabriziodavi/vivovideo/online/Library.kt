@@ -97,7 +97,7 @@ object Library {
     // ---------------- Indirizzi delle ricerche ----------------
 
     fun openverseUrl(query: String, effects: Boolean, commercialOnly: Boolean, page: Int = 1): String =
-        "https://api.openverse.org/v1/audio/?q=${enc(query.ifBlank { if (effects) "sound effect" else "music" })}" +
+        "https://api.openverse.org/v1/audio/?q=${enc(query.ifBlank { if (effects) "whoosh" else "instrumental" })}" +
             "&category=${if (effects) "sound_effect" else "music"}" +
             "&license_type=${if (commercialOnly) "commercial,modification" else "modification"}" +
             "&page_size=20&page=$page"
@@ -196,9 +196,12 @@ object Library {
 
     // ---------------- Rete ----------------
 
-    private fun get(url: String): String {
+    /** Richiesta con un secondo tentativo se il servizio è lento (Openverse a volte lo è). */
+    private fun get(url: String): String = try { getOnce(url) } catch (e: java.net.SocketTimeoutException) { getOnce(url) }
+
+    private fun getOnce(url: String): String {
         val c = URL(url).openConnection() as HttpURLConnection
-        c.connectTimeout = 12_000; c.readTimeout = 20_000
+        c.connectTimeout = 15_000; c.readTimeout = 30_000
         c.setRequestProperty("User-Agent", UA)
         c.setRequestProperty("Accept", "application/json")
         try {
@@ -272,4 +275,12 @@ data class LibraryKeys(val jamendo: String?, val freesound: String?) {
         fun commercialOnly(ctx: Context) = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean("commerciale", false)
         fun setCommercialOnly(ctx: Context, v: Boolean) = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putBoolean("commerciale", v).apply()
     }
+}
+
+/** Messaggio comprensibile per un errore di rete. */
+fun friendlyError(e: Throwable, source: LibrarySource): String = when (e) {
+    is java.net.UnknownHostException -> "Nessuna connessione a internet."
+    is java.net.SocketTimeoutException -> "${source.label} non risponde (a volte è lento o sovraccarico). Riprova, prova una ricerca più precisa o un altro servizio."
+    is java.io.IOException -> "Collegamento con ${source.label} non riuscito: riprova fra poco."
+    else -> e.message ?: e.javaClass.simpleName
 }

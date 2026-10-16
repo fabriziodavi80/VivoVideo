@@ -100,4 +100,10 @@ class LibraryTest {
         assertFalse(LibraryKeys(null, "k").has(LibrarySource.JAMENDO))
         assertTrue(LibraryKeys(null, null).has(LibrarySource.OPENVERSE))
     }
+
+    @Test fun clearErrorMessages() {
+        assertTrue(friendlyError(java.net.SocketTimeoutException("timeout"), LibrarySource.OPENVERSE).startsWith("Openverse non risponde"))
+        assertEquals("Nessuna connessione a internet.", friendlyError(java.net.UnknownHostException("x"), LibrarySource.JAMENDO))
+        assertEquals("Codice errato", friendlyError(IllegalStateException("Codice errato"), LibrarySource.JAMENDO))
+    }
 }

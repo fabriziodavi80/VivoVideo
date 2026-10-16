@@ -3,6 +3,7 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- Libreria: se un servizio è lento l'app aspetta di più e riprova da sola; i messaggi d'errore dicono cosa fare. (Openverse a volte è lento: con Jamendo e Freesound le ricerche sono più rapide.)
 - **Formato del video e preimpostazioni verticale/orizzontale**: tocca il formato (es. "16:9") accanto al tasto play. Scegli **Automatico, Verticale 9:16, Orizzontale 16:9 o Quadrato 1:1** e come trattare foto e video: con lo **stesso orientamento** (di serie **Riempi**) e con l'**orientamento opposto** (di serie **Sfondo sfocato**: l'immagine intera con dietro una sua copia sfocata, niente bande nere). Vale per le clip che aggiungi e per il video automatico.
 - **Inquadra**: oltre a Riempi e Adatta c'è **Sfocato**.
 - **Video automatico**: nuovo passo **Formato** (Automatico = l'orientamento più frequente negli album).
