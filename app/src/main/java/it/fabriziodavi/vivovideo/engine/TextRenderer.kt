@@ -182,6 +182,57 @@ object TextRenderer {
         c.drawText(s, x, y, paint)
     }
 
+    /** Una lettera già disegnata con il suo aspetto, e dove va (coordinate del testo). */
+    private class Glyph(val bmp: Bitmap, val left: Float, val top: Float, val cx: Float, val cy: Float)
+
+    private val glyphCache = LruCache<String, List<Glyph>>(6)
+
+    /**
+     * Le lettere del testo disegnate una volta sola (contorno, ombra, neon e sfumatura compresi):
+     * i fotogrammi animati poi le spostano soltanto, così restano leggeri anche in anteprima.
+     */
+    private fun glyphs(context: Context, item: TextItem, frameW: Int, frameH: Int): List<Glyph> {
+        val key = baseKey(item, frameW, frameH)
+        glyphCache.get(key)?.let { return it }
+        val p = prepare(context, item, frameW, frameH, Int.MAX_VALUE)
+        val ts = p.paint.textSize
+        val light = isLight(item.color)
+        val pad = (ts * if (item.look == TextLook.NEON) 0.6f else 0.25f).toInt() + 2
+        val text = p.layout.text.toString()
+        val out = ArrayList<Glyph>()
+        val bounds = android.graphics.Rect()
+        var i = 0
+        while (i < text.length) {
+            val cp = text.codePointAt(i)
+            val len = Character.charCount(cp)
+            if (!Character.isWhitespace(cp)) {
+                val s1 = text.substring(i, i + len)
+                val line = p.layout.getLineForOffset(i)
+                val x = p.layout.getPrimaryHorizontal(i) + item.spacing * ts / 2f
+                val base = p.layout.getLineBaseline(line).toFloat()
+                val gp = TextPaint(p.paint).apply { letterSpacing = 0f }
+                gp.getTextBounds(s1, 0, s1.length, bounds)
+                if (bounds.isEmpty) bounds.set(0, (-ts * 0.7f).toInt(), (ts * 0.5f).toInt(), 0)
+                val bw = bounds.width() + 2 * pad
+                val bh = bounds.height() + 2 * pad
+                val bmp = Bitmap.createBitmap(bw.coerceAtLeast(2), bh.coerceAtLeast(2), Bitmap.Config.ARGB_8888)
+                val c = Canvas(bmp)
+                c.translate((pad - bounds.left).toFloat(), (pad - bounds.top).toFloat())
+                // La sfumatura resta quella dell'intero testo (dall'alto in basso del blocco).
+                val gradient = item.gradientTo?.let {
+                    android.graphics.LinearGradient(0f, -base, 0f, p.layout.height - base, item.color, it, android.graphics.Shader.TileMode.CLAMP)
+                }
+                drawGlyph(c, p.paint, item, light, s1, 0f, 0f, 1f, gradient)
+                val left = x + bounds.left - pad
+                val top = base + bounds.top - pad
+                out += Glyph(bmp, left, top, left + bw / 2f, top + bh / 2f)
+            }
+            i += len
+        }
+        glyphCache.put(key, out)
+        return out
+    }
+
     /**
      * Testo con le lettere animate una per una ([progress] 0→1 lungo l'entrata o l'uscita).
      * L'immagine ha margini più larghi, così le lettere possono uscire dalla riga mentre si muovono.
@@ -205,35 +256,20 @@ object TextRenderer {
             c.drawRoundRect(RectF(exX.toFloat(), exY.toFloat(), (bw - exX).toFloat(), (bh - exY).toFloat()), r, r, bg)
         }
         c.translate((p.pad + exX).toFloat(), (p.pad + exY).toFloat())
-        val gradient = item.gradientTo?.let {
-            android.graphics.LinearGradient(0f, 0f, 0f, p.layout.height.toFloat(), item.color, it, android.graphics.Shader.TileMode.CLAMP)
-        }
-        val text = p.layout.text.toString()
-        val n = text.count { !it.isWhitespace() }
-        var i = 0
-        var k = 0
-        while (i < text.length) {
-            val cp = text.codePointAt(i)
-            val len = Character.charCount(cp)
-            if (!Character.isWhitespace(cp)) {
-                val f = letterFx(anim, entering, progress, k, n)
-                k++
-                if (f.alpha > 0.004f) {
-                    val s1 = text.substring(i, i + len)
-                    val line = p.layout.getLineForOffset(i)
-                    val x = p.layout.getPrimaryHorizontal(i) + item.spacing * ts / 2f
-                    val base = p.layout.getLineBaseline(line).toFloat()
-                    val cx = x + p.paint.measureText(s1) / 2f - item.spacing * ts / 2f
-                    val cy = base - ts * 0.35f
-                    c.save()
-                    c.translate(0f, f.dy * ts)
-                    c.rotate(f.rot, cx, cy)
-                    c.scale(f.scale, f.scale, cx, cy)
-                    drawGlyph(c, p.paint, item, light, s1, x, base, f.alpha, gradient)
-                    c.restore()
-                }
+        val gs = glyphs(context, item, frameW, frameH)
+        val n = gs.size
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
+        gs.forEachIndexed { k, g ->
+            val f = letterFx(anim, entering, progress, k, n)
+            if (f.alpha > 0.004f) {
+                paint.alpha = (f.alpha.coerceIn(0f, 1f) * 255).toInt()
+                c.save()
+                c.translate(0f, f.dy * ts)
+                c.rotate(f.rot, g.cx, g.cy)
+                c.scale(f.scale, f.scale, g.cx, g.cy)
+                c.drawBitmap(g.bmp, g.left, g.top, paint)
+                c.restore()
             }
-            i += len
         }
         return keep(key, bmp)
     }
