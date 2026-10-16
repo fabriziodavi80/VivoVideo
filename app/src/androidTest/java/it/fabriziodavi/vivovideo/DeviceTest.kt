@@ -9,6 +9,10 @@ import android.graphics.PixelFormat
 import android.media.ImageReader
 import android.media.MediaMetadataRetriever
 import android.net.Uri
+import it.fabriziodavi.vivovideo.online.Library
+import it.fabriziodavi.vivovideo.online.LibraryKeys
+import it.fabriziodavi.vivovideo.online.LibrarySource
+import kotlinx.coroutines.runBlocking
 import android.os.Handler
 import android.os.Looper
 import androidx.media3.common.C
@@ -222,6 +226,28 @@ class DeviceTest {
                     animOut = if (a.inOnly) TextAnim.FADE else a, look = TextLook.entries[i % TextLook.entries.size], gradientTo = if (i % 2 == 0) Color.MAGENTA else null)
             },
         )
+    }
+
+    /** Libreria in rete: una ricerca vera su Openverse (musica ed effetti) e lo scaricamento di un brano. */
+    @Test fun onlineLibraryOpenverse() {
+        val keys = LibraryKeys(null, null)
+        val music = try {
+            runBlocking { Library.search(LibrarySource.OPENVERSE, "piano", false, keys, false, false) }
+        } catch (e: java.net.UnknownHostException) {
+            org.junit.Assume.assumeNoException("nessuna rete sull'emulatore", e); return
+        }
+        android.util.Log.i("VivoVideoTest", "Openverse musica: ${music.size} risultati, primo: ${music.firstOrNull()}")
+        assertTrue("nessun brano da Openverse", music.isNotEmpty())
+        assertTrue(music.all { it.downloadUrl.startsWith("http") && it.license.derivatives })
+        val sfx = runBlocking { Library.search(LibrarySource.OPENVERSE, "whoosh", true, keys, false, false) }
+        android.util.Log.i("VivoVideoTest", "Openverse effetti: ${sfx.size} risultati, primo: ${sfx.firstOrNull()}")
+        assertTrue("nessun effetto da Openverse", sfx.isNotEmpty())
+        // Scarica il più corto fra i primi e controlla che si legga come audio.
+        val pick = (sfx.take(5) + music.take(3)).minByOrNull { if (it.durationMs > 0) it.durationMs else Long.MAX_VALUE }!!
+        val f = runBlocking { Library.download(ctx, pick) }
+        val (_, durUs) = readAudioInfo(ctx, Uri.fromFile(f))
+        android.util.Log.i("VivoVideoTest", "scaricato ${f.name} ${f.length()} byte, ${durUs / 1000} ms")
+        assertTrue("file scaricato non leggibile", durUs > 0)
     }
 
     /** Video automatico con musica e battiti: tutte le regie si esportano. */
