@@ -3,14 +3,10 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
-- **Nuova barra degli strumenti**, fissa e senza scorrimento: **Modifica, Audio, Testo, Livelli, Effetti, Colore**.
-- **Modifica** apre una seconda riga: Dividi, Velocità (o Durata), Inquadra, Keyframe, Transizione, Slideshow, Altro.
-- **Transizioni sulla timeline**: tocca il cerchietto sul taglio fra due clip (pieno arancione se una transizione c'è già).
-- **Menu della clip**: tieni premuta una clip (o Modifica → Altro) per Sposta, Duplica, Dividi, Aggiungi, Elimina.
-- **Pannelli a schede**: Audio (Brano · Ritmo · Battiti · Clip), Testo (Stile · Animazione · Movimento), Livelli (Aspetto · Forma · Animazione), Effetti (Effetti · Dissolvenze).
-- Gli strumenti di clip funzionano anche senza selezione: usano la clip sotto l'indicatore.
-- **Barra di avanzamento** nell'anteprima a schermo intero (e in orizzontale): trascinala per spostarti nel video.
-- La scelta fatta si vede sempre: gli stili pronti del testo, i movimenti delle foto e i selettori a pulsanti si illuminano in arancione.
+- **Effetti Wow** (nuova categoria, la prima in Effetti): Colpo a ritmo, Cinematografico, Contorni neon, Raggi di luce, Luci bokeh, Polvere d'oro, Prisma, Linee di velocità.
+- **Transizioni Wow**: Glitch, Prisma, Luce, Cerchio, Pixel, Scossa.
+- **Testi Wow**: animazioni Lettere cadono, Lettere sfumate, Onda, Glitch, Luccichio; nuovi stili pronti **Glitch, Onda, Oro, Cascata**.
+- Nuova interfaccia (dalla versione precedente): barra fissa Modifica · Audio · Testo · Livelli · Effetti · Colore, transizioni sui tagli, menu della clip tenendola premuta, pannelli a schede, barra di avanzamento a schermo intero.
 
 ## Primi passi
 - Dalla schermata dei progetti tocca **Nuovo progetto** e scegli video e foto dalla galleria.
@@ -62,6 +58,8 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - Tocca il **cerchietto sul taglio** fra due clip nella timeline (oppure Modifica → Transizione con la clip prima del taglio). Il cerchietto diventa arancione quando c'è una transizione; ai lati della clip selezionata è nascosto per lasciare posto alle maniglie.
 - **Incrociata**: le due clip si sovrappongono (vera dissolvenza). Usa i fotogrammi oltre il taglio: se una clip non ne ha, la dissolvenza si accorcia (il pannello lo indica). Fra foto è sempre piena.
 - Altre: Nero, Flash, Zoom, Sfocatura, Scorrimento, Rotazione (metà alla fine di una clip, metà all'inizio della successiva).
+- **Wow**: **Glitch** (strisce e colori sfasati), **Prisma** (zoom con i colori divisi), **Luce** (bagliore caldo che brucia nel bianco), **Cerchio** (si chiude al nero e si riapre), **Pixel** (si scompone in quadretti), **Scossa** (scatto mosso).
+- Lo slideshow "Varie" usa solo le transizioni morbide; Glitch, Pixel e Scossa vanno scelte apposta.
 - **Applica a tutti i tagli** per uniformare.
 - In anteprima l'Incrociata si prepara da sola pochi secondi dopo ogni modifica (scritta "Preparo la dissolvenza…"); finché non è pronta si vede un passaggio al nero.
 - Se un lato del taglio ha meno di 0,1 s di video in più, in anteprima resta il passaggio al nero (nel video esportato è comunque vera).
@@ -70,6 +68,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - **Effetti** nella barra principale, due schede. **Dissolvenze**: in entrata e in uscita (fino a metà clip), dal/al nero o bianco, anche sull'audio (l'audio sfuma nel video esportato).
 - **Apri e chiudi il video**: dissolvenza dal nero sulla prima clip e al nero sull'ultima, in un tocco. **A tutte le clip** copia le dissolvenze.
 - Scheda **Effetti**, per categoria (tocca la categoria, poi l'effetto; il numero indica quanti ne hai accesi):
+- **Wow**: **Colpo a ritmo** (scatto di zoom con colori sfasati sul battito), **Cinematografico** (contrasto da film e bande nere), **Contorni neon** (i bordi si accendono di colori che cambiano), **Raggi di luce**, **Luci bokeh**, **Polvere d'oro** (scintille), **Prisma** (colori che ruotano), **Linee di velocità** (da fumetto).
 - **Colore**: Bianco e nero, Seppia, Colori vivaci, Bicromia, Arcobaleno, Poster, Negativo.
 - **Stile**: Pellicola, Vecchio film, VHS, Glitch, Fumetto, Retino, Pixel, Luce calda, Bagliore.
 - **Ottica**: Sfocatura, Sfocatura zoom, Miniatura, Vignettatura, Grandangolo, Aberrazione, Onde.
@@ -99,10 +98,11 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Testo
 - **Testo** nella barra principale: parte dall'indicatore, 3 secondi. Schede **Stile**, **Animazione**, **Movimento**.
-- **Stili pronti**: Cinema, Didascalia, Pop, Elegante, Neon, Impatto, Firma, Diario.
+- **Stili pronti**: Cinema, Didascalia, Pop, Elegante, Neon, Impatto, Firma, Diario e i nuovi **Glitch, Onda, Oro, Cascata**.
 - Carattere, colore, **sfumatura** a due colori, stile (Ombra, Contorno, Riquadro, Neon), spaziatura, maiuscolo.
 - Posizione: trascina, pizzica e ruota il riquadro tratteggiato sull'anteprima.
 - Animazioni di entrata/uscita (anche **Macchina da scrivere** e **Parola per parola**).
+- **Animazioni Wow**: **Lettere cadono** (rimbalzano al loro posto; in uscita cadono), **Lettere sfumate**, **Onda** (le lettere saltano una dopo l'altra), **Glitch** (con qualche sussulto anche mentre il testo resta), **Luccichio** (una striscia di luce attraversa il testo ogni 3 secondi; solo in entrata).
 - **Movimento**: posizione iniziale → finale (scegli quale modificare, sistemala con le dita).
 
 ## Livelli (immagini e video sopra al video)

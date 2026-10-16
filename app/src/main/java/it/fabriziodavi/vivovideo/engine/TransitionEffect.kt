@@ -29,25 +29,35 @@ class TransitionEffect(
     internal fun params(presentationTimeUs: Long): Params {
         val tUs = localTimeUs(presentationTimeUs, clipStartUs)
         var p = Params()
+        // Seme che cambia ~25 volte al secondo: per glitch e scossa.
+        val seed = (presentationTimeUs / 40_000) % 1000
         if (inType != null && inUs > 0 && tUs < inUs) {
             val e = 1f - smooth(tUs.toFloat() / inUs)
-            p = shape(inType, e, entering = true)
+            p = shape(inType, e, entering = true, seed)
         } else if (outType != null && outUs > 0 && tUs > clipOutputUs - outUs) {
             val e = smooth((tUs - (clipOutputUs - outUs)).toFloat() / outUs)
-            p = shape(outType, e, entering = false)
+            p = shape(outType, e, entering = false, seed)
         }
-        return p
+        return p.copy(seed = seed.toFloat())
     }
 
     internal data class Params(
         val zoom: Float = 1f, val shift: Float = 0f, val rotation: Float = 0f,
         val blur: Float = 0f, val blurMode: Int = 0, val black: Float = 0f, val white: Float = 0f,
+        val glitch: Float = 0f, val prism: Float = 0f, val leak: Float = 0f, val iris: Float = 0f, val pixel: Float = 0f,
+        val seed: Float = 0f,
     )
+
+    /** Numero pseudo-casuale stabile in -0,5…0,5 dato un seme. */
+    private fun jitter(seed: Long, k: Int): Float {
+        val x = kotlin.math.sin((seed * 12.9898 + k * 78.233)) * 43758.5453
+        return (x - kotlin.math.floor(x)).toFloat() - 0.5f
+    }
 
     private fun smooth(x: Float): Float { val u = x.coerceIn(0f, 1f); return u * u * (3 - 2 * u) }
 
     /** e = intensità, 1 esattamente sul taglio. */
-    private fun shape(t: TransitionType, e: Float, entering: Boolean): Params = when (t) {
+    private fun shape(t: TransitionType, e: Float, entering: Boolean, seed: Long): Params = when (t) {
         TransitionType.CROSSFADE -> Params() // fatta dal compositore (due clip sovrapposte)
         TransitionType.FADE_BLACK -> Params(black = e)
         TransitionType.FLASH -> Params(white = e * e, zoom = 1f + 0.04f * e)
@@ -55,6 +65,15 @@ class TransitionEffect(
         TransitionType.BLUR -> Params(blur = 0.025f * e, blurMode = 3)
         TransitionType.WHIP -> Params(shift = (if (entering) -0.7f else 0.7f) * e * e, blur = 0.09f * e, blurMode = 1)
         TransitionType.SPIN -> Params(rotation = (if (entering) -1f else 1f) * 0.9f * e * e, zoom = 1f + 0.25f * e, blur = 0.02f * e, blurMode = 3)
+        TransitionType.GLITCH -> Params(glitch = e, shift = jitter(seed, 1) * 0.06f * e * e, white = 0.25f * e * e * e * e)
+        TransitionType.PRISM -> Params(prism = e, zoom = 1f + 0.35f * e * e, blur = 0.02f * e, blurMode = 2)
+        TransitionType.LEAK -> Params(leak = e, white = 0.9f * e * e * e * e, zoom = 1f + 0.05f * e)
+        TransitionType.IRIS -> Params(iris = e)
+        TransitionType.PIXELATE -> Params(pixel = e, white = 0.1f * e * e)
+        TransitionType.SHAKE -> Params(
+            shift = jitter(seed, 2) * 0.14f * e, rotation = jitter(seed, 3) * 0.18f * e,
+            zoom = 1f + 0.15f * e, blur = 0.04f * e, blurMode = 1,
+        )
     }
 }
 
@@ -84,6 +103,12 @@ private class TransitionProgram(private val effect: TransitionEffect, useHdr: Bo
             program.setFloatsUniform("uBlack", floatArrayOf(p.black))
             program.setFloatsUniform("uWhite", floatArrayOf(p.white))
             program.setFloatsUniform("uAspect", floatArrayOf(aspect))
+            program.setFloatsUniform("uGlitch", floatArrayOf(p.glitch))
+            program.setFloatsUniform("uPrism", floatArrayOf(p.prism))
+            program.setFloatsUniform("uLeak", floatArrayOf(p.leak))
+            program.setFloatsUniform("uIris", floatArrayOf(p.iris))
+            program.setFloatsUniform("uPix", floatArrayOf(p.pixel))
+            program.setFloatsUniform("uSeed", floatArrayOf(p.seed))
             program.bindAttributesAndUniforms()
             GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
         } catch (e: GlUtil.GlException) {
@@ -116,7 +141,19 @@ uniform float uMode;
 uniform float uBlack;
 uniform float uWhite;
 uniform float uAspect;
+uniform float uGlitch;
+uniform float uPrism;
+uniform float uLeak;
+uniform float uIris;
+uniform float uPix;
+uniform float uSeed;
 varying vec2 vTexSamplingCoord;
+
+float hash(vec2 p) {
+  vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+  p3 += dot(p3, p3.yzx + 33.33);
+  return fract((p3.x + p3.y) * p3.z);
+}
 
 // Coordinate trasformate (zoom, rotazione in proporzioni reali, scorrimento); fuori dal quadro = specchio.
 vec2 xf(vec2 uv) {
@@ -131,6 +168,11 @@ vec2 xf(vec2 uv) {
 
 void main() {
   vec2 uv = vTexSamplingCoord;
+  if (uPix > 0.0) { float n = mix(220.0, 10.0, uPix * uPix); vec2 cells = vec2(n, n / uAspect); uv = (floor(uv * cells) + 0.5) / cells; }
+  if (uGlitch > 0.0) {
+    float row = floor(uv.y * 22.0);
+    if (hash(vec2(row, uSeed)) < 0.55 * uGlitch) uv.x += (hash(vec2(uSeed, row)) - 0.5) * 0.35 * uGlitch;
+  }
   vec3 acc = vec3(0.0);
   if (uBlur <= 0.0001) {
     acc = texture2D(uTexSampler, xf(uv)).rgb;
@@ -144,6 +186,23 @@ void main() {
       acc += texture2D(uTexSampler, xf(uv + o)).rgb;
     }
     acc /= 12.0;
+  }
+  if (uPrism > 0.0 || uGlitch > 0.0) {
+    vec2 d = (uv - 0.5) * 0.06 * uPrism + vec2(0.02 * uGlitch * (hash(vec2(uSeed, 9.0)) - 0.2), 0.0);
+    acc.r = texture2D(uTexSampler, xf(uv + d)).r;
+    acc.b = texture2D(uTexSampler, xf(uv - d)).b;
+  }
+  if (uLeak > 0.0) {
+    vec2 lp = uv - vec2(0.15, 0.85); lp.x *= uAspect;
+    vec3 leak = vec3(1.0, 0.5, 0.18) * exp(-dot(lp, lp) * (3.0 - 2.4 * uLeak)) * uLeak * 1.5;
+    vec2 lp2 = uv - vec2(0.9, 0.2); lp2.x *= uAspect;
+    leak += vec3(1.0, 0.25, 0.35) * exp(-dot(lp2, lp2) * 4.0) * uLeak * 0.8;
+    acc = 1.0 - (1.0 - clamp(acc, 0.0, 1.0)) * (1.0 - clamp(leak, 0.0, 1.0));
+  }
+  if (uIris > 0.0) {
+    vec2 ip = uv - 0.5; ip.x *= uAspect;
+    float rr = (1.0 - uIris) * 0.5 * sqrt(uAspect * uAspect + 1.0) * 1.02;
+    acc *= 1.0 - smoothstep(rr - 0.012, rr, length(ip));
   }
   acc = mix(acc, vec3(0.0), uBlack);
   acc = mix(acc, vec3(1.0), uWhite);

@@ -22,6 +22,8 @@ import it.fabriziodavi.vivovideo.model.MusicTrack
 import it.fabriziodavi.vivovideo.model.Project
 import it.fabriziodavi.vivovideo.model.SpeedPreset
 import it.fabriziodavi.vivovideo.model.TextAnim
+import it.fabriziodavi.vivovideo.model.TextPreset
+import it.fabriziodavi.vivovideo.model.FxCategory
 import it.fabriziodavi.vivovideo.model.TextFont
 import it.fabriziodavi.vivovideo.model.TextItem
 import it.fabriziodavi.vivovideo.model.TextLook
@@ -206,6 +208,71 @@ class EngineTest {
             assertEquals("$a a metà", 1f, mid.alpha, 1e-3f)
             assertEquals(0f, animFactors(a, a, -1, 2_000_000).alpha, 0f)
             assertEquals(0f, animFactors(a, a, 2_000_000, 2_000_000).alpha, 0f)
+        }
+    }
+
+    @Test fun wowTransitionsPeakAtTheCutAndVanishAway() {
+        val wow = listOf(TransitionType.GLITCH, TransitionType.PRISM, TransitionType.LEAK, TransitionType.IRIS, TransitionType.PIXELATE, TransitionType.SHAKE)
+        wow.forEach { t ->
+            val e = TransitionEffect(0, 4_000_000, t, 500_000, t, 500_000)
+            assertEquals("$t a metà clip", TransitionEffect.Params(), e.params(2_000_000).copy(seed = 0f))
+            assertTrue("$t sul taglio", e.params(3_999_000).copy(seed = 0f) != TransitionEffect.Params())
+            assertTrue("$t all'inizio", e.params(0).copy(seed = 0f) != TransitionEffect.Params())
+        }
+        // Il cerchio è chiuso del tutto proprio sul taglio.
+        assertTrue(TransitionEffect(0, 4_000_000, null, 0, TransitionType.IRIS, 500_000).params(3_999_000).iris > 0.99f)
+        assertTrue(TransitionType.entries.filter { it.soft }.none { it == TransitionType.GLITCH || it == TransitionType.SHAKE })
+    }
+
+    @Test fun hitFollowsBeats() {
+        val fx = FxEffect(listOf(ClipFx(FxType.HIT)), listOf(1_000_000))
+        assertEquals(1f, fx.hitAt(1_000_000), 1e-3f)
+        assertTrue(fx.hitAt(1_300_000) < 0.1f)
+        assertEquals(0f, fx.hitAt(900_000), 0f)
+        assertTrue(FxType.HIT.onBeats && FxType.PULSE.onBeats && !FxType.BOKEH.onBeats)
+        assertEquals(8, FxType.entries.count { it.category == FxCategory.WOW })
+    }
+
+    @Test fun lettersArriveInTurnAndLeave() {
+        TextAnim.entries.filter { it.letters }.forEach { a ->
+            val n = 8
+            (0 until n).forEach { i ->
+                assertEquals("$a lettera $i all'inizio", 0f, letterFx(a, true, 0f, i, n).alpha, 1e-3f)
+                val end = letterFx(a, true, 1f, i, n)
+                assertEquals("$a lettera $i alla fine", 1f, end.alpha, 1e-3f)
+                assertEquals("$a al suo posto", 0f, end.dy, 0.02f)
+                assertEquals("$a misura normale", 1f, end.scale, 0.02f)
+                assertEquals("$a uscita finita", 0f, letterFx(a, false, 1f, i, n).alpha, 1e-3f)
+                assertEquals("$a uscita non iniziata", 1f, letterFx(a, false, 0f, i, n).alpha, 1e-3f)
+            }
+            // A metà entrata la prima lettera è più avanti dell'ultima.
+            assertTrue("$a a turno", letterFx(a, true, 0.3f, 0, n).alpha > letterFx(a, true, 0.3f, n - 1, n).alpha)
+        }
+        assertEquals(1f, letterFx(TextAnim.DROP, true, 1f, 0, 1).alpha, 1e-3f) // una sola lettera
+    }
+
+    @Test fun wowTextFramesDraw() {
+        val t = TextItem(text = "Ciao mondo", look = TextLook.SEMPLICE, gradientTo = Color.RED)
+        val still = TextRenderer.render(app, t, 1080, 1920)
+        listOf(TextAnim.DROP, TextAnim.RISE, TextAnim.WAVE).forEach { a ->
+            assertEquals("$a prima: nulla", 0, opaquePixels(TextRenderer.renderLetters(app, t, 1080, 1920, a, true, 0f)))
+            assertTrue("$a dopo: tutto", opaquePixels(TextRenderer.renderLetters(app, t, 1080, 1920, a, true, 1f)) > opaquePixels(still) / 2)
+            TextLook.entries.forEach { l -> assertTrue("$a/$l", opaquePixels(TextRenderer.renderLetters(app, t.copy(look = l), 1080, 1920, a, true, 0.7f)) > 10) }
+        }
+        val g = TextRenderer.renderGlitch(app, t, 1080, 1920, 1f, 3)
+        assertTrue(g.width > still.width && g.height == still.height && opaquePixels(g) > opaquePixels(still) / 2)
+        val sh = TextRenderer.renderShine(app, t, 1080, 1920, 0.5f)
+        assertEquals(still.width, sh.width)
+        assertTrue(opaquePixels(sh) >= opaquePixels(still) - 2)
+        assertEquals(null, shinePhase(100_000))
+        assertEquals(0f, shinePhase(300_000)!!, 1e-3f)
+        assertEquals(null, shinePhase(1_500_000))
+        assertTrue(lettersInUs(t) in 450_000L..1_800_000L)
+    }
+
+    @Test fun wowTextPresetsAreRecognized() {
+        listOf(TextPreset.GLITCH, TextPreset.ONDA, TextPreset.ORO, TextPreset.CASCATA).forEach { p ->
+            assertEquals(p, TextPreset.matching(p.applyTo(TextItem(text = "x"))))
         }
     }
 

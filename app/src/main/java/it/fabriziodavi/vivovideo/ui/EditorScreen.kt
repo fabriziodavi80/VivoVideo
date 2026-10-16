@@ -183,6 +183,8 @@ fun ToolGroup.panel(): Tool? = when (this) {
 val MUSIC_TABS = listOf("Brano", "Ritmo", "Battiti", "Clip")
 val TEXT_TABS = listOf("Stile", "Animazione", "Movimento")
 val LAYER_TABS = listOf("Aspetto", "Forma", "Animazione")
+/** Animazioni per i livelli (quelle lettera per lettera, glitch e luccichio sono solo per i testi). */
+val LAYER_ANIMS = TextAnim.entries.filter { !it.inOnly && !it.letters && it != TextAnim.GLITCH }
 val EFFECT_TABS = listOf("Effetti", "Dissolvenze")
 
 @Composable
@@ -1167,7 +1169,7 @@ private fun TextPanel(vm: EditorViewModel, running: Boolean, tab: Int) {
             PanelLabel("In entrata")
             PillRow(TextAnim.entries, t.animIn, { it.label }, enabled) { a -> vm.updateText { it.copy(animIn = a) } }
             PanelLabel("In uscita")
-            PillRow(TextAnim.entries.filter { it != TextAnim.TYPE && it != TextAnim.WORDS }, t.animOut, { it.label }, enabled) { a -> vm.updateText { it.copy(animOut = a) } }
+            PillRow(TextAnim.entries.filter { !it.inOnly }, t.animOut, { it.label }, enabled) { a -> vm.updateText { it.copy(animOut = a) } }
         }
         else -> {
             PanelLabel("Posizione")
@@ -1362,9 +1364,9 @@ private fun LayerPanel(vm: EditorViewModel, running: Boolean, tab: Int, onAdd: (
         else -> {
             MotionSection(vm, l.endPose != null, enabled, l.startUs, l.durationUs) { vm.toggleLayerMotion() }
             PanelLabel("Animazione in entrata")
-            PillRow(TextAnim.entries.filter { it != TextAnim.TYPE && it != TextAnim.WORDS }, l.animIn, { it.label }, enabled) { a -> vm.updateLayer { it.copy(animIn = a) } }
+            PillRow(LAYER_ANIMS, l.animIn, { it.label }, enabled) { a -> vm.updateLayer { it.copy(animIn = a) } }
             PanelLabel("Animazione in uscita")
-            PillRow(TextAnim.entries.filter { it != TextAnim.TYPE && it != TextAnim.WORDS }, l.animOut, { it.label }, enabled) { a -> vm.updateLayer { it.copy(animOut = a) } }
+            PillRow(LAYER_ANIMS, l.animOut, { it.label }, enabled) { a -> vm.updateLayer { it.copy(animOut = a) } }
         }
     }
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -1448,7 +1450,7 @@ private fun EffectsPanel(vm: EditorViewModel, running: Boolean, tab: Int) {
 
 @Composable
 private fun FxTab(vm: EditorViewModel, clip: it.fabriziodavi.vivovideo.model.Clip, p: it.fabriziodavi.vivovideo.model.Project, enabled: Boolean) {
-    var category by remember { mutableStateOf(FxCategory.COLOR) }
+    var category by remember { mutableStateOf(FxCategory.WOW) }
     Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         FxCategory.entries.forEach { cat ->
             val on = cat == category
@@ -1474,8 +1476,8 @@ private fun FxTab(vm: EditorViewModel, clip: it.fabriziodavi.vivovideo.model.Cli
     clip.fx.filter { !it.type.toggle }.forEach { f ->
         LabeledSlider(f.type.label, null, (f.amount * 100).toInt(), enabled, format = { "$it%" }) { v -> vm.setFxAmount(f.type, v / 100f) }
     }
-    if (clip.fx.any { it.type == FxType.PULSE || it.type == FxType.STROBE } && p.beatTimes().isEmpty()) {
-        Hint("\"Pulsa a ritmo\" e \"Lampi a ritmo\" usano i battiti della musica: aggiungi un brano e rileva i battiti dal pannello Musica.")
+    if (clip.fx.any { it.type.onBeats } && p.beatTimes().isEmpty()) {
+        Hint("\"Pulsa a ritmo\", \"Lampi a ritmo\" e \"Colpo a ritmo\" usano i battiti della musica: aggiungi un brano e rileva i battiti dal pannello Musica.")
     }
     if (clip.fx.isNotEmpty()) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

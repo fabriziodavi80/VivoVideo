@@ -54,6 +54,13 @@ class FxEffect(
         return if (dt > 0.3f) 0f else exp(-dt / 0.05f)
     }
 
+    /** Colpo: scatto deciso sul battito che si spegne in ~0,2 s. */
+    internal fun hitAt(timeUs: Long): Float {
+        if (amount(FxType.HIT) <= 0f) return 0f
+        val dt = sinceBeat(timeUs)
+        return if (dt > 0.8f) 0f else exp(-dt / 0.12f)
+    }
+
     /** Quanto è coperta l'immagine dalla dissolvenza (0 = niente, 1 = tutto nero/bianco). */
     internal fun fadeAt(timeUs: Long): Float {
         if (fadeInUs <= 0 && fadeOutUs <= 0) return 0f
@@ -96,6 +103,7 @@ private class FxProgram(private val effect: FxEffect, useHdr: Boolean) : BaseGlS
                 val a = amounts.getValue(type) * when (type) {
                     FxType.PULSE -> effect.pulseAt(presentationTimeUs)
                     FxType.STROBE -> effect.strobeAt(presentationTimeUs)
+                    FxType.HIT -> effect.hitAt(presentationTimeUs)
                     else -> 1f
                 }
                 program.setFloatsUniform(name, floatArrayOf(a))
@@ -130,6 +138,8 @@ internal val FX_UNIFORMS: Map<FxType, String> = mapOf(
             FxType.FISHEYE to "uFish", FxType.CHROMA to "uChroma", FxType.WAVE to "uWave",
             FxType.MIRROR to "uMirror", FxType.KALEIDO to "uKaleido", FxType.GRID to "uGrid",
             FxType.SHAKE to "uShake", FxType.PULSE to "uPulse", FxType.STROBE to "uStrobe",
+            FxType.HIT to "uHit", FxType.CINEMATIC to "uCine", FxType.NEON to "uNeon", FxType.RAYS to "uRays",
+            FxType.BOKEH to "uBokeh", FxType.SPARKLE to "uSparkle", FxType.PRISM to "uPrism", FxType.SPEEDLINES to "uSpeed",
         )
 
 private const val VERTEX = """
@@ -149,6 +159,7 @@ uniform float uBW, uSepia, uVivid, uDuo, uHue, uPoster, uInvert;
 uniform float uGrain, uOld, uVHS, uGlitch, uCartoon, uHalftone, uPixel, uLeak, uGlow;
 uniform float uBlur, uZoomBlur, uTilt, uVignette, uFish, uChroma, uWave;
 uniform float uMirror, uKaleido, uGrid, uShake, uPulse, uStrobe;
+uniform float uHit, uCine, uNeon, uRays, uBokeh, uSparkle, uPrism, uSpeed;
 uniform float uFade, uFadeWhite;
 varying vec2 vUv;
 
@@ -192,6 +203,7 @@ void main() {
   // --- Movimento ---
   if (uShake > 0.0) uv += (vec2(noise1(uTime * 9.0), noise1(uTime * 11.0 + 5.0)) - 0.5) * 0.03 * uShake;
   if (uPulse > 0.0) uv = (uv - 0.5) / (1.0 + 0.09 * uPulse) + 0.5;
+  if (uHit > 0.0) uv = (uv - 0.5) / (1.0 + 0.16 * uHit) + 0.5;
   // --- Ottica che deforma ---
   if (uFish > 0.0) {
     vec2 p = (uv - 0.5) * 2.0; p.x *= aspect;
@@ -241,7 +253,14 @@ void main() {
     c = tex(uv);
   }
   if (uChroma > 0.0) { vec2 d = (uv - 0.5) * 0.025 * uChroma; c.r = tex(uv + d).r; c.b = tex(uv - d).b; }
-  float split = 0.008 * uGlitch * step(0.6, hash(vec2(floor(uTime * 8.0), 3.0))) + 0.0035 * uVHS;
+  if (uPrism > 0.0) {
+    float pa = uTime * 1.3;
+    vec2 po = vec2(cos(pa), sin(pa) * aspect) * 0.014 * uPrism;
+    c.r = tex(uv + po).r;
+    c.g = mix(c.g, tex(uv + vec2(-po.y, po.x)).g, 0.5 * uPrism);
+    c.b = tex(uv - po).b;
+  }
+  float split = 0.008 * uGlitch * step(0.6, hash(vec2(floor(uTime * 8.0), 3.0))) + 0.0035 * uVHS + 0.014 * uHit;
   if (split > 0.0) { c.r = tex(uv + vec2(split, 0.0)).r; c.b = tex(uv - vec2(split, 0.0)).b; }
   if (uGlow > 0.0) {
     vec3 g = vec3(0.0);
@@ -250,6 +269,24 @@ void main() {
       g += max(tex(uv + vec2(cos(a), sin(a) * aspect) * 0.02) - 0.55, 0.0);
     }
     c += g / 12.0 * 2.2 * uGlow;
+  }
+  if (uRays > 0.0) {
+    // Raggi di luce: le zone chiare "colano" verso una sorgente in alto che si sposta piano.
+    vec2 src = vec2(0.5 + 0.3 * sin(uTime * 0.25), 1.1);
+    vec3 ray = vec3(0.0);
+    for (int i = 0; i < 16; i++) {
+      float k = float(i) / 16.0;
+      ray += max(tex(mix(uv, src, k * 0.4)) - 0.55, 0.0) * (1.0 - k);
+    }
+    c += ray / 16.0 * 3.5 * uRays * vec3(1.0, 0.9, 0.72);
+  }
+  if (uNeon > 0.0) {
+    vec2 px = 1.5 / uRes;
+    float ngx = lum(tex(uv + vec2(px.x, 0.0))) - lum(tex(uv - vec2(px.x, 0.0)));
+    float ngy = lum(tex(uv + vec2(0.0, px.y))) - lum(tex(uv - vec2(0.0, px.y)));
+    float ne = smoothstep(0.03, 0.16, length(vec2(ngx, ngy)));
+    vec3 nc = hsv2rgb(vec3(fract(uTime * 0.12 + vUv.y * 0.5 + vUv.x * 0.25), 0.85, 1.0));
+    c = mix(c, c * 0.2 + nc * ne * 1.7, uNeon);
   }
   // --- Stile ---
   if (uCartoon > 0.0) {
@@ -320,6 +357,56 @@ void main() {
     vec3 leak = vec3(1.0, 0.55, 0.22) * exp(-dot(lp, lp) * 2.5) * uLeak;
     c = 1.0 - (1.0 - clamp(c, 0.0, 1.0)) * (1.0 - leak);
   }
+  if (uBokeh > 0.0) {
+    // Luci sfocate che salgono piano, sommate come luce (schermo).
+    vec3 bk = vec3(0.0);
+    for (int i = 0; i < 14; i++) {
+      float fi = float(i);
+      vec2 cp = vec2(hash(vec2(fi, 1.0)), fract(hash(vec2(fi, 2.0)) + uTime * (0.015 + 0.03 * hash(vec2(fi, 3.0)))));
+      float rad = mix(0.035, 0.1, hash(vec2(fi, 4.0)));
+      vec2 bd = vUv - cp; bd.x *= aspect;
+      float disk = 1.0 - smoothstep(rad * 0.82, rad, length(bd));
+      vec3 bcol = hsv2rgb(vec3(fract(0.02 + hash(vec2(fi, 5.0)) * 0.16), 0.5, 1.0));
+      bk += bcol * disk * (0.45 + 0.25 * sin(uTime * 1.3 + fi * 1.7));
+    }
+    c = 1.0 - (1.0 - clamp(c, 0.0, 1.0)) * (1.0 - clamp(bk * 0.55 * uBokeh, 0.0, 1.0));
+  }
+  if (uSparkle > 0.0) {
+    // Scintille dorate che si accendono e spengono, a croce.
+    vec2 sg = vUv * vec2(aspect, 1.0) * 24.0;
+    vec2 cell = floor(sg);
+    float sh = hash(cell + 0.5);
+    if (sh > 0.82) {
+      vec2 q = fract(sg) - 0.5 - (vec2(hash(cell + 3.1), hash(cell + 7.7)) - 0.5) * 0.5;
+      float tw = pow(0.5 + 0.5 * sin(uTime * (2.0 + sh * 5.0) + sh * 40.0), 6.0);
+      float star = exp(-dot(q, q) * 220.0) + 0.6 * (exp(-abs(q.x) * 70.0) * exp(-abs(q.y) * 9.0) + exp(-abs(q.y) * 70.0) * exp(-abs(q.x) * 9.0));
+      c += vec3(1.0, 0.84, 0.45) * star * tw * 1.4 * uSparkle;
+    }
+  }
+  if (uSpeed > 0.0) {
+    // Linee di velocità da fumetto: raggi bianchi ai bordi che cambiano a scatti.
+    vec2 sp = vUv - 0.5; sp.x *= aspect;
+    float sang = (atan(sp.y, sp.x) + 3.14159265) / 6.2831853 * 110.0;
+    float sk = floor(sang);
+    float sfr = floor(uTime * 12.0);
+    float son = step(0.55, hash(vec2(sk, sfr)));
+    float sw = 1.0 - smoothstep(0.05, 0.4, abs(fract(sang) - 0.5));
+    float sri = 0.28 + 0.25 * hash(vec2(sk, sfr + 1.0));
+    float smask = son * sw * smoothstep(sri, sri + 0.18, length(sp));
+    c = mix(c, vec3(1.0), smask * 0.85 * uSpeed);
+  }
+  if (uCine > 0.0) {
+    // Look da film: contrasto, ombre verso il ciano, luci verso l'arancio, bande nere.
+    float cl = lum(c);
+    vec3 cc2 = clamp(c, 0.0, 1.0);
+    vec3 con = cc2 * cc2 * (3.0 - 2.0 * cc2);
+    vec3 tint = mix(vec3(0.75, 1.05, 1.15), vec3(1.15, 0.98, 0.82), smoothstep(0.15, 0.8, cl));
+    c = mix(c, con * tint, 0.75 * uCine);
+    float barH = aspect > 1.0 ? max(0.0, (1.0 - aspect / 2.39) * 0.5) : 0.07;
+    barH *= min(1.0, uCine * 2.0);
+    c *= step(barH, vUv.y) * step(vUv.y, 1.0 - barH);
+  }
+  if (uHit > 0.0) c = mix(c, vec3(1.0), 0.18 * uHit);
   if (uVignette > 0.0) {
     vec2 d = vUv - 0.5;
     d.x *= aspect;

@@ -143,7 +143,205 @@ object TextRenderer {
         cache.put(key, bmp)
         return bmp
     }
+
+    private fun baseKey(item: TextItem, frameW: Int, frameH: Int) =
+        "${item.text.hashCode()}|${item.font}|${item.look}|${item.color}|${item.gradientTo}|${item.spacing}|${item.upper}|${item.size}|$frameW|$frameH"
+
+    /** Fotogrammi animati: in cache solo se piccoli (in 4K sarebbero troppi). */
+    private fun keep(key: String, b: Bitmap): Bitmap { if (b.byteCount < 6 * 1024 * 1024) cache.put(key, b); return b }
+
+    private fun withAlpha(col: Int, a: Float) =
+        Color.argb((Color.alpha(col) * a.coerceIn(0f, 1f)).toInt(), Color.red(col), Color.green(col), Color.blue(col))
+
+    /** Una lettera con lo stesso aspetto del testo intero (contorno, ombra, neon, sfumatura). */
+    private fun drawGlyph(c: Canvas, base: TextPaint, item: TextItem, light: Boolean, s: String, x: Float, y: Float, a: Float, gradient: android.graphics.Shader?) {
+        val paint = TextPaint(base).apply { letterSpacing = 0f; clearShadowLayer() }
+        val size = paint.textSize
+        when (item.look) {
+            TextLook.OMBRA -> paint.setShadowLayer(size * 0.1f, 0f, size * 0.04f, withAlpha(0xB0000000.toInt(), a))
+            TextLook.CONTORNO -> {
+                paint.style = Paint.Style.STROKE
+                paint.strokeWidth = size * 0.14f
+                paint.strokeJoin = Paint.Join.ROUND
+                paint.color = withAlpha(if (light) Color.BLACK else Color.WHITE, a)
+                c.drawText(s, x, y, paint)
+                paint.style = Paint.Style.FILL
+            }
+            else -> {}
+        }
+        paint.color = withAlpha(item.color, a)
+        if (item.look == TextLook.NEON) {
+            paint.setShadowLayer(size * 0.45f, 0f, 0f, withAlpha(item.color, a))
+            c.drawText(s, x, y, paint)
+            paint.setShadowLayer(size * 0.18f, 0f, 0f, withAlpha(item.color, a))
+            c.drawText(s, x, y, paint)
+            paint.color = withAlpha(blendToWhite(item.color, 0.75f), a)
+            paint.setShadowLayer(size * 0.06f, 0f, 0f, withAlpha(item.color, a))
+        }
+        paint.shader = gradient
+        c.drawText(s, x, y, paint)
+    }
+
+    /**
+     * Testo con le lettere animate una per una ([progress] 0→1 lungo l'entrata o l'uscita).
+     * L'immagine ha margini più larghi, così le lettere possono uscire dalla riga mentre si muovono.
+     */
+    fun renderLetters(context: Context, item: TextItem, frameW: Int, frameH: Int, anim: TextAnim, entering: Boolean, progress: Float): Bitmap {
+        val key = baseKey(item, frameW, frameH) + "|L|$anim|$entering|${(progress * 1000).toInt()}"
+        cache.get(key)?.let { return it }
+        val p = prepare(context, item, frameW, frameH, Int.MAX_VALUE)
+        val ts = p.paint.textSize
+        val exX = (ts * 0.4f).toInt()
+        val exY = (ts * 1.1f).toInt()
+        val bw = p.width + 2 * p.pad + 2 * exX
+        val bh = p.layout.height + 2 * p.pad + 2 * exY
+        val bmp = Bitmap.createBitmap(bw.coerceAtLeast(2), bh.coerceAtLeast(2), Bitmap.Config.ARGB_8888)
+        val c = Canvas(bmp)
+        val light = isLight(item.color)
+        if (item.look == TextLook.RIQUADRO) {
+            val boxA = if (entering) (progress * 2.5f).coerceIn(0f, 1f) else 1f - progress
+            val bg = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = withAlpha(if (light) 0x99000000.toInt() else 0xE6FFFFFF.toInt(), boxA) }
+            val r = ts * 0.3f
+            c.drawRoundRect(RectF(exX.toFloat(), exY.toFloat(), (bw - exX).toFloat(), (bh - exY).toFloat()), r, r, bg)
+        }
+        c.translate((p.pad + exX).toFloat(), (p.pad + exY).toFloat())
+        val gradient = item.gradientTo?.let {
+            android.graphics.LinearGradient(0f, 0f, 0f, p.layout.height.toFloat(), item.color, it, android.graphics.Shader.TileMode.CLAMP)
+        }
+        val text = p.layout.text.toString()
+        val n = text.count { !it.isWhitespace() }
+        var i = 0
+        var k = 0
+        while (i < text.length) {
+            val cp = text.codePointAt(i)
+            val len = Character.charCount(cp)
+            if (!Character.isWhitespace(cp)) {
+                val f = letterFx(anim, entering, progress, k, n)
+                k++
+                if (f.alpha > 0.004f) {
+                    val s1 = text.substring(i, i + len)
+                    val line = p.layout.getLineForOffset(i)
+                    val x = p.layout.getPrimaryHorizontal(i) + item.spacing * ts / 2f
+                    val base = p.layout.getLineBaseline(line).toFloat()
+                    val cx = x + p.paint.measureText(s1) / 2f - item.spacing * ts / 2f
+                    val cy = base - ts * 0.35f
+                    c.save()
+                    c.translate(0f, f.dy * ts)
+                    c.rotate(f.rot, cx, cy)
+                    c.scale(f.scale, f.scale, cx, cy)
+                    drawGlyph(c, p.paint, item, light, s1, x, base, f.alpha, gradient)
+                    c.restore()
+                }
+            }
+            i += len
+        }
+        return keep(key, bmp)
+    }
+
+    /** Glitch: il testo a strisce spostate, con i bordi rossi e azzurri sfasati ([amount] 0…1). */
+    fun renderGlitch(context: Context, item: TextItem, frameW: Int, frameH: Int, amount: Float, seed: Long): Bitmap {
+        val key = baseKey(item, frameW, frameH) + "|G|$seed|${(amount * 20).toInt()}"
+        cache.get(key)?.let { return it }
+        val base = render(context, item, frameW, frameH)
+        val ex = (base.height * 0.3f).toInt().coerceAtLeast(4)
+        val out = Bitmap.createBitmap(base.width + 2 * ex, base.height, Bitmap.Config.ARGB_8888)
+        val c = Canvas(out)
+        val rnd = java.util.Random(seed * 31L + 7L)
+        val red = Paint().apply { colorFilter = android.graphics.PorterDuffColorFilter(0xFFFF2B5E.toInt(), android.graphics.PorterDuff.Mode.SRC_IN) }
+        val cyan = Paint().apply {
+            colorFilter = android.graphics.PorterDuffColorFilter(0xFF1EF2FF.toInt(), android.graphics.PorterDuff.Mode.SRC_IN)
+            xfermode = android.graphics.PorterDuffXfermode(android.graphics.PorterDuff.Mode.ADD)
+        }
+        val norm = Paint()
+        val bands = 7
+        val off = ex * 0.3f * amount + 2f
+        for (b in 0 until bands) {
+            val y0 = base.height * b / bands
+            val y1 = base.height * (b + 1) / bands
+            val dx = if (rnd.nextFloat() < 0.15f + 0.5f * amount) (rnd.nextFloat() - 0.5f) * 2f * ex * amount else 0f
+            val src = android.graphics.Rect(0, y0, base.width, y1)
+            fun dst(o: Float) = RectF(ex + dx + o, y0.toFloat(), ex + dx + o + base.width, y1.toFloat())
+            c.drawBitmap(base, src, dst(-off), red)
+            c.drawBitmap(base, src, dst(off), cyan)
+            c.drawBitmap(base, src, dst(0f), norm)
+        }
+        return keep(key, out)
+    }
+
+    /** Luccichio: una striscia di luce che attraversa il testo ([phase] 0→1). */
+    fun renderShine(context: Context, item: TextItem, frameW: Int, frameH: Int, phase: Float): Bitmap {
+        val key = baseKey(item, frameW, frameH) + "|S|${(phase * 100).toInt()}"
+        cache.get(key)?.let { return it }
+        val out = render(context, item, frameW, frameH).copy(Bitmap.Config.ARGB_8888, true)
+        val c = Canvas(out)
+        val band = out.width * 0.3f + out.height
+        val x0 = -band + phase * (out.width + band)
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            shader = android.graphics.LinearGradient(
+                x0, 0f, x0 + band, out.height * 0.6f,
+                intArrayOf(0x00FFFFFF, 0xE6FFFFFF.toInt(), 0x00FFFFFF), floatArrayOf(0f, 0.5f, 1f),
+                android.graphics.Shader.TileMode.CLAMP,
+            )
+            xfermode = android.graphics.PorterDuffXfermode(android.graphics.PorterDuff.Mode.SRC_ATOP)
+        }
+        c.drawRect(0f, 0f, out.width.toFloat(), out.height.toFloat(), paint)
+        return keep(key, out)
+    }
 }
+
+/** Una lettera durante l'animazione: trasparenza, spostamento verticale (in altezze del testo), scala, rotazione (gradi). */
+internal data class LetterFx(val alpha: Float, val dy: Float, val scale: Float, val rot: Float)
+
+private fun bounceOut(x: Float): Float {
+    val n = 7.5625f; val d = 2.75f
+    return when {
+        x < 1f / d -> n * x * x
+        x < 2f / d -> { val t = x - 1.5f / d; n * t * t + 0.75f }
+        x < 2.5f / d -> { val t = x - 2.25f / d; n * t * t + 0.9375f }
+        else -> { val t = x - 2.625f / d; n * t * t + 0.984375f }
+    }
+}
+
+/**
+ * Lettera [i] di [n] con [progress] 0→1 dell'entrata ([entering]) o dell'uscita: le lettere partono a turno,
+ * da sinistra a destra, ognuna con una sua finestra di tempo.
+ */
+internal fun letterFx(anim: TextAnim, entering: Boolean, progress: Float, i: Int, n: Int): LetterFx {
+    val win = if (n <= 1) 1f else 0.45f
+    val start = if (n <= 1) 0f else (1f - win) * i / (n - 1)
+    val q = ((progress - start) / win).coerceIn(0f, 1f)
+    fun ease(x: Float) = 1 - (1 - x) * (1 - x) * (1 - x)
+    val pi = Math.PI.toFloat()
+    return if (entering) when (anim) {
+        TextAnim.DROP -> LetterFx((q * 4f).coerceAtMost(1f), -1f * (1f - bounceOut(q)), 1f, 0f)
+        TextAnim.RISE -> LetterFx(ease(q), 0.6f * (1f - ease(q)), 1f + 0.5f * (1f - ease(q)), 0f)
+        TextAnim.WAVE -> LetterFx(if (q > 0f) (q * 5f).coerceAtMost(1f) else 0f, -0.55f * kotlin.math.sin(q * pi), 1f + 0.35f * kotlin.math.sin(q * pi), 0f)
+        else -> LetterFx(1f, 0f, 1f, 0f)
+    } else when (anim) {
+        TextAnim.DROP -> LetterFx(1f - q, 1.0f * q * q, 1f, (if (i % 2 == 0) 25f else -25f) * q)
+        TextAnim.RISE -> LetterFx(1f - ease(q), -0.6f * ease(q), 1f + 0.5f * ease(q), 0f)
+        TextAnim.WAVE -> LetterFx(1f - q, -0.5f * kotlin.math.sin(q * pi * 0.5f), 1f + 0.3f * kotlin.math.sin(q * pi), 0f)
+        else -> LetterFx(1f, 0f, 1f, 0f)
+    }
+}
+
+/** Durata dell'entrata lettera per lettera: più lettere, più tempo (al massimo 1,8 s o metà del testo). */
+internal fun lettersInUs(item: TextItem): Long {
+    val n = TextRenderer.displayText(item).count { !it.isWhitespace() }
+    return minOf(maxOf(n * 55_000L, 450_000L) + 350_000L, 1_800_000L, item.durationUs / 2).coerceAtLeast(1)
+}
+internal fun lettersOutUs(item: TextItem): Long = minOf(600_000L, item.durationUs / 2).coerceAtLeast(1)
+internal const val GLITCH_US = 600_000L
+
+/** Fase del luccichio (0→1) se a [local] µs una striscia di luce sta passando, altrimenti null. */
+internal fun shinePhase(local: Long): Float? {
+    val t = local - 300_000L
+    if (t < 0) return null
+    val ph = t % 3_000_000L
+    return if (ph < 900_000L) ph / 900_000f else null
+}
+
+private fun quant(x: Float, steps: Int = 60): Float = (x.coerceIn(0f, 1f) * steps).toInt() / steps.toFloat()
 
 private const val IN_US = 450_000L
 private const val OUT_US = 350_000L
@@ -169,6 +367,8 @@ internal fun animFactors(animIn: TextAnim, animOut: TextAnim, local: Long, durat
         }
         TextAnim.SLIDE -> { dy += 0.08f * (1 - ease(pin)); alpha *= ease(pin) }
         TextAnim.ZOOM -> { scale *= 1.6f - 0.6f * ease(pin); alpha *= ease(pin) }
+        TextAnim.GLITCH -> alpha *= ease(pin * 1.5f)
+        TextAnim.SHINE -> alpha *= ease(pin)
         else -> {}
     }
     when (animOut) {
@@ -176,6 +376,7 @@ internal fun animFactors(animIn: TextAnim, animOut: TextAnim, local: Long, durat
         TextAnim.POP -> { scale *= 0.5f + 0.5f * ease(pout); alpha *= ease(pout) }
         TextAnim.SLIDE -> { dy -= 0.08f * (1 - ease(pout)); alpha *= ease(pout) }
         TextAnim.ZOOM -> { scale *= 1f + 0.6f * (1 - ease(pout)); alpha *= ease(pout) }
+        TextAnim.GLITCH -> alpha *= ease(pout * 1.5f)
         else -> {}
     }
     return AnimFactors(alpha, scale, dy)
@@ -208,6 +409,29 @@ class TimedTextOverlay(
 
     override fun getBitmap(presentationTimeUs: Long): Bitmap {
         val local = presentationTimeUs - item.startUs
+        val dur = item.durationUs
+        // Lettera per lettera (uscita prima: se il testo è corto vince la fine).
+        if (item.animOut.letters) {
+            val ou = lettersOutUs(item)
+            if (local > dur - ou) return TextRenderer.renderLetters(context, item, frameW, frameH, item.animOut, false, quant((local - (dur - ou)).toFloat() / ou))
+        }
+        if (item.animIn.letters) {
+            val iu = lettersInUs(item)
+            if (local < iu) return TextRenderer.renderLetters(context, item, frameW, frameH, item.animIn, true, quant(local.coerceAtLeast(0).toFloat() / iu))
+        }
+        val g = minOf(GLITCH_US, dur / 2).coerceAtLeast(1)
+        if (item.animOut == TextAnim.GLITCH && local > dur - g) {
+            return TextRenderer.renderGlitch(context, item, frameW, frameH, (local - (dur - g)).toFloat() / g, local / 66_000)
+        }
+        if (item.animIn == TextAnim.GLITCH) {
+            if (local < g) return TextRenderer.renderGlitch(context, item, frameW, frameH, 1f - local.coerceAtLeast(0).toFloat() / g, local / 66_000)
+            // Ogni tanto un piccolo sussulto mentre il testo resta a schermo.
+            val ph = local % 2_200_000L
+            if (ph in 1_500_000L..1_650_000L) return TextRenderer.renderGlitch(context, item, frameW, frameH, 0.45f, local / 66_000)
+        }
+        if (item.animIn == TextAnim.SHINE) {
+            shinePhase(local)?.let { return TextRenderer.renderShine(context, item, frameW, frameH, quant(it, 30)) }
+        }
         if (item.animIn == TextAnim.WORDS) {
             // Parola per parola: ogni parola compare a turno (~0,25 s l'una).
             val text = TextRenderer.displayText(item)

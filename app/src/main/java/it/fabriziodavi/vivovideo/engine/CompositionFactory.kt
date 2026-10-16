@@ -298,7 +298,7 @@ class CompositionFactory(private val context: Context) {
                     if (clip.keyframes.any { it.value.opacity != 1f }) add(KeyframeFade(clip, startUs))
                 }
                 if (clip.fx.isNotEmpty() || clip.fadeInUs > 0 || clip.fadeOutUs > 0) {
-                    val needsBeats = clip.fx.any { f -> f.type == FxType.PULSE || f.type == FxType.STROBE }
+                    val needsBeats = clip.fx.any { f -> f.type.onBeats }
                     add(FxEffect(clip.fx, if (needsBeats) beats else emptyList(), startUs, clip.outputUs, clip.fadeInUs, clip.fadeOutUs, clip.fadeColor))
                 }
                 // Transizioni: metà alla fine di questa clip, metà all'inizio della successiva.

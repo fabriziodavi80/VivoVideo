@@ -203,6 +203,32 @@ class DeviceTest {
         )
     }
 
+    /** Le transizioni e le animazioni dei testi "wow", tutte insieme. */
+    private fun wowProject(): Project {
+        val wow = listOf(TransitionType.GLITCH, TransitionType.PRISM, TransitionType.LEAK, TransitionType.IRIS, TransitionType.PIXELATE, TransitionType.SHAKE)
+        val clips = (0..wow.size).map { i ->
+            video("w$i", listOf(videoA, videoB, videoC)[i % 3], s = 1_000_000, e = 2_500_000)
+                .copy(transitionOut = wow.getOrNull(i)?.let { TransitionSpec(it, 600_000) })
+        }
+        val anims = listOf(TextAnim.DROP, TextAnim.RISE, TextAnim.WAVE, TextAnim.GLITCH, TextAnim.SHINE)
+        return Project(
+            name = "wow",
+            clips = clips,
+            texts = anims.mapIndexed { i, a ->
+                TextItem(text = "Wow ${a.label}", startUs = i * 1_500_000L, durationUs = 2_500_000, animIn = a,
+                    animOut = if (a.inOnly) TextAnim.FADE else a, look = TextLook.entries[i % TextLook.entries.size], gradientTo = if (i % 2 == 0) Color.MAGENTA else null)
+            },
+        )
+    }
+
+    @Test fun exportWowTransitionsAndTexts() {
+        exportAndCheck(wowProject())
+    }
+
+    @Test fun previewPlaysWow() {
+        playFor(wowProject())
+    }
+
     private fun exportAndCheck(p: Project, extraLayers: List<Layer> = emptyList(), multi: Boolean = true) {
         val project = p.copy(layers = p.layers + extraLayers)
         Safety.setMultiExport(ctx, multi)
