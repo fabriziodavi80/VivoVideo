@@ -3,6 +3,7 @@ package it.fabriziodavi.vivovideo.online
 import android.content.Context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
@@ -104,14 +105,14 @@ object Library {
 
     fun jamendoUrl(clientId: String, query: String, commercialOnly: Boolean, instrumental: Boolean, page: Int = 1): String =
         "https://api.jamendo.com/v3.0/tracks/?client_id=${enc(clientId)}&format=json&limit=30&offset=${(page - 1) * 30}" +
-            "&audioformat=mp32&include=musicinfo&order=popularity_total&ccnd=false" +
+            "&audioformat=mp32&order=popularity_total&ccnd=false" +
             (if (commercialOnly) "&ccnc=false" else "") +
             (if (instrumental) "&vocalinstrumental=instrumental" else "") +
             (if (query.isBlank()) "" else "&search=${enc(query)}")
 
     fun freesoundUrl(key: String, query: String, effects: Boolean, page: Int = 1): String =
         "https://freesound.org/apiv2/search/text/?query=${enc(query)}&token=${enc(key)}" +
-            "&fields=id,name,username,duration,license,previews,url&page_size=30&page=$page" +
+            "&fields=id,name,username,duration,license,previews,url&page_size=20&page=$page" +
             "&filter=${enc(if (effects) "duration:[0 TO 30]" else "duration:[20 TO 600]")}"
 
     // ---------------- Lettura delle risposte ----------------
@@ -213,9 +214,17 @@ object Library {
         } finally { c.disconnect() }
     }
 
+    /** Una richiesta alla volta: quelle superate (annullate) mentre aspettano il turno non partono neppure. */
+    private val turn = kotlinx.coroutines.sync.Mutex()
+
     suspend fun search(
         source: LibrarySource, query: String, effects: Boolean, keys: LibraryKeys,
         commercialOnly: Boolean, instrumental: Boolean, page: Int = 1,
+    ): List<OnlineTrack> = turn.withLock { searchNow(source, query, effects, keys, commercialOnly, instrumental, page) }
+
+    private suspend fun searchNow(
+        source: LibrarySource, query: String, effects: Boolean, keys: LibraryKeys,
+        commercialOnly: Boolean, instrumental: Boolean, page: Int,
     ): List<OnlineTrack> = withContext(Dispatchers.IO) {
         val list = when (source) {
             LibrarySource.OPENVERSE -> parseOpenverse(get(openverseUrl(query, effects, commercialOnly, page))).ifEmpty {

@@ -64,6 +64,8 @@ class LibraryState {
     var loading by mutableStateOf(false)
     var error by mutableStateOf<String?>(null)
     var searched by mutableStateOf(false)
+    /** Risultati già avuti in questa apertura della libreria. */
+    val cache = HashMap<String, List<OnlineTrack>>()
 }
 
 /**
@@ -114,14 +116,27 @@ fun LibraryScreen(vm: EditorViewModel, state: LibraryState = remember { LibraryS
     }
 
     val search = chip?.let { c -> if (query.isBlank()) c else "$query $c" } ?: query
+    var forced by remember { mutableIntStateOf(0) }
     LaunchedEffect(source, search, commercial, instrumental, tick) {
         if (!autoSearch) return@LaunchedEffect
+        val key = "$source|$search|$effects|$commercial|$instrumental"
+        // Già cercato: subito, senza rete (salvo "Riprova" / tasto Cerca).
+        if (tick == forced) state.cache[key]?.let { state.results = it; state.error = null; state.searched = true; return@LaunchedEffect }
+        forced = tick
+        // Si aspetta che l'utente smetta di scrivere/toccare: niente ricerche a ogni lettera.
+        kotlinx.coroutines.delay(600)
         state.loading = true; state.error = null
-        val r = runCatching { Library.search(source, search, effects, keys, commercial, instrumental && !effects) }
-        state.loading = false; state.searched = true
-        r.onSuccess { state.results = it }.onFailure {
+        try {
+            val r = Library.search(source, search, effects, keys, commercial, instrumental && !effects)
+            state.cache[key] = r
+            state.results = r
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e // ricerca superata da una nuova: non è un errore
+        } catch (e: Exception) {
             state.results = emptyList()
-            state.error = friendlyError(it, source)
+            state.error = friendlyError(e, source)
+        } finally {
+            state.loading = false; state.searched = true
         }
     }
 
