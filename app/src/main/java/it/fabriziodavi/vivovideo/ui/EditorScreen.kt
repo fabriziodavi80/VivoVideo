@@ -1035,7 +1035,7 @@ private fun PhotoPanel(vm: EditorViewModel, running: Boolean) {
     ) { v -> vm.setPhotoDuration(v * 100_000L) }
     PanelLabel("Movimento")
     var allPhotos by remember { mutableStateOf(false) }
-    PillRow(MotionStyle.entries, null as MotionStyle?, { it?.label ?: "" }, enabled) { m -> if (m != null) vm.applyMotion(m, allPhotos) }
+    PillRow(MotionStyle.entries, MotionStyle.matching(clip.keyframes, clip.trimmedUs), { it?.label ?: "" }, enabled) { m -> if (m != null) vm.applyMotion(m, allPhotos) }
     ToggleRow("Applica a tutte le foto", allPhotos, enabled) { allPhotos = it }
     Hint("I movimenti usano due keyframe: li personalizzi dallo strumento Keyframe. Zoom fisso, posizione e Adatta/Riempi sono in Inquadra. Con i battiti, la maniglia destra aggancia la durata al ritmo.")
 }
@@ -1099,7 +1099,7 @@ private fun TextPanel(vm: EditorViewModel, running: Boolean, tab: Int) {
     when (tab) {
         0 -> {
             PanelLabel("Stili pronti")
-            PillRow(TextPreset.entries, null as TextPreset?, { it?.label ?: "" }, enabled) { pr -> if (pr != null) vm.applyTextPreset(pr) }
+            PillRow(TextPreset.entries, TextPreset.matching(t), { it?.label ?: "" }, enabled) { pr -> if (pr != null) vm.applyTextPreset(pr) }
             PanelLabel("Carattere")
             PillRow(TextFont.entries, t.font, { it.label }, enabled) { f -> vm.updateText { it.copy(font = f) } }
             PanelLabel("Colore")

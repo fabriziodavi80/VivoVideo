@@ -58,15 +58,15 @@ fun <T> Segmented(items: List<T>, selected: T, label: (T) -> String, enabled: Bo
                     .weight(1f)
                     .height(34.dp)
                     .clip(RoundedCornerShape(8.dp))
-                    .background(if (on) VV.Raised2 else VV.Raised)
+                    .background(if (on) VV.Tally else VV.Raised)
                     .clickable(enabled = enabled) { onSelect(item) },
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
                     label(item),
                     style = MaterialTheme.typography.labelLarge,
-                    color = if (on) VV.Text else VV.Dim,
-                    fontWeight = if (on) FontWeight.Medium else FontWeight.Normal,
+                    color = if (on) VV.TallyInk else VV.Dim,
+                    fontWeight = if (on) FontWeight.SemiBold else FontWeight.Normal,
                     textAlign = TextAlign.Center,
                     maxLines = 1,
                 )

@@ -261,6 +261,10 @@ enum class MotionStyle(val label: String) {
     companion object {
         /** Movimenti per il "casuale": tutti tranne fermo, senza ripetere lo stesso due volte di fila. */
         val varied = entries.filter { it != NONE }
+
+        /** Movimento pronto che corrisponde ai keyframe della clip (null se personalizzati). */
+        fun matching(keyframes: List<Keyframe>, durationUs: Long): MotionStyle? =
+            entries.firstOrNull { it.keyframes(durationUs) == keyframes }
     }
 }
 
@@ -407,7 +411,12 @@ enum class TextPreset(val label: String) {
             animIn = TextAnim.TYPE, animOut = TextAnim.FADE, endPose = null)
     }
 
-    private companion object { const val WHITE = 0xFFFFFFFF.toInt() }
+    companion object {
+        private const val WHITE = 0xFFFFFFFF.toInt()
+
+        /** Stile pronto che corrisponde esattamente al testo (null se ritoccato a mano). */
+        fun matching(t: TextItem): TextPreset? = entries.firstOrNull { it.applyTo(t) == t }
+    }
 }
 
 /** Distribuisce elementi su righe senza sovrapposizioni (ordinati per inizio). */

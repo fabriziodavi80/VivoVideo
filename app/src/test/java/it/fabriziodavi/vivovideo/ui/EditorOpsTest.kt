@@ -89,6 +89,8 @@ class EditorOpsTest {
         val p = vm.project!!.clips.first { it.isPhoto }
         assertEquals(6_000_000L, p.outputUs)
         assertEquals(6_000_000L, p.keyframes.last().timeUs) // il movimento segue la nuova durata
+        // Il movimento scelto si riconosce (e si illumina) anche dopo il cambio di durata.
+        assertEquals(MotionStyle.PAN_LEFT, MotionStyle.matching(p.keyframes, p.trimmedUs))
     }
 
     @Test fun transitionsToAllCutsAndEffectsToAllClips() {
@@ -124,6 +126,11 @@ class EditorOpsTest {
         val t = vm.selectedText!!
         assertEquals("Titolo", t.text)
         assertNotNull(t.endPose) // lo stile Cinema ha lo zoom lento
+        // Lo stile scelto si riconosce (e si illumina) finché non lo si ritocca.
+        assertEquals(TextPreset.CINEMA, TextPreset.matching(t))
+        vm.updateText { it.copy(size = 0.2f) }
+        assertNull(TextPreset.matching(vm.selectedText!!))
+        vm.applyTextPreset(TextPreset.CINEMA)
         vm.toggleTextMotion()
         assertNull(vm.selectedText!!.endPose)
         vm.toggleTextMotion()

@@ -9,6 +9,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - **Menu della clip**: tieni premuta una clip (o Modifica → Altro) per Sposta, Duplica, Dividi, Aggiungi, Elimina.
 - **Pannelli a schede**: Audio (Brano · Ritmo · Battiti · Clip), Testo (Stile · Animazione · Movimento), Livelli (Aspetto · Forma · Animazione), Effetti (Effetti · Dissolvenze).
 - Gli strumenti di clip funzionano anche senza selezione: usano la clip sotto l'indicatore.
+- La scelta fatta si vede sempre: gli stili pronti del testo, i movimenti delle foto e i selettori a pulsanti si illuminano in arancione.
 
 ## Primi passi
 - Dalla schermata dei progetti tocca **Nuovo progetto** e scegli video e foto dalla galleria.
