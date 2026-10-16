@@ -100,9 +100,15 @@ class EditorOpsTest {
         val clips = vm.project!!.clips
         assertTrue(clips.dropLast(1).all { it.transitionOut?.type == TransitionType.SPIN })
         assertNull(clips.last().transitionOut)
+        assertTrue(vm.project!!.transitionOnAllCuts(TransitionSpec(TransitionType.SPIN)))
         vm.toggleFx(FxType.VIGNETTE)
         vm.setFxAmount(FxType.VIGNETTE, 0.9f)
+        assertTrue(!vm.project!!.fxOnAll(vm.selectedClip!!)) // spento finché non si applica
         vm.applyFxToAll()
+        assertTrue(vm.project!!.fxOnAll(vm.selectedClip!!)) // poi si illumina
+        vm.toggleFx(FxType.HIT)
+        assertTrue(!vm.project!!.fxOnAll(vm.selectedClip!!)) // ritoccato: di nuovo spento
+        vm.toggleFx(FxType.HIT)
         assertTrue(vm.project!!.clips.all { c -> c.fx.single().let { it.type == FxType.VIGNETTE && abs(it.amount - 0.9f) < 1e-4 } })
     }
 
@@ -111,8 +117,10 @@ class EditorOpsTest {
         vm.selectedClipId = "b"
         vm.setFrame(Transform(scale = 1.3f, rotation = 90f))
         vm.updateSelected { it.copy(fill = true) }
+        assertTrue(!vm.project!!.frameOnAll(vm.selectedClip!!))
         vm.applyFrameToAll()
         assertTrue(vm.project!!.clips.all { it.frame.scale == 1.3f && it.fill })
+        assertTrue(vm.project!!.frameOnAll(vm.selectedClip!!))
     }
 
     @Test fun textEditingPresetsAndMotion() {
@@ -214,6 +222,7 @@ class EditorOpsTest {
         vm.selectedClipId = "a"
         vm.updateSelected { it.copy(fadeOutUs = 3_000_000, fadeColor = FadeColor.WHITE) }
         vm.applyFadesToAll()
+        assertTrue(vm.project!!.fadesOnAll(vm.selectedClip!!))
         // Mai più di metà clip.
         assertTrue(vm.project!!.clips.all { it.fadeOutUs <= it.outputUs / 2 && it.fadeOutUs > 0 && it.fadeColor == FadeColor.WHITE })
     }

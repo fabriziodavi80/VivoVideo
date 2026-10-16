@@ -912,7 +912,7 @@ private fun TransitionPanel(vm: EditorViewModel, running: Boolean) {
                 else String.format(java.util.Locale.ITALIAN, if (cross) "Poco video oltre il taglio: durata effettiva %.1f s." else "Clip corte: durata effettiva %.1f s.", real / 1_000_000f)
             )
         }
-        SecondaryButton("Applica a tutti i tagli", onClick = { vm.setTransitionAll(spec) })
+        SecondaryButton("Applica a tutti i tagli", selected = p.transitionOnAllCuts(spec), onClick = { vm.setTransitionAll(spec) })
     }
     Hint(
         if (spec?.type == TransitionType.CROSSFADE) "Incrociata: le due clip si sovrappongono usando i fotogrammi prima e dopo il taglio, senza cambiare la durata del video."
@@ -1094,7 +1094,7 @@ private fun FramePanel(vm: EditorViewModel, running: Boolean) {
         })
         SecondaryButton("Reimposta", onClick = { if (enabled) { vm.setFrame(Transform()); vm.updateSelected { it.copy(fill = false) } } })
     }
-    SecondaryButton("Applica a tutte le clip", onClick = { if (enabled) vm.applyFrameToAll() })
+    SecondaryButton("Applica a tutte le clip", selected = vm.project?.frameOnAll(clip) == true, onClick = { if (enabled) vm.applyFrameToAll() })
 }
 
 private val TEXT_COLORS = listOf(
@@ -1189,7 +1189,7 @@ private fun TextPanel(vm: EditorViewModel, running: Boolean, tab: Int) {
         SecondaryButton("Duplica", onClick = { if (enabled) vm.duplicateText() })
         SecondaryButton("Elimina", onClick = { if (enabled) vm.deleteText() })
     }
-    SecondaryButton("Stile a tutti i testi", onClick = { if (enabled) vm.applyTextStyleToAll() })
+    SecondaryButton("Stile a tutti i testi", selected = p.textStyleOnAll(t), onClick = { if (enabled) vm.applyTextStyleToAll() })
 }
 
 /**
@@ -1445,7 +1445,7 @@ private fun EffectsPanel(vm: EditorViewModel, running: Boolean, tab: Int) {
     }
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         SecondaryButton("Apri e chiudi il video", selected = p.videoEndsFaded(), onClick = { if (enabled) vm.toggleVideoEnds() })
-        if (clip.fadeInUs > 0 || clip.fadeOutUs > 0) SecondaryButton("A tutte le clip", onClick = { if (enabled) vm.applyFadesToAll() })
+        if (clip.fadeInUs > 0 || clip.fadeOutUs > 0) SecondaryButton("A tutte le clip", selected = p.fadesOnAll(clip), onClick = { if (enabled) vm.applyFadesToAll() })
     }
     Hint("\"Apri e chiudi il video\": dissolvenza dal nero sulla prima clip (1 s) e al nero sull'ultima (1,5 s). Acceso è in ambra; toccalo di nuovo per toglierle.")
 }
@@ -1483,7 +1483,7 @@ private fun FxTab(vm: EditorViewModel, clip: it.fabriziodavi.vivovideo.model.Cli
     }
     if (clip.fx.isNotEmpty()) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            SecondaryButton("Applica a tutte le clip", onClick = { if (enabled) vm.applyFxToAll() })
+            SecondaryButton("Applica a tutte le clip", selected = p.fxOnAll(clip), onClick = { if (enabled) vm.applyFxToAll() })
             SecondaryButton("Togli tutti", onClick = { if (enabled) vm.updateSelected { it.copy(fx = emptyList()) } })
         }
     } else {

@@ -4,6 +4,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
 - **Apri e chiudi il video** ora è un interruttore: acceso si illumina in ambra, toccandolo di nuovo toglie le due dissolvenze. Anche Alto/Centro/Basso del testo mostrano la posizione scelta.
+- I pulsanti **Applica a tutte le clip / a tutti i tagli / Stile a tutti i testi** restano in ambra finché tutte le clip (o i testi) hanno la stessa scelta; se ne ritocchi una si spengono.
 - **TAP a tempo che taglia**: in Audio → Battiti, con "Taglia le clip a ogni tocco" acceso, ogni tocco a tempo segna anche un taglio del video. I tagli si fanno tutti insieme quando metti in pausa (così l'ascolto non si interrompe) e un solo Annulla li toglie.
 - Effetti, transizioni e testi **Wow** (versione precedente): categoria Wow in Effetti, transizioni Glitch/Prisma/Luce/Cerchio/Pixel/Scossa, animazioni lettera per lettera, stili Glitch/Onda/Oro/Cascata.
 

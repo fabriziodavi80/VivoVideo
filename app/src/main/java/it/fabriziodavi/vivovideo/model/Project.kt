@@ -773,6 +773,18 @@ data class Project(
      * Restituisce null se t cade troppo vicino a un bordo o se la clip ha una rampa
      * (la rampa è definita sull'intera clip e dividerla cambierebbe il risultato).
      */
+    // Le scelte "a tutte" restano illuminate finché tutte le clip (o i testi) sono uguali a quella selezionata.
+    fun fxOnAll(c: Clip): Boolean = clips.size > 1 && clips.all { it.fx == c.fx }
+    fun fadesOnAll(c: Clip): Boolean = clips.size > 1 && clips.all {
+        it.fadeInUs == minOf(c.fadeInUs, it.outputUs / 2) && it.fadeOutUs == minOf(c.fadeOutUs, it.outputUs / 2) &&
+            it.fadeColor == c.fadeColor && it.fadeAudio == c.fadeAudio
+    }
+    fun frameOnAll(c: Clip): Boolean = clips.size > 1 && clips.all { it.frame == c.frame && it.fill == c.fill }
+    fun transitionOnAllCuts(spec: TransitionSpec?): Boolean = clips.size > 2 && clips.dropLast(1).all { it.transitionOut == spec }
+    fun textStyleOnAll(t: TextItem): Boolean = texts.size > 1 && texts.all {
+        it.font == t.font && it.look == t.look && it.color == t.color && it.size == t.size && it.animIn == t.animIn && it.animOut == t.animOut
+    }
+
     /** Il video si apre dal nero/bianco e si chiude (prima clip con entrata, ultima con uscita). */
     fun videoEndsFaded(): Boolean = clips.isNotEmpty() && clips.first().fadeInUs > 0 && clips.last().fadeOutUs > 0
 
