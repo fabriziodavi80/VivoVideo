@@ -201,7 +201,8 @@ fun Timeline(
                 var x = half
                 project.clips.dropLast(1).forEachIndexed { i, c ->
                     x += (c.outputUs / 1e6f * dpPerSecond).dp
-                    CutButton(
+                    // Ai lati della clip selezionata ci sono le maniglie: lì il pulsante non va.
+                    if (c.id != selectedClipId && project.clips[i + 1].id != selectedClipId) CutButton(
                         Modifier.offset(x = x - 1.dp - CUT_D / 2, y = top),
                         has = c.transitionOut != null,
                         onClick = { onCutTap(i) },

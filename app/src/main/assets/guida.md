@@ -57,7 +57,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - Si annulla con Annulla.
 
 ## Transizioni
-- Tocca il **cerchietto sul taglio** fra due clip nella timeline (oppure Modifica → Transizione con la clip prima del taglio). Il cerchietto diventa arancione quando c'è una transizione.
+- Tocca il **cerchietto sul taglio** fra due clip nella timeline (oppure Modifica → Transizione con la clip prima del taglio). Il cerchietto diventa arancione quando c'è una transizione; ai lati della clip selezionata è nascosto per lasciare posto alle maniglie.
 - **Incrociata**: le due clip si sovrappongono (vera dissolvenza). Usa i fotogrammi oltre il taglio: se una clip non ne ha, la dissolvenza si accorcia (il pannello lo indica). Fra foto è sempre piena.
 - Altre: Nero, Flash, Zoom, Sfocatura, Scorrimento, Rotazione (metà alla fine di una clip, metà all'inizio della successiva).
 - **Applica a tutti i tagli** per uniformare.

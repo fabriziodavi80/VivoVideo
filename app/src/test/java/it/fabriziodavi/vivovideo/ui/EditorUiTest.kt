@@ -2,6 +2,7 @@ package it.fabriziodavi.vivovideo.ui
 
 import android.app.Application
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
@@ -74,7 +75,7 @@ class EditorUiTest {
         val vm = vm(); show(vm)
         bar("Audio").performClick()
         listOf("Brano", "Ritmo", "Battiti", "Clip").forEach { compose.onNodeWithText(it).assertIsDisplayed() }
-        compose.onNodeWithText("Aggiungi musica").assertIsDisplayed()
+        compose.onAllNodesWithText("Aggiungi musica").assertCountEquals(2) // nel pannello e sotto la timeline
         compose.onNodeWithText("Clip").performClick()
         compose.onNodeWithText("Disattiva l'audio della clip").assertIsDisplayed()
         assertNotNull(vm.selectedClipId)
