@@ -3,6 +3,8 @@ package it.fabriziodavi.vivovideo.ui
 import it.fabriziodavi.vivovideo.model.TextItem
 import it.fabriziodavi.vivovideo.model.TransitionSpec
 import it.fabriziodavi.vivovideo.model.Clip
+import it.fabriziodavi.vivovideo.model.FrameMode
+import it.fabriziodavi.vivovideo.model.VideoFormat
 import it.fabriziodavi.vivovideo.online.Library
 import it.fabriziodavi.vivovideo.online.OnlineTrack
 import it.fabriziodavi.vivovideo.model.AutoEdit
@@ -233,7 +235,9 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             val p = project ?: return@launch
             // Inserisce dopo la clip selezionata, o in fondo.
             val at = p.clips.indexOfFirst { it.id == selectedClipId }.let { if (it < 0) p.clips.size else it + 1 }
-            update { it.addClips(clips, at) }
+            // Le nuove clip seguono le preimpostazioni di formato (riempi / sfondo sfocato secondo l'orientamento).
+            val ids = clips.map { it.id }.toSet()
+            update { it.addClips(clips, at).applyFramePresets(ids) }
             selectedClipId = clips.first().id
             // Primo video LOG: un po' di riduzione rumore di base.
             if (p.clips.isEmpty() && clips.any { it.log } && project!!.color.denoise == 0) {
@@ -567,7 +571,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             if (built.clips.isEmpty()) { message = "Non sono riuscito a leggere le foto e i video degli album."; return@launch }
             pause()
             update { cur ->
-                cur.copy(clips = built.clips, texts = built.texts, music = built.music,
+                cur.copy(clips = built.clips, texts = built.texts, music = built.music, format = built.format,
                     auto = r.copy(options = o, round = round, imported = imported))
             }
             selectedClipId = null
@@ -949,13 +953,18 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         update { p -> p.copy(clips = p.clips.map { it.copy(fadeInUs = minOf(c.fadeInUs, it.outputUs / 2), fadeOutUs = minOf(c.fadeOutUs, it.outputUs / 2), fadeColor = c.fadeColor, fadeAudio = c.fadeAudio) }) }
     }
 
+    /** Formato del video e preimpostazioni: si applicano subito a tutte le clip. */
+    fun setFormat(format: VideoFormat? = null, same: FrameMode? = null, other: FrameMode? = null) = update { p ->
+        p.copy(format = format ?: p.format, sameMode = same ?: p.sameMode, otherMode = other ?: p.otherMode).applyFramePresets()
+    }
+
     /** Inquadratura fissa della clip selezionata. */
     fun setFrame(f: Transform) = updateSelected { it.copy(frame = f) }
 
     /** Copia inquadratura e Adatta/Riempi della clip selezionata su tutte le clip. */
     fun applyFrameToAll() {
         val c = selectedClip ?: return
-        update { p -> p.copy(clips = p.clips.map { it.copy(frame = c.frame, fill = c.fill) }) }
+        update { p -> p.copy(clips = p.clips.map { it.copy(frame = c.frame, fill = c.fill, blurBg = c.blurBg) }) }
     }
 
     /** Durata di una foto. */

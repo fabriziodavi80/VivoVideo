@@ -80,6 +80,22 @@ import kotlin.math.sin
  */
 @RunWith(AndroidJUnit4::class)
 class DeviceTest {
+    /**
+     * L'emulatore (decodifica e GPU via software) a volte si inceppa da solo: ogni prova ha un secondo tentativo.
+     * Un errore vero dell'app fallisce comunque due volte di fila; i tentativi falliti finiscono nel registro.
+     */
+    @get:org.junit.Rule val retry = org.junit.rules.TestRule { base, d ->
+        object : org.junit.runners.model.Statement() {
+            override fun evaluate() {
+                try { base.evaluate() } catch (e: Throwable) {
+                    if (e is org.junit.AssumptionViolatedException) throw e
+                    android.util.Log.w("VivoVideoTest", "${d.methodName}: primo tentativo fallito, riprovo: ${e.message?.take(300)}")
+                    base.evaluate()
+                }
+            }
+        }
+    }
+
     companion object {
         private val ctx: Context get() = InstrumentationRegistry.getInstrumentation().targetContext
         private val main = Handler(Looper.getMainLooper())

@@ -151,6 +151,8 @@ data class Clip(
     val isPhoto: Boolean = false,
     /** Riempie il quadro tagliando i bordi, invece di mostrare bande nere. */
     val fill: Boolean = false,
+    /** Adatta con, dietro, una copia sfocata della stessa immagine al posto delle bande nere. */
+    val blurBg: Boolean = false,
     /** Inquadratura fissa (zoom, posizione, rotazione), sotto ad eventuali keyframe. */
     val frame: Transform = Transform(),
     /** Effetti video della clip. */
@@ -569,7 +571,29 @@ data class Project(
     val layers: List<Layer> = emptyList(),
     /** Se il progetto è un video automatico: come rifarlo (per "Altra proposta"). */
     val auto: AutoRecipe? = null,
+    /** Formato del video e preimpostazioni per le clip con lo stesso orientamento o con quello opposto. */
+    val format: VideoFormat = VideoFormat.AUTO,
+    val sameMode: FrameMode = FrameMode.FILL,
+    val otherMode: FrameMode = FrameMode.BLUR,
 ) {
+    /** Orientamento del video finito. */
+    fun outputOrientation(): Orientation = when (format) {
+        VideoFormat.VERTICAL -> Orientation.PORTRAIT
+        VideoFormat.HORIZONTAL -> Orientation.LANDSCAPE
+        VideoFormat.SQUARE -> Orientation.SQUARE
+        VideoFormat.AUTO -> (clips.firstOrNull { !it.isPhoto } ?: clips.firstOrNull())?.orientation ?: Orientation.LANDSCAPE
+    }
+
+    /** Come mettere nel quadro una clip, secondo le preimpostazioni (nel quadrato tutte sono "dello stesso" orientamento solo se quadrate). */
+    fun presetModeFor(c: Clip): FrameMode = if (c.orientation == outputOrientation()) sameMode else otherMode
+
+    /** Applica le preimpostazioni alle clip indicate (tutte se null). */
+    fun applyFramePresets(ids: Set<String>? = null): Project =
+        copy(clips = clips.map { if (ids == null || it.id in ids) it.withMode(presetModeFor(it)) else it })
+
+    /** Tutte le clip seguono le preimpostazioni. */
+    fun followsPresets(): Boolean = clips.all { it.frameMode == presetModeFor(it) }
+
     fun replaceLayer(l: Layer): Project = copy(layers = layers.map { if (it.id == l.id) l else it })
 
     /**
@@ -696,7 +720,7 @@ data class Project(
                 dur = dur.coerceIn(300_000L, Clip.PHOTO_MAX_US)
                 val style = o.motion ?: MotionStyle.varied.filter { it != prev }.random(rnd)
                 prev = style
-                c = c.copy(trimStartUs = 0, trimEndUs = dur, fill = o.fill, keyframes = style.keyframes(dur))
+                c = c.copy(trimStartUs = 0, trimEndUs = dur, keyframes = style.keyframes(dur)).let { x -> if (o.fill) x.withMode(q.presetModeFor(x)) else x }
             }
             if (i < clips.lastIndex) {
                 val type = when {
@@ -783,7 +807,7 @@ data class Project(
         it.fadeInUs == minOf(c.fadeInUs, it.outputUs / 2) && it.fadeOutUs == minOf(c.fadeOutUs, it.outputUs / 2) &&
             it.fadeColor == c.fadeColor && it.fadeAudio == c.fadeAudio
     }
-    fun frameOnAll(c: Clip): Boolean = clips.size > 1 && clips.all { it.frame == c.frame && it.fill == c.fill }
+    fun frameOnAll(c: Clip): Boolean = clips.size > 1 && clips.all { it.frame == c.frame && it.fill == c.fill && it.blurBg == c.blurBg }
     fun transitionOnAllCuts(spec: TransitionSpec?): Boolean = clips.size > 2 && clips.dropLast(1).all { it.transitionOut == spec }
     fun textStyleOnAll(t: TextItem): Boolean = texts.size > 1 && texts.all {
         it.font == t.font && it.look == t.look && it.color == t.color && it.size == t.size && it.animIn == t.animIn && it.animOut == t.animOut
@@ -994,6 +1018,38 @@ class SpeedCurve(val segEndUs: LongArray, val speeds: FloatArray, val durationUs
             ClipSpeed.SLOW -> constant(0.5f, durationUs)
             ClipSpeed.FAST -> constant(2f, durationUs)
             ClipSpeed.RAMP -> fromPoints(points, durationUs)
+        }
+    }
+}
+
+/** Come una foto o un video sta nel quadro. */
+enum class FrameMode(val label: String) { FILL("Riempi"), FIT("Adatta"), BLUR("Sfondo sfocato") }
+
+val Clip.frameMode: FrameMode get() = when { blurBg -> FrameMode.BLUR; fill -> FrameMode.FILL; else -> FrameMode.FIT }
+fun Clip.withMode(m: FrameMode): Clip = copy(fill = m == FrameMode.FILL, blurBg = m == FrameMode.BLUR)
+
+/** Orientamento di una clip (o del video): verticale, orizzontale o quasi quadrato. */
+enum class Orientation { PORTRAIT, LANDSCAPE, SQUARE }
+
+fun orientationOf(w: Int, h: Int): Orientation = when {
+    w <= 0 || h <= 0 -> Orientation.LANDSCAPE
+    h > w * 1.1f -> Orientation.PORTRAIT
+    w > h * 1.1f -> Orientation.LANDSCAPE
+    else -> Orientation.SQUARE
+}
+val Clip.orientation: Orientation get() = orientationOf(width, height)
+
+/** Formato del video finito. AUTO = come la prima clip (com'era prima). */
+enum class VideoFormat(val label: String, val short: String, val aspect: Float?) {
+    AUTO("Automatico", "Auto", null), VERTICAL("Verticale 9:16", "9:16", 9f / 16f),
+    HORIZONTAL("Orizzontale 16:9", "16:9", 16f / 9f), SQUARE("Quadrato 1:1", "1:1", 1f);
+
+    companion object {
+        /** Il formato adatto a un insieme di clip: l'orientamento più frequente. */
+        fun majority(clips: List<Clip>): VideoFormat {
+            val p = clips.count { it.orientation == Orientation.PORTRAIT }
+            val l = clips.count { it.orientation == Orientation.LANDSCAPE }
+            return if (p > l) VERTICAL else HORIZONTAL
         }
     }
 }

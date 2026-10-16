@@ -103,6 +103,13 @@ class CompositionFactory(private val context: Context) {
     }
 
     /** Dimensioni del video finale: orientamento e proporzioni del primo video (o della prima foto). */
+    /** Clip nel quadro finale: riempi, adatta (bande nere) o adatta con sfondo sfocato. */
+    private fun framing(clip: Clip, outW: Int, outH: Int): Effect = when {
+        clip.blurBg -> BlurFillEffect(outW, outH)
+        clip.fill -> Presentation.createForWidthAndHeight(outW, outH, Presentation.LAYOUT_SCALE_TO_FIT_WITH_CROP)
+        else -> Presentation.createForWidthAndHeight(outW, outH, Presentation.LAYOUT_SCALE_TO_FIT)
+    }
+
     fun outputSize(project: Project, shortSide: Int?): Pair<Int, Int> {
         // Il formato lo decide il primo video; con sole foto, la prima foto (al massimo in 4K).
         val first = project.clips.firstOrNull { !it.isPhoto } ?: project.clips.firstOrNull() ?: return 1920 to 1080
@@ -111,6 +118,15 @@ class CompositionFactory(private val context: Context) {
         val srcShort = if (first.isPhoto) minOf(w, h, 2160) else minOf(w, h)
         val target = minOf(shortSide ?: srcShort, srcShort)
         fun even(v: Long) = (v / 2 * 2).toInt()
+        // Formato scelto: lato corto come sopra, l'altro dalle proporzioni (9:16, 16:9, 1:1).
+        project.format.aspect?.let { a ->
+            val s = target.toLong()
+            return when {
+                a < 1f -> even(s) to even((s / a).toLong())
+                a > 1f -> even((s * a).toLong()) to even(s)
+                else -> even(s) to even(s)
+            }
+        }
         val scale = target.toDouble() / srcShort
         return even((w * scale).toLong()) to even((h * scale).toLong())
     }
@@ -165,10 +181,7 @@ class CompositionFactory(private val context: Context) {
             val clipStart = starts[project.clips.indexOf(clip)]
             val effects = buildList<Effect> {
                 addAll(colorEffects(clip, project))
-                add(Presentation.createForWidthAndHeight(
-                    outW, outH,
-                    if (clip.fill) Presentation.LAYOUT_SCALE_TO_FIT_WITH_CROP else Presentation.LAYOUT_SCALE_TO_FIT,
-                ))
+                add(framing(clip, outW, outH))
                 if (clip.frame != Transform()) add(FrameTransformation(clip.frame, outW.toFloat() / outH))
                 if (clip.keyframes.any { it.value.x != 0f || it.value.y != 0f || it.value.scale != 1f || it.value.rotation != 0f }) {
                     add(KeyframeTransformation(clip, outW.toFloat() / outH, clipStart))
@@ -284,10 +297,7 @@ class CompositionFactory(private val context: Context) {
                 .build()
             val effects: List<Effect> = if (light) listOf(Presentation.createForWidthAndHeight(outW, outH, Presentation.LAYOUT_SCALE_TO_FIT)) else buildList<Effect> {
                 addAll(colorEffects(clip, project))
-                add(Presentation.createForWidthAndHeight(
-                    outW, outH,
-                    if (clip.fill) Presentation.LAYOUT_SCALE_TO_FIT_WITH_CROP else Presentation.LAYOUT_SCALE_TO_FIT,
-                ))
+                add(framing(clip, outW, outH))
                 if (clip.frame != Transform()) {
                     add(FrameTransformation(clip.frame, outW.toFloat() / outH))
                 }

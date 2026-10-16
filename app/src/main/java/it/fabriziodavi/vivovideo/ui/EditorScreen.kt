@@ -2,6 +2,12 @@ package it.fabriziodavi.vivovideo.ui
 
 import it.fabriziodavi.vivovideo.model.FadeColor
 import it.fabriziodavi.vivovideo.model.AutoStyle
+import it.fabriziodavi.vivovideo.model.FrameMode
+import it.fabriziodavi.vivovideo.model.VideoFormat
+import it.fabriziodavi.vivovideo.model.Orientation
+import it.fabriziodavi.vivovideo.model.frameMode
+import it.fabriziodavi.vivovideo.model.withMode
+import it.fabriziodavi.vivovideo.model.orientation
 
 import it.fabriziodavi.vivovideo.model.FxCategory
 
@@ -156,6 +162,7 @@ enum class Tool(val label: String, val icon: () -> ImageVector, val group: ToolG
     KEYFRAME("Keyframe", { VVIcons.Keyframe }, ToolGroup.EDIT, needsClip = true),
     TRANSITION("Transizione", { VVIcons.Transition }, ToolGroup.EDIT),
     SLIDESHOW("Slideshow", { VVIcons.Movie }, ToolGroup.EDIT),
+    FORMAT("Formato", { VVIcons.Fullscreen }, ToolGroup.EDIT),
     MORE("Altro", { VVIcons.Tune }, ToolGroup.EDIT, needsClip = true),
     MUSIC("Audio", { VVIcons.Music }, ToolGroup.AUDIO),
     TEXT("Testo", { VVIcons.Text }, ToolGroup.TEXT),
@@ -406,7 +413,20 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
         Box(Modifier.fillMaxWidth().height(46.dp).padding(horizontal = 12.dp)) {
             Box(Modifier.align(Alignment.CenterStart)) { timecode() }
             Box(Modifier.align(Alignment.Center)) { playButton(38.dp) }
-            Row(Modifier.align(Alignment.CenterEnd)) {
+            Row(Modifier.align(Alignment.CenterEnd), verticalAlignment = Alignment.CenterVertically) {
+                // Formato del video: sempre a vista, apre le preimpostazioni.
+                val fmtOn = activeTool == Tool.FORMAT
+                Box(
+                    Modifier.clip(RoundedCornerShape(999.dp)).background(if (fmtOn) VV.Tally else VV.Raised)
+                        .clickable(enabled = !running) { group = ToolGroup.EDIT; activeTool = if (fmtOn) null else Tool.FORMAT }
+                        .padding(horizontal = 10.dp, vertical = 5.dp),
+                ) {
+                    val (fw, fh) = vm.previewFrameSize()
+                    Text(
+                        if (project.format == VideoFormat.AUTO) (if (fh > fw) "9:16" else if (fw > fh) "16:9" else "1:1") else project.format.short,
+                        style = MaterialTheme.typography.labelMedium, color = if (fmtOn) VV.TallyInk else VV.Text,
+                    )
+                }
                 IconBtn(VVIcons.Remove, "Riduci zoom", tint = VV.Dim) { if (zoom > 0) zoom-- }
                 IconBtn(VVIcons.Add, "Aumenta zoom", tint = VV.Dim) { if (zoom < ZOOMS.lastIndex) zoom++ }
             }
@@ -482,6 +502,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
             Tool.TEXT -> TextPanel(vm, running, tab)
             Tool.LAYER -> LayerPanel(vm, running, tab, pickLayer)
             Tool.SLIDESHOW -> SlideshowPanel(vm, running)
+            Tool.FORMAT -> FormatPanel(vm, running)
             Tool.EFFECTS -> EffectsPanel(vm, running, tab)
             Tool.COLOR -> ColorPanel(vm, running) { lutPicker.launch(arrayOf("*/*")) }
             Tool.EXPORT -> ExportPanel(vm) { uri ->
@@ -521,7 +542,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
                                 verticalArrangement = Arrangement.spacedBy(12.dp),
                             ) { panelBody(t) }
                         } else {
-                            val all = subTools + ToolGroup.entries.mapNotNull { it.panel() }
+                            val all = subTools + Tool.FORMAT + ToolGroup.entries.mapNotNull { it.panel() }
                             ToolGrid(all, activeTool, !running, Modifier.weight(1f)) { onTool(it) }
                             Box(Modifier.fillMaxWidth().padding(10.dp), contentAlignment = Alignment.Center) {
                                 ExportPill(enabled = project.clips.isNotEmpty()) { activeTool = Tool.EXPORT }
@@ -1161,9 +1182,10 @@ private fun FramePanel(vm: EditorViewModel, running: Boolean) {
     val clip = vm.selectedClip ?: return
     val enabled = !running
     val f = clip.frame
-    Segmented(listOf(false, true), clip.fill, { if (it) "Riempi" else "Adatta" }, enabled) { v ->
-        vm.updateSelected { it.copy(fill = v) }
+    Segmented(FrameMode.entries, clip.frameMode, { if (it == FrameMode.BLUR) "Sfocato" else it.label }, enabled) { m ->
+        vm.updateSelected { it.withMode(m) }
     }
+    if (clip.frameMode == FrameMode.BLUR) Hint("Sfondo sfocato: l'immagine intera, con dietro una sua copia sfocata al posto delle bande nere.")
     Hint("Pizzica, trascina o ruota l'anteprima con due dita, oppure usa i cursori.")
     LabeledSlider("Zoom", null, (f.scale * 100).toInt(), enabled, range = 20..400, format = { "$it%" }) {
         vm.setFrame(f.copy(scale = it / 100f))
@@ -1177,7 +1199,7 @@ private fun FramePanel(vm: EditorViewModel, running: Boolean) {
         SecondaryButton("Ruota 90°", onClick = {
             if (enabled) vm.setFrame(f.copy(rotation = ((f.rotation + 90f + 540f) % 360f) - 180f))
         })
-        SecondaryButton("Reimposta", onClick = { if (enabled) { vm.setFrame(Transform()); vm.updateSelected { it.copy(fill = false) } } })
+        SecondaryButton("Reimposta", onClick = { if (enabled) { vm.setFrame(Transform()); vm.project?.let { p -> vm.updateSelected { it.withMode(p.presetModeFor(it)) } } } })
     }
     SecondaryButton("Applica a tutte le clip", selected = vm.project?.frameOnAll(clip) == true, onClick = { if (enabled) vm.applyFrameToAll() })
 }
@@ -1461,6 +1483,32 @@ private fun LayerPanel(vm: EditorViewModel, running: Boolean, tab: Int, onAdd: (
         SecondaryButton("Duplica", onClick = { if (enabled) vm.duplicateLayer() })
         SecondaryButton("Elimina", onClick = { if (enabled) vm.deleteLayer() })
     }
+}
+
+/** Formato del video e preimpostazioni per foto e video verticali/orizzontali. */
+@Composable
+private fun FormatPanel(vm: EditorViewModel, running: Boolean) {
+    val p = vm.project ?: return
+    val enabled = !running
+    PanelLabel("Formato del video")
+    Segmented(VideoFormat.entries, p.format, { if (it == VideoFormat.AUTO) "Auto" else it.short }, enabled) { vm.setFormat(format = it) }
+    Hint(
+        when (p.format) {
+            VideoFormat.AUTO -> "Automatico: come la prima clip (ora " + (if (p.outputOrientation() == Orientation.PORTRAIT) "verticale" else if (p.outputOrientation() == Orientation.SQUARE) "quadrato" else "orizzontale") + ")."
+            VideoFormat.VERTICAL -> "Verticale 9:16: per storie, reel e telefono."
+            VideoFormat.HORIZONTAL -> "Orizzontale 16:9: per TV, computer e YouTube."
+            VideoFormat.SQUARE -> "Quadrato 1:1: per i post."
+        }
+    )
+    PanelLabel("Foto e video con lo stesso orientamento")
+    Segmented(FrameMode.entries, p.sameMode, { if (it == FrameMode.BLUR) "Sfocato" else it.label }, enabled) { vm.setFormat(same = it) }
+    PanelLabel("Foto e video con l'orientamento opposto")
+    Segmented(FrameMode.entries, p.otherMode, { if (it == FrameMode.BLUR) "Sfocato" else it.label }, enabled) { vm.setFormat(other = it) }
+    val v = p.clips.count { it.orientation == Orientation.PORTRAIT }
+    val o = p.clips.count { it.orientation == Orientation.LANDSCAPE }
+    Hint("Nel progetto: $v verticali, $o orizzontali. Riempi taglia i bordi, Adatta mostra tutto con bande nere, Sfocato mostra tutto con dietro una copia sfocata.")
+    SecondaryButton("Applica a tutte le clip", Modifier.fillMaxWidth(), selected = p.followsPresets(), onClick = { if (enabled) vm.setFormat() })
+    Hint("Le preimpostazioni valgono anche per le foto e i video che aggiungi dopo. Una singola clip la cambi in Inquadra.")
 }
 
 @Composable

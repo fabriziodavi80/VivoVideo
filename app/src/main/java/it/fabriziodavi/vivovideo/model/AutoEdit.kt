@@ -82,6 +82,8 @@ data class AutoOptions(
     val seed: Int = 7,
     /** 0 = prima proposta; dalle successive cambiano anche le scene scelte e il punto dei video. */
     val variant: Int = 0,
+    /** Formato del video: AUTO = l'orientamento più frequente fra foto e video scelti. */
+    val format: VideoFormat = VideoFormat.AUTO,
 )
 
 /** Un elemento della galleria da cui è nato il video automatico. */
@@ -173,7 +175,7 @@ object AutoEdit {
                 val start = ((src.sourceDurationUs - len) * pos).toLong().coerceAtLeast(0)
                 src.copy(trimStartUs = start, trimEndUs = start + len, speed = ClipSpeed.NORMAL, keyframes = emptyList())
             }
-            c = c.copy(fill = true, muted = music != null || c.muted, fx = style.fx, fadeInUs = 0, fadeOutUs = 0, transitionOut = null)
+            c = c.copy(muted = music != null || c.muted, fx = style.fx, fadeInUs = 0, fadeOutUs = 0, transitionOut = null)
             clips += c
             t += len
         }
@@ -199,7 +201,9 @@ object AutoEdit {
         clips[0] = clips[0].copy(fadeInUs = minOf(1_000_000L, clips[0].outputUs / 2))
         clips[clips.lastIndex] = clips.last().copy(fadeOutUs = minOf(1_500_000L, clips.last().outputUs / 2))
 
-        var p = Project(name = name, clips = clips)
+        // Formato e inquadratura: stesso orientamento = riempi, orientamento opposto = sfondo sfocato.
+        val format = if (o.format == VideoFormat.AUTO) VideoFormat.majority(sources) else o.format
+        var p = Project(name = name, clips = clips, format = format).applyFramePresets()
         val total = p.durationUs
 
         // 4. Titolo (e sottotitolo) all'inizio, nello stile della regia.

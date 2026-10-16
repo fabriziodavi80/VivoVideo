@@ -23,6 +23,7 @@ import it.fabriziodavi.vivovideo.model.Project
 import it.fabriziodavi.vivovideo.model.SpeedPreset
 import it.fabriziodavi.vivovideo.model.TextAnim
 import it.fabriziodavi.vivovideo.model.TextPreset
+import it.fabriziodavi.vivovideo.model.VideoFormat
 import it.fabriziodavi.vivovideo.model.FxCategory
 import it.fabriziodavi.vivovideo.model.TextFont
 import it.fabriziodavi.vivovideo.model.TextItem
@@ -209,6 +210,27 @@ class EngineTest {
             assertEquals(0f, animFactors(a, a, -1, 2_000_000).alpha, 0f)
             assertEquals(0f, animFactors(a, a, 2_000_000, 2_000_000).alpha, 0f)
         }
+    }
+
+    @Test fun formatsSetTheOutputSizeAndBlurredBackgroundReplacesTheBands() {
+        val land = Clip(id = "l", uri = "content://l", sourceDurationUs = 4_000_000, width = 3840, height = 2160)
+        val port = Clip(id = "p", uri = "content://p", sourceDurationUs = 4_000_000, width = 2160, height = 3840)
+        val p = Project(name = "f", clips = listOf(land, port))
+        assertEquals(3840 to 2160, factory.outputSize(p, null))
+        assertEquals(2160 to 3840, factory.outputSize(p.copy(format = VideoFormat.VERTICAL), null))
+        assertEquals(1080 to 1920, factory.outputSize(p.copy(format = VideoFormat.VERTICAL), 1080))
+        assertEquals(1920 to 1080, factory.outputSize(p.copy(format = VideoFormat.HORIZONTAL), 1080))
+        assertEquals(1080 to 1080, factory.outputSize(p.copy(format = VideoFormat.SQUARE), 1080))
+        // Orizzontale in verticale: rettangolo centrato a tutta larghezza.
+        val r = fitRect(1920, 1080, 1080, 1920)
+        assertEquals(0f, r[0], 1e-4f); assertEquals(1f, r[2], 1e-4f)
+        assertEquals(0.3164f, r[3], 1e-3f); assertEquals((1f - r[3]) / 2f, r[1], 1e-4f)
+        // La clip con sfondo sfocato usa l'effetto apposito al posto di Presentation.
+        val q = p.copy(format = VideoFormat.VERTICAL).applyFramePresets()
+        assertTrue(q.clips[0].blurBg && q.clips[1].fill)
+        val c = factory.build(q, ExportOptions(), forPreview = true, nativeAudio = null, allowMulti = false)
+        val effects = c.sequences.flatMap { s -> s.editedMediaItems.flatMap { it.effects.videoEffects } }
+        assertTrue(effects.any { it is BlurFillEffect })
     }
 
     @Test fun wowTransitionsPeakAtTheCutAndVanishAway() {

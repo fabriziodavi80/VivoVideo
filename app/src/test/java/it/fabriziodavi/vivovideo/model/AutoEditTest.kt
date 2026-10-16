@@ -43,7 +43,7 @@ class AutoEditTest {
                     assertTrue("$s video $i: preso dal mezzo", c.trimStartUs > 0 && c.trimEndUs < c.sourceDurationUs)
                     assertTrue(!c.muted) // senza musica si sentono i video
                 }
-                assertTrue(c.fill)
+                assertEquals(FrameMode.FILL, c.frameMode) // tutte orizzontali come il video
                 s.fx.forEach { f -> assertTrue("$s effetto ${f.type}", c.fx.any { it.type == f.type }) }
                 if (i < p.clips.lastIndex) assertNotNull("$s transizione $i", c.transitionOut) else assertNull(c.transitionOut)
                 c.transitionOut?.let { assertTrue(it.type in s.transitions && it.durationUs <= s.transitionUs) }
@@ -119,5 +119,22 @@ class AutoEditTest {
         assertEquals(r, back.auto)
         // I progetti vecchi (senza ricetta) si leggono ancora.
         assertNull(Project.JSON.decodeFromString(Project.serializer(), """{"name":"vecchio"}""").auto)
+    }
+
+    @Test fun formatFollowsTheMajorityAndOppositeOnesGetABlurredBackground() {
+        fun v(i: Int, w: Int, h: Int) = video(i).copy(width = w, height = h)
+        val srcs = listOf(v(0, 1080, 1920), v(1, 1080, 1920), v(2, 1920, 1080), photo(3).copy(width = 3000, height = 4000))
+        val p = AutoEdit.build("Verticale", srcs, null, AutoOptions())
+        assertEquals(VideoFormat.VERTICAL, p.format)
+        assertEquals(listOf(FrameMode.FILL, FrameMode.FILL, FrameMode.BLUR, FrameMode.FILL), p.clips.map { it.frameMode })
+        // Formato scelto a mano: orizzontale.
+        val h = AutoEdit.build("Orizzontale", srcs, null, AutoOptions(format = VideoFormat.HORIZONTAL))
+        assertEquals(listOf(FrameMode.BLUR, FrameMode.BLUR, FrameMode.FILL, FrameMode.BLUR), h.clips.map { it.frameMode })
+        assertTrue(h.followsPresets())
+        // Preimpostazioni diverse: orientamento opposto con bande nere.
+        val q = h.copy(otherMode = FrameMode.FIT).applyFramePresets()
+        assertEquals(FrameMode.FIT, q.clips[0].frameMode)
+        assertEquals(VideoFormat.HORIZONTAL, VideoFormat.majority(listOf(v(0, 1920, 1080), v(1, 1080, 1920))))
+        assertEquals(Orientation.SQUARE, orientationOf(1000, 1050))
     }
 }

@@ -60,6 +60,7 @@ import it.fabriziodavi.vivovideo.media.Gallery
 import it.fabriziodavi.vivovideo.media.GalleryItem
 import it.fabriziodavi.vivovideo.model.AutoOptions
 import it.fabriziodavi.vivovideo.model.AutoStyle
+import it.fabriziodavi.vivovideo.model.VideoFormat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -107,6 +108,7 @@ fun AutoScreen(vm: EditorViewModel) {
     var selected by remember { mutableStateOf(setOf<String>()) }
     var style by remember { mutableStateOf(AutoStyle.CINEMA) }
     var duration by remember { mutableStateOf(60_000_000L) }
+    var format by remember { mutableStateOf(VideoFormat.AUTO) }
     var musicUri by remember { mutableStateOf<Uri?>(null) }
     var title by remember { mutableStateOf("") }
     var titleTouched by remember { mutableStateOf(false) }
@@ -215,13 +217,20 @@ fun AutoScreen(vm: EditorViewModel) {
                 }
             }
 
-            Section("4", "Durata")
+            Section("4", "Formato")
+            PillRow(VideoFormat.entries, format, { if (it == VideoFormat.AUTO) "Automatico" else it.label }) { format = it }
+            Hint(
+                if (format == VideoFormat.AUTO) "Automatico: verticale o orizzontale secondo le foto e i video più numerosi. Quelli con l'orientamento opposto avranno lo sfondo sfocato."
+                else "Le foto e i video con l'orientamento opposto avranno lo sfondo sfocato invece delle bande nere."
+            )
+
+            Section("5", "Durata")
             val options = (if (musicUri != null) listOf(FIT_MUSIC) else emptyList()) + DURATIONS
             PillRow(options, duration, { d ->
                 when (d) { FIT_MUSIC -> "Come il brano"; 0L -> "Tutto"; else -> if (d < 60_000_000L) "${d / 1_000_000} s" else "${d / 60_000_000} min" }
             }) { duration = it }
 
-            Section("5", "Titolo")
+            Section("6", "Titolo")
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it; titleTouched = true },
@@ -245,7 +254,7 @@ fun AutoScreen(vm: EditorViewModel) {
                     val all = withContext(Dispatchers.IO) { Gallery.items(ctx, selected) }
                     vm.autoCreate(
                         all, musicUri,
-                        AutoOptions(style = style, targetUs = duration.coerceAtLeast(0), title = title, subtitle = if (title.isBlank()) "" else subtitle,
+                        AutoOptions(style = style, format = format, targetUs = duration.coerceAtLeast(0), title = title, subtitle = if (title.isBlank()) "" else subtitle,
                             seed = (System.currentTimeMillis() % 10_000).toInt()),
                         fitMusic = duration == FIT_MUSIC,
                     )

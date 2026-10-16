@@ -4,6 +4,10 @@ import android.app.Application
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import it.fabriziodavi.vivovideo.model.Clip
+import it.fabriziodavi.vivovideo.model.FrameMode
+import it.fabriziodavi.vivovideo.model.VideoFormat
+import it.fabriziodavi.vivovideo.model.frameMode
+import it.fabriziodavi.vivovideo.model.withMode
 import it.fabriziodavi.vivovideo.model.AutoEdit
 import it.fabriziodavi.vivovideo.model.AutoOptions
 import it.fabriziodavi.vivovideo.model.AutoRecipe
@@ -285,5 +289,24 @@ class EditorOpsTest {
         vm.undo(); vm.undo()
         assertEquals(1, vm.project!!.auto!!.round)
         assertEquals(before.clips, vm.project!!.clips)
+    }
+
+    @Test fun formatPresetsApplyToEveryClip() {
+        val vm = vm(listOf(
+            Clip(id = "h", uri = "content://v/h", sourceDurationUs = 5_000_000, width = 1920, height = 1080),
+            Clip(id = "v", uri = "content://v/v", sourceDurationUs = 5_000_000, width = 1080, height = 1920),
+        ))
+        vm.setFormat(format = VideoFormat.VERTICAL)
+        val p = vm.project!!
+        assertEquals(FrameMode.BLUR, p.clips[0].frameMode)
+        assertEquals(FrameMode.FILL, p.clips[1].frameMode)
+        vm.setFormat(other = FrameMode.FIT)
+        assertEquals(FrameMode.FIT, vm.project!!.clips[0].frameMode)
+        vm.undo()
+        assertEquals(FrameMode.BLUR, vm.project!!.clips[0].frameMode)
+        // A mano su una clip: non segue più le preimpostazioni (il pulsante si spegne).
+        vm.selectedClipId = "v"
+        vm.updateSelected { it.withMode(FrameMode.FIT) }
+        assertTrue(!vm.project!!.followsPresets())
     }
 }

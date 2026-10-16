@@ -215,7 +215,10 @@ object Library {
         commercialOnly: Boolean, instrumental: Boolean, page: Int = 1,
     ): List<OnlineTrack> = withContext(Dispatchers.IO) {
         val list = when (source) {
-            LibrarySource.OPENVERSE -> parseOpenverse(get(openverseUrl(query, effects, commercialOnly, page)))
+            LibrarySource.OPENVERSE -> parseOpenverse(get(openverseUrl(query, effects, commercialOnly, page))).ifEmpty {
+                // Molti effetti non hanno la categoria "sound_effect": si riprova senza, con "sound effect" nella ricerca.
+                if (effects) parseOpenverse(get(openverseUrl(query, effects, commercialOnly, page).replace("&category=sound_effect", "").replace("?q=", "?q=sound+effect+"))) else emptyList()
+            }
             LibrarySource.JAMENDO -> parseJamendo(get(jamendoUrl(keys.jamendo ?: error("Manca il codice Jamendo."), query, commercialOnly, instrumental, page)))
             LibrarySource.FREESOUND -> parseFreesound(get(freesoundUrl(keys.freesound ?: error("Manca la chiave Freesound."), query.ifBlank { if (effects) "whoosh" else "ambient music" }, effects, page)))
         }

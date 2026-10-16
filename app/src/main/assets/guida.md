@@ -3,16 +3,16 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
-- **Libreria di musica ed effetti sonori liberi** (Audio → Brano → **Libreria online** / **Effetti sonori**, e nel Video automatico): cerchi o tocchi un'atmosfera, ascolti l'anteprima e tocchi **Usa**. Funziona subito con **Openverse**; con i codici gratuiti di **Jamendo** e **Freesound** (icona in alto a destra nella libreria) la scelta diventa molto più ampia.
-- **Crediti automatici**: autore e licenza di ogni brano preso in rete si salvano nel progetto; li copi da Audio → Brano o dopo l'esportazione, per la descrizione del video.
-- Video automatico con **Altra proposta** e cambio di stile.
+- **Formato del video e preimpostazioni verticale/orizzontale**: tocca il formato (es. "16:9") accanto al tasto play. Scegli **Automatico, Verticale 9:16, Orizzontale 16:9 o Quadrato 1:1** e come trattare foto e video: con lo **stesso orientamento** (di serie **Riempi**) e con l'**orientamento opposto** (di serie **Sfondo sfocato**: l'immagine intera con dietro una sua copia sfocata, niente bande nere). Vale per le clip che aggiungi e per il video automatico.
+- **Inquadra**: oltre a Riempi e Adatta c'è **Sfocato**.
+- **Video automatico**: nuovo passo **Formato** (Automatico = l'orientamento più frequente negli album).
+- Libreria di musica ed effetti sonori liberi (Openverse, Jamendo, Freesound) con crediti automatici.
 
-## Musica ed effetti dalla rete
-- **Audio → Brano → Libreria online** (musica) o **Effetti sonori**. Il brano si scarica e parte dall'indicatore, come uno scelto dal telefono (battiti, volume, dissolvenze: tutto uguale). Gli effetti sonori si mettono nel punto dell'indicatore e si spostano nella timeline.
-- Cerca in inglese (gli archivi sono internazionali) o tocca un'atmosfera pronta: Epica, Allegra, Rilassante, Cinematografica… / Whoosh, Applausi, Pioggia, Passi…
-- **Servizi**: **Openverse** (senza codici), **Jamendo** (musica: centinaia di migliaia di brani, anche "solo strumentali"), **Freesound** (effetti sonori). Per Jamendo e Freesound tocca l'icona in alto a destra e incolla i codici gratuiti: restano solo sul telefono.
-- **Licenze**: l'app mostra solo brani che si possono mettere sotto un video (niente licenze "ND"). Con **Solo licenze per uso commerciale** spariscono anche quelli "NC": accendilo se pensi di guadagnare col video. Jamendo è gratuito solo per uso non commerciale.
-- **Crediti**: molte licenze chiedono di citare l'autore. L'app li salva da sola: **Copia i crediti** in Audio → Brano o dopo l'esportazione, e incollali nella descrizione.
+## Formato e orientamento
+- Il pulsante del formato è nella riga del tasto play (mostra "9:16", "16:9" o "1:1"); in orizzontale è fra gli strumenti a destra.
+- **Formato**: Automatico (come la prima clip), Verticale 9:16 (storie, reel), Orizzontale 16:9 (TV, YouTube), Quadrato 1:1 (post).
+- **Preimpostazioni**: una scelta per le foto e i video che hanno lo stesso orientamento del video, una per quelli con l'orientamento opposto. **Riempi** taglia i bordi, **Adatta** mostra tutto con bande nere, **Sfocato** mostra tutto con uno sfondo sfocato.
+- Cambiando formato o preimpostazioni, tutte le clip si sistemano subito (Annulla torna indietro); le clip aggiunte dopo le seguono da sole. Una singola clip si cambia in **Inquadra**; **Applica a tutte le clip** (in ambra se tutte seguono le preimpostazioni) rimette tutto in ordine.
 
 ## Primi passi
 - Dalla schermata dei progetti tocca **Nuovo progetto** e scegli video e foto dalla galleria.
@@ -41,7 +41,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - In esportazione l'audio dei tratti rallentati/accelerati mantiene il tono naturale (si può spegnere in Esporta).
 
 ## Inquadra
-- **Adatta** (tutta l'immagine, con bande) o **Riempi** (tutto lo schermo, tagliando i bordi).
+- **Riempi** (tutto lo schermo, tagliando i bordi), **Adatta** (tutta l'immagine, con bande) o **Sfocato** (tutta l'immagine con dietro una copia sfocata). **Reimposta** torna alla preimpostazione del formato.
 - Zoom, posizione e rotazione fissi: con i cursori o con due dita sull'anteprima. **Ruota 90°**, **Reimposta**, **Applica a tutte le clip**.
 
 ## Keyframe (animazioni)
