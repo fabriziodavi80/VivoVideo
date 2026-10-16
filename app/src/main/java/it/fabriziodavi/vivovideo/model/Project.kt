@@ -773,6 +773,9 @@ data class Project(
      * Restituisce null se t cade troppo vicino a un bordo o se la clip ha una rampa
      * (la rampa è definita sull'intera clip e dividerla cambierebbe il risultato).
      */
+    /** Il video si apre dal nero/bianco e si chiude (prima clip con entrata, ultima con uscita). */
+    fun videoEndsFaded(): Boolean = clips.isNotEmpty() && clips.first().fadeInUs > 0 && clips.last().fadeOutUs > 0
+
     fun splitAt(timeUs: Long, minPieceUs: Long = 100_000): Project? {
         val (index, offsetOut) = locate(timeUs) ?: return null
         val clip = clips[index]

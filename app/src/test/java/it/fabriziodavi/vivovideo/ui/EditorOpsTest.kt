@@ -205,6 +205,12 @@ class EditorOpsTest {
         assertEquals(1_000_000L, c.first().fadeInUs)
         assertEquals(1_500_000L, c.last().fadeOutUs)
         assertEquals(0L, c[1].fadeInUs + c[1].fadeOutUs)
+        // Il pulsante è un interruttore: acceso si riconosce (si illumina), ritoccato toglie le dissolvenze.
+        assertTrue(vm.project!!.videoEndsFaded())
+        vm.toggleVideoEnds()
+        assertTrue(!vm.project!!.videoEndsFaded() && vm.project!!.clips.all { it.fadeInUs == 0L && it.fadeOutUs == 0L })
+        vm.toggleVideoEnds()
+        assertTrue(vm.project!!.videoEndsFaded())
         vm.selectedClipId = "a"
         vm.updateSelected { it.copy(fadeOutUs = 3_000_000, fadeColor = FadeColor.WHITE) }
         vm.applyFadesToAll()

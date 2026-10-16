@@ -3,6 +3,7 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **Apri e chiudi il video** ora è un interruttore: acceso si illumina in ambra, toccandolo di nuovo toglie le due dissolvenze. Anche Alto/Centro/Basso del testo mostrano la posizione scelta.
 - **TAP a tempo che taglia**: in Audio → Battiti, con "Taglia le clip a ogni tocco" acceso, ogni tocco a tempo segna anche un taglio del video. I tagli si fanno tutti insieme quando metti in pausa (così l'ascolto non si interrompe) e un solo Annulla li toglie.
 - Effetti, transizioni e testi **Wow** (versione precedente): categoria Wow in Effetti, transizioni Glitch/Prisma/Luce/Cerchio/Pixel/Scossa, animazioni lettera per lettera, stili Glitch/Onda/Oro/Cascata.
 
@@ -64,7 +65,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Effetti
 - **Effetti** nella barra principale, due schede. **Dissolvenze**: in entrata e in uscita (fino a metà clip), dal/al nero o bianco, anche sull'audio (l'audio sfuma nel video esportato).
-- **Apri e chiudi il video**: dissolvenza dal nero sulla prima clip e al nero sull'ultima, in un tocco. **A tutte le clip** copia le dissolvenze.
+- **Apri e chiudi il video**: dissolvenza dal nero sulla prima clip e al nero sull'ultima, in un tocco (acceso è in ambra; ritoccalo per toglierle). **A tutte le clip** copia le dissolvenze.
 - Scheda **Effetti**, per categoria (tocca la categoria, poi l'effetto; il numero indica quanti ne hai accesi):
 - **Wow**: **Colpo a ritmo** (scatto di zoom con colori sfasati sul battito), **Cinematografico** (contrasto da film e bande nere), **Contorni neon** (i bordi si accendono di colori che cambiano), **Raggi di luce**, **Luci bokeh**, **Polvere d'oro** (scintille), **Prisma** (colori che ruotano), **Linee di velocità** (da fumetto).
 - **Colore**: Bianco e nero, Seppia, Colori vivaci, Bicromia, Arcobaleno, Poster, Negativo.

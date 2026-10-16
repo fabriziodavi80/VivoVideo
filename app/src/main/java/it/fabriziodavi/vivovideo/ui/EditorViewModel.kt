@@ -790,6 +790,22 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         })
     }
 
+    /** "Apri e chiudi il video" come interruttore: lo accende o toglie le due dissolvenze. */
+    fun toggleVideoEnds() {
+        val p = project ?: return
+        if (!p.videoEndsFaded()) { fadeVideoEnds(); return }
+        update { q ->
+            val first = q.clips.first().id
+            val last = q.clips.last().id
+            q.copy(clips = q.clips.map { c ->
+                var x = c
+                if (c.id == first) x = x.copy(fadeInUs = 0)
+                if (c.id == last) x = x.copy(fadeOutUs = 0)
+                x
+            })
+        }
+    }
+
     fun applyFxToAll() {
         val c = selectedClip ?: return
         update { p -> p.copy(clips = p.clips.map { it.copy(fx = c.fx) }) }

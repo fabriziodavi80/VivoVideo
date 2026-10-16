@@ -1176,9 +1176,9 @@ private fun TextPanel(vm: EditorViewModel, running: Boolean, tab: Int) {
         else -> {
             PanelLabel("Posizione")
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                SecondaryButton("Alto", onClick = { vm.updateText { it.copy(x = 0f, y = -0.36f) } })
-                SecondaryButton("Centro", onClick = { vm.updateText { it.copy(x = 0f, y = 0f) } })
-                SecondaryButton("Basso", onClick = { vm.updateText { it.copy(x = 0f, y = 0.36f) } })
+                SecondaryButton("Alto", selected = t.x == 0f && t.y == -0.36f, onClick = { vm.updateText { it.copy(x = 0f, y = -0.36f) } })
+                SecondaryButton("Centro", selected = t.x == 0f && t.y == 0f, onClick = { vm.updateText { it.copy(x = 0f, y = 0f) } })
+                SecondaryButton("Basso", selected = t.x == 0f && t.y == 0.36f, onClick = { vm.updateText { it.copy(x = 0f, y = 0.36f) } })
             }
             Hint("Oppure trascina, pizzica e ruota il riquadro sull'anteprima con le dita.")
             MotionSection(vm, t.endPose != null, enabled, t.startUs, t.durationUs) { vm.toggleTextMotion() }
@@ -1444,10 +1444,10 @@ private fun EffectsPanel(vm: EditorViewModel, running: Boolean, tab: Int) {
         if (!clip.isPhoto) ToggleRow("Anche l'audio (nel video esportato)", clip.fadeAudio, enabled) { v -> vm.updateSelected { it.copy(fadeAudio = v) } }
     }
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        SecondaryButton("Apri e chiudi il video", onClick = { if (enabled) vm.fadeVideoEnds() })
+        SecondaryButton("Apri e chiudi il video", selected = p.videoEndsFaded(), onClick = { if (enabled) vm.toggleVideoEnds() })
         if (clip.fadeInUs > 0 || clip.fadeOutUs > 0) SecondaryButton("A tutte le clip", onClick = { if (enabled) vm.applyFadesToAll() })
     }
-    Hint("\"Apri e chiudi il video\": dissolvenza dal nero sulla prima clip (1 s) e al nero sull'ultima (1,5 s).")
+    Hint("\"Apri e chiudi il video\": dissolvenza dal nero sulla prima clip (1 s) e al nero sull'ultima (1,5 s). Acceso è in ambra; toccalo di nuovo per toglierle.")
 }
 
 @Composable
@@ -1559,13 +1559,14 @@ fun PrimaryButton(text: String, modifier: Modifier = Modifier, enabled: Boolean 
     ) { Text(text, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold, color = if (enabled) VV.TallyInk else VV.Faint) }
 }
 
+/** Pulsante secondario; con [selected] si illumina in ambra (per le scelte che restano attive). */
 @Composable
-fun SecondaryButton(text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun SecondaryButton(text: String, modifier: Modifier = Modifier, selected: Boolean = false, onClick: () -> Unit) {
     Box(
-        modifier.clip(RoundedCornerShape(12.dp)).background(VV.Raised).clickable(onClick = onClick)
+        modifier.clip(RoundedCornerShape(12.dp)).background(if (selected) VV.Tally else VV.Raised).clickable(onClick = onClick)
             .padding(horizontal = 18.dp, vertical = 13.dp),
         contentAlignment = Alignment.Center,
-    ) { Text(text, style = MaterialTheme.typography.labelLarge) }
+    ) { Text(text, style = MaterialTheme.typography.labelLarge, color = if (selected) VV.TallyInk else VV.Text, fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal) }
 }
 
 @Composable
