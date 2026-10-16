@@ -147,6 +147,26 @@ class ScreenshotTest {
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/13_editor_effetti.png")
     }
 
+    @Test fun editorEditRow() {
+        val vm = vm(); vm.selectedClipId = vm.project!!.clips[0].id
+        vm.setTransition(TransitionSpec(TransitionType.CROSSFADE))
+        vm.selectedClipId = vm.project!!.clips[1].id
+        compose.setContent { VivoTheme { EditorScreen(vm) } }
+        compose.onRoot().captureRoboImage("build/outputs/roborazzi/15_editor_modifica.png")
+    }
+
+    @Test fun editorMusicRhythmTab() {
+        val vm = vm()
+        val t = it.fabriziodavi.vivovideo.model.MusicTrack(
+            uri = "content://demo/music", name = "Sunset Drive", sourceDurationUs = 180_000_000,
+            beatsUs = (0 until 400).map { it * 468_750L }, bpm = 128f,
+        )
+        vm.setMusicForTest(listOf(t))
+        vm.selectedMusicId = t.id
+        compose.setContent { VivoTheme { EditorScreen(vm, initialTool = Tool.MUSIC, initialTab = 1) } }
+        compose.onRoot().captureRoboImage("build/outputs/roborazzi/16_editor_musica_ritmo.png")
+    }
+
     @Test fun guide() {
         compose.setContent { VivoTheme { GuideScreen {} } }
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/14_guida.png")

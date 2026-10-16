@@ -6,6 +6,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.DragInteraction
@@ -70,6 +73,7 @@ private val AUDIO_H = 18.dp
 private val RULER_H = 20.dp
 private val HANDLE_W = 14.dp
 private val MUSIC_H = 22.dp
+private val CUT_D = 22.dp
 
 /**
  * Timeline con l'indicatore fisso al centro: scorrendo si sceglie il punto,
@@ -97,6 +101,8 @@ fun Timeline(
     selectedLayerId: String? = null,
     onSelectLayer: (String) -> Unit = {},
     onLayerChange: (Layer) -> Unit = {},
+    onClipLongPress: (String) -> Unit = {},
+    onCutTap: (index: Int) -> Unit = {},
 ) {
     val density = LocalDensity.current
     val scroll = rememberScrollState()
@@ -152,6 +158,8 @@ fun Timeline(
                 Spacer(Modifier.width(half))
             }
             Spacer(Modifier.height(4.dp))
+            // Clip e, sopra, i pulsanti delle transizioni sui tagli.
+            Box {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Spacer(Modifier.width(half))
                 project.clips.forEach { original ->
@@ -165,6 +173,7 @@ fun Timeline(
                             selected = clip.id == selectedClipId,
                             pxPerUs = pxPerUs,
                             onClick = { onSelect(clip.id) },
+                            onLongClick = { onClipLongPress(clip.id) },
                             onTrimDrag = { s, e -> trimDraft = Triple(clip.id, s, e) },
                             onTrimEnd = {
                                 trimDraft?.let { (id, s, e) -> onTrim(id, s, e) }
@@ -185,6 +194,20 @@ fun Timeline(
                     contentAlignment = Alignment.Center,
                 ) { Icon(VVIcons.Add, "Aggiungi video e foto", tint = VV.Text) }
                 Spacer(Modifier.width(half))
+            }
+            if (trimDraft == null && project.clips.size > 1) {
+                val colH = VIDEO_H + 3.dp + AUDIO_H
+                val top = (maxOf(colH, 40.dp) - colH) / 2 + (VIDEO_H - CUT_D) / 2
+                var x = half
+                project.clips.dropLast(1).forEachIndexed { i, c ->
+                    x += (c.outputUs / 1e6f * dpPerSecond).dp
+                    CutButton(
+                        Modifier.offset(x = x - 1.dp - CUT_D / 2, y = top),
+                        has = c.transitionOut != null,
+                        onClick = { onCutTap(i) },
+                    )
+                }
+            }
             }
             val totalW = (project.durationUs / 1e6f * dpPerSecond).dp
             // Righe delle immagini (livelli).
@@ -329,6 +352,32 @@ private fun Ruler(durationUs: Long, dpPerSecond: Float, beats: List<Long> = empt
     }
 }
 
+/** Pulsante sul taglio fra due clip: apre la transizione (pieno se ce n'è già una). */
+@Composable
+private fun CutButton(modifier: Modifier, has: Boolean, onClick: () -> Unit) {
+    Box(
+        modifier.size(CUT_D).clip(CircleShape)
+            .background(if (has) VV.Tally else VV.Canvas)
+            .border(1.5.dp, if (has) VV.TallyInk else VV.Text, CircleShape)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (has) {
+            Canvas(Modifier.size(12.dp)) {
+                val w = size.width; val h = size.height
+                val bow = Path().apply {
+                    moveTo(0f, h * 0.15f); lineTo(w / 2, h / 2); lineTo(0f, h * 0.85f); close()
+                    moveTo(w, h * 0.15f); lineTo(w / 2, h / 2); lineTo(w, h * 0.85f); close()
+                }
+                drawPath(bow, VV.TallyInk)
+            }
+        } else {
+            Icon(VVIcons.Add, "Transizione", tint = VV.Text, modifier = Modifier.size(14.dp))
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ClipBox(
     clip: Clip,
@@ -336,6 +385,7 @@ private fun ClipBox(
     selected: Boolean,
     pxPerUs: Float,
     onClick: () -> Unit,
+    onLongClick: () -> Unit,
     onTrimDrag: (Long, Long) -> Unit,
     onTrimEnd: () -> Unit,
 ) {
@@ -347,7 +397,7 @@ private fun ClipBox(
             .height(VIDEO_H)
             .clip(shape)
             .background(VV.Raised)
-            .clickable(onClick = onClick)
+            .combinedClickable(onClick = onClick, onLongClick = onLongClick)
     ) {
         Filmstrip(clip, width)
         Row(Modifier.align(Alignment.BottomStart).padding(start = if (selected) HANDLE_W + 3.dp else 4.dp, bottom = 3.dp)) {
@@ -398,15 +448,6 @@ private fun ClipBox(
                     topLeft = Offset(size.width - zone, 0f),
                     size = androidx.compose.ui.geometry.Size(zone, size.height),
                 )
-                val cx = size.width - (if (selected) HANDLE_W.toPx() + 9.dp.toPx() else 9.dp.toPx())
-                val cy = size.height / 2
-                val r = 6.dp.toPx()
-                drawCircle(VV.TallyInk, r + 2.dp.toPx(), Offset(cx, cy))
-                val bow = Path().apply {
-                    moveTo(cx - r * 0.7f, cy - r * 0.6f); lineTo(cx, cy); lineTo(cx - r * 0.7f, cy + r * 0.6f); close()
-                    moveTo(cx + r * 0.7f, cy - r * 0.6f); lineTo(cx, cy); lineTo(cx + r * 0.7f, cy + r * 0.6f); close()
-                }
-                drawPath(bow, VV.Tally)
             }
         }
         if (selected) {

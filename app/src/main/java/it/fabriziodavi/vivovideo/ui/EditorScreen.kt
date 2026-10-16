@@ -134,59 +134,81 @@ import kotlin.math.ln
 
 private val ZOOMS = listOf(8f, 15f, 30f, 60f, 120f)
 
-/** Strumenti della barra in basso. Quelli "futuri" hanno già il loro posto. */
-enum class Tool(val label: String, val icon: () -> ImageVector, val future: Boolean = false) {
-    ADD("Aggiungi", { VVIcons.Add }),
-    SPLIT("Dividi", { VVIcons.Split }),
-    SPEED("Velocità", { VVIcons.Speed }),
-    AUDIO("Audio", { VVIcons.Volume }),
-    COLOR("Colore", { VVIcons.Palette }),
-    KEYFRAME("Keyframe", { VVIcons.Keyframe }),
-    EFFECTS("Effetti", { VVIcons.Effects }),
-    TRANSITION("Transizione", { VVIcons.Transition }),
-    DURATION("Durata", { VVIcons.Speed }),
-    FRAME("Inquadra", { VVIcons.Fullscreen }),
+/** Le sei voci della barra principale, sempre visibili. */
+enum class ToolGroup(val label: String, val icon: () -> ImageVector) {
+    EDIT("Modifica", { VVIcons.Edit }),
+    AUDIO("Audio", { VVIcons.Music }),
     TEXT("Testo", { VVIcons.Text }),
     LAYER("Livelli", { VVIcons.Layers }),
-    SLIDESHOW("Slideshow", { VVIcons.Movie }),
-    MUSIC("Musica", { VVIcons.Music }),
-    DUPLICATE("Duplica", { VVIcons.Copy }),
-    MOVE_LEFT("Indietro", { VVIcons.MoveLeft }),
-    MOVE_RIGHT("Avanti", { VVIcons.MoveRight }),
-    DELETE("Elimina", { VVIcons.Delete }),
-    EXPORT("Esporta", { VVIcons.Export }),
+    EFFECTS("Effetti", { VVIcons.Effects }),
+    COLOR("Colore", { VVIcons.Palette }),
 }
 
-private val CLIP_TOOLS = listOf(
-    Tool.SPLIT, Tool.SPEED, Tool.FRAME, Tool.TRANSITION, Tool.EFFECTS, Tool.KEYFRAME, Tool.AUDIO, Tool.COLOR,
-    Tool.DUPLICATE, Tool.MOVE_LEFT, Tool.MOVE_RIGHT, Tool.DELETE,
+/** Strumenti e pannelli. [group] è la voce della barra principale a cui appartengono. */
+enum class Tool(val label: String, val icon: () -> ImageVector, val group: ToolGroup?, val needsClip: Boolean = false) {
+    SPLIT("Dividi", { VVIcons.Split }, ToolGroup.EDIT),
+    SPEED("Velocità", { VVIcons.Speed }, ToolGroup.EDIT, needsClip = true),
+    DURATION("Durata", { VVIcons.Speed }, ToolGroup.EDIT, needsClip = true),
+    FRAME("Inquadra", { VVIcons.Fullscreen }, ToolGroup.EDIT, needsClip = true),
+    KEYFRAME("Keyframe", { VVIcons.Keyframe }, ToolGroup.EDIT, needsClip = true),
+    TRANSITION("Transizione", { VVIcons.Transition }, ToolGroup.EDIT),
+    SLIDESHOW("Slideshow", { VVIcons.Movie }, ToolGroup.EDIT),
+    MORE("Altro", { VVIcons.Tune }, ToolGroup.EDIT, needsClip = true),
+    MUSIC("Audio", { VVIcons.Music }, ToolGroup.AUDIO),
+    TEXT("Testo", { VVIcons.Text }, ToolGroup.TEXT),
+    LAYER("Livelli", { VVIcons.Layers }, ToolGroup.LAYER),
+    EFFECTS("Effetti", { VVIcons.Effects }, ToolGroup.EFFECTS, needsClip = true),
+    COLOR("Colore", { VVIcons.Palette }, ToolGroup.COLOR),
+    EXPORT("Esporta", { VVIcons.Export }, null),
+}
+
+/** Strumenti della seconda riga di "Modifica" (Velocità diventa Durata sulle foto). */
+fun editTools(photo: Boolean) = listOf(
+    Tool.SPLIT, if (photo) Tool.DURATION else Tool.SPEED, Tool.FRAME, Tool.KEYFRAME, Tool.TRANSITION, Tool.SLIDESHOW, Tool.MORE,
 )
-private val PHOTO_TOOLS = listOf(
-    Tool.SPLIT, Tool.DURATION, Tool.FRAME, Tool.TRANSITION, Tool.EFFECTS, Tool.KEYFRAME, Tool.COLOR,
-    Tool.DUPLICATE, Tool.MOVE_LEFT, Tool.MOVE_RIGHT, Tool.DELETE,
-)
-private val PROJECT_TOOLS = listOf(Tool.ADD, Tool.SLIDESHOW, Tool.SPLIT, Tool.TRANSITION, Tool.TEXT, Tool.LAYER, Tool.MUSIC, Tool.COLOR)
+
+/** Pannello che si apre toccando una voce della barra principale (null = mostra la seconda riga). */
+fun ToolGroup.panel(): Tool? = when (this) {
+    ToolGroup.EDIT -> null
+    ToolGroup.AUDIO -> Tool.MUSIC
+    ToolGroup.TEXT -> Tool.TEXT
+    ToolGroup.LAYER -> Tool.LAYER
+    ToolGroup.EFFECTS -> Tool.EFFECTS
+    ToolGroup.COLOR -> Tool.COLOR
+}
+
+/** Schede in cima ai pannelli più ricchi. */
+val MUSIC_TABS = listOf("Brano", "Ritmo", "Battiti", "Clip")
+val TEXT_TABS = listOf("Stile", "Animazione", "Movimento")
+val LAYER_TABS = listOf("Aspetto", "Forma", "Animazione")
+val EFFECT_TABS = listOf("Effetti", "Dissolvenze")
 
 @Composable
-fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
+fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int = 0) {
     val project = vm.project ?: return
     val context = LocalContext.current
     val running = vm.exportState is ExportState.Running
     var zoom by remember { mutableIntStateOf(2) }
     var renaming by remember { mutableStateOf(false) }
     var activeTool by remember { mutableStateOf(initialTool) }
+    // Voce della barra principale aperta (per "Modifica" mostra la seconda riga).
+    var group by remember { mutableStateOf(initialTool?.group ?: if (vm.selectedClipId != null) ToolGroup.EDIT else null) }
+    var tab by remember(activeTool) { mutableIntStateOf(if (activeTool == initialTool) initialTab else 0) }
+    var clipMenu by remember { mutableStateOf(false) }
     val clip = vm.selectedClip
 
     // Un pannello di clip si chiude se non c'è più una clip selezionata.
-    if (clip == null && (activeTool == Tool.SPEED || activeTool == Tool.AUDIO || activeTool == Tool.KEYFRAME || activeTool == Tool.DURATION || activeTool == Tool.FRAME || activeTool == Tool.EFFECTS)) activeTool = null
+    if (clip == null && activeTool?.needsClip == true) activeTool = null
     // Foto e video hanno strumenti diversi.
-    if (clip != null && clip.isPhoto && (activeTool == Tool.SPEED || activeTool == Tool.AUDIO)) activeTool = Tool.DURATION
+    if (clip != null && clip.isPhoto && activeTool == Tool.SPEED) activeTool = Tool.DURATION
     if (clip != null && !clip.isPhoto && activeTool == Tool.DURATION) activeTool = Tool.SPEED
+    val shownGroup = activeTool?.group ?: group
 
     BackHandler {
         when {
             running -> vm.cancelExport()
             activeTool != null -> activeTool = null
+            group != null -> group = null
             else -> vm.closeProject()
         }
     }
@@ -205,15 +227,18 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
     val pickLayer = { layerPicker.launch(arrayOf("image/*", "video/*")) }
     val pickVideos = { picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo)) }
 
+    /** Clip su cui lavorare: quella selezionata o, se nessuna, quella sotto l'indicatore. */
+    fun targetClip() = vm.selectedClip ?: project.locate(vm.playheadUs)?.let { (i, _) -> project.clips[i] }
+
     fun onTool(t: Tool) {
-        if (t.future) { vm.message = "\"${t.label}\" arriverà nelle prossime versioni: lo spazio è già pronto."; return }
+        if (t.needsClip && vm.selectedClip == null) {
+            val c = targetClip()
+            if (c == null) { vm.message = "Aggiungi prima un video o una foto."; return }
+            vm.selectedClipId = c.id
+        }
         when (t) {
-            Tool.ADD -> pickVideos()
             Tool.SPLIT -> if (vm.selectedMusicId != null) vm.splitMusicAtPlayhead() else vm.splitAtPlayhead()
-            Tool.DUPLICATE -> vm.duplicateSelected()
-            Tool.MOVE_LEFT -> vm.moveSelected(-1)
-            Tool.MOVE_RIGHT -> vm.moveSelected(+1)
-            Tool.DELETE -> vm.deleteSelected()
+            Tool.MORE -> clipMenu = true
             Tool.TEXT -> {
                 activeTool = Tool.TEXT
                 if (project.texts.isEmpty()) vm.addText()
@@ -224,6 +249,13 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
             }
             else -> activeTool = if (activeTool == t) null else t
         }
+    }
+
+    fun onGroup(g: ToolGroup) {
+        if (shownGroup == g) { activeTool = null; group = null; return }
+        group = g
+        activeTool = null
+        g.panel()?.let { onTool(it); if (activeTool == null && it != Tool.LAYER) group = null }
     }
 
     val landscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -379,7 +411,11 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
             dpPerSecond = ZOOMS[zoom],
             onSeek = vm::seekTo,
             onScrubStart = vm::pause,
-            onSelect = { vm.selectedClipId = it; if (it == null) { vm.selectedMusicId = null; vm.selectedTextId = null; vm.selectedLayerId = null } },
+            onSelect = {
+                vm.selectedClipId = it
+                if (it == null) { vm.selectedMusicId = null; vm.selectedTextId = null; vm.selectedLayerId = null }
+                else if (activeTool == null) group = ToolGroup.EDIT
+            },
             onTrim = { id, s, e -> vm.trimClip(id, s, e) },
             onAdd = pickVideos,
             selectedMusicId = vm.selectedMusicId,
@@ -392,20 +428,39 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
             selectedLayerId = vm.selectedLayerId,
             onSelectLayer = { vm.selectLayer(it); activeTool = Tool.LAYER },
             onLayerChange = vm::setLayerItem,
+            onClipLongPress = { vm.selectedClipId = it; clipMenu = true },
+            onCutTap = { i -> vm.selectedClipId = project.clips[i].id; group = ToolGroup.EDIT; activeTool = Tool.TRANSITION },
         )
     }
 
-    val tools = when { clip == null -> PROJECT_TOOLS; clip.isPhoto -> PHOTO_TOOLS; else -> CLIP_TOOLS }
+    val photo = targetClip()?.isPhoto == true
+    val subTools = editTools(photo)
     val toolbar: @Composable () -> Unit = {
-        Row(
-            Modifier.fillMaxWidth().background(VV.Canvas).horizontalScroll(rememberScrollState())
-                .padding(horizontal = 4.dp, vertical = 2.dp),
-            horizontalArrangement = Arrangement.spacedBy(0.dp),
-        ) {
-            tools.forEach { t -> ToolButton(t, active = activeTool == t, enabled = !running) { onTool(t) } }
+        Column(Modifier.fillMaxWidth().background(VV.Canvas)) {
+            if (shownGroup == ToolGroup.EDIT) {
+                Row(
+                    Modifier.fillMaxWidth().background(VV.Panel).padding(horizontal = 2.dp, vertical = 2.dp),
+                ) {
+                    subTools.forEach { t ->
+                        ToolButton(t.label, t.icon(), active = activeTool == t, enabled = !running, small = true, modifier = Modifier.weight(1f)) { onTool(t) }
+                    }
+                }
+            }
+            Row(Modifier.fillMaxWidth().padding(horizontal = 2.dp, vertical = 2.dp)) {
+                ToolGroup.entries.forEach { g ->
+                    ToolButton(g.label, g.icon(), active = shownGroup == g, enabled = !running, modifier = Modifier.weight(1f), underline = true) { onGroup(g) }
+                }
+            }
         }
     }
 
+    val tabs: List<String> = when (activeTool) {
+        Tool.MUSIC -> MUSIC_TABS
+        Tool.TEXT -> if (vm.selectedText != null) TEXT_TABS else emptyList()
+        Tool.LAYER -> if (vm.selectedLayer != null) LAYER_TABS else emptyList()
+        Tool.EFFECTS -> EFFECT_TABS
+        else -> emptyList()
+    }
     val panelBody: @Composable (Tool) -> Unit = { t ->
         when (t) {
             Tool.SPEED -> SpeedPanel(vm, running)
@@ -413,12 +468,11 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
             Tool.TRANSITION -> TransitionPanel(vm, running)
             Tool.DURATION -> PhotoPanel(vm, running)
             Tool.FRAME -> FramePanel(vm, running)
-            Tool.MUSIC -> MusicPanel(vm, running, pickMusic)
-            Tool.TEXT -> TextPanel(vm, running)
-            Tool.LAYER -> LayerPanel(vm, running, pickLayer)
+            Tool.MUSIC -> MusicPanel(vm, running, tab, pickMusic)
+            Tool.TEXT -> TextPanel(vm, running, tab)
+            Tool.LAYER -> LayerPanel(vm, running, tab, pickLayer)
             Tool.SLIDESHOW -> SlideshowPanel(vm, running)
-            Tool.EFFECTS -> EffectsPanel(vm, running)
-            Tool.AUDIO -> AudioPanel(vm, running)
+            Tool.EFFECTS -> EffectsPanel(vm, running, tab)
             Tool.COLOR -> ColorPanel(vm, running) { lutPicker.launch(arrayOf("*/*")) }
             Tool.EXPORT -> ExportPanel(vm) { uri ->
                 val intent = Intent(Intent.ACTION_VIEW).setDataAndType(uri, "video/mp4")
@@ -431,11 +485,12 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
     val panelHeader: @Composable (Tool) -> Unit = { t ->
         Row(Modifier.fillMaxWidth().padding(start = 16.dp, end = 4.dp, top = 2.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(t.label, style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
-            if (clip != null && t != Tool.EXPORT && t != Tool.COLOR) {
+            if (clip != null && (t.needsClip || t == Tool.TRANSITION || (t == Tool.MUSIC && tab == 3))) {
                 Text("Clip ${project.clips.indexOf(clip) + 1} di ${project.clips.size}", style = MaterialTheme.typography.bodySmall)
             }
             IconBtn(VVIcons.Check, "Chiudi", enabled = !running) { activeTool = null }
         }
+        if (tabs.isNotEmpty()) PanelTabs(tabs, tab) { tab = it }
     }
 
     Column(Modifier.fillMaxSize().background(if (fullscreen) Color.Black else VV.Canvas).then(if (landscape || fullscreen) Modifier else Modifier.safeDrawingPadding())) {
@@ -456,7 +511,8 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
                                 verticalArrangement = Arrangement.spacedBy(12.dp),
                             ) { panelBody(t) }
                         } else {
-                            ToolGrid(tools, activeTool, !running, Modifier.weight(1f)) { onTool(it) }
+                            val all = subTools + ToolGroup.entries.mapNotNull { it.panel() }
+                            ToolGrid(all, activeTool, !running, Modifier.weight(1f)) { onTool(it) }
                             Box(Modifier.fillMaxWidth().padding(10.dp), contentAlignment = Alignment.Center) {
                                 ExportPill(enabled = project.clips.isNotEmpty()) { activeTool = Tool.EXPORT }
                             }
@@ -497,6 +553,29 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null) {
             containerColor = VV.Raised,
             confirmButton = { TextButton(onClick = { vm.message = null }) { Text("OK", color = VV.Tally) } },
             text = { Text(msg, style = MaterialTheme.typography.bodyMedium) },
+        )
+    }
+    if (clipMenu) {
+        val c = vm.selectedClip
+        val idx = c?.let { project.clips.indexOf(it) } ?: -1
+        AlertDialog(
+            onDismissRequest = { clipMenu = false },
+            containerColor = VV.Raised,
+            title = { Text(if (c == null) "Clip" else "Clip ${idx + 1} di ${project.clips.size}", style = MaterialTheme.typography.titleSmall) },
+            text = {
+                Column {
+                    fun act(f: () -> Unit) { f(); clipMenu = false }
+                    if (c != null) {
+                        MenuRow(VVIcons.MoveLeft, "Sposta prima", enabled = idx > 0) { act { vm.moveSelected(-1) } }
+                        MenuRow(VVIcons.MoveRight, "Sposta dopo", enabled = idx < project.clips.lastIndex) { act { vm.moveSelected(+1) } }
+                        MenuRow(VVIcons.Copy, "Duplica") { act { vm.duplicateSelected() } }
+                        MenuRow(VVIcons.Split, "Dividi all'indicatore") { act { vm.splitAtPlayhead() } }
+                    }
+                    MenuRow(VVIcons.Add, "Aggiungi video e foto") { act { pickVideos() } }
+                    if (c != null) MenuRow(VVIcons.Delete, "Elimina", tint = VV.Danger) { act { vm.deleteSelected() } }
+                }
+            },
+            confirmButton = { TextButton(onClick = { clipMenu = false }) { Text("Chiudi", color = VV.Dim) } },
         )
     }
     if (renaming) {
@@ -540,32 +619,77 @@ private fun ExportPill(enabled: Boolean, onClick: () -> Unit) {
 private fun ToolGrid(tools: List<Tool>, active: Tool?, enabled: Boolean, modifier: Modifier, onClick: (Tool) -> Unit) {
     Column(modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 8.dp, vertical = 4.dp)) {
         tools.chunked(4).forEach { row ->
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                row.forEach { t -> ToolButton(t, active == t, enabled) { onClick(t) } }
-                repeat(4 - row.size) { Spacer(Modifier.width(64.dp)) }
+            Row(Modifier.fillMaxWidth()) {
+                row.forEach { t -> ToolButton(t.label, t.icon(), active == t, enabled, modifier = Modifier.weight(1f)) { onClick(t) } }
+                repeat(4 - row.size) { Spacer(Modifier.weight(1f)) }
             }
         }
     }
 }
 
 @Composable
-private fun ToolButton(t: Tool, active: Boolean, enabled: Boolean, onClick: () -> Unit) {
+private fun ToolButton(
+    label: String,
+    icon: ImageVector,
+    active: Boolean,
+    enabled: Boolean,
+    modifier: Modifier = Modifier,
+    small: Boolean = false,
+    underline: Boolean = false,
+    onClick: () -> Unit,
+) {
     val color = when {
         !enabled -> VV.Faint
         active -> VV.Tally
-        t.future -> VV.Faint
         else -> VV.Text
     }
     Column(
-        Modifier.width(64.dp).clip(RoundedCornerShape(10.dp)).clickable(enabled = enabled, onClick = onClick).padding(vertical = 6.dp),
+        modifier.clip(RoundedCornerShape(10.dp)).clickable(enabled = enabled, onClick = onClick).padding(top = if (small) 5.dp else 7.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Icon(t.icon(), t.label, tint = color, modifier = Modifier.size(22.dp))
-        Spacer(Modifier.height(5.dp))
+        Icon(icon, label, tint = color, modifier = Modifier.size(if (small) 20.dp else 23.dp))
+        Spacer(Modifier.height(4.dp))
         Text(
-            t.label, fontSize = 11.sp, fontFamily = Plex, maxLines = 1,
-            color = if (active) VV.Tally else if (t.future || !enabled) VV.Faint else VV.Dim,
+            label, fontSize = if (small) 10.sp else 11.sp, fontFamily = Plex, maxLines = 1, softWrap = false,
+            fontWeight = if (active && underline) FontWeight.SemiBold else FontWeight.Normal,
+            color = if (active) VV.Tally else if (!enabled) VV.Faint else VV.Dim,
         )
+        Spacer(Modifier.height(if (small) 5.dp else 5.dp))
+        Box(Modifier.width(18.dp).height(2.dp).clip(RoundedCornerShape(1.dp)).background(if (active && underline) VV.Tally else Color.Transparent))
+    }
+}
+
+/** Schede in cima a un pannello. */
+@Composable
+private fun PanelTabs(tabs: List<String>, selected: Int, onSelect: (Int) -> Unit) {
+    Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp)) {
+        tabs.forEachIndexed { i, label ->
+            val on = i == selected
+            Column(
+                Modifier.weight(1f).clip(RoundedCornerShape(8.dp)).clickable { onSelect(i) }.padding(top = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    label, style = MaterialTheme.typography.labelLarge, maxLines = 1,
+                    color = if (on) VV.Text else VV.Dim, fontWeight = if (on) FontWeight.SemiBold else FontWeight.Normal,
+                )
+                Spacer(Modifier.height(7.dp))
+                Box(Modifier.fillMaxWidth().height(2.dp).background(if (on) VV.Tally else VV.Line))
+            }
+        }
+    }
+}
+
+@Composable
+private fun MenuRow(icon: ImageVector, label: String, enabled: Boolean = true, tint: Color = VV.Text, onClick: () -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).clickable(enabled = enabled, onClick = onClick)
+            .padding(horizontal = 8.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(icon, null, tint = if (enabled) tint else VV.Faint, modifier = Modifier.size(20.dp))
+        Spacer(Modifier.width(14.dp))
+        Text(label, style = MaterialTheme.typography.bodyLarge, color = if (enabled) tint else VV.Faint)
     }
 }
 
@@ -768,18 +892,21 @@ private fun TransitionPanel(vm: EditorViewModel, running: Boolean) {
 }
 
 @Composable
-private fun MusicPanel(vm: EditorViewModel, running: Boolean, onAdd: () -> Unit) {
+private fun MusicPanel(vm: EditorViewModel, running: Boolean, tab: Int, onAdd: () -> Unit) {
     val p = vm.project ?: return
-    val t = vm.selectedMusic
     val enabled = !running
-    if (t == null) {
-        if (p.music.isEmpty()) {
-            Hint("Scegli un brano dal telefono (MP3, M4A, WAV, FLAC…): parte dal punto dell'indicatore e si ferma alla fine del video.")
-        } else {
-            PanelLabel("Brani nel progetto")
-            PillRow(p.music, null as MusicTrack?, { it?.name ?: "" }, enabled) { m -> if (m != null) vm.selectedMusicId = m.id }
+    if (tab == 3) { ClipAudioTab(vm, running); return }
+    // Nessun brano selezionato: prende quello sotto l'indicatore (o il primo).
+    if (vm.selectedMusic == null && p.music.isNotEmpty()) {
+        LaunchedEffect(Unit) {
+            val m = p.music.firstOrNull { vm.playheadUs >= it.startUs && vm.playheadUs < it.endUs } ?: p.music.first()
+            vm.selectedMusicId = m.id
         }
-        SecondaryButton(if (p.music.isEmpty()) "Aggiungi musica" else "Aggiungi un altro brano", onClick = { if (enabled) onAdd() })
+    }
+    val t = vm.selectedMusic
+    if (t == null) {
+        Hint("Scegli un brano dal telefono (MP3, M4A, WAV, FLAC, anche MIDI): parte dal punto dell'indicatore e si ferma alla fine del video.")
+        PrimaryButton("Aggiungi musica", Modifier.fillMaxWidth(), enabled = enabled, onClick = onAdd)
         return
     }
     val total = p.durationUs
@@ -789,87 +916,113 @@ private fun MusicPanel(vm: EditorViewModel, running: Boolean, onAdd: () -> Unit)
         Text(t.name, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
         Text(formatTime(t.playUs(total)), style = MaterialTheme.typography.bodySmall)
     }
-    PanelLabel("Ritmo")
-    if (t.beatsUs.isEmpty()) {
-        SecondaryButton("Rileva i battiti automaticamente", onClick = { if (enabled) vm.detectBeats() })
-    } else {
-        Text(
-            "${t.bpm.roundToInt()} BPM · ${t.timelineBeats(total).size} battiti nel video",
-            style = MaterialTheme.typography.bodyMedium,
-        )
-        Segmented(listOf(1, 2, 4), t.beatEvery, { if (it == 1) "Tutti" else "Ogni $it" }, enabled) { n ->
-            vm.updateBeats { it.copy(beatEvery = n) }
+    when (tab) {
+        0 -> {
+            if (p.music.size > 1) PillRow(p.music, t, { it.name.take(18) }, enabled) { m -> vm.selectedMusicId = m.id }
+            LabeledSlider("Volume", null, (t.volume * 100).toInt(), enabled, range = 0..200, format = { "$it%" }) { v ->
+                vm.updateMusic { it.copy(volume = v / 100f) }
+            }
+            val secs = { v: Int -> String.format(java.util.Locale.ITALIAN, "%.1f s", v / 10f) }
+            LabeledSlider("Dissolvenza in entrata", null, (t.fadeInUs / 100_000).toInt(), enabled, range = 0..100, format = secs) { v ->
+                vm.updateMusic { it.copy(fadeInUs = v * 100_000L) }
+            }
+            LabeledSlider("Dissolvenza in uscita", null, (t.fadeOutUs / 100_000).toInt(), enabled, range = 0..100, format = secs) { v ->
+                vm.updateMusic { it.copy(fadeOutUs = v * 100_000L) }
+            }
+            val maxOffset = ((t.sourceDurationUs - MusicTrack.MIN_US) / 100_000).toInt().coerceAtLeast(0)
+            LabeledSlider(
+                "Parti dal punto del brano", "Per far partire la musica dal ritornello o da un altro punto.",
+                (t.offsetUs / 100_000).toInt().coerceAtMost(maxOffset), enabled && maxOffset > 0, range = 0..maxOf(maxOffset, 1),
+                format = { formatTime(it * 100_000L) },
+            ) { v ->
+                vm.updateMusic { m ->
+                    val off = v * 100_000L
+                    m.copy(offsetUs = off, lengthUs = minOf(m.lengthUs, m.sourceDurationUs - off).coerceAtLeast(MusicTrack.MIN_US))
+                }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                SecondaryButton("Inizia da qui", onClick = {
+                    if (enabled) vm.updateMusic { it.copy(startUs = vm.playheadUs.coerceIn(0, (total - MusicTrack.MIN_US).coerceAtLeast(0))) }
+                })
+                SecondaryButton("Fino alla fine", onClick = {
+                    if (enabled) vm.updateMusic { it.copy(lengthUs = (it.sourceDurationUs - it.offsetUs).coerceAtLeast(MusicTrack.MIN_US)) }
+                })
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                SecondaryButton("Dividi qui", onClick = { if (enabled) vm.splitMusicAtPlayhead() })
+                SecondaryButton("Elimina brano", onClick = { if (enabled) vm.deleteMusic() })
+            }
+            SecondaryButton("Aggiungi un altro brano", onClick = { if (enabled) onAdd() })
+            Hint("Nella timeline: tocca il brano per selezionarlo, trascinalo per spostarlo, usa le maniglie per accorciarlo. Le dissolvenze si sentono nel video esportato.")
         }
-        LabeledSlider(
-            "Sposta i battiti automatici", "Se cadono tutti un po' prima o dopo il colpo, correggili qui.",
-            (t.beatShiftUs / 10_000).toInt(), enabled, range = -30..30,
-            format = { (if (it > 0) "+" else "") + "${it * 10} ms" },
-        ) { v -> vm.updateBeats { it.copy(beatShiftUs = v * 10_000L) } }
-    }
-    PanelLabel("Battiti a mano")
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-        SecondaryButton("Segna / togli qui", onClick = { if (enabled) vm.toggleBeatAtPlayhead() })
-        // Tap: si preme play e si tocca a tempo di musica.
-        Box(
-            Modifier.weight(1f).clip(RoundedCornerShape(12.dp))
-                .background(if (vm.isPlaying) VV.Tally else VV.Raised)
-                .clickable(enabled = enabled) { if (vm.isPlaying) vm.tapBeat() else vm.togglePlay() }
-                .padding(vertical = 13.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                if (vm.isPlaying) "TAP a tempo" else "▶ Ascolta e tocca",
-                style = MaterialTheme.typography.labelLarge,
-                color = if (vm.isPlaying) VV.TallyInk else VV.Text,
-            )
+        1 -> {
+            if (t.beatsUs.isEmpty()) {
+                PrimaryButton("Rileva i battiti automaticamente", Modifier.fillMaxWidth(), enabled = enabled, onClick = vm::detectBeats)
+                Hint("Dai file MIDI i battiti sono già esatti. Puoi anche segnarli a mano nella scheda Battiti.")
+            } else {
+                Text("${t.bpm.roundToInt()} BPM · ${t.timelineBeats(total).size} battiti nel video", style = MaterialTheme.typography.bodyMedium)
+                Segmented(listOf(1, 2, 4), t.beatEvery, { if (it == 1) "Tutti" else "Ogni $it" }, enabled) { n ->
+                    vm.updateBeats { it.copy(beatEvery = n) }
+                }
+                LabeledSlider(
+                    "Sposta i battiti automatici", "Se cadono tutti un po' prima o dopo il colpo, correggili qui.",
+                    (t.beatShiftUs / 10_000).toInt(), enabled, range = -30..30,
+                    format = { (if (it > 0) "+" else "") + "${it * 10} ms" },
+                ) { v -> vm.updateBeats { it.copy(beatShiftUs = v * 10_000L) } }
+            }
+            if (t.hasBeats) {
+                PanelLabel("Tagli a ritmo")
+                SecondaryButton("Allinea i tagli al ritmo", Modifier.fillMaxWidth(), onClick = { if (enabled) vm.alignCutsToBeats() })
+                SecondaryButton("Dividi i video sui battiti", Modifier.fillMaxWidth(), onClick = { if (enabled) vm.splitOnBeats() })
+                ToggleRow("Aggancia i tagli ai battiti", vm.snapToBeats, enabled) { vm.snapToBeats = it }
+                SecondaryButton("Cancella tutti i battiti", onClick = { if (enabled) vm.clearBeats() })
+            }
+        }
+        else -> {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                SecondaryButton("Segna / togli qui", onClick = { if (enabled) vm.toggleBeatAtPlayhead() })
+                // Tap: si preme play e si tocca a tempo di musica.
+                Box(
+                    Modifier.weight(1f).clip(RoundedCornerShape(12.dp))
+                        .background(if (vm.isPlaying) VV.Tally else VV.Raised)
+                        .clickable(enabled = enabled) { if (vm.isPlaying) vm.tapBeat() else vm.togglePlay() }
+                        .padding(vertical = 13.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        if (vm.isPlaying) "TAP a tempo" else "▶ Ascolta e tocca",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = if (vm.isPlaying) VV.TallyInk else VV.Text,
+                    )
+                }
+            }
+            if (t.hasBeats) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    SecondaryButton("◀ Battito", onClick = { vm.jumpBeat(-1) })
+                    SecondaryButton("Battito ▶", onClick = { vm.jumpBeat(+1) })
+                }
+            }
+            Hint("Segna: aggiunge un battito nel punto dell'indicatore, o toglie quello che c'è già (anche automatico). Tap: avvia l'ascolto e tocca il pulsante a ogni colpo; i battiti a mano sono bianchi.")
         }
     }
-    Hint("Segna: aggiunge un battito nel punto dell'indicatore, o toglie quello che c'è già (anche automatico). Tap: avvia l'ascolto e tocca il pulsante a ogni colpo; i battiti a mano sono bianchi.")
-    if (t.hasBeats) {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            SecondaryButton("◀ Battito", onClick = { vm.jumpBeat(-1) })
-            SecondaryButton("Battito ▶", onClick = { vm.jumpBeat(+1) })
-        }
-        SecondaryButton("Allinea i tagli al ritmo", onClick = { if (enabled) vm.alignCutsToBeats() })
-        SecondaryButton("Dividi i video sui battiti", onClick = { if (enabled) vm.splitOnBeats() })
-        ToggleRow("Aggancia i tagli ai battiti", vm.snapToBeats, enabled) { vm.snapToBeats = it }
-        SecondaryButton("Cancella tutti i battiti", onClick = { if (enabled) vm.clearBeats() })
+}
+
+/** Scheda "Clip" del pannello Audio: volume della clip sotto l'indicatore. */
+@Composable
+private fun ClipAudioTab(vm: EditorViewModel, running: Boolean) {
+    val p = vm.project ?: return
+    if (vm.selectedClip == null) {
+        LaunchedEffect(Unit) { p.locate(vm.playheadUs)?.let { (i, _) -> vm.selectedClipId = p.clips[i].id } }
     }
-    PanelLabel("Brano")
-    LabeledSlider("Volume", null, (t.volume * 100).toInt(), enabled, range = 0..200, format = { "$it%" }) { v ->
-        vm.updateMusic { it.copy(volume = v / 100f) }
-    }
-    val secs = { v: Int -> String.format(java.util.Locale.ITALIAN, "%.1f s", v / 10f) }
-    LabeledSlider("Dissolvenza in entrata", null, (t.fadeInUs / 100_000).toInt(), enabled, range = 0..100, format = secs) { v ->
-        vm.updateMusic { it.copy(fadeInUs = v * 100_000L) }
-    }
-    LabeledSlider("Dissolvenza in uscita", null, (t.fadeOutUs / 100_000).toInt(), enabled, range = 0..100, format = secs) { v ->
-        vm.updateMusic { it.copy(fadeOutUs = v * 100_000L) }
-    }
-    val maxOffset = ((t.sourceDurationUs - MusicTrack.MIN_US) / 100_000).toInt().coerceAtLeast(0)
+    val clip = vm.selectedClip
+    if (clip == null) { Hint("Nessuna clip nel progetto."); return }
+    if (clip.isPhoto) { Hint("Le foto non hanno audio."); return }
+    ToggleRow("Disattiva l'audio della clip", clip.muted, !running) { v -> vm.updateSelected { it.copy(muted = v) } }
     LabeledSlider(
-        "Parti dal punto del brano", "Per far partire la musica dal ritornello o da un altro punto.",
-        (t.offsetUs / 100_000).toInt().coerceAtMost(maxOffset), enabled && maxOffset > 0, range = 0..maxOf(maxOffset, 1),
-        format = { formatTime(it * 100_000L) },
-    ) { v ->
-        vm.updateMusic { m ->
-            val off = v * 100_000L
-            m.copy(offsetUs = off, lengthUs = minOf(m.lengthUs, m.sourceDurationUs - off).coerceAtLeast(MusicTrack.MIN_US))
-        }
-    }
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        SecondaryButton("Inizia da qui", onClick = {
-            if (enabled) vm.updateMusic { it.copy(startUs = vm.playheadUs.coerceIn(0, (total - MusicTrack.MIN_US).coerceAtLeast(0))) }
-        })
-        SecondaryButton("Fino alla fine", onClick = {
-            if (enabled) vm.updateMusic { it.copy(lengthUs = (it.sourceDurationUs - it.offsetUs).coerceAtLeast(MusicTrack.MIN_US)) }
-        })
-    }
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        SecondaryButton("Dividi qui", onClick = { if (enabled) vm.splitMusicAtPlayhead() })
-        SecondaryButton("Elimina brano", onClick = { if (enabled) vm.deleteMusic() })
-    }
-    Hint("Tocca il brano nella timeline per selezionarlo: trascinalo per spostarlo, usa le maniglie per accorciarlo. Le dissolvenze si sentono nel video esportato.")
+        "Volume", null, (clip.volume * 100).toInt(), enabled = !running && !clip.muted, range = 0..200,
+        format = { "$it%" },
+    ) { v -> vm.updateSelected { it.copy(volume = v / 100f) } }
+    Hint("Tocca un'altra clip nella timeline per regolarne il volume. Nei cambi di velocità l'audio esportato mantiene il tono naturale (impostazione in Esporta).")
 }
 
 @Composable
@@ -918,7 +1071,7 @@ private val TEXT_COLORS = listOf(
 ).map { it.toInt() }
 
 @Composable
-private fun TextPanel(vm: EditorViewModel, running: Boolean) {
+private fun TextPanel(vm: EditorViewModel, running: Boolean, tab: Int) {
     val p = vm.project ?: return
     val t = vm.selectedText
     val enabled = !running
@@ -927,7 +1080,7 @@ private fun TextPanel(vm: EditorViewModel, running: Boolean) {
             PanelLabel("Testi nel progetto")
             PillRow(p.texts, null as TextItem?, { it?.text?.lines()?.firstOrNull()?.take(18) ?: "" }, enabled) { x -> if (x != null) vm.selectText(x.id) }
         }
-        SecondaryButton("Aggiungi testo", onClick = { if (enabled) vm.addText() })
+        PrimaryButton("Aggiungi testo", Modifier.fillMaxWidth(), enabled = enabled, onClick = vm::addText)
         Hint("Il testo parte dall'indicatore. Nella timeline lo sposti trascinandolo e ne cambi la durata con le maniglie.")
         return
     }
@@ -943,63 +1096,69 @@ private fun TextPanel(vm: EditorViewModel, running: Boolean) {
             focusedTextColor = VV.Text, unfocusedTextColor = VV.Text,
         ),
     )
-    PanelLabel("Stili pronti")
-    PillRow(TextPreset.entries, null as TextPreset?, { it?.label ?: "" }, enabled) { pr -> if (pr != null) vm.applyTextPreset(pr) }
-    PanelLabel("Carattere")
-    PillRow(TextFont.entries, t.font, { it.label }, enabled) { f -> vm.updateText { it.copy(font = f) } }
-    PanelLabel("Colore")
-    Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-        TEXT_COLORS.forEach { c ->
-            Box(
-                Modifier.size(30.dp).clip(RoundedCornerShape(15.dp)).background(Color(c))
-                    .border(if (c == t.color) 3.dp else 1.dp, if (c == t.color) VV.Tally else VV.Line, RoundedCornerShape(15.dp))
-                    .clickable(enabled = enabled) { vm.updateText { it.copy(color = c) } }
-            )
+    when (tab) {
+        0 -> {
+            PanelLabel("Stili pronti")
+            PillRow(TextPreset.entries, null as TextPreset?, { it?.label ?: "" }, enabled) { pr -> if (pr != null) vm.applyTextPreset(pr) }
+            PanelLabel("Carattere")
+            PillRow(TextFont.entries, t.font, { it.label }, enabled) { f -> vm.updateText { it.copy(font = f) } }
+            PanelLabel("Colore")
+            Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                TEXT_COLORS.forEach { c ->
+                    Box(
+                        Modifier.size(30.dp).clip(RoundedCornerShape(15.dp)).background(Color(c))
+                            .border(if (c == t.color) 3.dp else 1.dp, if (c == t.color) VV.Tally else VV.Line, RoundedCornerShape(15.dp))
+                            .clickable(enabled = enabled) { vm.updateText { it.copy(color = c) } }
+                    )
+                }
+            }
+            PanelLabel("Sfumatura verso")
+            Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    Modifier.clip(RoundedCornerShape(15.dp)).background(if (t.gradientTo == null) VV.Tally else VV.Raised)
+                        .clickable(enabled = enabled) { vm.updateText { it.copy(gradientTo = null) } }.padding(horizontal = 12.dp, vertical = 6.dp)
+                ) { Text("Nessuna", style = MaterialTheme.typography.labelMedium, color = if (t.gradientTo == null) VV.TallyInk else VV.Text) }
+                TEXT_COLORS.forEach { c ->
+                    Box(
+                        Modifier.size(30.dp).clip(RoundedCornerShape(15.dp)).background(Color(c))
+                            .border(if (c == t.gradientTo) 3.dp else 1.dp, if (c == t.gradientTo) VV.Tally else VV.Line, RoundedCornerShape(15.dp))
+                            .clickable(enabled = enabled) { vm.updateText { it.copy(gradientTo = c) } }
+                    )
+                }
+            }
+            PanelLabel("Contorno e ombra")
+            Segmented(TextLook.entries, t.look, { it.label }, enabled) { l -> vm.updateText { it.copy(look = l) } }
+            LabeledSlider("Dimensione", null, (t.size * 1000).toInt(), enabled, range = 15..250, format = { "${it / 10}" }) { v ->
+                vm.updateText(typing = true) { it.copy(size = v / 1000f) }
+            }
+            LabeledSlider("Spaziatura lettere", null, (t.spacing * 100).toInt(), enabled, range = -5..60) { v ->
+                vm.updateText(typing = true) { it.copy(spacing = v / 100f) }
+            }
+            ToggleRow("Tutto maiuscolo", t.upper, enabled) { v -> vm.updateText { it.copy(upper = v) } }
+        }
+        1 -> {
+            PanelLabel("In entrata")
+            PillRow(TextAnim.entries, t.animIn, { it.label }, enabled) { a -> vm.updateText { it.copy(animIn = a) } }
+            PanelLabel("In uscita")
+            PillRow(TextAnim.entries.filter { it != TextAnim.TYPE && it != TextAnim.WORDS }, t.animOut, { it.label }, enabled) { a -> vm.updateText { it.copy(animOut = a) } }
+        }
+        else -> {
+            PanelLabel("Posizione")
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                SecondaryButton("Alto", onClick = { vm.updateText { it.copy(x = 0f, y = -0.36f) } })
+                SecondaryButton("Centro", onClick = { vm.updateText { it.copy(x = 0f, y = 0f) } })
+                SecondaryButton("Basso", onClick = { vm.updateText { it.copy(x = 0f, y = 0.36f) } })
+            }
+            Hint("Oppure trascina, pizzica e ruota il riquadro sull'anteprima con le dita.")
+            MotionSection(vm, t.endPose != null, enabled, t.startUs, t.durationUs) { vm.toggleTextMotion() }
         }
     }
-    PanelLabel("Sfumatura verso")
-    Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
-        Box(
-            Modifier.clip(RoundedCornerShape(15.dp)).background(if (t.gradientTo == null) VV.Tally else VV.Raised)
-                .clickable(enabled = enabled) { vm.updateText { it.copy(gradientTo = null) } }.padding(horizontal = 12.dp, vertical = 6.dp)
-        ) { Text("Nessuna", style = MaterialTheme.typography.labelMedium, color = if (t.gradientTo == null) VV.TallyInk else VV.Text) }
-        TEXT_COLORS.forEach { c ->
-            Box(
-                Modifier.size(30.dp).clip(RoundedCornerShape(15.dp)).background(Color(c))
-                    .border(if (c == t.gradientTo) 3.dp else 1.dp, if (c == t.gradientTo) VV.Tally else VV.Line, RoundedCornerShape(15.dp))
-                    .clickable(enabled = enabled) { vm.updateText { it.copy(gradientTo = c) } }
-            )
-        }
-    }
-    PanelLabel("Stile")
-    Segmented(TextLook.entries, t.look, { it.label }, enabled) { l -> vm.updateText { it.copy(look = l) } }
-    LabeledSlider("Spaziatura lettere", null, (t.spacing * 100).toInt(), enabled, range = -5..60) { v ->
-        vm.updateText(typing = true) { it.copy(spacing = v / 100f) }
-    }
-    ToggleRow("Tutto maiuscolo", t.upper, enabled) { v -> vm.updateText { it.copy(upper = v) } }
-    LabeledSlider("Dimensione", null, (t.size * 1000).toInt(), enabled, range = 15..250, format = { "${it / 10}" }) { v ->
-        vm.updateText(typing = true) { it.copy(size = v / 1000f) }
-    }
-    PanelLabel("Posizione")
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        SecondaryButton("Alto", onClick = { vm.updateText { it.copy(x = 0f, y = -0.36f) } })
-        SecondaryButton("Centro", onClick = { vm.updateText { it.copy(x = 0f, y = 0f) } })
-        SecondaryButton("Basso", onClick = { vm.updateText { it.copy(x = 0f, y = 0.36f) } })
-    }
-    Hint("Oppure trascina, pizzica e ruota il riquadro sull'anteprima con le dita.")
-    MotionSection(vm, t.endPose != null, enabled, t.startUs, t.durationUs) { vm.toggleTextMotion() }
-    PanelLabel("Animazione in entrata")
-    PillRow(TextAnim.entries, t.animIn, { it.label }, enabled) { a -> vm.updateText { it.copy(animIn = a) } }
-    PanelLabel("Animazione in uscita")
-    PillRow(TextAnim.entries.filter { it != TextAnim.TYPE && it != TextAnim.WORDS }, t.animOut, { it.label }, enabled) { a -> vm.updateText { it.copy(animOut = a) } }
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        SecondaryButton("Nuovo", onClick = { if (enabled) vm.addText() })
         SecondaryButton("Duplica", onClick = { if (enabled) vm.duplicateText() })
         SecondaryButton("Elimina", onClick = { if (enabled) vm.deleteText() })
     }
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        SecondaryButton("Nuovo testo", onClick = { if (enabled) vm.addText() })
-        SecondaryButton("Stile a tutti", onClick = { if (enabled) vm.applyTextStyleToAll() })
-    }
+    SecondaryButton("Stile a tutti i testi", onClick = { if (enabled) vm.applyTextStyleToAll() })
 }
 
 /**
@@ -1119,67 +1278,73 @@ private fun MotionSection(vm: EditorViewModel, on: Boolean, enabled: Boolean, st
 }
 
 @Composable
-private fun LayerPanel(vm: EditorViewModel, running: Boolean, onAdd: () -> Unit) {
+private fun LayerPanel(vm: EditorViewModel, running: Boolean, tab: Int, onAdd: () -> Unit) {
     val p = vm.project ?: return
     val l = vm.selectedLayer
     val enabled = !running
     if (l == null) {
         if (p.layers.isNotEmpty()) {
-            PanelLabel("Immagini nel progetto")
+            PanelLabel("Livelli nel progetto")
             PillRow(p.layers, null as Layer?, { it?.name?.take(18) ?: "" }, enabled) { x -> if (x != null) vm.selectLayer(x.id) }
         }
-        SecondaryButton("Aggiungi immagine o video", onClick = { if (enabled) onAdd() })
+        PrimaryButton("Aggiungi immagine o video", Modifier.fillMaxWidth(), enabled = enabled, onClick = onAdd)
         Hint("Foto, loghi, adesivi PNG con trasparenza o altri video (picture-in-picture) sopra al video, dall'indicatore. Nella timeline li sposti e ne cambi la durata con le maniglie.")
         return
     }
     val pose = vm.editedLayerPose() ?: l.pose
     Text(l.name, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-    Hint("Trascina, pizzica e ruota il riquadro sull'anteprima con due dita.")
-    LabeledSlider("Dimensione", null, (pose.scale * 100).toInt(), enabled, range = 5..150, format = { "$it%" }) {
-        vm.setLayerPose(pose.copy(scale = it / 100f))
-    }
-    LabeledSlider("Opacità", null, (pose.opacity * 100).toInt(), enabled, format = { "$it%" }) {
-        vm.setLayerPose(pose.copy(opacity = it / 100f))
-    }
-    LabeledSlider("Rotazione", null, pose.rotation.toInt(), enabled, range = -180..180, format = { "$it°" }) {
-        vm.setLayerPose(pose.copy(rotation = it.toFloat()))
-    }
-    MotionSection(vm, l.endPose != null, enabled, l.startUs, l.durationUs) { vm.toggleLayerMotion() }
-    if (l.isVideo) {
-        Hint("In anteprima il video sovrapposto si vede come immagine ferma; nel video esportato si muove.")
-        PanelLabel("Audio del video sovrapposto")
-        ToggleRow("Disattiva l'audio", l.muted, enabled) { v -> vm.updateLayer { it.copy(muted = v) } }
-        if (!l.muted) LabeledSlider("Volume", null, (l.volume * 100).toInt(), enabled, range = 0..200, format = { "$it%" }) { v ->
-            vm.updateLayer { it.copy(volume = v / 100f) }
-        }
-    }
-    run {
-        PanelLabel(if (l.isVideo) "Cornice" else "Cornice e ombra")
-        Segmented(LayerBorder.entries, l.border, { it.label }, enabled) { b -> vm.updateLayer { it.copy(border = b) } }
-        if (!l.isVideo) ToggleRow("Ombra", l.shadow, enabled) { v -> vm.updateLayer { it.copy(shadow = v) } }
-        PanelLabel("Forma")
-        PillRow(LayerMask.entries, l.shape, { it.label }, enabled) { m -> vm.updateLayer { it.copy(mask = m, rounded = false) } }
-        PanelLabel("Scontorno (togli lo sfondo)")
-        PillRow(KeyColor.entries, l.key, { it.label }, enabled) { k -> vm.updateLayer { it.copy(key = k) } }
-        if (l.key != KeyColor.NONE) {
-            LabeledSlider("Tolleranza", "Alzala se resta un alone di sfondo, abbassala se sparisce anche il soggetto.", (l.keyTolerance * 100).toInt(), enabled, format = { "$it%" }) { v ->
-                vm.updateLayer { it.copy(keyTolerance = v / 100f) }
+    when (tab) {
+        0 -> {
+            Hint("Trascina, pizzica e ruota il riquadro sull'anteprima con due dita.")
+            LabeledSlider("Dimensione", null, (pose.scale * 100).toInt(), enabled, range = 5..150, format = { "$it%" }) {
+                vm.setLayerPose(pose.copy(scale = it / 100f))
+            }
+            LabeledSlider("Opacità", null, (pose.opacity * 100).toInt(), enabled, format = { "$it%" }) {
+                vm.setLayerPose(pose.copy(opacity = it / 100f))
+            }
+            LabeledSlider("Rotazione", null, pose.rotation.toInt(), enabled, range = -180..180, format = { "$it°" }) {
+                vm.setLayerPose(pose.copy(rotation = it.toFloat()))
+            }
+            if (l.isVideo) {
+                Hint("In anteprima il video sovrapposto si vede come immagine ferma; nel video esportato si muove.")
+                PanelLabel("Audio del video sovrapposto")
+                ToggleRow("Disattiva l'audio", l.muted, enabled) { v -> vm.updateLayer { it.copy(muted = v) } }
+                if (!l.muted) LabeledSlider("Volume", null, (l.volume * 100).toInt(), enabled, range = 0..200, format = { "$it%" }) { v ->
+                    vm.updateLayer { it.copy(volume = v / 100f) }
+                }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                SecondaryButton("Porta sopra", onClick = { if (enabled) vm.moveLayerZ(+1) })
+                SecondaryButton("Porta sotto", onClick = { if (enabled) vm.moveLayerZ(-1) })
             }
         }
+        1 -> {
+            PanelLabel("Forma")
+            PillRow(LayerMask.entries, l.shape, { it.label }, enabled) { m -> vm.updateLayer { it.copy(mask = m, rounded = false) } }
+            PanelLabel(if (l.isVideo) "Cornice" else "Cornice e ombra")
+            Segmented(LayerBorder.entries, l.border, { it.label }, enabled) { b -> vm.updateLayer { it.copy(border = b) } }
+            if (!l.isVideo) ToggleRow("Ombra", l.shadow, enabled) { v -> vm.updateLayer { it.copy(shadow = v) } }
+            PanelLabel("Scontorno (togli lo sfondo)")
+            PillRow(KeyColor.entries, l.key, { it.label }, enabled) { k -> vm.updateLayer { it.copy(key = k) } }
+            if (l.key != KeyColor.NONE) {
+                LabeledSlider("Tolleranza", "Alzala se resta un alone di sfondo, abbassala se sparisce anche il soggetto.", (l.keyTolerance * 100).toInt(), enabled, format = { "$it%" }) { v ->
+                    vm.updateLayer { it.copy(keyTolerance = v / 100f) }
+                }
+            }
+        }
+        else -> {
+            MotionSection(vm, l.endPose != null, enabled, l.startUs, l.durationUs) { vm.toggleLayerMotion() }
+            PanelLabel("Animazione in entrata")
+            PillRow(TextAnim.entries.filter { it != TextAnim.TYPE && it != TextAnim.WORDS }, l.animIn, { it.label }, enabled) { a -> vm.updateLayer { it.copy(animIn = a) } }
+            PanelLabel("Animazione in uscita")
+            PillRow(TextAnim.entries.filter { it != TextAnim.TYPE && it != TextAnim.WORDS }, l.animOut, { it.label }, enabled) { a -> vm.updateLayer { it.copy(animOut = a) } }
+        }
     }
-    PanelLabel("Animazione in entrata")
-    PillRow(TextAnim.entries.filter { it != TextAnim.TYPE && it != TextAnim.WORDS }, l.animIn, { it.label }, enabled) { a -> vm.updateLayer { it.copy(animIn = a) } }
-    PanelLabel("Animazione in uscita")
-    PillRow(TextAnim.entries.filter { it != TextAnim.TYPE && it != TextAnim.WORDS }, l.animOut, { it.label }, enabled) { a -> vm.updateLayer { it.copy(animOut = a) } }
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        SecondaryButton("Porta sopra", onClick = { if (enabled) vm.moveLayerZ(+1) })
-        SecondaryButton("Porta sotto", onClick = { if (enabled) vm.moveLayerZ(-1) })
-    }
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        SecondaryButton("Aggiungi", onClick = { if (enabled) onAdd() })
         SecondaryButton("Duplica", onClick = { if (enabled) vm.duplicateLayer() })
         SecondaryButton("Elimina", onClick = { if (enabled) vm.deleteLayer() })
     }
-    SecondaryButton("Aggiungi un'altra immagine", onClick = { if (enabled) onAdd() })
 }
 
 @Composable
@@ -1229,10 +1394,11 @@ private fun SlideshowPanel(vm: EditorViewModel, running: Boolean) {
 }
 
 @Composable
-private fun EffectsPanel(vm: EditorViewModel, running: Boolean) {
+private fun EffectsPanel(vm: EditorViewModel, running: Boolean, tab: Int) {
     val clip = vm.selectedClip ?: return
     val p = vm.project ?: return
     val enabled = !running
+    if (tab == 0) { FxTab(vm, clip, p, enabled); return }
     val secs = { v: Int -> if (v == 0) "No" else String.format(java.util.Locale.ITALIAN, "%.1f s", v / 10f) }
     val maxTenths = (clip.outputUs / 2 / 100_000).toInt().coerceIn(1, 50)
     PanelLabel("Dissolvenze della clip")
@@ -1251,8 +1417,10 @@ private fun EffectsPanel(vm: EditorViewModel, running: Boolean) {
         if (clip.fadeInUs > 0 || clip.fadeOutUs > 0) SecondaryButton("A tutte le clip", onClick = { if (enabled) vm.applyFadesToAll() })
     }
     Hint("\"Apri e chiudi il video\": dissolvenza dal nero sulla prima clip (1 s) e al nero sull'ultima (1,5 s).")
+}
 
-    PanelLabel("Effetti")
+@Composable
+private fun FxTab(vm: EditorViewModel, clip: it.fabriziodavi.vivovideo.model.Clip, p: it.fabriziodavi.vivovideo.model.Project, enabled: Boolean) {
     var category by remember { mutableStateOf(FxCategory.COLOR) }
     Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         FxCategory.entries.forEach { cat ->
@@ -1290,17 +1458,6 @@ private fun EffectsPanel(vm: EditorViewModel, running: Boolean) {
     } else {
         Hint("Tocca un effetto per accenderlo o spegnerlo; si possono combinare anche di categorie diverse.")
     }
-}
-
-@Composable
-private fun AudioPanel(vm: EditorViewModel, running: Boolean) {
-    val clip = vm.selectedClip ?: return
-    ToggleRow("Disattiva l'audio della clip", clip.muted, !running) { v -> vm.updateSelected { it.copy(muted = v) } }
-    LabeledSlider(
-        "Volume", null, (clip.volume * 100).toInt(), enabled = !running && !clip.muted, range = 0..200,
-        format = { "$it%" },
-    ) { v -> vm.updateSelected { it.copy(volume = v / 100f) } }
-    Hint("Nei cambi di velocità l'audio esportato mantiene il tono naturale (impostazione in Esporta).")
 }
 
 @Composable

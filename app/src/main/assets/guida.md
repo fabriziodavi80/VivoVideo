@@ -3,27 +3,32 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
-- **Dissolvenze in entrata e in uscita** per ogni clip (dal/al nero o bianco, anche sull'audio), con il tasto **Apri e chiudi il video** per la prima e l'ultima clip.
-- Se l'esportazione resta ferma per un minuto (raro inceppamento del motore video), l'app riprova da sola.
-- Se l'anteprima si ferma da sola mentre è in riproduzione, dopo 4 secondi l'app la ricarica da quel punto e riparte.
-- **29 effetti** divisi in categorie: Colore, Stile, Ottica, Forma, Movimento. Nuovi: Seppia, Colori vivaci, Bicromia, Arcobaleno, Poster, Negativo, Vecchio film, Fumetto, Retino, Luce calda, Sfocatura zoom, Miniatura, Grandangolo, Aberrazione, Onde, Caleidoscopio, Moltiplica, Lampi a ritmo.
+- **Nuova barra degli strumenti**, fissa e senza scorrimento: **Modifica, Audio, Testo, Livelli, Effetti, Colore**.
+- **Modifica** apre una seconda riga: Dividi, Velocità (o Durata), Inquadra, Keyframe, Transizione, Slideshow, Altro.
+- **Transizioni sulla timeline**: tocca il cerchietto sul taglio fra due clip (pieno arancione se una transizione c'è già).
+- **Menu della clip**: tieni premuta una clip (o Modifica → Altro) per Sposta, Duplica, Dividi, Aggiungi, Elimina.
+- **Pannelli a schede**: Audio (Brano · Ritmo · Battiti · Clip), Testo (Stile · Animazione · Movimento), Livelli (Aspetto · Forma · Animazione), Effetti (Effetti · Dissolvenze).
+- Gli strumenti di clip funzionano anche senza selezione: usano la clip sotto l'indicatore.
 
 ## Primi passi
 - Dalla schermata dei progetti tocca **Nuovo progetto** e scegli video e foto dalla galleria.
 - L'editor ha tre zone: **anteprima** in alto, **timeline** al centro, **strumenti** in basso.
+- In fondo c'è sempre la **barra principale**: Modifica, Audio, Testo, Livelli, Effetti, Colore. Toccando di nuovo la voce accesa si chiude.
+- **Modifica** mostra sopra una seconda riga con gli strumenti della clip; le altre voci aprono subito il loro pannello, diviso in schede.
 - La timeline scorre sotto l'indicatore arancione fisso: trascinala per scegliere il punto. Con **–** e **+** cambi lo zoom.
 - **Annulla/Ripeti** sono in alto. Il progetto si salva da solo.
 - Ruotando il telefono l'editor passa in orizzontale; il tasto in alto a destra nell'anteprima la porta a schermo intero.
 
 ## Selezionare
-- Tocca una **clip** nella timeline: la barra in basso mostra gli strumenti della clip.
+- Tocca una **clip** nella timeline: si apre la riga di **Modifica** per quella clip.
+- Senza clip selezionata, gli strumenti di clip (Velocità, Inquadra, Effetti…) lavorano sulla clip sotto l'indicatore.
 - Tocca un **testo**, un **livello** o un **brano** nelle loro righe: si apre il loro pannello.
-- Tocca uno spazio vuoto della timeline per togliere la selezione: tornano gli strumenti del progetto.
+- Tocca uno spazio vuoto della timeline per togliere la selezione.
 
 ## Tagliare e ordinare
 - **Maniglie arancioni** ai lati della clip selezionata: trascinale per accorciare o allungare.
-- **Dividi**: taglia nel punto dell'indicatore (anche un brano musicale, se selezionato).
-- **Duplica**, **Sposta ◀ ▶**, **Elimina** sono in fondo alla barra della clip.
+- **Modifica → Dividi**: taglia nel punto dell'indicatore (anche un brano musicale, se selezionato).
+- **Tieni premuta una clip** (oppure Modifica → **Altro**): Sposta prima/dopo, Duplica, Dividi, Aggiungi video e foto, Elimina.
 
 ## Velocità
 - **Velocità** sulla clip: Normale, Lenta, Veloce o **Curva** (speed ramp disegnabile).
@@ -47,12 +52,12 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - Le foto vengono raddrizzate e ridotte a 4096 pixel: abbastanza per il 4K.
 
 ## Slideshow automatico
-- Strumento **Slideshow** (senza clip selezionata): imposta in un colpo durata, movimento, transizioni e riempimento di tutte le foto.
+- **Modifica → Slideshow**: imposta in un colpo durata, movimento, transizioni e riempimento di tutte le foto.
 - Con una musica e i suoi battiti, le foto possono cambiare **a ritmo** (ogni 1, 2, 4 o 8 battiti).
 - Si annulla con Annulla.
 
 ## Transizioni
-- Seleziona la clip **prima** del taglio, strumento **Transizione**.
+- Tocca il **cerchietto sul taglio** fra due clip nella timeline (oppure Modifica → Transizione con la clip prima del taglio). Il cerchietto diventa arancione quando c'è una transizione.
 - **Incrociata**: le due clip si sovrappongono (vera dissolvenza). Usa i fotogrammi oltre il taglio: se una clip non ne ha, la dissolvenza si accorcia (il pannello lo indica). Fra foto è sempre piena.
 - Altre: Nero, Flash, Zoom, Sfocatura, Scorrimento, Rotazione (metà alla fine di una clip, metà all'inizio della successiva).
 - **Applica a tutti i tagli** per uniformare.
@@ -60,9 +65,9 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - Se un lato del taglio ha meno di 0,1 s di video in più, in anteprima resta il passaggio al nero (nel video esportato è comunque vera).
 
 ## Effetti
-- Strumento **Effetti** sulla clip. In cima le **dissolvenze**: in entrata e in uscita (fino a metà clip), dal/al nero o bianco, anche sull'audio (l'audio sfuma nel video esportato).
+- **Effetti** nella barra principale, due schede. **Dissolvenze**: in entrata e in uscita (fino a metà clip), dal/al nero o bianco, anche sull'audio (l'audio sfuma nel video esportato).
 - **Apri e chiudi il video**: dissolvenza dal nero sulla prima clip e al nero sull'ultima, in un tocco. **A tutte le clip** copia le dissolvenze.
-- Effetti per categoria (tocca la categoria, poi l'effetto; il numero indica quanti ne hai accesi):
+- Scheda **Effetti**, per categoria (tocca la categoria, poi l'effetto; il numero indica quanti ne hai accesi):
 - **Colore**: Bianco e nero, Seppia, Colori vivaci, Bicromia, Arcobaleno, Poster, Negativo.
 - **Stile**: Pellicola, Vecchio film, VHS, Glitch, Fumetto, Retino, Pixel, Luce calda, Bagliore.
 - **Ottica**: Sfocatura, Sfocatura zoom, Miniatura, Vignettatura, Grandangolo, Aberrazione, Onde.
@@ -75,23 +80,23 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - Filtri pronti, **LUT .cube** personalizzate, **Alte luci/cielo** e **Riduzione rumore** per tutto il progetto.
 
 ## Audio delle clip
-- Strumento **Audio**: volume (0–200%) o audio disattivato.
+- **Audio → scheda Clip**: volume (0–200%) o audio disattivato della clip selezionata (o sotto l'indicatore).
 
 ## Musica
-- **Musica** (o "Aggiungi musica" sotto la timeline): MP3, M4A, WAV, FLAC… e anche **MIDI** (convertiti in audio dal sintetizzatore di Android).
+- **Audio → scheda Brano** (o "Aggiungi musica" sotto la timeline): MP3, M4A, WAV, FLAC… e anche **MIDI** (convertiti in audio dal sintetizzatore di Android).
 - Il brano parte dall'indicatore. Nella timeline: tocca per selezionare, trascina per spostare, maniglie per accorciare.
 - Volume, dissolvenze in entrata/uscita (si sentono nel video esportato), **Parti dal punto del brano**, Dividi, Elimina.
 
 ## Taglio a ritmo (battiti)
-- Nel pannello Musica: **Rileva i battiti automaticamente** (dai MIDI i battiti sono già esatti).
+- **Audio → scheda Ritmo**: **Rileva i battiti automaticamente** (dai MIDI i battiti sono già esatti).
 - **Tutti / Ogni 2 / Ogni 4** sceglie quanti battiti usare (Ogni 4 ≈ uno per battuta).
 - **Sposta i battiti automatici** corregge un anticipo/ritardo costante.
-- **Battiti a mano**: *Segna / togli qui* all'indicatore, oppure **TAP a tempo** durante l'ascolto.
-- **Allinea i tagli al ritmo**, **Dividi i video sui battiti**, ◀ Battito ▶ per saltare.
+- **Allinea i tagli al ritmo**, **Dividi i video sui battiti** sono nella scheda Ritmo.
+- **Scheda Battiti** (a mano): *Segna / togli qui* all'indicatore, oppure **TAP a tempo** durante l'ascolto; ◀ Battito ▶ per saltare.
 - **Aggancia i tagli ai battiti**: accorciando una clip, la fine si ferma sul battito vicino.
 
 ## Testo
-- **Testo** (senza clip selezionata): parte dall'indicatore, 3 secondi.
+- **Testo** nella barra principale: parte dall'indicatore, 3 secondi. Schede **Stile**, **Animazione**, **Movimento**.
 - **Stili pronti**: Cinema, Didascalia, Pop, Elegante, Neon, Impatto, Firma, Diario.
 - Carattere, colore, **sfumatura** a due colori, stile (Ombra, Contorno, Riquadro, Neon), spaziatura, maiuscolo.
 - Posizione: trascina, pizzica e ruota il riquadro tratteggiato sull'anteprima.
@@ -99,7 +104,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - **Movimento**: posizione iniziale → finale (scegli quale modificare, sistemala con le dita).
 
 ## Livelli (immagini e video sopra al video)
-- **Livelli** (senza clip selezionata): foto, loghi, adesivi PNG con trasparenza, oppure altri **video** (picture-in-picture).
+- **Livelli** nella barra principale: foto, loghi, adesivi PNG con trasparenza, oppure altri **video** (picture-in-picture). Schede **Aspetto**, **Forma**, **Animazione**.
 - Dimensione, opacità, rotazione; con due dita sull'anteprima. Movimento inizio → fine, animazioni.
 - **Forma** (arrotondata, cerchio, cuore, stella, sfumata), **cornice**, **ombra** (solo immagini), **scontorno** di sfondo verde/blu/bianco/nero con tolleranza.
 - Video sovrapposti: audio con volume; in anteprima si vedono come immagine ferma, nel video esportato si muovono.
