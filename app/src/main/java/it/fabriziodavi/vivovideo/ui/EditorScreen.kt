@@ -121,6 +121,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -378,10 +380,15 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
                         .windowInsetsPadding(WindowInsets.safeDrawing)
                         .padding(horizontal = 14.dp, vertical = 8.dp)
                 ) {
-                    Box(Modifier.align(Alignment.CenterStart)) { timecode() }
-                    Box(Modifier.align(Alignment.Center)) { playButton(40.dp) }
-                    Box(Modifier.align(Alignment.CenterEnd)) {
-                        IconBtn(if (fullscreen) VVIcons.FullscreenExit else VVIcons.Fullscreen, "Schermo intero", tint = Color.White) { fullscreen = !fullscreen }
+                    Column(Modifier.fillMaxWidth()) {
+                        if (project.durationUs > 0) SeekBar(vm, project.durationUs)
+                        Box(Modifier.fillMaxWidth()) {
+                            Box(Modifier.align(Alignment.CenterStart)) { timecode() }
+                            Box(Modifier.align(Alignment.Center)) { playButton(40.dp) }
+                            Box(Modifier.align(Alignment.CenterEnd)) {
+                                IconBtn(if (fullscreen) VVIcons.FullscreenExit else VVIcons.Fullscreen, "Schermo intero", tint = Color.White) { fullscreen = !fullscreen }
+                            }
+                        }
                     }
                 }
             } else if (project.clips.isNotEmpty()) {
@@ -657,6 +664,26 @@ private fun ToolButton(
         Spacer(Modifier.height(if (small) 5.dp else 5.dp))
         Box(Modifier.width(18.dp).height(2.dp).clip(RoundedCornerShape(1.dp)).background(if (active && underline) VV.Tally else Color.Transparent))
     }
+}
+
+/** Barra di avanzamento sopra al video (schermo intero e orizzontale): trascinandola si sposta l'indicatore. */
+@Composable
+private fun SeekBar(vm: EditorViewModel, durationUs: Long) {
+    var dragging by remember { mutableStateOf<Float?>(null) }
+    val pos = dragging ?: (vm.playheadUs.toFloat() / durationUs).coerceIn(0f, 1f)
+    androidx.compose.material3.Slider(
+        value = pos,
+        onValueChange = { v ->
+            if (dragging == null) vm.pause()
+            dragging = v
+            vm.seekTo((v * durationUs).toLong())
+        },
+        onValueChangeFinished = { dragging = null },
+        modifier = Modifier.fillMaxWidth().height(28.dp).semantics { contentDescription = "Avanzamento" },
+        colors = androidx.compose.material3.SliderDefaults.colors(
+            thumbColor = VV.Tally, activeTrackColor = VV.Tally, inactiveTrackColor = Color(0x66FFFFFF),
+        ),
+    )
 }
 
 /** Schede in cima a un pannello. */

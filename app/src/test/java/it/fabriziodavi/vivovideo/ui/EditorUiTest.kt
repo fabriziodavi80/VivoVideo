@@ -9,6 +9,9 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.click
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import it.fabriziodavi.vivovideo.model.Clip
@@ -17,6 +20,7 @@ import it.fabriziodavi.vivovideo.model.TransitionType
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -114,5 +118,13 @@ class EditorUiTest {
         compose.onNodeWithText("Tutto il progetto").assertIsDisplayed()
         bar("Colore").performClick()
         compose.onNodeWithText("Tutto il progetto").assertDoesNotExist()
+    }
+
+    @Test fun fullscreenHasSeekBar() {
+        val vm = vm(); vm.fullscreen = true; show(vm)
+        compose.onNodeWithContentDescription("Avanzamento").assertIsDisplayed()
+        compose.onNodeWithContentDescription("Avanzamento").performTouchInput { click(centerLeft + androidx.compose.ui.geometry.Offset(width * 0.5f, 0f)) }
+        // A metà barra: circa a metà del video (12 s).
+        assertTrue("indicatore a ${vm.playheadUs}", vm.playheadUs in 4_000_000L..8_000_000L)
     }
 }

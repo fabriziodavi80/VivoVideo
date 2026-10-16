@@ -9,6 +9,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - **Menu della clip**: tieni premuta una clip (o Modifica → Altro) per Sposta, Duplica, Dividi, Aggiungi, Elimina.
 - **Pannelli a schede**: Audio (Brano · Ritmo · Battiti · Clip), Testo (Stile · Animazione · Movimento), Livelli (Aspetto · Forma · Animazione), Effetti (Effetti · Dissolvenze).
 - Gli strumenti di clip funzionano anche senza selezione: usano la clip sotto l'indicatore.
+- **Barra di avanzamento** nell'anteprima a schermo intero (e in orizzontale): trascinala per spostarti nel video.
 - La scelta fatta si vede sempre: gli stili pronti del testo, i movimenti delle foto e i selettori a pulsanti si illuminano in arancione.
 
 ## Primi passi
@@ -18,7 +19,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - **Modifica** mostra sopra una seconda riga con gli strumenti della clip; le altre voci aprono subito il loro pannello, diviso in schede.
 - La timeline scorre sotto l'indicatore arancione fisso: trascinala per scegliere il punto. Con **–** e **+** cambi lo zoom.
 - **Annulla/Ripeti** sono in alto. Il progetto si salva da solo.
-- Ruotando il telefono l'editor passa in orizzontale; il tasto in alto a destra nell'anteprima la porta a schermo intero.
+- Ruotando il telefono l'editor passa in orizzontale; il tasto in alto a destra nell'anteprima la porta a schermo intero, con la barra di avanzamento da trascinare.
 
 ## Selezionare
 - Tocca una **clip** nella timeline: si apre la riga di **Modifica** per quella clip.
