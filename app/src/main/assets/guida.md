@@ -3,10 +3,8 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
-- **Effetti Wow** (nuova categoria, la prima in Effetti): Colpo a ritmo, Cinematografico, Contorni neon, Raggi di luce, Luci bokeh, Polvere d'oro, Prisma, Linee di velocità.
-- **Transizioni Wow**: Glitch, Prisma, Luce, Cerchio, Pixel, Scossa.
-- **Testi Wow**: animazioni Lettere cadono, Lettere sfumate, Onda, Glitch, Luccichio; nuovi stili pronti **Glitch, Onda, Oro, Cascata**.
-- Nuova interfaccia (dalla versione precedente): barra fissa Modifica · Audio · Testo · Livelli · Effetti · Colore, transizioni sui tagli, menu della clip tenendola premuta, pannelli a schede, barra di avanzamento a schermo intero.
+- **TAP a tempo che taglia**: in Audio → Battiti, con "Taglia le clip a ogni tocco" acceso, ogni tocco a tempo segna anche un taglio del video. I tagli si fanno tutti insieme quando metti in pausa (così l'ascolto non si interrompe) e un solo Annulla li toglie.
+- Effetti, transizioni e testi **Wow** (versione precedente): categoria Wow in Effetti, transizioni Glitch/Prisma/Luce/Cerchio/Pixel/Scossa, animazioni lettera per lettera, stili Glitch/Onda/Oro/Cascata.
 
 ## Primi passi
 - Dalla schermata dei progetti tocca **Nuovo progetto** e scegli video e foto dalla galleria.
@@ -94,6 +92,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - **Sposta i battiti automatici** corregge un anticipo/ritardo costante.
 - **Allinea i tagli al ritmo**, **Dividi i video sui battiti** sono nella scheda Ritmo.
 - **Scheda Battiti** (a mano): *Segna / togli qui* all'indicatore, oppure **TAP a tempo** durante l'ascolto; ◀ Battito ▶ per saltare.
+- **Taglia le clip a ogni tocco** (acceso di serie): mentre fai TAP a tempo segni anche i tagli; alla pausa il video viene diviso in quei punti, tutto con un solo Annulla. Poi puoi eliminare o sostituire i pezzi.
 - **Aggancia i tagli ai battiti**: accorciando una clip, la fine si ferma sul battito vicino.
 
 ## Testo

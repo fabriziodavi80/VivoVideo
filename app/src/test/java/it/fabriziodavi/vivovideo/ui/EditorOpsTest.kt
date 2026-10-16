@@ -211,4 +211,28 @@ class EditorOpsTest {
         // Mai più di metà clip.
         assertTrue(vm.project!!.clips.all { it.fadeOutUs <= it.outputUs / 2 && it.fadeOutUs > 0 && it.fadeColor == FadeColor.WHITE })
     }
+
+    @Test fun tapToTheBeatAlsoCutsTheClipsOnPause() {
+        val vm = vm()
+        val m = MusicTrack(id = "m", uri = "content://m", name = "M", sourceDurationUs = 60_000_000, lengthUs = 11_000_000)
+        vm.setMusicForTest(listOf(m))
+        vm.selectedMusicId = "m"
+        val before = vm.project!!
+        listOf(1_000_000L, 2_500_000L, 5_500_000L).forEach { vm.seekTo(it); vm.tapBeat() }
+        assertEquals(3, vm.pendingCutCount)
+        assertEquals(3, vm.project!!.clips.size) // niente tagli finché si ascolta
+        vm.applyTapCuts()
+        val p = vm.project!!
+        assertEquals(6, p.clips.size)
+        assertEquals(before.durationUs, p.durationUs)
+        val starts = p.clipStartsUs()
+        listOf(1_000_000L, 2_500_000L, 5_500_000L).forEach { c -> assertTrue("taglio a $c", starts.any { abs(it - c) < 2_000 }) }
+        assertEquals(3, vm.selectedMusic!!.markersUs.size) // i battiti restano segnati
+        vm.undo()
+        assertEquals(3, vm.project!!.clips.size)
+        // Spento: solo battiti, nessun taglio.
+        vm.tapCuts = false
+        vm.seekTo(1_500_000); vm.tapBeat()
+        assertEquals(0, vm.pendingCutCount)
+    }
 }

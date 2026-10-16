@@ -1031,7 +1031,9 @@ private fun MusicPanel(vm: EditorViewModel, running: Boolean, tab: Int, onAdd: (
                     SecondaryButton("Battito ▶", onClick = { vm.jumpBeat(+1) })
                 }
             }
-            Hint("Segna: aggiunge un battito nel punto dell'indicatore, o toglie quello che c'è già (anche automatico). Tap: avvia l'ascolto e tocca il pulsante a ogni colpo; i battiti a mano sono bianchi.")
+            ToggleRow("Taglia le clip a ogni tocco", vm.tapCuts, enabled) { vm.tapCuts = it }
+            if (vm.pendingCutCount > 0) Text("${vm.pendingCutCount} tagli pronti: si fanno alla pausa", style = MaterialTheme.typography.labelMedium, color = VV.Tally)
+            Hint("Segna: aggiunge un battito nel punto dell'indicatore, o toglie quello che c'è già (anche automatico). Tap: avvia l'ascolto e tocca il pulsante a ogni colpo; i battiti a mano sono bianchi. Con \"Taglia le clip\" acceso, quando metti in pausa il video viene tagliato in ogni punto toccato (un solo Annulla li toglie tutti).")
         }
     }
 }

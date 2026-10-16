@@ -508,14 +508,35 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /** Tap a tempo durante l'ascolto: segna un battito nel punto che si sta sentendo. */
+    /** "TAP a tempo" taglia anche le clip (i tagli si fanno tutti insieme alla pausa, per non far scattare l'anteprima). */
+    var tapCuts by mutableStateOf(true)
+    private val pendingCuts = mutableListOf<Long>()
+    val pendingCutCount: Int get() = pendingCutsState
+    private var pendingCutsState by mutableStateOf(0)
+
     fun tapBeat() {
         val t = selectedMusic ?: return
         val now = player?.currentPosition?.let { it * 1000 } ?: playheadUs
+        if (tapCuts) { pendingCuts += now; pendingCutsState = pendingCuts.size }
         val src = musicSrcAt(t, now) ?: return
         update(keepUndo = false, rebuild = false) { p ->
             val cur = p.music.firstOrNull { it.id == t.id } ?: return@update null
             p.replaceMusic(cur.addMarker(src))
         }
+    }
+
+    /** Fa in un colpo solo (un solo Annulla) i tagli segnati con i tocchi a tempo. */
+    fun applyTapCuts() {
+        if (pendingCuts.isEmpty()) return
+        val cuts = pendingCuts.sorted()
+        pendingCuts.clear(); pendingCutsState = 0
+        val p = project ?: return
+        var q = p
+        var n = 0
+        cuts.forEach { c -> q.splitAt(c)?.let { q = it; n++ } }
+        if (n == 0) return
+        update { q }
+        message = "$n ${if (n == 1) "taglio fatto" else "tagli fatti"} sui tuoi tocchi a tempo. Annulla li toglie tutti insieme."
     }
 
     fun clearBeats() = updateMusic { it.copy(beatsUs = emptyList(), bpm = 0f, markersUs = emptyList(), hiddenUs = emptyList(), beatShiftUs = 0) }
@@ -868,6 +889,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                 playheadUs = p.currentPosition * 1000
                 isPlaying = p.isPlaying
                 watchStall(p)
+                if (!p.playWhenReady && pendingCuts.isNotEmpty()) applyTapCuts()
             }
             handler.postDelayed(this, 50)
         }
