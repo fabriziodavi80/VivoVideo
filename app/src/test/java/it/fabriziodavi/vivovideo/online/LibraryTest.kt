@@ -76,6 +76,13 @@ class LibraryTest {
         assertTrue(runCatching { Library.parseFreesound("""{"detail":"Invalid token"}""") }.isFailure)
     }
 
+    @Test fun freesoundLicenseNames() {
+        // Dal 2025 Freesound dà i nomi delle licenze invece degli indirizzi.
+        assertEquals("CC0", LicenseInfo.fromUrl("Creative Commons 0").code)
+        assertTrue(LicenseInfo.fromUrl("Attribution").let { it.commercial && it.derivatives && it.attribution })
+        assertFalse(LicenseInfo.fromUrl("Attribution NonCommercial").commercial)
+    }
+
     @Test fun licensesFromEveryForm() {
         assertEquals("CC BY-NC-SA 4.0", LicenseInfo.fromUrl("https://creativecommons.org/licenses/by-nc-sa/4.0/").code)
         assertFalse(LicenseInfo.fromUrl("https://creativecommons.org/licenses/by-nd/4.0/").derivatives)
@@ -92,7 +99,7 @@ class LibraryTest {
         val j = Library.jamendoUrl("abc", "summer", commercialOnly = true, instrumental = true)
         assertTrue(j.contains("client_id=abc") && j.contains("ccnd=false") && j.contains("ccnc=false") && j.contains("vocalinstrumental=instrumental") && j.contains("search=summer"))
         val f = Library.freesoundUrl("KEY", "rain", effects = true)
-        assertTrue(f.contains("token=KEY") && f.contains("query=rain") && f.contains("previews"))
+        assertTrue(f.startsWith("https://freesound.org/apiv2/search/?") && f.contains("token=KEY") && f.contains("query=rain") && f.contains("previews"))
         val t = Library.parseOpenverse(openverse)[0]
         assertEquals("“Summer Breeze” di Mario (Openverse) – CC BY 4.0 – https://www.jamendo.com/track/1", t.credit)
         assertEquals("openverse_a1b2.mp3", t.fileName)

@@ -39,6 +39,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -64,6 +65,8 @@ class LibraryState {
     var loading by mutableStateOf(false)
     var error by mutableStateOf<String?>(null)
     var searched by mutableStateOf(false)
+    var page by mutableStateOf(1)
+    var loadingMore by mutableStateOf(false)
     /** Risultati già avuti in questa apertura della libreria. */
     val cache = HashMap<String, List<OnlineTrack>>()
 }
@@ -76,6 +79,7 @@ class LibraryState {
 fun LibraryScreen(vm: EditorViewModel, state: LibraryState = remember { LibraryState() }, autoSearch: Boolean = true) {
     val req = vm.library ?: return
     val ctx = LocalContext.current
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
     val effects = req.effects
     BackHandler { vm.library = null }
 
@@ -121,7 +125,7 @@ fun LibraryScreen(vm: EditorViewModel, state: LibraryState = remember { LibraryS
         if (!autoSearch) return@LaunchedEffect
         val key = "$source|$search|$effects|$commercial|$instrumental"
         // Già cercato: subito, senza rete (salvo "Riprova" / tasto Cerca).
-        if (tick == forced) state.cache[key]?.let { state.results = it; state.error = null; state.searched = true; return@LaunchedEffect }
+        if (tick == forced) state.cache[key]?.let { state.results = it; state.page = 1; state.error = null; state.searched = true; return@LaunchedEffect }
         forced = tick
         // Si aspetta che l'utente smetta di scrivere/toccare: niente ricerche a ogni lettera.
         kotlinx.coroutines.delay(600)
@@ -130,6 +134,7 @@ fun LibraryScreen(vm: EditorViewModel, state: LibraryState = remember { LibraryS
             val r = Library.search(source, search, effects, keys, commercial, instrumental && !effects)
             state.cache[key] = r
             state.results = r
+            state.page = 1
         } catch (e: kotlinx.coroutines.CancellationException) {
             throw e // ricerca superata da una nuova: non è un errore
         } catch (e: Exception) {
@@ -176,6 +181,25 @@ fun LibraryScreen(vm: EditorViewModel, state: LibraryState = remember { LibraryS
                 else -> LazyColumn(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     items(state.results, key = { it.source.name + it.id }) { t ->
                         TrackRow(t, playing == t.id, vm.downloading == t.id, vm.downloading == null, { toggle(t) }) { player.stop(); playing = null; vm.useOnline(t) }
+                    }
+                    if (state.results.size >= 15) item {
+                        Box(Modifier.fillMaxWidth().padding(top = 6.dp), contentAlignment = Alignment.Center) {
+                            if (state.loadingMore) CircularProgressIndicator(Modifier.size(28.dp), color = VV.Tally)
+                            else SecondaryButton("Altri risultati", onClick = {
+                                scope.launch {
+                                    state.loadingMore = true
+                                    try {
+                                        val more = Library.search(source, search, effects, keys, commercial, instrumental && !effects, page = state.page + 1)
+                                        val seen = state.results.map { it.id }.toSet()
+                                        state.results = state.results + more.filter { it.id !in seen }
+                                        state.page++
+                                        if (more.isEmpty()) state.error = null
+                                    } catch (e: kotlinx.coroutines.CancellationException) { throw e
+                                    } catch (e: Exception) { vm.message = friendlyError(e, source)
+                                    } finally { state.loadingMore = false }
+                                }
+                            })
+                        }
                     }
                     item {
                         Text(

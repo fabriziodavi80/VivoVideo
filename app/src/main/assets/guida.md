@@ -3,6 +3,7 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **Freesound** di nuovo pieno di effetti (aveva cambiato il modo di cercare). In fondo all'elenco della libreria c'è **Altri risultati** per vederne di più.
 - Libreria più affidabile: la ricerca parte quando smetti di scrivere (o col tasto Cerca), una alla volta; i risultati già visti tornano subito; se un servizio è lento l'app aspetta e riprova da sola, con messaggi d'errore chiari.
 - **Formato del video e preimpostazioni verticale/orizzontale**: tocca il formato (es. "16:9") accanto al tasto play. Scegli **Automatico, Verticale 9:16, Orizzontale 16:9 o Quadrato 1:1** e come trattare foto e video: con lo **stesso orientamento** (di serie **Riempi**) e con l'**orientamento opposto** (di serie **Sfondo sfocato**: l'immagine intera con dietro una sua copia sfocata, niente bande nere). Vale per le clip che aggiungi e per il video automatico.
 - **Inquadra**: oltre a Riempi e Adatta c'è **Sfocato**.

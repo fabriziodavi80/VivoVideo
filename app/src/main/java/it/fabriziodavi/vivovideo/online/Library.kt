@@ -111,8 +111,8 @@ object Library {
             (if (query.isBlank()) "" else "&search=${enc(query)}")
 
     fun freesoundUrl(key: String, query: String, effects: Boolean, page: Int = 1): String =
-        "https://freesound.org/apiv2/search/text/?query=${enc(query)}&token=${enc(key)}" +
-            "&fields=id,name,username,duration,license,previews,url&page_size=20&page=$page" +
+        "https://freesound.org/apiv2/search/?query=${enc(query)}&token=${enc(key)}" +
+            "&fields=id,name,username,duration,license,previews,url&page_size=30&page=$page" +
             "&filter=${enc(if (effects) "duration:[0 TO 30]" else "duration:[20 TO 600]")}"
 
     // ---------------- Lettura delle risposte ----------------
