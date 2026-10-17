@@ -2,6 +2,12 @@ package it.fabriziodavi.vivovideo.ui
 
 import it.fabriziodavi.vivovideo.model.FadeColor
 import it.fabriziodavi.vivovideo.model.AutoStyle
+import it.fabriziodavi.vivovideo.model.Grade
+import it.fabriziodavi.vivovideo.model.GradeMath
+import it.fabriziodavi.vivovideo.model.Hsl
+import it.fabriziodavi.vivovideo.model.HslBand
+import it.fabriziodavi.vivovideo.model.Wheel
+import androidx.compose.ui.graphics.Brush
 import it.fabriziodavi.vivovideo.model.FrameMode
 import it.fabriziodavi.vivovideo.model.VideoFormat
 import it.fabriziodavi.vivovideo.model.Orientation
@@ -194,6 +200,7 @@ val LAYER_TABS = listOf("Aspetto", "Forma", "Animazione")
 /** Animazioni per i livelli (quelle lettera per lettera, glitch e luccichio sono solo per i testi). */
 val LAYER_ANIMS = TextAnim.entries.filter { !it.inOnly && !it.letters && it != TextAnim.GLITCH }
 val EFFECT_TABS = listOf("Effetti", "Dissolvenze")
+val COLOR_TABS = listOf("Base", "Ruote", "HSL", "Progetto")
 
 @Composable
 fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int = 0) {
@@ -490,6 +497,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
         Tool.TEXT -> if (vm.selectedText != null) TEXT_TABS else emptyList()
         Tool.LAYER -> if (vm.selectedLayer != null) LAYER_TABS else emptyList()
         Tool.EFFECTS -> EFFECT_TABS
+        Tool.COLOR -> COLOR_TABS
         else -> emptyList()
     }
     val panelBody: @Composable (Tool) -> Unit = { t ->
@@ -505,7 +513,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
             Tool.SLIDESHOW -> SlideshowPanel(vm, running)
             Tool.FORMAT -> FormatPanel(vm, running)
             Tool.EFFECTS -> EffectsPanel(vm, running, tab)
-            Tool.COLOR -> ColorPanel(vm, running) { lutPicker.launch(arrayOf("*/*")) }
+            Tool.COLOR -> ColorPanel(vm, running, tab) { lutPicker.launch(arrayOf("*/*")) }
             Tool.EXPORT -> ExportPanel(vm) { uri ->
                 val intent = Intent(Intent.ACTION_VIEW).setDataAndType(uri, "video/mp4")
                     .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -1633,23 +1641,172 @@ private fun FxTab(vm: EditorViewModel, clip: it.fabriziodavi.vivovideo.model.Cli
 }
 
 @Composable
-private fun ColorPanel(vm: EditorViewModel, running: Boolean, onPickLut: () -> Unit) {
-    val c = vm.project?.color ?: return
+private fun ColorPanel(vm: EditorViewModel, running: Boolean, tab: Int, onPickLut: () -> Unit) {
+    val p = vm.project ?: return
+    val c = p.color
     val enabled = !running
-    vm.selectedClip?.let { clip ->
-        PanelLabel("Questa clip")
-        ToggleRow("Girata in LOG: converti in colori normali", clip.log, enabled) { v -> vm.updateSelected { it.copy(log = v) } }
+    if (tab == 3) {
+        vm.selectedClip?.let { clip ->
+            PanelLabel("Questa clip")
+            ToggleRow("Girata in LOG: converti in colori normali", clip.log, enabled) { v -> vm.updateSelected { it.copy(log = v) } }
+        }
+        PanelLabel("Tutto il progetto")
+        val look = runCatching { Look.valueOf(c.look) }.getOrDefault(Look.NONE)
+        PillRow(Look.entries, look, { it.label }, enabled) { l -> vm.updateColor { it.copy(look = l.name) } }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(c.lutName ?: "Nessuna LUT", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+            TextButton(onClick = onPickLut, enabled = enabled) { Text(if (c.lutPath == null) "Carica .cube" else "Cambia", color = VV.Tally) }
+            if (c.lutPath != null) TextButton(onClick = { vm.updateColor { it.copy(lutPath = null, lutName = null) } }, enabled = enabled) { Text("Togli", color = VV.Dim) }
+        }
+        LabeledSlider("Alte luci / cielo", null, c.highlights, enabled) { v -> vm.updateColor { it.copy(highlights = v) } }
+        LabeledSlider("Riduzione rumore", "Leviga cielo e zone uniformi mantenendo i bordi.", c.denoise, enabled) { v -> vm.updateColor { it.copy(denoise = v) } }
+        return
     }
-    PanelLabel("Tutto il progetto")
-    val look = runCatching { Look.valueOf(c.look) }.getOrDefault(Look.NONE)
-    PillRow(Look.entries, look, { it.label }, enabled) { l -> vm.updateColor { it.copy(look = l.name) } }
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(c.lutName ?: "Nessuna LUT", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
-        TextButton(onClick = onPickLut, enabled = enabled) { Text(if (c.lutPath == null) "Carica .cube" else "Cambia", color = VV.Tally) }
-        if (c.lutPath != null) TextButton(onClick = { vm.updateColor { it.copy(lutPath = null, lutName = null) } }, enabled = enabled) { Text("Togli", color = VV.Dim) }
+    // Le schede della clip lavorano sulla clip selezionata (o su quella sotto l'indicatore).
+    if (vm.selectedClip == null) {
+        LaunchedEffect(Unit) { p.locate(vm.playheadUs)?.let { (i, _) -> vm.selectedClipId = p.clips[i].id } }
     }
-    LabeledSlider("Alte luci / cielo", null, c.highlights, enabled) { v -> vm.updateColor { it.copy(highlights = v) } }
-    LabeledSlider("Riduzione rumore", "Leviga cielo e zone uniformi mantenendo i bordi.", c.denoise, enabled) { v -> vm.updateColor { it.copy(denoise = v) } }
+    val clip = vm.selectedClip ?: return
+    val g = clip.grade
+    Histogram(vm, clip)
+    fun set(change: (Grade) -> Grade) { vm.updateSelected { it.copy(grade = change(it.grade)) } }
+    fun pct(v: Float) = (v * 100).roundToInt()
+    val signed = { v: Int -> if (v > 0) "+$v" else "$v" }
+    when (tab) {
+        0 -> {
+            LabeledSlider("Esposizione", null, pct(g.exposure), enabled, range = -200..200,
+                format = { String.format(java.util.Locale.ITALIAN, "%+.1f EV", it / 100f) }) { v -> set { it.copy(exposure = v / 100f) } }
+            LabeledSlider("Contrasto", null, pct(g.contrast), enabled, range = -100..100, format = signed) { v -> set { it.copy(contrast = v / 100f) } }
+            LabeledSlider("Alte luci", null, pct(g.highlights), enabled, range = -100..100, format = signed) { v -> set { it.copy(highlights = v / 100f) } }
+            LabeledSlider("Ombre", null, pct(g.shadows), enabled, range = -100..100, format = signed) { v -> set { it.copy(shadows = v / 100f) } }
+            LabeledSlider("Temperatura", "Verso il blu (–) o verso l'arancio (+).", pct(g.temperature), enabled, range = -100..100, format = signed) { v -> set { it.copy(temperature = v / 100f) } }
+            LabeledSlider("Tinta", "Verso il verde (–) o verso il magenta (+).", pct(g.tint), enabled, range = -100..100, format = signed) { v -> set { it.copy(tint = v / 100f) } }
+            LabeledSlider("Saturazione", null, pct(g.saturation), enabled, range = -100..100, format = signed) { v -> set { it.copy(saturation = v / 100f) } }
+            LabeledSlider("Vividezza", "Ravviva i colori spenti lasciando com'è la pelle.", pct(g.vibrance), enabled, range = -100..100, format = signed) { v -> set { it.copy(vibrance = v / 100f) } }
+        }
+        1 -> {
+            Hint("Trascina il punto verso un colore per spingere ombre, toni medi o luci in quella direzione; più lontano dal centro, più forte.")
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                ColorWheel("Ombre", g.shadowWheel, enabled) { w -> set { it.copy(shadowWheel = w) } }
+                ColorWheel("Toni medi", g.midWheel, enabled) { w -> set { it.copy(midWheel = w) } }
+                ColorWheel("Luci", g.highWheel, enabled) { w -> set { it.copy(highWheel = w) } }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                SecondaryButton("Look cinema", Modifier.weight(1f), onClick = {
+                    if (enabled) set { it.copy(shadowWheel = Wheel(190f, 0.5f), highWheel = Wheel(30f, 0.4f), contrast = maxOf(it.contrast, 0.15f)) }
+                })
+                SecondaryButton("Azzera ruote", Modifier.weight(1f), onClick = { if (enabled) set { it.copy(shadowWheel = Wheel(), midWheel = Wheel(), highWheel = Wheel()) } })
+            }
+        }
+        else -> {
+            var band by remember { mutableStateOf(HslBand.ORANGE) }
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                HslBand.entries.forEach { b ->
+                    val on = b == band
+                    val changed = g.band(b) != Hsl()
+                    Box(
+                        Modifier.size(32.dp).clip(CircleShape).background(Color(b.argb))
+                            .border(if (on) 3.dp else if (changed) 2.dp else 0.dp, if (on) VV.Text else VV.Tally, CircleShape)
+                            .clickable { band = b },
+                    )
+                }
+            }
+            val h = g.band(band)
+            Text(band.label, style = MaterialTheme.typography.labelLarge, color = VV.Tally)
+            LabeledSlider("Tonalità", null, pct(h.hue), enabled, range = -100..100, format = signed) { v -> set { it.withBand(band, h.copy(hue = v / 100f)) } }
+            LabeledSlider("Saturazione", null, pct(h.sat), enabled, range = -100..100, format = signed) { v -> set { it.withBand(band, h.copy(sat = v / 100f)) } }
+            LabeledSlider("Luminosità", null, pct(h.lum), enabled, range = -100..100, format = signed) { v -> set { it.withBand(band, h.copy(lum = v / 100f)) } }
+            Hint("Cambia un solo colore: per esempio il cielo più blu (Blu: saturazione +) o il verde dei prati meno acceso, senza toccare il resto.")
+        }
+    }
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        SecondaryButton("Copia", Modifier.weight(1f), onClick = { vm.copiedGrade = g })
+        SecondaryButton("Incolla", Modifier.weight(1f), onClick = { vm.copiedGrade?.let { cg -> if (enabled) set { cg } } })
+        SecondaryButton("Reimposta", Modifier.weight(1f), onClick = { if (enabled) set { Grade() } })
+    }
+    SecondaryButton("Applica a tutte le clip", Modifier.fillMaxWidth(), selected = p.clips.size > 1 && p.clips.all { it.grade == g }, onClick = { if (enabled) vm.applyGradeToAll() })
+}
+
+/** Istogramma del fotogramma sotto l'indicatore, già corretto: luminosità (grigio) e canali rosso, verde, blu. */
+@Composable
+private fun Histogram(vm: EditorViewModel, clip: it.fabriziodavi.vivovideo.model.Clip) {
+    val ctx = LocalContext.current
+    val pixels by androidx.compose.runtime.produceState<IntArray?>(null, clip.id, clip.trimStartUs, vm.playheadUs / 500_000) {
+        value = vm.sampleFrame(ctx, clip)
+    }
+    val px = pixels
+    val bins = remember(px, clip.grade) { px?.let { GradeMath.histogram(it, clip.grade) } }
+    Box(Modifier.fillMaxWidth().height(64.dp).clip(RoundedCornerShape(8.dp)).background(Color(0xFF0B0C0F))) {
+        if (bins == null) {
+            Text("Istogramma", style = MaterialTheme.typography.labelSmall, color = VV.Faint, modifier = Modifier.align(Alignment.Center))
+        } else {
+            Canvas(Modifier.fillMaxSize().padding(horizontal = 4.dp, vertical = 4.dp)) {
+                val n = bins[0].size
+                val maxV = (bins.flatMap { it.toList() }.sortedDescending().getOrNull(n / 8) ?: 1).coerceAtLeast(1).toFloat()
+                fun path(b: IntArray): Path = Path().apply {
+                    moveTo(0f, size.height)
+                    for (i in 0 until n) lineTo(i * size.width / (n - 1), size.height - (b[i] / maxV).coerceAtMost(1f) * size.height)
+                    lineTo(size.width, size.height); close()
+                }
+                drawPath(path(bins[0]), Color(0x55FFFFFF))
+                drawPath(path(bins[1]), Color(0xFFFF4D4D), style = Stroke(1.2.dp.toPx()))
+                drawPath(path(bins[2]), Color(0xFF4DFF6A), style = Stroke(1.2.dp.toPx()))
+                drawPath(path(bins[3]), Color(0xFF4D8BFF), style = Stroke(1.2.dp.toPx()))
+            }
+            val total = bins[0].sum().coerceAtLeast(1)
+            val clipHi = bins[0].last() * 100 / total
+            val clipLo = bins[0].first() * 100 / total
+            if (clipHi >= 3 || clipLo >= 3) {
+                Text(
+                    listOfNotNull(if (clipHi >= 3) "Luci bruciate $clipHi%" else null, if (clipLo >= 3) "Ombre chiuse $clipLo%" else null).joinToString(" · "),
+                    style = MaterialTheme.typography.labelSmall, color = VV.Tally,
+                    modifier = Modifier.align(Alignment.TopEnd).padding(6.dp),
+                )
+            }
+        }
+    }
+}
+
+/** Ruota colore: il punto indica la direzione (tinta) e la forza della spinta. */
+@Composable
+private fun ColorWheel(label: String, value: Wheel, enabled: Boolean, onChange: (Wheel) -> Unit) {
+    var live by remember(value) { mutableStateOf(value) }
+    val onCh by rememberUpdatedState(onChange)
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Canvas(
+            Modifier.size(92.dp).pointerInput(enabled) {
+                if (!enabled) return@pointerInput
+                awaitEachGesture {
+                    val down = awaitFirstDown()
+                    fun at(p: Offset): Wheel {
+                        val cx = size.width / 2f; val cy = size.height / 2f
+                        val dx = p.x - cx; val dy = p.y - cy
+                        val r = kotlin.math.sqrt(dx * dx + dy * dy) / (minOf(cx, cy))
+                        val deg = ((Math.toDegrees(kotlin.math.atan2(dy, dx).toDouble()).toFloat()) + 360f) % 360f
+                        return Wheel(deg, r.coerceIn(0f, 1f).let { if (it < 0.06f) 0f else it })
+                    }
+                    live = at(down.position)
+                    do {
+                        val ev = awaitPointerEvent()
+                        ev.changes.forEach { ch -> ch.consume(); live = at(ch.position) }
+                    } while (ev.changes.any { it.pressed })
+                    onCh(live)
+                }
+            }
+        ) {
+            val r = size.minDimension / 2f
+            drawCircle(Brush.sweepGradient(listOf(Color.Red, Color.Yellow, Color.Green, Color.Cyan, Color.Blue, Color.Magenta, Color.Red)), r)
+            drawCircle(Brush.radialGradient(listOf(Color(0xFF8A8F98), Color(0x008A8F98)), center, r), r)
+            drawCircle(Color(0x55000000), r, style = Stroke(1.dp.toPx()))
+            val a = Math.toRadians(live.hue.toDouble())
+            val p = Offset(center.x + (kotlin.math.cos(a) * live.amount * r).toFloat(), center.y + (kotlin.math.sin(a) * live.amount * r).toFloat())
+            drawCircle(Color.White, 7.dp.toPx(), p)
+            drawCircle(Color.Black, 7.dp.toPx(), p, style = Stroke(1.5.dp.toPx()))
+        }
+        Text(label, style = MaterialTheme.typography.labelMedium, modifier = Modifier.padding(top = 4.dp))
+        Text(if (value.amount > 0f) "${(value.amount * 100).roundToInt()}%" else "—", style = MaterialTheme.typography.labelSmall, color = VV.Dim,
+            modifier = Modifier.clickable(enabled = enabled) { onChange(Wheel()) })
+    }
 }
 
 @Composable

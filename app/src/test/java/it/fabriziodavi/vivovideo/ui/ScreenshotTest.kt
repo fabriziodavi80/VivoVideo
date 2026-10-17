@@ -7,6 +7,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.takahirom.roborazzi.captureRoboImage
 import it.fabriziodavi.vivovideo.model.Clip
+import it.fabriziodavi.vivovideo.model.Wheel
 import it.fabriziodavi.vivovideo.model.ClipSpeed
 import it.fabriziodavi.vivovideo.model.Keyframe
 import it.fabriziodavi.vivovideo.model.Project
@@ -204,6 +205,13 @@ class ScreenshotTest {
         vm.openAlbumPicker(newProject = true)
         compose.setContent { VivoTheme { AlbumPickerScreen(vm) } }
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/20_album_interi.png")
+    }
+
+    @Test fun colorGrading() {
+        val vm = vm(); vm.selectedClipId = vm.project!!.clips[0].id
+        vm.updateSelected { it.copy(grade = it.grade.copy(exposure = 0.3f, shadowWheel = Wheel(200f, 0.5f))) }
+        compose.setContent { VivoTheme { EditorScreen(vm, initialTool = Tool.COLOR, initialTab = 1) } }
+        compose.onRoot().captureRoboImage("build/outputs/roborazzi/21_colore_ruote.png")
     }
 
     @Test fun guide() {

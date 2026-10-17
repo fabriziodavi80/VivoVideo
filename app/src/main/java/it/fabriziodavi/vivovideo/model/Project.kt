@@ -153,6 +153,8 @@ data class Clip(
     val fill: Boolean = false,
     /** Adatta con, dietro, una copia sfocata della stessa immagine al posto delle bande nere. */
     val blurBg: Boolean = false,
+    /** Correzione del colore di questa clip. */
+    val grade: Grade = Grade(),
     /** Inquadratura fissa (zoom, posizione, rotazione), sotto ad eventuali keyframe. */
     val frame: Transform = Transform(),
     /** Effetti video della clip. */

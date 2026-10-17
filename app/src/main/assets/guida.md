@@ -3,19 +3,10 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
-- **Album interi anche nei progetti manuali**: Nuovo progetto (o + / Aggiungi nell'editor) → **Album interi**: scegli uno o più album e tutte le foto e i video entrano in ordine di data. Con "Scegli foto e video" ora se ne possono prendere fino a 100.
-- **Freesound** di nuovo pieno di effetti (aveva cambiato il modo di cercare). In fondo all'elenco della libreria c'è **Altri risultati** per vederne di più.
-- Libreria più affidabile: la ricerca parte quando smetti di scrivere (o col tasto Cerca), una alla volta; i risultati già visti tornano subito; se un servizio è lento l'app aspetta e riprova da sola, con messaggi d'errore chiari.
-- **Formato del video e preimpostazioni verticale/orizzontale**: tocca il formato (es. "16:9") accanto al tasto play. Scegli **Automatico, Verticale 9:16, Orizzontale 16:9 o Quadrato 1:1** e come trattare foto e video: con lo **stesso orientamento** (di serie **Riempi**) e con l'**orientamento opposto** (di serie **Sfondo sfocato**: l'immagine intera con dietro una sua copia sfocata, niente bande nere). Vale per le clip che aggiungi e per il video automatico.
-- **Inquadra**: oltre a Riempi e Adatta c'è **Sfocato**.
-- **Video automatico**: nuovo passo **Formato** (Automatico = l'orientamento più frequente negli album).
-- Libreria di musica ed effetti sonori liberi (Openverse, Jamendo, Freesound) con crediti automatici.
-
-## Formato e orientamento
-- Il pulsante del formato è nella riga del tasto play (mostra "9:16", "16:9" o "1:1"); in orizzontale è fra gli strumenti a destra.
-- **Formato**: Automatico (come la prima clip), Verticale 9:16 (storie, reel), Orizzontale 16:9 (TV, YouTube), Quadrato 1:1 (post).
-- **Preimpostazioni**: una scelta per le foto e i video che hanno lo stesso orientamento del video, una per quelli con l'orientamento opposto. **Riempi** taglia i bordi, **Adatta** mostra tutto con bande nere, **Sfocato** mostra tutto con uno sfondo sfocato.
-- Cambiando formato o preimpostazioni, tutte le clip si sistemano subito (Annulla torna indietro); le clip aggiunte dopo le seguono da sole. Una singola clip si cambia in **Inquadra**; **Applica a tutte le clip** (in ambra se tutte seguono le preimpostazioni) rimette tutto in ordine.
+- **Colore per singola clip** (Colore → schede **Base, Ruote, HSL, Progetto**), con **istogramma** del fotogramma sotto l'indicatore e avviso di luci bruciate / ombre chiuse.
+- **Base**: esposizione, contrasto, alte luci, ombre, temperatura, tinta, saturazione, vividezza. **Ruote**: spingi ombre, toni medi e luci verso un colore (c'è anche "Look cinema"). **HSL**: cambia un solo colore (tonalità, saturazione, luminosità).
+- **Copia / Incolla** la correzione fra clip, **Applica a tutte le clip**, **Reimposta**.
+- Album interi anche per i progetti manuali; Freesound di nuovo pieno di effetti.
 
 ## Primi passi
 - Dalla schermata dei progetti tocca **Nuovo progetto**: **Scegli foto e video** (fino a 100) oppure **Album interi** (uno o più album, tutto in ordine di data). Lo stesso vale per **+** e **Aggiungi** dentro l'editor.
@@ -86,6 +77,13 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - Si combinano liberamente; ognuno ha la sua intensità. **Applica a tutte le clip** per uniformare.
 
 ## Colore
+- **Base / Ruote / HSL** valgono per la clip selezionata (o quella sotto l'indicatore); **Progetto** per tutto il video.
+- In cima c'è l'**istogramma**: grigio = luminosità, linee rosse/verdi/blu = canali. Se compare "Luci bruciate" o "Ombre chiuse", abbassa esposizione/alte luci o alza le ombre.
+- **Base**: esposizione (in stop, EV), contrasto, alte luci, ombre, temperatura (blu ↔ arancio), tinta (verde ↔ magenta), saturazione, vividezza (ravviva i colori spenti senza esagerare la pelle).
+- **Ruote**: trascina il punto verso un colore per spingere **ombre**, **toni medi** o **luci**; il numero sotto la ruota è la forza (toccalo per azzerare). **Look cinema**: ombre verso il ciano, luci verso l'arancio.
+- **HSL**: tocca un colore (rosso, arancio, giallo, verde, acqua, blu, viola, magenta) e regolane tonalità, saturazione e luminosità; un bordo arancio indica i colori ritoccati.
+- **Copia / Incolla** per portare la correzione su un'altra clip, **Applica a tutte le clip** (in ambra se tutte sono uguali), **Reimposta**.
+- La correzione si applica dopo LOG, LUT e filtro del progetto.
 - **LOG**: le clip girate in LOG si convertono in colori normali (riconosciute da sole, interruttore nel pannello).
 - Filtri pronti, **LUT .cube** personalizzate, **Alte luci/cielo** e **Riduzione rumore** per tutto il progetto.
 

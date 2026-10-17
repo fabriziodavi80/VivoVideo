@@ -3,6 +3,8 @@ package it.fabriziodavi.vivovideo.ui
 import it.fabriziodavi.vivovideo.model.TextItem
 import it.fabriziodavi.vivovideo.model.TransitionSpec
 import it.fabriziodavi.vivovideo.model.Clip
+import it.fabriziodavi.vivovideo.model.Grade
+import it.fabriziodavi.vivovideo.decodePhotoThumb
 import it.fabriziodavi.vivovideo.model.FrameMode
 import it.fabriziodavi.vivovideo.model.VideoFormat
 import it.fabriziodavi.vivovideo.online.Library
@@ -972,6 +974,36 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     /** Formato del video e preimpostazioni: si applicano subito a tutte le clip. */
     fun setFormat(format: VideoFormat? = null, same: FrameMode? = null, other: FrameMode? = null) = update { p ->
         p.copy(format = format ?: p.format, sameMode = same ?: p.sameMode, otherMode = other ?: p.otherMode).applyFramePresets()
+    }
+
+    /** Correzione colore copiata (per "Incolla" su un'altra clip). */
+    var copiedGrade by mutableStateOf<Grade?>(null)
+
+    fun applyGradeToAll() {
+        val c = selectedClip ?: return
+        update { p -> p.copy(clips = p.clips.map { it.copy(grade = c.grade) }) }
+    }
+
+    /** Piccola immagine (160 px) del fotogramma della clip sotto l'indicatore, per l'istogramma. */
+    suspend fun sampleFrame(ctx: android.content.Context, clip: Clip): IntArray? = withContext(Dispatchers.IO) {
+        runCatching {
+            val p = project ?: return@runCatching null
+            val i = p.clips.indexOfFirst { it.id == clip.id }.takeIf { it >= 0 } ?: return@runCatching null
+            val start = p.clipStartsUs()[i]
+            val outOff = (playheadUs - start).let { if (it in 0..clip.outputUs) it else clip.outputUs / 2 }
+            val bmp: android.graphics.Bitmap = if (clip.isPhoto) {
+                decodePhotoThumb(Uri.parse(clip.uri).path ?: return@runCatching null, 120) ?: return@runCatching null
+            } else {
+                val src = clip.trimStartUs + clip.speedCurve().sourceTimeAt(outOff)
+                val r = android.media.MediaMetadataRetriever()
+                try {
+                    r.setDataSource(ctx, Uri.parse(clip.uri))
+                    r.getScaledFrameAtTime(src, android.media.MediaMetadataRetriever.OPTION_CLOSEST_SYNC, 160, 160) ?: return@runCatching null
+                } finally { r.release() }
+            }
+            val w = bmp.width; val h = bmp.height
+            IntArray(w * h).also { bmp.getPixels(it, 0, w, 0, 0, w, h) }
+        }.getOrNull()
     }
 
     /** Inquadratura fissa della clip selezionata. */

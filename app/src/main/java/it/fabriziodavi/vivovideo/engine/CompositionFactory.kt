@@ -89,6 +89,8 @@ class CompositionFactory(private val context: Context) {
         if (c.denoise > 0) add(DenoiseEffect(c.denoise / 100f))
         if (c.highlights > 0 || clip.log) add(HighlightEffect(c.highlights / 100f))
         addAll(runCatching { Look.valueOf(c.look) }.getOrDefault(Look.NONE).effects())
+        // Correzione della singola clip, dopo LOG, LUT e filtro del progetto.
+        if (!clip.grade.isIdentity) add(GradeEffect(clip.grade))
     }
 
     private fun volumeProcessors(volume: Float): List<androidx.media3.common.audio.AudioProcessor> {

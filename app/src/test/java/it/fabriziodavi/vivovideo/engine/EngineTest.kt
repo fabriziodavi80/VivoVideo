@@ -10,6 +10,7 @@ import androidx.media3.effect.OverlayEffect
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import it.fabriziodavi.vivovideo.model.Clip
+import it.fabriziodavi.vivovideo.model.Grade
 import it.fabriziodavi.vivovideo.model.ClipFx
 import it.fabriziodavi.vivovideo.model.ClipSpeed
 import it.fabriziodavi.vivovideo.model.FxType
@@ -231,6 +232,16 @@ class EngineTest {
         val c = factory.build(q, ExportOptions(), forPreview = true, nativeAudio = null, allowMulti = false)
         val effects = c.sequences.flatMap { s -> s.editedMediaItems.flatMap { it.effects.videoEffects } }
         assertTrue(effects.any { it is BlurFillEffect })
+    }
+
+    @Test fun clipGradeAddsItsShaderOnlyWhenNeeded() {
+        val a = Clip(id = "a", uri = "content://a", sourceDurationUs = 3_000_000, width = 1920, height = 1080)
+        fun hasGrade(p: Project) = factory.build(p, ExportOptions(), forPreview = true, nativeAudio = null, allowMulti = false)
+            .sequences.flatMap { s -> s.editedMediaItems.flatMap { it.effects.videoEffects } }.any { it is GradeEffect }
+        assertTrue(!hasGrade(Project(name = "g", clips = listOf(a))))
+        assertTrue(hasGrade(Project(name = "g", clips = listOf(a.copy(grade = Grade(contrast = 0.2f))))))
+        listOf("uBasic", "uWb", "uWheelS", "uWheelM", "uWheelH", "uHslH0", "uHslH1", "uHslS0", "uHslS1", "uHslL0", "uHslL1", "uHslOn")
+            .forEach { u -> assertTrue("$u nello shader", Regex("\\b$u\\b").findAll(GRADE_FRAGMENT).count() >= 2) }
     }
 
     @Test fun wowTransitionsPeakAtTheCutAndVanishAway() {
