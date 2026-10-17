@@ -39,6 +39,9 @@ import it.fabriziodavi.vivovideo.engine.CompositionFactory
 import it.fabriziodavi.vivovideo.engine.CrossfadePreview
 import it.fabriziodavi.vivovideo.engine.Proxies
 import it.fabriziodavi.vivovideo.engine.Reverser
+import it.fabriziodavi.vivovideo.engine.Backup
+import it.fabriziodavi.vivovideo.engine.MediaRef
+import it.fabriziodavi.vivovideo.engine.TextRenderer
 import it.fabriziodavi.vivovideo.engine.SmartAnalyzer
 import it.fabriziodavi.vivovideo.engine.PersonMasks
 import it.fabriziodavi.vivovideo.model.Moments
@@ -738,5 +741,40 @@ class DeviceTest {
         // Anche "segui il soggetto" (orizzontale in verticale) passa dall'esportazione.
         val follow = video("b", videoB).copy(fill = true, reframe = Reframe(listOf(0, 3_000_000), listOf(0.2f, 0.8f), listOf(0.5f, 0.5f)))
         exportAndCheck(Project(name = "segui", clips = listOf(follow), format = VideoFormat.VERTICAL))
+    }
+
+    /** Copia di sicurezza con i video, riaperta: il progetto si esporta come prima. E un file spostato si ritrova per nome. */
+    @Test fun backupWithMediaAndRelink() {
+        val p = Project(name = "copia", clips = listOf(video("a", videoA), photoClip("f"), video("b", videoB, s = 1_000_000, e = 3_000_000)))
+        val file = File(ctx.cacheDir, "prova.vivo")
+        file.outputStream().use { Backup.export(ctx, p, withMedia = true, out = it) {} }
+        val imp = file.inputStream().use { Backup.import(ctx, it, emptySet()) }
+        assertTrue("i video non sono nella copia", imp.project.clips.all { it.uri.startsWith("file:") && it.uri.contains("importati") })
+        exportAndCheck(imp.project)
+
+        // Un video nella galleria con un nome unico: lo si ritrova per nome e dimensione.
+        val name = "vivo_prova_${System.currentTimeMillis()}.mp4"
+        val values = android.content.ContentValues().apply {
+            put(android.provider.MediaStore.Video.Media.DISPLAY_NAME, name)
+            put(android.provider.MediaStore.Video.Media.MIME_TYPE, "video/mp4")
+            put(android.provider.MediaStore.Video.Media.RELATIVE_PATH, "Movies/VivoProve")
+        }
+        val dst = ctx.contentResolver.insert(android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values)!!
+        try {
+            val bytes = File(videoA.path!!).readBytes()
+            ctx.contentResolver.openOutputStream(dst)!!.use { it.write(bytes) }
+            val found = Backup.findByName(ctx, MediaRef("content://sparito/1", name, bytes.size.toLong()))
+            assertTrue("non ritrovato: $found", found != null && Backup.exists(ctx, found))
+        } finally { ctx.contentResolver.delete(dst, null, null) }
+    }
+
+    /** Testo con un font aggiunto (copiato da quelli dell'app): si disegna e si esporta. */
+    @Test fun customFontText() {
+        val f = File(ctx.filesDir, "fonts/prova.ttf").apply { parentFile!!.mkdirs() }
+        ctx.resources.openRawResource(R.font.pacifico).use { s -> f.outputStream().use { s.copyTo(it) } }
+        val t = TextItem(text = "Font mio", startUs = 0, durationUs = 3_000_000, fontFile = f.absolutePath)
+        val tf = TextRenderer.typeface(ctx, t)
+        assertTrue(tf != android.graphics.Typeface.DEFAULT_BOLD)
+        exportAndCheck(Project(name = "font", clips = listOf(video("a", videoA)), texts = listOf(t)))
     }
 }

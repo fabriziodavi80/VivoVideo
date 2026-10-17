@@ -49,6 +49,16 @@ object TextRenderer {
         }
     }
 
+    private val fileFaces = HashMap<String, Typeface>()
+
+    /** Il font del testo: quello aggiunto dall'utente se c'è (e si legge), altrimenti uno di quelli dell'app. */
+    fun typeface(context: Context, item: TextItem): Typeface {
+        val path = item.fontFile ?: return typeface(context, item.font)
+        return synchronized(fileFaces) {
+            fileFaces.getOrPut(path) { runCatching { Typeface.createFromFile(path) }.getOrNull() ?: typeface(context, item.font) }
+        }
+    }
+
     private fun blendToWhite(c: Int, k: Float): Int = Color.argb(
         255,
         (Color.red(c) + (255 - Color.red(c)) * k).toInt(),
@@ -65,7 +75,7 @@ object TextRenderer {
 
     private fun prepare(context: Context, item: TextItem, frameW: Int, frameH: Int, visible: Int, highlight: IntRange? = null): Prepared {
         val paint = TextPaint(Paint.ANTI_ALIAS_FLAG or Paint.SUBPIXEL_TEXT_FLAG).apply {
-            typeface = typeface(context, item.font)
+            typeface = typeface(context, item)
             textSize = (item.size * frameH).coerceAtLeast(4f)
             color = item.color
             letterSpacing = item.spacing
@@ -99,7 +109,7 @@ object TextRenderer {
 
     fun render(context: Context, item: TextItem, frameW: Int, frameH: Int, visible: Int = Int.MAX_VALUE, highlight: IntRange? = null): Bitmap {
         val v = visible.coerceAtMost(displayText(item).length)
-        val key = "${item.text.hashCode()}|${item.font}|${item.look}|${item.color}|${item.gradientTo}|${item.spacing}|${item.upper}|${item.size}|$frameW|$frameH|$v|$highlight|${item.highlight}"
+        val key = "${item.text.hashCode()}|${item.font}|${item.fontFile}|${item.look}|${item.color}|${item.gradientTo}|${item.spacing}|${item.upper}|${item.size}|$frameW|$frameH|$v|$highlight|${item.highlight}"
         cache.get(key)?.let { return it }
         val p = prepare(context, item, frameW, frameH, v, highlight)
         val bw = p.width + 2 * p.pad
@@ -150,7 +160,7 @@ object TextRenderer {
     }
 
     private fun baseKey(item: TextItem, frameW: Int, frameH: Int) =
-        "${item.text.hashCode()}|${item.font}|${item.look}|${item.color}|${item.gradientTo}|${item.spacing}|${item.upper}|${item.size}|$frameW|$frameH"
+        "${item.text.hashCode()}|${item.font}|${item.fontFile}|${item.look}|${item.color}|${item.gradientTo}|${item.spacing}|${item.upper}|${item.size}|$frameW|$frameH"
 
     /** Fotogrammi animati: in cache solo se piccoli (in 4K sarebbero troppi). */
     private fun keep(key: String, b: Bitmap): Bitmap { if (b.byteCount < 6 * 1024 * 1024) cache.put(key, b); return b }

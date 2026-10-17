@@ -76,6 +76,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import java.io.File
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.gestures.awaitEachGesture
@@ -253,6 +254,20 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
     val pickLayer = { layerPicker.launch(arrayOf("image/*", "video/*")) }
     var askAdd by remember { mutableStateOf(false) }
     val pickVideos = { askAdd = true }
+    var projectMenu by remember { mutableStateOf(false) }
+    var naming by remember { mutableStateOf(false) }
+    var relinkOpen by remember { mutableStateOf(false) }
+    var backupWithMedia by remember { mutableStateOf(false) }
+    val backupSaver = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/octet-stream")) { uri ->
+        if (uri != null) vm.exportBackup(uri, backupWithMedia)
+    }
+    var relinkTarget by remember { mutableStateOf<String?>(null) }
+    val relinkPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        val old = relinkTarget
+        if (uri != null && old != null) vm.relinkManual(old, uri)
+        relinkTarget = null
+    }
+    val fontPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) vm.addFont(uri) }
 
     /** Clip su cui lavorare: quella selezionata o, se nessuna, quella sotto l'indicatore. */
     fun targetClip() = vm.selectedClip ?: project.locate(vm.playheadUs)?.let { (i, _) -> project.clips[i] }
@@ -303,6 +318,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
                 modifier = Modifier.weight(1f).clickable(enabled = !running) { renaming = true }.padding(horizontal = 4.dp),
             )
             IconBtn(VVIcons.Help, "Guida") { vm.pause(); vm.showGuide = true }
+            IconBtn(VVIcons.Tune, "Progetto", enabled = !running) { vm.pause(); projectMenu = true }
             IconBtn(VVIcons.Undo, "Annulla", enabled = vm.canUndo && !running, onClick = vm::undo)
             IconBtn(VVIcons.Redo, "Ripeti", enabled = vm.canRedo && !running, onClick = vm::redo)
             if (showExport) {
@@ -392,6 +408,14 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
                     color = Color.White, fontSize = 12.sp,
                     modifier = Modifier.align(Alignment.TopStart).padding(8.dp)
                         .background(Color(0x99000000), RoundedCornerShape(6.dp)).padding(horizontal = 8.dp, vertical = 4.dp),
+                )
+            }
+            if (vm.missingFiles.isNotEmpty() && vm.clipWork == null) {
+                Text(
+                    "${vm.missingFiles.size} file non trovati · Ricollega",
+                    color = Color.White, fontSize = 13.sp,
+                    modifier = Modifier.align(Alignment.TopCenter).padding(8.dp)
+                        .background(VV.Danger, RoundedCornerShape(8.dp)).clickable { relinkOpen = true }.padding(horizontal = 10.dp, vertical = 6.dp),
                 )
             }
             vm.clipWork?.let { label ->
@@ -536,7 +560,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
             Tool.DURATION -> PhotoPanel(vm, running)
             Tool.FRAME -> FramePanel(vm, running)
             Tool.MUSIC -> MusicPanel(vm, running, tab, pickMusic)
-            Tool.TEXT -> TextPanel(vm, running, tab)
+            Tool.TEXT -> TextPanel(vm, running, tab, onPickFont = { fontPicker.launch(arrayOf("font/ttf", "font/otf", "application/x-font-ttf", "application/x-font-otf", "application/octet-stream")) })
             Tool.LAYER -> LayerPanel(vm, running, tab, pickLayer)
             Tool.SLIDESHOW -> SlideshowPanel(vm, running)
             Tool.FORMAT -> FormatPanel(vm, running)
@@ -661,6 +685,67 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
                 }
             },
             confirmButton = { TextButton(onClick = { clipMenu = false }) { Text("Chiudi", color = VV.Dim) } },
+        )
+    }
+    if (projectMenu) {
+        AlertDialog(
+            onDismissRequest = { projectMenu = false },
+            containerColor = VV.Raised,
+            title = { Text("Progetto", style = MaterialTheme.typography.titleSmall) },
+            text = {
+                Column {
+                    MenuRow(VVIcons.Copy, "Salva come modello") { projectMenu = false; naming = true }
+                    MenuRow(VVIcons.Export, "Copia di sicurezza (leggera)") {
+                        projectMenu = false; backupWithMedia = false; backupSaver.launch(project.name.ifBlank { "progetto" } + ".vivo")
+                    }
+                    MenuRow(VVIcons.Export, "Copia di sicurezza con tutti i video") {
+                        projectMenu = false; backupWithMedia = true; backupSaver.launch(project.name.ifBlank { "progetto" } + ".vivo")
+                    }
+                    if (vm.missingFiles.isNotEmpty()) MenuRow(VVIcons.Movie, "Ricollega i file spariti") { projectMenu = false; relinkOpen = true }
+                    Hint("Leggera: il progetto e i file creati dall'app (foto importate, voce, fermi immagine, brani scaricati); i video restano nella galleria. Con tutti i video: si apre anche su un altro telefono.")
+                }
+            },
+            confirmButton = { TextButton(onClick = { projectMenu = false }) { Text("Chiudi", color = VV.Dim) } },
+        )
+    }
+    if (naming) {
+        var name by remember { mutableStateOf(project.name) }
+        AlertDialog(
+            onDismissRequest = { naming = false },
+            containerColor = VV.Raised,
+            title = { Text("Nome del modello", style = MaterialTheme.typography.titleSmall) },
+            text = {
+                Column {
+                    OutlinedTextField(value = name, onValueChange = { name = it }, singleLine = true)
+                    Hint("Il modello tiene ${project.clips.size} spazi con durate, velocità, transizioni, effetti e colori, più testi, musica e livelli. Poi basta scegliere i video.")
+                }
+            },
+            confirmButton = { TextButton(onClick = { vm.saveTemplate(name); naming = false }) { Text("Salva", color = VV.Tally) } },
+            dismissButton = { TextButton(onClick = { naming = false }) { Text("Annulla", color = VV.Dim) } },
+        )
+    }
+    if (relinkOpen) {
+        AlertDialog(
+            onDismissRequest = { relinkOpen = false },
+            containerColor = VV.Raised,
+            title = { Text("File non trovati", style = MaterialTheme.typography.titleSmall) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    if (vm.missingFiles.isEmpty()) Hint("Tutti i file sono al loro posto.")
+                    vm.missingFiles.forEach { u ->
+                        val info = vm.missingInfo(u)
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(info.name.ifBlank { "File senza nome" }, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+                            TextButton(onClick = { relinkTarget = u; relinkPicker.launch(arrayOf("video/*", "image/*", "audio/*")) }) { Text("Scegli", color = VV.Tally) }
+                        }
+                    }
+                    if (vm.missingFiles.isNotEmpty()) {
+                        SecondaryButton("Cerca nel telefono per nome", Modifier.fillMaxWidth(), onClick = vm::autoRelink)
+                        Hint("Se hai spostato o rinominato i file, sceglili tu: tagli, effetti e tutto il resto restano.")
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { relinkOpen = false }) { Text("Chiudi", color = VV.Dim) } },
         )
     }
     if (pasteDialog) {
@@ -1328,7 +1413,7 @@ private val TEXT_COLORS = listOf(
 ).map { it.toInt() }
 
 @Composable
-private fun TextPanel(vm: EditorViewModel, running: Boolean, tab: Int) {
+private fun TextPanel(vm: EditorViewModel, running: Boolean, tab: Int, onPickFont: () -> Unit = {}) {
     val p = vm.project ?: return
     val t = vm.selectedText
     val enabled = !running
@@ -1359,7 +1444,17 @@ private fun TextPanel(vm: EditorViewModel, running: Boolean, tab: Int) {
             PanelLabel("Stili pronti")
             PillRow(TextPreset.entries, TextPreset.matching(t), { it?.label ?: "" }, enabled) { pr -> if (pr != null) vm.applyTextPreset(pr) }
             PanelLabel("Carattere")
-            PillRow(TextFont.entries, t.font, { it.label }, enabled) { f -> vm.updateText { it.copy(font = f) } }
+            PillRow(TextFont.entries.map<TextFont, TextFont?> { it }, if (t.fontFile == null) t.font else null, { it?.label ?: "" }, enabled) { f -> if (f != null) vm.updateText { it.copy(font = f, fontFile = null) } }
+            PanelLabel("I tuoi font")
+            Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                vm.fonts.forEach { path ->
+                    SecondaryButton(File(path).nameWithoutExtension.take(18), selected = t.fontFile == path, onClick = { if (enabled) vm.updateText { it.copy(fontFile = path) } })
+                }
+                SecondaryButton("+ Aggiungi font", onClick = { if (enabled) onPickFont() })
+            }
+            if (t.fontFile != null) {
+                TextButton(onClick = { t.fontFile?.let { vm.removeFont(it) } }) { Text("Togli questo font dall'app", color = VV.Danger) }
+            }
             PanelLabel("Colore")
             Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 TEXT_COLORS.forEach { c ->

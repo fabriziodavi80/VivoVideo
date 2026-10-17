@@ -46,6 +46,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import it.fabriziodavi.vivovideo.describeEncoders
 import it.fabriziodavi.vivovideo.model.Project
+import it.fabriziodavi.vivovideo.model.Template
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -58,6 +59,13 @@ fun HomeScreen(vm: EditorViewModel) {
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(100)) { uris ->
         if (uris.isNotEmpty()) vm.newProject(uris)
     }
+    var askTemplate by remember { mutableStateOf(false) }
+    var chosenTemplate by remember { mutableStateOf<Template?>(null) }
+    val templateMedia = rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(100)) { uris ->
+        chosenTemplate?.let { t -> if (uris.isNotEmpty()) vm.createFromTemplate(t, uris) }
+        chosenTemplate = null
+    }
+    val backupOpener = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) vm.importBackup(uri) }
     LaunchedEffect(Unit) { vm.refreshProjects() }
     val version = remember {
         runCatching { context.packageManager.getPackageInfo(context.packageName, 0).versionName }.getOrNull() ?: "?"
@@ -84,6 +92,10 @@ fun HomeScreen(vm: EditorViewModel) {
                 Text("Video automatico", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                 Text("Scegli uno o più album: musica, tagli a ritmo, transizioni ed effetti li fa l'app.", style = MaterialTheme.typography.bodySmall)
             }
+        }
+        Row(Modifier.fillMaxWidth().padding(bottom = 14.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            SecondaryButton("Da un modello", Modifier.weight(1f), onClick = { askTemplate = true })
+            SecondaryButton("Apri una copia", Modifier.weight(1f), onClick = { backupOpener.launch(arrayOf("application/octet-stream", "application/zip", "*/*")) })
         }
         if (vm.projects.isEmpty()) {
             Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
@@ -115,6 +127,35 @@ fun HomeScreen(vm: EditorViewModel) {
             onPick = { picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo)) },
             onAlbums = { vm.openAlbumPicker(newProject = true) },
             onDismiss = { askNew = false },
+        )
+    }
+    if (askTemplate) {
+        AlertDialog(
+            onDismissRequest = { askTemplate = false },
+            containerColor = VV.Raised,
+            title = { Text("Da un modello", style = MaterialTheme.typography.titleSmall) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    if (vm.templates.isEmpty()) Text(
+                        "Nessun modello. Apri un progetto riuscito → Progetto (in alto) → Salva come modello: poi qui basterà scegliere nuovi video.",
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    vm.templates.forEach { t ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Column(Modifier.weight(1f).clickable {
+                                askTemplate = false; chosenTemplate = t
+                                templateMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
+                            }.padding(vertical = 6.dp)) {
+                                Text(t.name, style = MaterialTheme.typography.titleSmall, color = VV.Text)
+                                Text("${t.slots} spazi · ${formatTime(t.durationUs)}", style = MaterialTheme.typography.bodySmall)
+                            }
+                            TextButton(onClick = { vm.deleteTemplate(t.id) }) { Text("Elimina", color = VV.Danger) }
+                        }
+                    }
+                    if (vm.templates.isNotEmpty()) Text("Scegli il modello, poi i video e le foto nell'ordine in cui vuoi vederli.", style = MaterialTheme.typography.bodySmall)
+                }
+            },
+            confirmButton = { TextButton(onClick = { askTemplate = false }) { Text("Chiudi", color = VV.Dim) } },
         )
     }
     toDelete?.let { p ->

@@ -11,10 +11,16 @@ import it.fabriziodavi.vivovideo.engine.Proxies
 import it.fabriziodavi.vivovideo.model.ClipAttr
 import it.fabriziodavi.vivovideo.model.ClipStyle
 import it.fabriziodavi.vivovideo.model.ClipTools
+import it.fabriziodavi.vivovideo.model.Template
+import it.fabriziodavi.vivovideo.model.TemplateStore
+import it.fabriziodavi.vivovideo.model.Templates
 import it.fabriziodavi.vivovideo.model.StabMath
 import it.fabriziodavi.vivovideo.model.insertAt
 import it.fabriziodavi.vivovideo.engine.Reverser
 import it.fabriziodavi.vivovideo.engine.SmartAnalyzer
+import it.fabriziodavi.vivovideo.engine.Backup
+import it.fabriziodavi.vivovideo.engine.MediaRef
+import it.fabriziodavi.vivovideo.engine.ProjectRefs
 import it.fabriziodavi.vivovideo.engine.PersonMasks
 import it.fabriziodavi.vivovideo.model.PersonMode
 import it.fabriziodavi.vivovideo.model.withMode
@@ -162,6 +168,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         project = p
         multiFailed = false
         multiIds = null
+        missingFiles = emptyList()
         undoStack.clear(); redoStack.clear(); updateUndoFlags()
         selectedClipId = p.clips.firstOrNull()?.id
         exportState = ExportState.Idle
@@ -169,18 +176,191 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         detectHdr(p)
     }
 
-    /** I progetti fatti prima non sapevano quali video sono HDR: lo si legge (solo i dati del file, è rapido). */
+    /**
+     * Controllo dei file all'apertura: quali video sono HDR (i progetti fatti prima non lo sapevano), nome e dimensione
+     * dei file (per ritrovarli se si spostano) e quali file mancano.
+     */
     private fun detectHdr(p: Project) {
         val ctx = getApplication<Application>()
         viewModelScope.launch {
-            val kinds = withContext(Dispatchers.IO) {
-                p.clips.filter { !it.isPhoto && !it.baked && it.hdr == 0 }.associate { c ->
+            data class Info(val hdr: Map<String, Int>, val names: Map<String, MediaRef>, val missing: List<String>)
+            val info = withContext(Dispatchers.IO) {
+                val missing = Backup.missing(ctx, p)
+                val hdr = p.clips.filter { !it.isPhoto && !it.baked && it.hdr == 0 && it.uri !in missing }.associate { c ->
                     c.id to (runCatching { readVideoInfo(ctx, Uri.parse(c.uri)).hdrKind }.getOrNull() ?: 0)
                 }.filterValues { it > 0 }
+                val names = (p.clips.filter { it.fileName.isBlank() && !it.isPhoto }.map { it.uri } + p.layers.filter { it.fileName.isBlank() && it.isVideo }.map { it.uri })
+                    .distinct().filter { it !in missing }.associateWith { Backup.describe(ctx, it) }.filterValues { it.name.isNotBlank() }
+                Info(hdr, names, missing)
             }
-            if (kinds.isEmpty() || project?.id != p.id) return@launch
-            project = project?.let { q -> q.copy(clips = q.clips.map { c -> kinds[c.id]?.let { c.copy(hdr = it) } ?: c }) }
+            if (project?.id != p.id) return@launch
+            missingFiles = info.missing
+            if (info.hdr.isEmpty() && info.names.isEmpty()) return@launch
+            project = project?.let { q ->
+                q.copy(
+                    clips = q.clips.map { c ->
+                        var x = info.hdr[c.id]?.let { c.copy(hdr = it) } ?: c
+                        info.names[x.uri]?.let { r -> if (x.fileName.isBlank()) x = x.copy(fileName = r.name, fileSize = r.size) }
+                        x
+                    },
+                    layers = q.layers.map { l -> info.names[l.uri]?.let { r -> if (l.fileName.isBlank()) l.copy(fileName = r.name, fileSize = r.size) else l } ?: l },
+                )
+            }
             scheduleSave()
+        }
+    }
+
+    // ---------------- Modelli e font ----------------
+
+    val templateStore = TemplateStore(app)
+    var templates by mutableStateOf(templateStore.list())
+        private set
+
+    fun saveTemplate(name: String) {
+        val p = project ?: return
+        if (p.clips.isEmpty()) { message = "Il modello prende la struttura delle clip: aggiungine almeno una."; return }
+        templateStore.save(Templates.fromProject(p, name))
+        templates = templateStore.list()
+        message = "Modello salvato: lo trovi in Home → Da un modello."
+    }
+
+    fun deleteTemplate(id: String) { templateStore.delete(id); templates = templateStore.list() }
+
+    /** Nuovo progetto dal modello [t] con i video e le foto [uris] (in ordine di scelta). */
+    fun createFromTemplate(t: Template, uris: List<Uri>) {
+        if (uris.isEmpty()) return
+        val ctx = getApplication<Application>()
+        viewModelScope.launch {
+            val clips = uris.mapIndexedNotNull { i, u ->
+                busy = "Preparo foto e video… ${i + 1} di ${uris.size}"
+                withContext(Dispatchers.IO) { importClip(ctx, u) }
+            }
+            if (clips.isEmpty()) { busy = null; message = "Non sono riuscito a leggere le foto e i video scelti."; return@launch }
+            val scans = smartScans(ctx, clips.filter { !it.isPhoto }, true)
+            busy = "Montaggio…"
+            val p = withContext(Dispatchers.Default) {
+                Templates.apply(t, clips, t.name) { c, len -> scans[c.uri]?.let { Moments.bestStarts(it, len, 1).first() } }
+            }
+            busy = null
+            store.save(p)
+            openProject(p)
+            message = "Progetto dal modello \"${t.name}\": ${p.clips.size} clip. Ritocca quello che vuoi."
+        }
+    }
+
+    /** Font aggiunti dall'utente (file nella cartella fonts). */
+    private val fontDir get() = File(getApplication<Application>().filesDir, "fonts").apply { mkdirs() }
+    var fonts by mutableStateOf(fontDir.listFiles().orEmpty().filter { it.extension.lowercase() in listOf("ttf", "otf") }.map { it.absolutePath }.sorted())
+        private set
+
+    /** Copia un font (.ttf/.otf) nell'app e lo mette sul testo selezionato. */
+    fun addFont(uri: Uri) {
+        val ctx = getApplication<Application>()
+        viewModelScope.launch {
+            val f = withContext(Dispatchers.IO) {
+                runCatching {
+                    val name = Backup.describe(ctx, uri.toString()).name.ifBlank { "font.ttf" }.replace(Regex("[^A-Za-z0-9._ -]"), "_")
+                    val ext = name.substringAfterLast('.', "").lowercase()
+                    require(ext == "ttf" || ext == "otf") { "Servono file .ttf o .otf." }
+                    val out = File(fontDir, name)
+                    ctx.contentResolver.openInputStream(uri)!!.use { s -> out.outputStream().use { s.copyTo(it) } }
+                    // Prova: se Android non lo legge, meglio dirlo subito.
+                    android.graphics.Typeface.createFromFile(out)
+                    out
+                }
+            }
+            f.onSuccess { file ->
+                fonts = (fonts + file.absolutePath).distinct().sorted()
+                updateText { it.copy(fontFile = file.absolutePath) }
+                message = "Font aggiunto: ${file.nameWithoutExtension}."
+            }.onFailure { message = "Font non leggibile: ${it.message}" }
+        }
+    }
+
+    fun removeFont(path: String) {
+        File(path).delete()
+        fonts = fonts - path
+        update { p -> p.copy(texts = p.texts.map { if (it.fontFile == path) it.copy(fontFile = null) else it }) }
+    }
+
+    // ---------------- File spariti, copie di sicurezza ----------------
+
+    /** File del progetto che non si trovano più (spostati, rinominati o cancellati). */
+    var missingFiles by mutableStateOf<List<String>>(emptyList())
+        private set
+
+    /** Come si chiamava un file sparito (dalle clip, dai livelli o dai brani). */
+    fun missingInfo(uri: String): MediaRef {
+        val p = project ?: return MediaRef(uri)
+        p.clips.firstOrNull { it.uri == uri && it.fileName.isNotBlank() }?.let { return MediaRef(uri, it.fileName, it.fileSize) }
+        p.layers.firstOrNull { it.uri == uri && it.fileName.isNotBlank() }?.let { return MediaRef(uri, it.fileName, it.fileSize) }
+        p.music.firstOrNull { it.uri == uri }?.let { return MediaRef(uri, it.name) }
+        return MediaRef(uri)
+    }
+
+    private fun relink(map: Map<String, String>) {
+        if (map.isEmpty()) return
+        update { p -> ProjectRefs.replace(p) { r -> map[r] } }
+        missingFiles = missingFiles - map.keys
+    }
+
+    /** Cerca nel telefono, per nome, i file spariti. */
+    fun autoRelink() {
+        val ctx = getApplication<Application>()
+        val todo = missingFiles
+        viewModelScope.launch {
+            busy = "Cerco i file nel telefono…"
+            val found = withContext(Dispatchers.IO) { todo.mapNotNull { u -> Backup.findByName(ctx, missingInfo(u))?.let { u to it } }.toMap() }
+            busy = null
+            relink(found)
+            message = when {
+                found.isEmpty() -> "Non li ho trovati: sceglili tu, uno per uno."
+                found.size == todo.size -> "Ritrovati tutti i ${found.size} file."
+                else -> "Ritrovati ${found.size} file su ${todo.size}: gli altri sceglili tu."
+            }
+        }
+    }
+
+    /** Il file sparito [old] ora è [new] (scelto dall'utente). */
+    fun relinkManual(old: String, new: Uri) {
+        val ctx = getApplication<Application>()
+        runCatching { ctx.contentResolver.takePersistableUriPermission(new, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
+        relink(mapOf(old to new.toString()))
+        message = "File ricollegato."
+    }
+
+    /** Copia di sicurezza del progetto in [target] (file .vivo scelto dall'utente). */
+    fun exportBackup(target: Uri, withMedia: Boolean) {
+        val p = project ?: return
+        store.save(p)
+        val ctx = getApplication<Application>()
+        runClipWork(if (withMedia) "Salvo il progetto con tutti i file…" else "Salvo il progetto…") { prog ->
+            withContext(Dispatchers.IO) {
+                ctx.contentResolver.openOutputStream(target, "wt")!!.use { out -> Backup.export(ctx, p, withMedia, out) { f -> prog(f) } }
+            }
+            message = "Copia di sicurezza salvata."
+        }
+    }
+
+    /** Apre una copia di sicurezza (.vivo) come nuovo progetto. */
+    fun importBackup(source: Uri) {
+        val ctx = getApplication<Application>()
+        viewModelScope.launch {
+            busy = "Apro la copia di sicurezza…"
+            val r = withContext(Dispatchers.IO) {
+                runCatching {
+                    val imp = ctx.contentResolver.openInputStream(source)!!.use { Backup.import(ctx, it, store.list().map { p -> p.id }.toSet()) }
+                    // Nomi dei file originali (per ritrovarli in questo telefono).
+                    val byUri = imp.media.associateBy { it.uri }
+                    imp.project.copy(
+                        clips = imp.project.clips.map { c -> byUri[c.uri]?.takeIf { c.fileName.isBlank() }?.let { c.copy(fileName = it.name, fileSize = it.size) } ?: c },
+                        layers = imp.project.layers.map { l -> byUri[l.uri]?.takeIf { l.fileName.isBlank() }?.let { l.copy(fileName = it.name, fileSize = it.size) } ?: l },
+                    )
+                }
+            }
+            busy = null
+            r.onSuccess { p -> store.save(p); refreshProjects(); openProject(p); message = "Progetto aperto dalla copia di sicurezza." }
+                .onFailure { message = "Non riesco ad aprire questa copia: ${it.message}" }
         }
     }
 
@@ -260,6 +440,8 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                 sourceDurationUs = info.durationMs * 1000,
                 log = info.tenBit && !info.isHdr,
                 hdr = info.hdrKind,
+                fileName = Backup.describe(ctx, uri.toString()).name,
+                fileSize = Backup.describe(ctx, uri.toString()).size,
                 width = info.displayWidth,
                 height = info.displayHeight,
                 fps = info.fps ?: 30f,
@@ -401,6 +583,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                         return@runCatching Layer(
                             uri = uri.toString(), name = name, width = info.displayWidth, height = info.displayHeight,
                             isVideo = true, sourceDurationUs = src,
+                            fileName = Backup.describe(ctx, uri.toString()).name,
                             startUs = start, durationUs = minOf(src, total - start).coerceAtLeast(Layer.MIN_US),
                         )
                     }

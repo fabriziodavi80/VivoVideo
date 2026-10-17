@@ -178,6 +178,9 @@ data class Clip(
     val reframe: Reframe? = null,
     /** Persona scontornata: cosa fare dello sfondo. */
     val person: PersonFx? = null,
+    /** Nome e dimensione del file originale: servono a ritrovarlo se viene spostato. */
+    val fileName: String = "",
+    val fileSize: Long = 0,
     val width: Int = 0,
     val height: Int = 0,
     val fps: Float = 30f,
@@ -339,6 +342,8 @@ data class TextItem(
     val rotation: Float = 0f,
     val color: Int = 0xFFFFFFFF.toInt(),
     val font: TextFont = TextFont.MODERNO,
+    /** Font aggiunto dall'utente (file .ttf/.otf nella cartella dell'app): se c'è, vale al posto di [font]. */
+    val fontFile: String? = null,
     val look: TextLook = TextLook.OMBRA,
     val animIn: TextAnim = TextAnim.FADE,
     val animOut: TextAnim = TextAnim.FADE,
@@ -408,6 +413,8 @@ data class Layer(
     val keyTolerance: Float = 0.35f,
     /** Video sovrapposto: si vede solo la persona (sfondo trasparente). */
     val person: PersonFx? = null,
+    val fileName: String = "",
+    val fileSize: Long = 0,
 ) {
     val endUs: Long get() = startUs + durationUs
 

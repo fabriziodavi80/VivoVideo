@@ -3,11 +3,11 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
-- **Regia intelligente** nel video automatico (acceso di serie): l'app guarda ogni video e prende il tratto migliore (nitido, ben illuminato, con volti e sorrisi); i video con l'orientamento opposto riempiono il quadro **seguendo le persone**. Ogni "Altra proposta" prova anche altri tratti.
-- **Momento migliore** (tieni premuta una clip): stessa durata, ma sul tratto migliore del video. Toccandolo di nuovo propone il secondo e il terzo.
-- **Segui il soggetto** (Modifica → Inquadra): l'inquadratura si sposta da sola per tenere al centro volti o soggetto. Perfetto per un video orizzontale in un progetto verticale.
-- **Scontorno della persona** senza telo verde (Effetti → **Persona**): sfondo sfocato, a colore o in bianco e nero. Nei video sovrapposti (Livelli → Forma → **Scontorna la persona**) resta solo la persona sopra al video principale.
-- Prima: fermo immagine, al contrario, stabilizzazione, selezione multipla con copia/incolla degli attributi, esportazione HDR a 10 bit.
+- **Copie di sicurezza** (in alto nell'editor → **Progetto**): un file .vivo da tenere dove vuoi (Drive, PC, scheda). **Leggera** (il progetto e i file creati dall'app) o **con tutti i video** (si apre anche su un altro telefono). Si riapre da Home → **Apri una copia**.
+- **File spariti**: se sposti o rinomini un video, in anteprima compare "N file non trovati · Ricollega". L'app li cerca per nome nel telefono, oppure li scegli tu: tagli ed effetti restano.
+- **Modelli di montaggio**: Progetto → **Salva come modello**; poi Home → **Da un modello**, scegli i video e il montaggio è già fatto (durate, velocità, transizioni, effetti, colori, testi, musica).
+- **Font tuoi**: Testo → Stile → **+ Aggiungi font** (.ttf o .otf).
+- Prima: regia intelligente, momento migliore, segui il soggetto, scontorno della persona; fermo immagine, al contrario, stabilizzazione; HDR a 10 bit.
 
 ## Primi passi
 - Dalla schermata dei progetti tocca **Nuovo progetto**: **Scegli foto e video** (fino a 100) oppure **Album interi** (uno o più album, tutto in ordine di data). Lo stesso vale per **+** e **Aggiungi** dentro l'editor.
@@ -36,6 +36,14 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - **Al contrario**: tieni premuta la clip → **Al contrario** (fino a 60 s). L'app prepara una copia rovesciata, anche l'audio (segno ◀); keyframe e curva di velocità si specchiano. La copia è al massimo in 1080p. **Di nuovo nel verso normale** torna all'originale.
 - **Stabilizzazione**: Modifica → **Inquadra** → **Stabilizza la clip**. L'app misura il tremolio della camera e lo leviga con un leggero zoom (segno STAB). **Forza** regola quanto: più forza = immagine più ferma ma più zoom (al massimo 20%). Si vede subito in anteprima. Se poi accorci o allunghi molto la clip, rifai la stabilizzazione.
 - Durante al contrario e stabilizzazione l'anteprima si ferma; c'è **Annulla**.
+
+## Progetto: copie di sicurezza, file spariti, modelli
+- Il pulsante **Progetto** (in alto nell'editor, accanto alla guida) apre: Salva come modello, Copia di sicurezza (leggera), Copia di sicurezza con tutti i video, Ricollega i file spariti.
+- **Copia leggera**: il progetto con tutto quello che l'app ha creato o copiato (foto importate, voce registrata, fermi immagine, clip al contrario, maschere della persona, LUT, font, brani scaricati). I video restano nella galleria: va bene per tenere il progetto al sicuro sullo stesso telefono.
+- **Con tutti i video**: dentro ci sono anche i video originali (file grande): si apre su un altro telefono identico a com'era.
+- **Apri una copia** (Home): il progetto torna nella lista; se ce n'è già uno uguale, si chiama "(copia)".
+- **Ricollega**: se un file non si trova più compare l'avviso rosso sull'anteprima. "Cerca nel telefono per nome" li ritrova se li hai spostati di cartella; altrimenti "Scegli" per ciascuno. Funziona anche per i brani e i video sovrapposti.
+- **Modelli**: Salva come modello tiene la struttura del progetto (ogni clip diventa uno "spazio" con la sua durata, velocità, transizione, effetti, colore, inquadratura e movimento) e anche testi, musica, livelli e formato. Da un modello: scegli i video e le foto nell'ordine giusto; per ogni video si prende il momento migliore della durata giusta. Se scegli più elementi degli spazi, il modello si ripete.
 
 ## Funzioni intelligenti
 - Tutto sul telefono, senza internet: riconoscimento dei volti (con sorrisi e occhi aperti) e della persona.
@@ -136,6 +144,10 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - Animazioni di entrata/uscita (anche **Macchina da scrivere** e **Parola per parola**).
 - **Animazioni Wow**: **Lettere cadono** (rimbalzano al loro posto; in uscita cadono), **Lettere sfumate**, **Onda** (le lettere saltano una dopo l'altra), **Glitch** (con qualche sussulto anche mentre il testo resta), **Luccichio** (una striscia di luce attraversa il testo ogni 3 secondi; solo in entrata).
 - **Movimento**: posizione iniziale → finale (scegli quale modificare, sistemala con le dita).
+
+## Font tuoi
+- Testo → Stile → **I tuoi font** → **+ Aggiungi font**: scegli un file .ttf o .otf (per esempio scaricato da Google Fonts). Il font resta nell'app per tutti i progetti e finisce anche nelle copie di sicurezza.
+- Tocca un font dell'app per tornare a quelli di serie; "Togli questo font dall'app" lo cancella (i testi che lo usavano tornano al loro font).
 
 ## Sottotitoli automatici
 - **Testo → Sottotitoli automatici**. L'app ascolta l'audio delle clip, la voce fuori campo e l'audio staccato (la musica no) e crea i sottotitoli, divisi in righe brevi da leggere, con i tempi di ogni parola.
