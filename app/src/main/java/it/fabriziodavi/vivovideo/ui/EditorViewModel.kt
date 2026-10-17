@@ -8,6 +8,8 @@ import it.fabriziodavi.vivovideo.model.SubPosition
 import it.fabriziodavi.vivovideo.model.Subtitles
 import it.fabriziodavi.vivovideo.engine.Whisper
 import it.fabriziodavi.vivovideo.engine.Proxies
+import it.fabriziodavi.vivovideo.model.ClipAttr
+import it.fabriziodavi.vivovideo.model.ClipStyle
 import it.fabriziodavi.vivovideo.engine.ExportEstimate
 import it.fabriziodavi.vivovideo.engine.OutputCodec
 import it.fabriziodavi.vivovideo.renderTimelineAudio
@@ -148,6 +150,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     fun openProject(p: Project, startPreview: Boolean = true) {
         project = p
         multiFailed = false
+        multiIds = null
         undoStack.clear(); redoStack.clear(); updateUndoFlags()
         selectedClipId = p.clips.firstOrNull()?.id
         exportState = ExportState.Idle
@@ -937,6 +940,51 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         val copy = c.copy(id = java.util.UUID.randomUUID().toString())
         update { it.addClips(listOf(copy), p.clips.indexOf(c) + 1) }
         selectedClipId = copy.id
+    }
+
+    // ---------------- Selezione multipla e copia/incolla degli attributi ----------------
+
+    /** Clip scelte con la selezione multipla (null = selezione normale, una clip alla volta). */
+    var multiIds by mutableStateOf<Set<String>?>(null)
+        private set
+    /** Clip da cui si sono copiati gli attributi. */
+    var copiedStyle by mutableStateOf<Clip?>(null)
+        private set
+
+    fun startMultiSelect() { multiIds = setOfNotNull(selectedClipId) }
+    fun endMultiSelect() { multiIds = null }
+    fun selectAllClips() { multiIds = project?.clips?.map { it.id }?.toSet() }
+
+    /** Tocco su una clip: con la selezione multipla la aggiunge o la toglie. */
+    fun toggleMulti(id: String) {
+        val m = multiIds ?: return
+        multiIds = if (id in m) m - id else m + id
+        selectedClipId = id
+    }
+
+    fun copyStyle() {
+        val c = selectedClip ?: return
+        copiedStyle = c
+        message = "Attributi copiati: scegli le clip e tocca Incolla."
+    }
+
+    /** Clip su cui si incolla: quelle della selezione multipla, altrimenti quella selezionata. */
+    private fun targetIds(): Set<String> = multiIds ?: setOfNotNull(selectedClipId)
+
+    fun pasteStyle(attrs: Set<ClipAttr>) {
+        val src = copiedStyle ?: return
+        val ids = targetIds() - src.id
+        if (ids.isEmpty() || attrs.isEmpty()) return
+        update { p -> p.copy(clips = p.clips.map { if (it.id in ids) ClipStyle.paste(src, it, attrs) else it }) }
+        message = "Attributi incollati su ${ids.size} clip."
+    }
+
+    fun deleteMulti() {
+        val ids = multiIds ?: return
+        if (ids.isEmpty()) return
+        update { p -> p.copy(clips = p.clips.filterNot { it.id in ids }).takeIf { it.clips.isNotEmpty() } ?: run { message = "Deve restare almeno una clip."; null } }
+        multiIds = emptySet()
+        selectedClipId = project?.clips?.firstOrNull()?.id
     }
 
     fun moveSelected(delta: Int) {

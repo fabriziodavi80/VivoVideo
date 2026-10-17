@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import it.fabriziodavi.vivovideo.model.Clip
+import it.fabriziodavi.vivovideo.model.ClipAttr
 import it.fabriziodavi.vivovideo.model.FrameMode
 import it.fabriziodavi.vivovideo.model.VideoFormat
 import it.fabriziodavi.vivovideo.model.frameMode
@@ -328,5 +329,29 @@ class EditorOpsTest {
         vm.message = null
         vm.setDuck(on = true, db = 18)
         assertTrue(vm.project!!.duck); assertEquals(18, vm.project!!.duckDb)
+    }
+
+    @Test fun multiSelectPasteAndDelete() {
+        val vm = vm()
+        vm.selectedClipId = "a"
+        vm.updateSelected { it.copy(grade = it.grade.copy(exposure = 0.7f), volume = 0.3f) }
+        vm.copyStyle()
+        vm.startMultiSelect()
+        assertEquals(setOf("a"), vm.multiIds)
+        vm.toggleMulti("b"); vm.toggleMulti("p")
+        assertEquals(setOf("a", "b", "p"), vm.multiIds)
+        vm.pasteStyle(setOf(ClipAttr.COLOR, ClipAttr.AUDIO))
+        val c = vm.project!!.clips.associateBy { it.id }
+        assertEquals(0.7f, c["b"]!!.grade.exposure); assertEquals(0.3f, c["b"]!!.volume)
+        assertEquals(0.7f, c["p"]!!.grade.exposure); assertEquals(1f, c["p"]!!.volume)
+        // Un solo passo da annullare.
+        vm.undo()
+        assertEquals(0f, vm.project!!.clips.first { it.id == "b" }.grade.exposure)
+        vm.toggleMulti("a")
+        assertEquals(setOf("b", "p"), vm.multiIds)
+        vm.deleteMulti()
+        assertEquals(listOf("a"), vm.project!!.clips.map { it.id })
+        vm.endMultiSelect()
+        assertNull(vm.multiIds)
     }
 }

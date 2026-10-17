@@ -103,6 +103,8 @@ fun Timeline(
     onLayerChange: (Layer) -> Unit = {},
     onClipLongPress: (String) -> Unit = {},
     onCutTap: (index: Int) -> Unit = {},
+    /** Selezione multipla in corso: le clip scelte. */
+    multiIds: Set<String>? = null,
 ) {
     val density = LocalDensity.current
     val scroll = rememberScrollState()
@@ -170,7 +172,8 @@ fun Timeline(
                         ClipBox(
                             clip = clip,
                             width = w,
-                            selected = clip.id == selectedClipId,
+                            selected = multiIds?.contains(clip.id) ?: (clip.id == selectedClipId),
+                            picking = multiIds != null,
                             pxPerUs = pxPerUs,
                             onClick = { onSelect(clip.id) },
                             onLongClick = { onClipLongPress(clip.id) },
@@ -386,6 +389,7 @@ private fun ClipBox(
     selected: Boolean,
     pxPerUs: Float,
     onClick: () -> Unit,
+    picking: Boolean = false,
     onLongClick: () -> Unit,
     onTrimDrag: (Long, Long) -> Unit,
     onTrimEnd: () -> Unit,
@@ -401,7 +405,7 @@ private fun ClipBox(
             .combinedClickable(onClick = onClick, onLongClick = onLongClick)
     ) {
         Filmstrip(clip, width)
-        Row(Modifier.align(Alignment.BottomStart).padding(start = if (selected) HANDLE_W + 3.dp else 4.dp, bottom = 3.dp)) {
+        Row(Modifier.align(Alignment.BottomStart).padding(start = if (selected && !picking) HANDLE_W + 3.dp else 4.dp, bottom = 3.dp)) {
             val label = buildString {
                 if (clip.speed != ClipSpeed.NORMAL) append(clip.speed.label).append("  ")
                 append("%.1f".format(clip.outputUs / 1e6).replace('.', ','))
@@ -451,7 +455,16 @@ private fun ClipBox(
                 )
             }
         }
-        if (selected) {
+        if (picking) {
+            // Selezione multipla: niente maniglie, solo il segno di scelta.
+            if (selected) Box(Modifier.fillMaxSize().border(2.dp, VV.Tally, shape))
+            Box(
+                Modifier.align(Alignment.TopEnd).padding(3.dp).size(16.dp).clip(RoundedCornerShape(8.dp))
+                    .background(if (selected) VV.Tally else Color.Black.copy(alpha = 0.45f))
+                    .border(1.dp, VV.Text, RoundedCornerShape(8.dp)),
+                contentAlignment = Alignment.Center,
+            ) { if (selected) Icon(VVIcons.Check, "Scelta", tint = VV.TallyInk, modifier = Modifier.size(12.dp)) }
+        } else if (selected) {
             Box(Modifier.fillMaxSize().border(2.dp, VV.Tally, shape))
             TrimHandle(Modifier.align(Alignment.CenterStart), left = true, clip, pxPerUs, onTrimDrag, onTrimEnd)
             TrimHandle(Modifier.align(Alignment.CenterEnd), left = false, clip, pxPerUs, onTrimDrag, onTrimEnd)

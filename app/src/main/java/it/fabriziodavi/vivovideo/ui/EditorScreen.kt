@@ -145,6 +145,9 @@ import it.fabriziodavi.vivovideo.engine.ExportState
 import it.fabriziodavi.vivovideo.engine.OutputCodec
 import it.fabriziodavi.vivovideo.engine.OutputFps
 import it.fabriziodavi.vivovideo.engine.OutputSize
+import it.fabriziodavi.vivovideo.model.Clip
+import it.fabriziodavi.vivovideo.model.ClipStyle
+import it.fabriziodavi.vivovideo.model.ClipAttr
 import it.fabriziodavi.vivovideo.engine.ExportPreset
 import kotlin.math.ln
 
@@ -215,6 +218,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
     var group by remember { mutableStateOf(initialTool?.group ?: if (vm.selectedClipId != null) ToolGroup.EDIT else null) }
     var tab by remember(activeTool) { mutableIntStateOf(if (activeTool == initialTool) initialTab else 0) }
     var clipMenu by remember { mutableStateOf(false) }
+    var pasteDialog by remember { mutableStateOf(false) }
     val clip = vm.selectedClip
 
     // Un pannello di clip si chiude se non c'è più una clip selezionata.
@@ -450,7 +454,9 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
             dpPerSecond = ZOOMS[zoom],
             onSeek = vm::seekTo,
             onScrubStart = vm::pause,
+            multiIds = vm.multiIds,
             onSelect = {
+                if (it != null && vm.multiIds != null) { vm.toggleMulti(it); return@Timeline }
                 vm.selectedClipId = it
                 if (it == null) { vm.selectedMusicId = null; vm.selectedTextId = null; vm.selectedLayerId = null }
                 else if (activeTool == null) group = ToolGroup.EDIT
@@ -476,6 +482,10 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
     val subTools = editTools(photo)
     val toolbar: @Composable () -> Unit = {
         Column(Modifier.fillMaxWidth().background(VV.Canvas)) {
+            val multi = vm.multiIds
+            if (multi != null) {
+                MultiSelectBar(vm, multi, onPaste = { pasteDialog = true })
+            } else {
             if (shownGroup == ToolGroup.EDIT) {
                 Row(
                     Modifier.fillMaxWidth().background(VV.Panel).padding(horizontal = 2.dp, vertical = 2.dp),
@@ -489,6 +499,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
                 ToolGroup.entries.forEach { g ->
                     ToolButton(g.label, g.icon(), active = shownGroup == g, enabled = !running, modifier = Modifier.weight(1f), underline = true) { onGroup(g) }
                 }
+            }
             }
         }
     }
@@ -620,6 +631,9 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
                         MenuRow(VVIcons.Copy, "Duplica") { act { vm.duplicateSelected() } }
                         MenuRow(VVIcons.Split, "Dividi all'indicatore") { act { vm.splitAtPlayhead() } }
                         if (!c.isPhoto && !c.muted) MenuRow(VVIcons.Volume, "Stacca l'audio") { act { vm.detachAudio() } }
+                        MenuRow(VVIcons.Copy, "Copia attributi") { act { vm.copyStyle() } }
+                        if (vm.copiedStyle != null && vm.copiedStyle?.id != c.id) MenuRow(VVIcons.Copy, "Incolla attributi") { act { pasteDialog = true } }
+                        MenuRow(VVIcons.Check, "Seleziona più clip") { act { vm.startMultiSelect() } }
                     }
                     MenuRow(VVIcons.Add, "Aggiungi video e foto") { act { pickVideos() } }
                     if (c != null) MenuRow(VVIcons.Delete, "Elimina", tint = VV.Danger) { act { vm.deleteSelected() } }
@@ -627,6 +641,10 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
             },
             confirmButton = { TextButton(onClick = { clipMenu = false }) { Text("Chiudi", color = VV.Dim) } },
         )
+    }
+    if (pasteDialog) {
+        vm.copiedStyle?.let { src -> PasteStyleDialog(src, targets = (vm.multiIds ?: setOfNotNull(vm.selectedClipId)).count { it != src.id }, onPaste = { vm.pasteStyle(it); pasteDialog = false }, onDismiss = { pasteDialog = false }) }
+            ?: run { pasteDialog = false }
     }
     if (renaming) {
         var name by remember { mutableStateOf(project.name) }
@@ -1945,4 +1963,48 @@ private fun ResultBox(title: String, body: String, actions: @Composable () -> Un
         SelectionContainer { Text(body, style = MaterialTheme.typography.bodySmall) }
         actions()
     }
+}
+
+
+/** Barra della selezione multipla, al posto degli strumenti. */
+@Composable
+private fun MultiSelectBar(vm: EditorViewModel, ids: Set<String>, onPaste: () -> Unit) {
+    Column(Modifier.fillMaxWidth().background(VV.Panel).padding(horizontal = 12.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                if (ids.isEmpty()) "Tocca le clip da scegliere" else "${ids.size} clip scelte",
+                style = MaterialTheme.typography.titleSmall, color = VV.Text, modifier = Modifier.weight(1f),
+            )
+            TextButton(onClick = vm::selectAllClips) { Text("Tutte", color = VV.Tally) }
+            TextButton(onClick = vm::endMultiSelect) { Text("Fine", color = VV.Dim) }
+        }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (vm.copiedStyle != null) SecondaryButton("Incolla attributi", Modifier.weight(1f), onClick = { if (ids.isNotEmpty()) onPaste() })
+            else SecondaryButton("Copia attributi", Modifier.weight(1f), onClick = vm::copyStyle)
+            SecondaryButton("Elimina", Modifier.weight(1f), onClick = vm::deleteMulti)
+        }
+        if (vm.copiedStyle == null) Hint("Copia gli attributi dalla clip evidenziata, poi scegli le clip su cui incollarli.")
+    }
+}
+
+/** Quali attributi incollare: di serie quelli che la clip copiata ha davvero. */
+@Composable
+private fun PasteStyleDialog(src: Clip, targets: Int, onPaste: (Set<ClipAttr>) -> Unit, onDismiss: () -> Unit) {
+    val present = remember(src) { ClipStyle.present(src) }
+    var chosen by remember(src) { mutableStateOf(present.ifEmpty { ClipAttr.entries.toSet() }) }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = VV.Raised,
+        title = { Text("Incolla attributi su $targets clip", style = MaterialTheme.typography.titleSmall) },
+        text = {
+            Column {
+                ClipAttr.entries.forEach { a ->
+                    ToggleRow(a.label + if (a in present) "" else " (normale)", a in chosen) { on -> chosen = if (on) chosen + a else chosen - a }
+                }
+                Hint("I keyframe si adattano alla durata di ogni clip. Velocità e volume non cambiano le foto.")
+            }
+        },
+        confirmButton = { TextButton(onClick = { onPaste(chosen) }, enabled = chosen.isNotEmpty() && targets > 0) { Text("Incolla", color = VV.Tally) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Annulla", color = VV.Dim) } },
+    )
 }

@@ -3,6 +3,7 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **Selezione multipla e copia/incolla degli attributi**: tieni premuta una clip → Copia attributi / Seleziona più clip → Incolla attributi su tutte le clip scelte (vedi "Selezionare").
 - **Esportazione HDR a 10 bit** (Esporta → "HDR 10 bit, come l'hai girato"): compare quando nel progetto ci sono video HDR. Luci e colori pieni come li ha ripresi il telefono; filtri, transizioni e correzioni di colore hanno lo stesso aspetto che in SDR. Se qualcosa non regge l'HDR, l'app esporta in SDR e lo scrive nel risultato (riga **Colore**).
 - Prima: preimpostazioni **Pronto per** (YouTube, Reels/TikTok, WhatsApp) con peso stimato, copie leggere per 4K/8K/120 fps, video sovrapposti che si muovono in anteprima.
 
@@ -20,6 +21,8 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - Senza clip selezionata, gli strumenti di clip (Velocità, Inquadra, Effetti…) lavorano sulla clip sotto l'indicatore.
 - Tocca un **testo**, un **livello** o un **brano** nelle loro righe: si apre il loro pannello.
 - Tocca uno spazio vuoto della timeline per togliere la selezione.
+- **Più clip insieme**: tieni premuta una clip → **Seleziona più clip**, poi tocca le altre (spunta in alto a destra) o **Tutte**. Dalla barra: **Incolla attributi** o **Elimina**; **Fine** per tornare normale.
+- **Copia attributi** (tieni premuta una clip): copia effetti, colore, transizione, apri e chiudi, inquadratura, keyframe, velocità e volume. **Incolla attributi** chiede quali gruppi incollare (di serie quelli che la clip copiata ha davvero). I keyframe si adattano alla durata di ogni clip; le foto non prendono velocità e volume. Si annulla con un solo Annulla.
 
 ## Tagliare e ordinare
 - **Maniglie arancioni** ai lati della clip selezionata: trascinale per accorciare o allungare.
