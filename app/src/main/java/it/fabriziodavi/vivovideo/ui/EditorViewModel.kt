@@ -223,12 +223,28 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         }.getOrNull()
     }
 
+    /** Scelta degli album interi: per un nuovo progetto o da aggiungere a quello aperto. */
+    var albumPick by mutableStateOf<Boolean?>(null) // true = nuovo progetto, false = aggiungi
+    fun openAlbumPicker(newProject: Boolean) { pause(); albumPick = newProject }
+
+    /** Elementi degli album scelti (in ordine di data) nel progetto. */
+    fun addAlbumItems(items: List<GalleryItem>) {
+        val forNew = albumPick ?: return
+        albumPick = null
+        val uris = items.map { it.uri }
+        if (uris.isEmpty()) return
+        if (forNew) newProject(uris) else addClips(uris)
+    }
+
     fun addClips(uris: List<Uri>) {
         if (uris.isEmpty()) return
         val ctx = getApplication<Application>()
         viewModelScope.launch {
-            busy = "Lettura di video e foto…"
-            val clips = withContext(Dispatchers.IO) { uris.mapNotNull { importClip(ctx, it) } }
+            val clips = ArrayList<Clip>()
+            uris.forEachIndexed { i, u ->
+                busy = if (uris.size > 3) "Lettura di video e foto… ${i + 1} di ${uris.size}" else "Lettura di video e foto…"
+                withContext(Dispatchers.IO) { importClip(ctx, u) }?.let { clips += it }
+            }
             busy = null
             if (clips.size < uris.size) message = "${uris.size - clips.size} file non leggibili sono stati saltati."
             if (clips.isEmpty()) return@launch

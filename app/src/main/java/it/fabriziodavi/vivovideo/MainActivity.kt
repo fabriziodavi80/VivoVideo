@@ -12,6 +12,7 @@ import it.fabriziodavi.vivovideo.engine.ExportState
 import it.fabriziodavi.vivovideo.ui.EditorScreen
 import it.fabriziodavi.vivovideo.ui.AutoScreen
 import it.fabriziodavi.vivovideo.ui.LibraryScreen
+import it.fabriziodavi.vivovideo.ui.AlbumPickerScreen
 import androidx.compose.foundation.layout.fillMaxSize
 import it.fabriziodavi.vivovideo.ui.GuideScreen
 import it.fabriziodavi.vivovideo.ui.EditorViewModel
@@ -60,6 +61,7 @@ class MainActivity : ComponentActivity() {
                         else -> EditorScreen(vm)
                     }
                     if (vm.library != null) LibraryScreen(vm)
+                    if (vm.albumPick != null) AlbumPickerScreen(vm)
                 }
             }
         }

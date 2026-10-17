@@ -199,6 +199,13 @@ class ScreenshotTest {
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/19_libreria_musica.png")
     }
 
+    @Test fun albumPicker() {
+        val vm = EditorViewModel(ApplicationProvider.getApplicationContext<Application>())
+        vm.openAlbumPicker(newProject = true)
+        compose.setContent { VivoTheme { AlbumPickerScreen(vm) } }
+        compose.onRoot().captureRoboImage("build/outputs/roborazzi/20_album_interi.png")
+    }
+
     @Test fun guide() {
         compose.setContent { VivoTheme { GuideScreen {} } }
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/14_guida.png")

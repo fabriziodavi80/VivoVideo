@@ -276,7 +276,7 @@ private fun Section(n: String, label: String) {
 }
 
 @Composable
-private fun AlbumCard(a: Album, on: Boolean, modifier: Modifier, onClick: () -> Unit) {
+internal fun AlbumCard(a: Album, on: Boolean, modifier: Modifier, onClick: () -> Unit) {
     val ctx = LocalContext.current
     val thumb by produceState<Bitmap?>(null, a.coverUri) { value = withContext(Dispatchers.IO) { Gallery.thumbnail(ctx, a.coverUri) } }
     Column(modifier.clip(RoundedCornerShape(10.dp)).clickable(onClick = onClick)) {

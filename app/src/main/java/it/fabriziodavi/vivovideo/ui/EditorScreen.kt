@@ -225,7 +225,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
         }
     }
 
-    val picker = rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(30)) { vm.addClips(it) }
+    val picker = rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(100)) { vm.addClips(it) }
     val lutPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) vm.importLut(uri)
     }
@@ -237,7 +237,8 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
         if (uri != null) { vm.addLayer(uri); activeTool = Tool.LAYER }
     }
     val pickLayer = { layerPicker.launch(arrayOf("image/*", "video/*")) }
-    val pickVideos = { picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo)) }
+    var askAdd by remember { mutableStateOf(false) }
+    val pickVideos = { askAdd = true }
 
     /** Clip su cui lavorare: quella selezionata o, se nessuna, quella sotto l'indicatore. */
     fun targetClip() = vm.selectedClip ?: project.locate(vm.playheadUs)?.let { (i, _) -> project.clips[i] }
@@ -585,6 +586,13 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
             containerColor = VV.Raised,
             confirmButton = { TextButton(onClick = { vm.message = null }) { Text("OK", color = VV.Tally) } },
             text = { Text(msg, style = MaterialTheme.typography.bodyMedium) },
+        )
+    }
+    if (askAdd) {
+        AddMediaDialog(
+            onPick = { picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo)) },
+            onAlbums = { vm.openAlbumPicker(newProject = false) },
+            onDismiss = { askAdd = false },
         )
     }
     if (clipMenu) {

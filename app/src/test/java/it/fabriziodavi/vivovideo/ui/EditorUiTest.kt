@@ -137,4 +137,14 @@ class EditorUiTest {
         compose.onNodeWithText("Effetti sonori").performClick()
         assertEquals(true, vm.library?.effects)
     }
+
+    @Test fun addOffersWholeAlbums() {
+        val vm = vm(); show(vm)
+        compose.onAllNodesWithContentDescription("Aggiungi video e foto")[0].performClick()
+        compose.onNodeWithText("Scegli foto e video").assertIsDisplayed()
+        compose.onNodeWithText("Album interi").performClick()
+        assertEquals(false, vm.albumPick) // false = da aggiungere al progetto aperto
+        vm.addAlbumItems(emptyList())
+        assertNull(vm.albumPick)
+    }
 }

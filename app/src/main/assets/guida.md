@@ -3,6 +3,7 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **Album interi anche nei progetti manuali**: Nuovo progetto (o + / Aggiungi nell'editor) → **Album interi**: scegli uno o più album e tutte le foto e i video entrano in ordine di data. Con "Scegli foto e video" ora se ne possono prendere fino a 100.
 - **Freesound** di nuovo pieno di effetti (aveva cambiato il modo di cercare). In fondo all'elenco della libreria c'è **Altri risultati** per vederne di più.
 - Libreria più affidabile: la ricerca parte quando smetti di scrivere (o col tasto Cerca), una alla volta; i risultati già visti tornano subito; se un servizio è lento l'app aspetta e riprova da sola, con messaggi d'errore chiari.
 - **Formato del video e preimpostazioni verticale/orizzontale**: tocca il formato (es. "16:9") accanto al tasto play. Scegli **Automatico, Verticale 9:16, Orizzontale 16:9 o Quadrato 1:1** e come trattare foto e video: con lo **stesso orientamento** (di serie **Riempi**) e con l'**orientamento opposto** (di serie **Sfondo sfocato**: l'immagine intera con dietro una sua copia sfocata, niente bande nere). Vale per le clip che aggiungi e per il video automatico.
@@ -17,7 +18,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - Cambiando formato o preimpostazioni, tutte le clip si sistemano subito (Annulla torna indietro); le clip aggiunte dopo le seguono da sole. Una singola clip si cambia in **Inquadra**; **Applica a tutte le clip** (in ambra se tutte seguono le preimpostazioni) rimette tutto in ordine.
 
 ## Primi passi
-- Dalla schermata dei progetti tocca **Nuovo progetto** e scegli video e foto dalla galleria.
+- Dalla schermata dei progetti tocca **Nuovo progetto**: **Scegli foto e video** (fino a 100) oppure **Album interi** (uno o più album, tutto in ordine di data). Lo stesso vale per **+** e **Aggiungi** dentro l'editor.
 - L'editor ha tre zone: **anteprima** in alto, **timeline** al centro, **strumenti** in basso.
 - In fondo c'è sempre la **barra principale**: Modifica, Audio, Testo, Livelli, Effetti, Colore. Toccando di nuovo la voce accesa si chiude.
 - **Modifica** mostra sopra una seconda riga con gli strumenti della clip; le altre voci aprono subito il loro pannello, diviso in schede.

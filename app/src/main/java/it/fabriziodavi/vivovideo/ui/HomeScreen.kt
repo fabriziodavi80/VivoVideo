@@ -54,7 +54,8 @@ import java.util.Locale
 fun HomeScreen(vm: EditorViewModel) {
     val context = LocalContext.current
     var toDelete by remember { mutableStateOf<Project?>(null) }
-    val picker = rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(30)) { uris ->
+    var askNew by remember { mutableStateOf(false) }
+    val picker = rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(100)) { uris ->
         if (uris.isNotEmpty()) vm.newProject(uris)
     }
     LaunchedEffect(Unit) { vm.refreshProjects() }
@@ -67,9 +68,7 @@ fun HomeScreen(vm: EditorViewModel) {
         Row(Modifier.fillMaxWidth().padding(top = 18.dp, bottom = 18.dp), verticalAlignment = Alignment.CenterVertically) {
             Text("VivoVideo", style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
             IconBtn(VVIcons.Help, "Guida") { vm.showGuide = true }
-            PrimaryButton("Nuovo progetto") {
-                picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
-            }
+            PrimaryButton("Nuovo progetto") { askNew = true }
         }
         // Video automatico: in evidenza, sopra ai progetti.
         Row(
@@ -111,6 +110,13 @@ fun HomeScreen(vm: EditorViewModel) {
         )
     }
 
+    if (askNew) {
+        AddMediaDialog(
+            onPick = { picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo)) },
+            onAlbums = { vm.openAlbumPicker(newProject = true) },
+            onDismiss = { askNew = false },
+        )
+    }
     toDelete?.let { p ->
         AlertDialog(
             onDismissRequest = { toDelete = null },
