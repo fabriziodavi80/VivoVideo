@@ -145,6 +145,7 @@ import it.fabriziodavi.vivovideo.engine.ExportState
 import it.fabriziodavi.vivovideo.engine.OutputCodec
 import it.fabriziodavi.vivovideo.engine.OutputFps
 import it.fabriziodavi.vivovideo.engine.OutputSize
+import it.fabriziodavi.vivovideo.engine.ExportPreset
 import kotlin.math.ln
 
 private val ZOOMS = listOf(8f, 15f, 30f, 60f, 120f)
@@ -381,7 +382,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
             }
             if (vm.preparing > 0) {
                 Text(
-                    "Preparo ${if (vm.preparing == 1) "la dissolvenza" else "${vm.preparing} dissolvenze"}…",
+                    vm.preparingLabel.ifBlank { if (vm.preparing == 1) "Preparo un tratto dell'anteprima…" else "Preparo ${vm.preparing} tratti dell'anteprima…" },
                     color = Color.White, fontSize = 12.sp,
                     modifier = Modifier.align(Alignment.TopStart).padding(8.dp)
                         .background(Color(0x99000000), RoundedCornerShape(6.dp)).padding(horizontal = 8.dp, vertical = 4.dp),
@@ -1859,17 +1860,28 @@ private fun ExportPanel(vm: EditorViewModel, onOpen: (android.net.Uri) -> Unit) 
     val o = vm.exportOptions
     val state = vm.exportState
     val running = state is ExportState.Running
+    PanelLabel("Pronto per")
+    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        ExportPreset.entries.forEach { pr ->
+            SecondaryButton(pr.label, selected = pr.matches(o)) { if (!running) vm.exportOptions = pr.applyTo(o) }
+        }
+    }
+    ExportPreset.entries.firstOrNull { it.matches(o) }?.let { Hint(it.hint) }
+    vm.exportEstimate()?.let { Text(it, style = MaterialTheme.typography.bodyMedium, color = VV.Tally) }
     PanelLabel("Risoluzione")
-    Segmented(OutputSize.entries, o.size, { it.label }, !running) { vm.exportOptions = o.copy(size = it) }
+    Segmented(OutputSize.entries, o.size, { it.label }, !running) { vm.exportOptions = o.copy(size = it, maxBitrate = null) }
     PanelLabel("Fotogrammi al secondo")
-    Segmented(OutputFps.entries, o.fps, { it.label }, !running) { vm.exportOptions = o.copy(fps = it) }
+    Segmented(OutputFps.entries, o.fps, { it.label }, !running) { vm.exportOptions = o.copy(fps = it, maxBitrate = null) }
     PanelLabel("Codec")
-    Segmented(OutputCodec.entries, o.codec, { it.label }, !running) { vm.exportOptions = o.copy(codec = it) }
+    Segmented(OutputCodec.entries, o.codec, { it.label }, !running) { vm.exportOptions = o.copy(codec = it, maxBitrate = null) }
     ToggleRow("Audio a tono naturale nei cambi di velocità", o.keepPitch, !running) { vm.exportOptions = o.copy(keepPitch = it) }
     ToggleRow("Volume uniformato (–14 LUFS, come YouTube e Instagram)", o.loudness, !running) { vm.exportOptions = o.copy(loudness = it) }
     PanelLabel("Sperimentale: dissolvenze incrociate e video sovrapposti")
     ToggleRow("Nel video esportato", vm.multiExportEnabled, !running) { vm.setMultiExport(it) }
-    Hint("In anteprima la dissolvenza incrociata si prepara in anticipo (pochi secondi dopo una modifica) e i video sovrapposti si vedono come immagine ferma. Se l'app si chiude per un errore, questa opzione si spegne da sola.")
+    Hint("In anteprima dissolvenze incrociate e video sovrapposti si preparano in anticipo (pochi secondi dopo una modifica). Se l'app si chiude per un errore, questa opzione si spegne da sola.")
+    PanelLabel("Anteprima")
+    ToggleRow("Copie leggere per i video 4K, 8K e 120 fps", vm.useProxies, !running) { vm.setProxies(it) }
+    Hint("Solo per l'anteprima, che scorre più fluida: il video esportato usa sempre gli originali.")
     when (state) {
         is ExportState.Running -> {
             Text(state.label + (state.percent?.let { "  $it%" } ?: ""), style = MaterialTheme.typography.bodyMedium)

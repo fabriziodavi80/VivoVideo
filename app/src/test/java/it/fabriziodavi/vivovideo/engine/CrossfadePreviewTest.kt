@@ -23,8 +23,8 @@ class CrossfadePreviewTest {
             assertTrue(abs(j.sub.clips[0].outputUs - 500_000) < 5_000)
             assertTrue(abs(j.sub.clips[1].outputUs - 500_000) < 5_000)
             // La mezza clip prima del taglio finisce dove finiva la clip (stessa coda per la dissolvenza).
-            assertEquals(p.clips[j.original.index].trimEndUs, j.sub.clips[0].trimEndUs)
-            assertEquals(p.clips[j.original.index + 1].trimStartUs, j.sub.clips[1].trimStartUs)
+            assertEquals(p.clips[j.original!!.index].trimEndUs, j.sub.clips[0].trimEndUs)
+            assertEquals(p.clips[j.original!!.index + 1].trimStartUs, j.sub.clips[1].trimStartUs)
         }
         // Chiavi diverse per tagli diversi, uguali se nulla cambia.
         assertTrue(jobs[0].key != jobs[1].key)

@@ -37,6 +37,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import it.fabriziodavi.vivovideo.engine.CompositionFactory
 import it.fabriziodavi.vivovideo.engine.CrossfadePreview
+import it.fabriziodavi.vivovideo.engine.Proxies
 import it.fabriziodavi.vivovideo.engine.ExportOptions
 import it.fabriziodavi.vivovideo.engine.ExportState
 import it.fabriziodavi.vivovideo.engine.Exporter
@@ -496,12 +497,61 @@ class DeviceTest {
         jobs.forEach { job ->
             val out = CrossfadePreview.file(ctx, job.key)
             val c = factory.build(job.sub, ExportOptions(), forPreview = true, nativeAudio = null, allowMulti = true,
-                sizeOverride = w to h, crossfadesOverride = listOf(job.cf))
+                sizeOverride = w to h, crossfadesOverride = job.cf?.let { listOf(it) })
             // Come nell'app: se si inceppa si riprova una volta.
             try { transform(c, out, timeoutS = 120) } catch (e: Throwable) { out.delete(); transform(c, out, timeoutS = 120) }
             assertTrue(out.length() > 1000)
         }
         // L'anteprima con le dissolvenze pronte scorre.
         playFor(p, seconds = 8)
+    }
+
+    /** Video sovrapposto: il tratto si prepara (con il video vero dentro) e l'anteprima lo riproduce al posto dell'immagine ferma. */
+    @Test fun overlaidVideoStretchRendersAndPlays() {
+        val p = Project(
+            name = "pip", clips = listOf(video("a", videoA), video("b", videoB)),
+            layers = listOf(Layer(uri = videoC.toString(), name = "pip", width = W, height = H, isVideo = true,
+                sourceDurationUs = 6_000_000, startUs = 1_000_000, durationUs = 3_000_000, pose = Transform(scale = 0.4f))),
+        )
+        val factory = CompositionFactory(ctx)
+        val (w, h) = factory.outputSize(p, 1080)
+        val jobs = CrossfadePreview.jobs(p, w, h)
+        assertTrue("nessun tratto da preparare", jobs.size == 1 && jobs[0].cf == null)
+        val job = jobs[0]
+        val out = CrossfadePreview.file(ctx, job.key)
+        val c = factory.build(job.sub, ExportOptions(), forPreview = true, nativeAudio = null, allowMulti = true,
+            sizeOverride = w to h, crossfadesOverride = null)
+        try { transform(c, out, timeoutS = 120) } catch (e: Throwable) { out.delete(); transform(c, out, timeoutS = 120) }
+        assertTrue(out.length() > 1000)
+        val shown = CrossfadePreview.previewProject(ctx, p, w, h)
+        assertTrue("il tratto non è stato usato", shown.clips.any { it.baked } && shown.layers.none { it.isVideo })
+        playFor(p, seconds = 6)
+    }
+
+    /** Copia leggera come la prepara l'app (720p, stessa durata) e anteprima che la usa. */
+    @Test fun proxyCopyIsMadeAndUsed() {
+        val src = videoA.toString()
+        val out = Proxies.file(ctx, src)
+        out.delete()
+        val (pw, ph) = Proxies.size(W * 3, H * 3)
+        val item = EditedMediaItem.Builder(MediaItem.fromUri(videoA))
+            .setEffects(androidx.media3.transformer.Effects(emptyList(), listOf(
+                androidx.media3.effect.Presentation.createForWidthAndHeight(pw, ph, androidx.media3.effect.Presentation.LAYOUT_SCALE_TO_FIT),
+            ))).build()
+        transform(Composition.Builder(listOf(EditedMediaItemSequence.Builder(setOf(C.TRACK_TYPE_AUDIO, C.TRACK_TYPE_VIDEO)).addItem(item).build())).build(), out)
+        assertTrue(Proxies.ready(ctx, src))
+        val mmr = MediaMetadataRetriever().apply { setDataSource(out.absolutePath) }
+        val ow = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)!!.toInt()
+        val oh = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)!!.toInt()
+        val dur = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)!!.toLong()
+        mmr.release()
+        assertTrue("copia ${ow}x$oh", minOf(ow, oh) == 720)
+        assertTrue("durata $dur", abs(dur - 6000) < 150)
+        // Clip "pesante" (finta 4K): l'anteprima prende la copia.
+        val heavy = video("a", videoA).copy(width = 3840, height = 2160)
+        val p = Project(name = "proxy", clips = listOf(heavy, video("b", videoB)))
+        val shown = Proxies.forPreview(ctx, p)
+        assertTrue(shown.clips[0].uri.startsWith("file:") && shown.clips[0].uri.contains("copie_leggere"))
+        playFor(shown, seconds = 5)
     }
 }

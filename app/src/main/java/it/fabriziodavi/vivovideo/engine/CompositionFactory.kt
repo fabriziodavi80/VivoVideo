@@ -36,6 +36,7 @@ enum class OutputSize(val label: String, val shortSide: Int?) {
     ORIGINAL("Originale", null),
     P2160("4K", 2160),
     P1080("1080p", 1080),
+    P720("720p", 720),
 }
 
 enum class OutputFps(val label: String, val max: Int?) {
@@ -57,7 +58,44 @@ data class ExportOptions(
     val keepPitch: Boolean = true,
     /** Volume uniformato a -14 LUFS (come YouTube e Instagram). */
     val loudness: Boolean = true,
+    /** Tetto alla qualità (bit al secondo), per i video da mandare in chat. */
+    val maxBitrate: Int? = null,
 )
+
+/** Preimpostazioni pronte per dove finirà il video. */
+enum class ExportPreset(val label: String, val hint: String, val options: ExportOptions) {
+    YOUTUBE_4K("YouTube 4K", "4K, fino a 60 fps, H.265", ExportOptions(OutputSize.P2160, OutputFps.F60, OutputCodec.H265)),
+    YOUTUBE_HD("YouTube 1080p", "1080p, fino a 60 fps, H.264", ExportOptions(OutputSize.P1080, OutputFps.F60, OutputCodec.H264)),
+    REELS("Reels e TikTok", "1080p, 30 fps, H.264 (meglio in verticale)", ExportOptions(OutputSize.P1080, OutputFps.F30, OutputCodec.H264)),
+    WHATSAPP("WhatsApp", "720p, 30 fps, leggero", ExportOptions(OutputSize.P720, OutputFps.F30, OutputCodec.H264, maxBitrate = 3_000_000));
+
+    /** Vale se le opzioni scelte sono proprio queste (il resto, come il volume, non conta). */
+    fun matches(o: ExportOptions) = o.size == options.size && o.fps == options.fps && o.codec == options.codec && o.maxBitrate == options.maxBitrate
+
+    fun applyTo(o: ExportOptions) = o.copy(size = options.size, fps = options.fps, codec = options.codec, maxBitrate = options.maxBitrate)
+}
+
+/** Qualità (bit al secondo) e peso stimato del video esportato: la stessa formula dell'esportazione. */
+object ExportEstimate {
+    const val AUDIO_BPS = 192_000
+
+    fun bitrate(outW: Int, outH: Int, outFps: Float, codec: OutputCodec, maxBitrate: Int? = null, attempt: Int = 0): Int {
+        val top = if (attempt >= 1) 100_000_000.0 else 160_000_000.0
+        var b = (45_000_000.0 * outW * outH * outFps / (3840.0 * 2160 * 30)).coerceIn(8_000_000.0, top).toInt()
+        if (codec == OutputCodec.H264) b = minOf((b * 1.4).toInt(), top.toInt())
+        maxBitrate?.let { b = minOf(b, it) }
+        return b
+    }
+
+    fun bytes(outW: Int, outH: Int, outFps: Float, codec: OutputCodec, durationUs: Long, maxBitrate: Int? = null): Long =
+        ((bitrate(outW, outH, outFps, codec, maxBitrate).toLong() + AUDIO_BPS) * durationUs / 8_000_000L)
+
+    /** "circa 85 MB" / "circa 1,2 GB". */
+    fun label(bytes: Long): String {
+        val mb = bytes / 1_000_000.0
+        return if (mb >= 1000) "circa " + String.format(java.util.Locale.ITALY, "%.1f GB", mb / 1000) else "circa ${maxOf(1, mb.toInt())} MB"
+    }
+}
 
 /** Adatta la curva del modello all'interfaccia di Media3. */
 class CurveSpeedProvider(private val curve: SpeedCurve) : SpeedProvider {

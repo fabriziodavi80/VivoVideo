@@ -7,6 +7,8 @@ import it.fabriziodavi.vivovideo.model.SubStyle
 import it.fabriziodavi.vivovideo.model.SubPosition
 import it.fabriziodavi.vivovideo.model.Subtitles
 import it.fabriziodavi.vivovideo.engine.Whisper
+import it.fabriziodavi.vivovideo.engine.Proxies
+import it.fabriziodavi.vivovideo.engine.ExportEstimate
 import it.fabriziodavi.vivovideo.renderTimelineAudio
 import it.fabriziodavi.vivovideo.model.Grade
 import it.fabriziodavi.vivovideo.decodePhotoThumb
@@ -1295,7 +1297,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         if (p.clips.isEmpty()) { releasePlayer(); playheadUs = 0; return }
         val allowMulti = false // l'anteprima con più video insieme si blocca sul telefono: dissolvenze preparate in anticipo
         val (fw, fh) = previewFrameSize()
-        val shown = runCatching { CrossfadePreview.previewProject(getApplication(), p, fw, fh) }.getOrDefault(p)
+        val shown = runCatching { CrossfadePreview.previewProject(getApplication(), previewSource(p), fw, fh) }.getOrDefault(p)
         val composition = runCatching { factory.build(shown, exportOptions, forPreview = true, nativeAudio = null, allowMulti = allowMulti) }
             .getOrElse { previewError = "Anteprima non disponibile: ${it.message}"; return }
         // Con video sovrapposti o dissolvenze incrociate serve il compositore a più ingressi:
@@ -1385,6 +1387,18 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     // ---------------- Export ----------------
 
     var exportOptions by mutableStateOf(ExportOptions())
+
+    /** Misure e peso stimato del video che uscirà con le opzioni scelte ("1080×1920 · 30 fps · circa 85 MB"). */
+    fun exportEstimate(): String? {
+        val p = project ?: return null
+        if (p.clips.isEmpty()) return null
+        val o = exportOptions
+        val (w, h) = factory.outputSize(p, o.size.shortSide)
+        val maxFps = p.clips.maxOfOrNull { it.fps } ?: 30f
+        val fps = o.fps.max?.let { minOf(it.toFloat(), maxFps) } ?: maxFps
+        val bytes = ExportEstimate.bytes(w, h, fps, o.codec, p.durationUs, o.maxBitrate)
+        return "${w}×$h · ${"%.0f".format(fps)} fps · " + ExportEstimate.label(bytes)
+    }
     var exportState by mutableStateOf<ExportState>(ExportState.Idle)
         private set
 
@@ -1401,15 +1415,88 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     private val failedSegments = mutableSetOf<String>()
     private var segProduced = false
 
-    /** Dopo una modifica (con calma) prepara le dissolvenze incrociate che mancano. */
+    // ---------------- Copie leggere (anteprima fluida con 4K120 / 8K) ----------------
+
+    private val prefs get() = getApplication<Application>().getSharedPreferences("anteprima", android.content.Context.MODE_PRIVATE)
+    var useProxies by mutableStateOf(prefs.getBoolean("copie_leggere", true))
+        private set
+    fun setProxies(on: Boolean) {
+        useProxies = on
+        prefs.edit().putBoolean("copie_leggere", on).apply()
+        rebuildPreview(playheadUs / 1000)
+    }
+    /** Cosa si sta preparando in sottofondo (per la scritta sull'anteprima). */
+    var preparingLabel by mutableStateOf("")
+        private set
+    private var proxyTransformer: Transformer? = null
+    private val failedProxies = mutableSetOf<String>()
+
+    /** Il progetto come lo vede l'anteprima: copie leggere al posto dei video pesanti (se pronte). */
+    private fun previewSource(p: Project): Project =
+        if (useProxies) runCatching { Proxies.forPreview(getApplication(), p) }.getOrDefault(p) else p
+
+    /** Prepara una copia leggera (720p, stessa durata e audio) del video [uri]; poi la successiva. */
+    private fun nextProxy(queue: ArrayDeque<String>) {
+        val ctx = getApplication<Application>()
+        val uri = queue.firstOrNull()
+        val p = project
+        if (uri == null || p == null) {
+            proxyTransformer = null
+            preparing = 0
+            rebuildPreview(playheadUs / 1000)
+            schedulePrerender()
+            return
+        }
+        preparing = queue.size
+        preparingLabel = if (queue.size == 1) "Preparo la copia leggera…" else "Preparo ${queue.size} copie leggere…"
+        val (w, h) = p.clips.firstOrNull { it.uri == uri }?.let { it.width to it.height }
+            ?: p.layers.firstOrNull { it.uri == uri }?.let { it.width to it.height } ?: (1920 to 1080)
+        val (pw, ph) = Proxies.size(w, h)
+        val out = Proxies.file(ctx, uri)
+        val tmp = File(out.parentFile, out.name + ".tmp.mp4")
+        val item = androidx.media3.transformer.EditedMediaItem.Builder(androidx.media3.common.MediaItem.fromUri(Uri.parse(uri)))
+            .setEffects(androidx.media3.transformer.Effects(emptyList(), listOf(
+                androidx.media3.effect.Presentation.createForWidthAndHeight(pw, ph, androidx.media3.effect.Presentation.LAYOUT_SCALE_TO_FIT),
+            )))
+            .build()
+        fun next(ok: Boolean) {
+            proxyTransformer = null
+            if (ok) tmp.renameTo(out) else { tmp.delete(); failedProxies += uri }
+            queue.removeFirstOrNull()
+            nextProxy(queue)
+        }
+        val t = Transformer.Builder(ctx)
+            .setVideoMimeType(androidx.media3.common.MimeTypes.VIDEO_H264)
+            .setMaxDelayBetweenMuxerSamplesMs(30_000)
+            .addListener(object : Transformer.Listener {
+                override fun onCompleted(composition: androidx.media3.transformer.Composition, exportResult: androidx.media3.transformer.ExportResult) = next(true)
+                override fun onError(
+                    composition: androidx.media3.transformer.Composition,
+                    exportResult: androidx.media3.transformer.ExportResult,
+                    exportException: androidx.media3.transformer.ExportException,
+                ) = next(false)
+            })
+            .build()
+        proxyTransformer = t
+        runCatching { t.start(item, tmp.absolutePath) }.onFailure { next(false) }
+    }
+
+    /** Dopo una modifica (con calma) prepara le copie leggere che mancano, poi i tratti (dissolvenze, video sovrapposti). */
     private fun schedulePrerender() {
         segSchedule?.cancel()
         segSchedule = viewModelScope.launch {
             delay(900)
-            val p = project ?: return@launch
+            val p0 = project ?: return@launch
             if (exportState is ExportState.Running) return@launch
-            val (w, h) = previewFrameSize()
             val ctx = getApplication<Application>()
+            if (useProxies && proxyTransformer == null && segTransformer == null) {
+                val missing = runCatching { Proxies.missing(ctx, p0) }.getOrDefault(emptyList()).filter { it !in failedProxies }
+                if (missing.isNotEmpty()) { nextProxy(ArrayDeque(missing)); return@launch }
+            }
+            if (proxyTransformer != null) return@launch
+            val p = previewSource(p0)
+            val (w, h) = previewFrameSize()
+            preparingLabel = ""
             val jobs = runCatching { CrossfadePreview.jobs(p, w, h) }.getOrDefault(emptyList())
                 .filter { !CrossfadePreview.file(ctx, it.key).exists() && it.key !in failedSegments }
             segQueue.clear()
@@ -1432,7 +1519,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         val tmp = File(CrossfadePreview.dir(ctx), "${job.key}.tmp.mp4")
         val composition = runCatching {
             factory.build(job.sub, ExportOptions(), forPreview = true, nativeAudio = null, allowMulti = true,
-                sizeOverride = w to h, crossfadesOverride = listOf(job.cf))
+                sizeOverride = w to h, crossfadesOverride = job.cf?.let { listOf(it) })
         }.getOrElse { failedSegments += job.key; segQueue.removeFirstOrNull(); nextSegment(false); return }
         val t = Transformer.Builder(ctx)
             // Un pezzo dura un secondo: se per 20 s non esce nulla si è inceppato e si riprova.
@@ -1476,6 +1563,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private fun cancelPrerender() {
+        proxyTransformer?.cancel(); proxyTransformer = null
         segSchedule?.cancel()
         segQueue.clear()
         segTransformer?.cancel()

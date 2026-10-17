@@ -105,10 +105,7 @@ class Exporter(
         val (outW, outH) = factory.outputSize(project, options.size.shortSide)
         val maxClipFps = project.clips.maxOfOrNull { it.fps } ?: 30f
         val outFps = options.fps.max?.let { minOf(it.toFloat(), maxClipFps) } ?: maxClipFps
-        val maxBitrate = if (attempt >= 1) 100_000_000.0 else 160_000_000.0
-        var bitrate = (45_000_000.0 * outW * outH * outFps / (3840.0 * 2160 * 30))
-            .coerceIn(8_000_000.0, maxBitrate).toInt()
-        if (options.codec == OutputCodec.H264) bitrate = minOf((bitrate * 1.4).toInt(), maxBitrate.toInt())
+        val bitrate = ExportEstimate.bitrate(outW, outH, outFps, options.codec, options.maxBitrate, attempt)
 
         val heavy = project.clips.any { it.isHeavy }
         val step = if (heavy) attempt + 1 else attempt

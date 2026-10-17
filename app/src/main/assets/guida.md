@@ -3,9 +3,10 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
-- **Sottotitoli automatici** (Testo → **Sottotitoli automatici**): l'app ascolta il parlato e scrive i sottotitoli con i tempi di ogni parola. Stili **Classico, Karaoke** (la parola detta si colora), **Parola per parola**, **Riquadro**. Tutto sul telefono, senza internet (il modello si scarica una volta sola).
-- Audio professionale: voce fuori campo, audio staccato (tagli J/L), ducking, volume uniformato a –14 LUFS.
-- Colore per singola clip con istogramma.
+- **Esporta → Pronto per**: preimpostazioni **YouTube 4K**, **YouTube 1080p**, **Reels e TikTok**, **WhatsApp**, con misure e **peso stimato** del file prima di esportare.
+- **Copie leggere** per i video 4K, 8K e 120 fps: l'anteprima scorre fluida (copia a 720p preparata in sottofondo); l'esportazione usa sempre gli originali.
+- **Video sovrapposti che si muovono anche in anteprima**: il tratto si prepara in anticipo, come le dissolvenze incrociate.
+- Prima: sottotitoli automatici, audio professionale (voce, ducking, –14 LUFS), colore per clip con istogramma.
 
 ## Primi passi
 - Dalla schermata dei progetti tocca **Nuovo progetto**: **Scegli foto e video** (fino a 100) oppure **Album interi** (uno o più album, tutto in ordine di data). Lo stesso vale per **+** e **Aggiungi** dentro l'editor.
@@ -131,11 +132,13 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - **Livelli** nella barra principale: foto, loghi, adesivi PNG con trasparenza, oppure altri **video** (picture-in-picture). Schede **Aspetto**, **Forma**, **Animazione**.
 - Dimensione, opacità, rotazione; con due dita sull'anteprima. Movimento inizio → fine, animazioni.
 - **Forma** (arrotondata, cerchio, cuore, stella, sfumata), **cornice**, **ombra** (solo immagini), **scontorno** di sfondo verde/blu/bianco/nero con tolleranza.
-- Video sovrapposti: audio con volume; in anteprima si vedono come immagine ferma, nel video esportato si muovono.
+- Video sovrapposti: audio con volume. In anteprima, pochi secondi dopo una modifica, il tratto si prepara e il video si muove (in alto compare "Preparo un tratto dell'anteprima…"); finché non è pronto si vede come immagine ferma.
 - **Porta sopra/sotto** per l'ordine fra livelli.
 
 ## Esportare
-- **Esporta** in alto: risoluzione (Originale, 4K, 1080p), fotogrammi al secondo, codec (**H.265** consigliato, H.264 più compatibile).
+- **Esporta** in alto. **Pronto per**: YouTube 4K (4K, fino a 60 fps, H.265), YouTube 1080p, Reels e TikTok (1080p 30 fps; meglio con formato verticale), WhatsApp (720p, file leggero). Sotto si vedono misure e peso stimato.
+- Oppure a mano: risoluzione (Originale, 4K, 1080p, 720p), fotogrammi al secondo, codec (**H.265** consigliato, H.264 più compatibile).
+- **Copie leggere per i video 4K, 8K e 120 fps** (acceso di serie): solo per un'anteprima fluida; la prima volta si preparano in sottofondo ("Preparo le copie leggere…").
 - Il video finito va in galleria, cartella Movies/VivoVideo.
 - **Sperimentale**: "Nel video esportato" attiva dissolvenze incrociate vere e video sovrapposti (acceso di serie).
 
