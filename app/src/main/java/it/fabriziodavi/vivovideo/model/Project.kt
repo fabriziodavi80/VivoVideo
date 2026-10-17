@@ -496,6 +496,8 @@ data class MusicTrack(
     val markersUs: List<Long> = emptyList(),
     /** Per i brani presi in rete: autore, licenza e pagina da citare. */
     val credit: String? = null,
+    /** Voce (fuori campo o audio staccato da una clip): fa abbassare la musica, non viene abbassata. */
+    val dialog: Boolean = false,
     /** Battiti automatici tolti a mano. */
     val hiddenUs: List<Long> = emptyList(),
 ) {
@@ -577,6 +579,9 @@ data class Project(
     val format: VideoFormat = VideoFormat.AUTO,
     val sameMode: FrameMode = FrameMode.FILL,
     val otherMode: FrameMode = FrameMode.BLUR,
+    /** Ducking: la musica si abbassa di [duckDb] dB dove si parla (clip, voce fuori campo, audio staccato). */
+    val duck: Boolean = false,
+    val duckDb: Int = 12,
 ) {
     /** Orientamento del video finito. */
     fun outputOrientation(): Orientation = when (format) {

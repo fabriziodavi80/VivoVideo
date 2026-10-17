@@ -55,6 +55,8 @@ data class ExportOptions(
     val codec: OutputCodec = OutputCodec.H265,
     /** Audio con tono naturale (motore nativo) nei tratti a velocità diversa da 1×. */
     val keepPitch: Boolean = true,
+    /** Volume uniformato a -14 LUFS (come YouTube e Instagram). */
+    val loudness: Boolean = true,
 )
 
 /** Adatta la curva del modello all'interfaccia di Media3. */

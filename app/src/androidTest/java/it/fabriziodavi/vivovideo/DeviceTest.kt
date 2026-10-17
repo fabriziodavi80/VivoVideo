@@ -10,6 +10,7 @@ import android.media.ImageReader
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import it.fabriziodavi.vivovideo.online.Library
+import it.fabriziodavi.vivovideo.engine.AudioDsp
 import it.fabriziodavi.vivovideo.online.LibraryKeys
 import it.fabriziodavi.vivovideo.online.LibrarySource
 import kotlinx.coroutines.runBlocking
@@ -244,6 +245,24 @@ class DeviceTest {
         )
     }
 
+    /** Audio: voce (audio staccato) che abbassa la musica e volume finale uniformato a -14 LUFS. */
+    @Test fun exportDuckingAndLoudness() {
+        val a = video("a", videoA, s = 0, e = 5_000_000)
+        val p = Project(
+            name = "audio", clips = listOf(a.copy(muted = true)),
+            music = listOf(
+                MusicTrack(uri = music.toString(), name = "musica", sourceDurationUs = 30_000_000, lengthUs = 5_000_000, volume = 0.3f),
+                MusicTrack(uri = videoA.toString(), name = "voce", sourceDurationUs = 6_000_000, startUs = 1_000_000, lengthUs = 3_000_000, dialog = true),
+            ),
+            duck = true,
+        )
+        val uri = exportAndCheckUri(p)
+        val pcm = decodeAudioRange(ctx, uri, 0, 5_000_000)!!
+        val lufs = AudioDsp.LoudnessMeter().apply { addInterleaved(pcm) }.lufs()
+        android.util.Log.i("VivoVideoTest", "volume del video esportato: $lufs LUFS")
+        assertTrue("volume $lufs invece di circa -14 LUFS", lufs in -16.5..-12.0 || lufs < -16.5 && pcm.maxOf { kotlin.math.abs(it) } > 0.85f)
+    }
+
     /** Libreria in rete: una ricerca vera su Openverse (musica ed effetti) e lo scaricamento di un brano. */
     @Test fun onlineLibraryOpenverse() {
         val keys = LibraryKeys(null, null)
@@ -286,7 +305,9 @@ class DeviceTest {
         playFor(wowProject())
     }
 
-    private fun exportAndCheck(p: Project, extraLayers: List<Layer> = emptyList(), multi: Boolean = true) {
+    private fun exportAndCheck(p: Project, extraLayers: List<Layer> = emptyList(), multi: Boolean = true) { exportAndCheckUri(p, extraLayers, multi) }
+
+    private fun exportAndCheckUri(p: Project, extraLayers: List<Layer> = emptyList(), multi: Boolean = true): Uri {
         val project = p.copy(layers = p.layers + extraLayers)
         Safety.setMultiExport(ctx, multi)
         val state = AtomicReference<ExportState>(ExportState.Idle)
@@ -310,6 +331,7 @@ class DeviceTest {
             assertTrue("niente video", r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_HAS_VIDEO) == "yes")
             assertTrue("solo note su sovrapposizioni mancanti", !s.details.contains("Attenzione") || !multi)
         } finally { r.release() }
+        return uri
     }
 
     @Test fun exportSimple() {

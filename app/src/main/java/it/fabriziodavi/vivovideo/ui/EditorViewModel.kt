@@ -976,6 +976,86 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         p.copy(format = format ?: p.format, sameMode = same ?: p.sameMode, otherMode = other ?: p.otherMode).applyFramePresets()
     }
 
+    // ---------------- Voce fuori campo, audio staccato, ducking ----------------
+
+    private var recorder: android.media.MediaRecorder? = null
+    private var recordFile: File? = null
+    private var recordStartUs = 0L
+    var recording by mutableStateOf(false)
+        private set
+    /** Silenzia l'anteprima mentre si registra (senza cuffie il microfono la risentirebbe). */
+    var muteWhileRecording by mutableStateOf(true)
+
+    /** Registra la voce dal punto dell'indicatore, con l'anteprima che scorre per andare a tempo. */
+    fun startVoice() {
+        val ctx = getApplication<Application>()
+        val p = project ?: return
+        if (p.clips.isEmpty() || recording) return
+        val dir = File(ctx.filesDir, "voice").apply { mkdirs() }
+        val f = File(dir, "voce_${System.currentTimeMillis()}.m4a")
+        val r = android.media.MediaRecorder(ctx)
+        try {
+            r.setAudioSource(android.media.MediaRecorder.AudioSource.MIC)
+            r.setOutputFormat(android.media.MediaRecorder.OutputFormat.MPEG_4)
+            r.setAudioEncoder(android.media.MediaRecorder.AudioEncoder.AAC)
+            r.setAudioSamplingRate(48_000)
+            r.setAudioEncodingBitRate(160_000)
+            r.setAudioChannels(1)
+            r.setOutputFile(f.absolutePath)
+            r.prepare()
+            r.start()
+        } catch (e: Exception) {
+            runCatching { r.release() }
+            message = "Non riesco a usare il microfono: ${e.message}"
+            return
+        }
+        recorder = r; recordFile = f; recording = true
+        recordStartUs = playheadUs.coerceAtMost(p.durationUs - 200_000).coerceAtLeast(0)
+        player?.let { pl -> if (muteWhileRecording) runCatching { pl.volume = 0f }; pl.play() }
+    }
+
+    fun stopVoice() {
+        val r = recorder ?: return
+        val f = recordFile
+        recorder = null; recording = false
+        runCatching { r.stop() }
+        runCatching { r.release() }
+        pause()
+        player?.let { pl -> runCatching { pl.volume = 1f } }
+        val ctx = getApplication<Application>()
+        val p = project ?: return
+        if (f == null || !f.exists() || f.length() < 1024) { message = "Registrazione troppo breve."; return }
+        viewModelScope.launch {
+            val durUs = withContext(Dispatchers.IO) { runCatching { readAudioInfo(ctx, Uri.fromFile(f)).second }.getOrDefault(0L) }
+            if (durUs <= 0) { message = "Registrazione non leggibile."; return@launch }
+            val n = p.music.count { it.dialog && it.uri.contains("/voice/") } + 1
+            val t = MusicTrack(
+                uri = Uri.fromFile(f).toString(), name = "Voce $n", sourceDurationUs = durUs,
+                startUs = recordStartUs, lengthUs = minOf(durUs, p.durationUs - recordStartUs), dialog = true,
+            )
+            update { it.copy(music = it.music + t, duck = if (it.music.any { m -> !m.dialog }) true else it.duck) }
+            selectedMusicId = t.id
+        }
+    }
+
+    /** L'audio della clip diventa una riga a sé (si può allungare prima/dopo il taglio: tagli J e L). */
+    fun detachAudio() {
+        val p = project ?: return
+        val c = selectedClip ?: return
+        if (c.isPhoto || c.muted) { message = "Questa clip non ha audio da staccare."; return }
+        if (c.speedCurve().speeds.any { it != 1f }) { message = "Per staccare l'audio la clip deve essere a velocità normale."; return }
+        val i = p.clips.indexOf(c)
+        val t = MusicTrack(
+            uri = c.uri, name = "Audio clip ${i + 1}", sourceDurationUs = c.sourceDurationUs,
+            startUs = p.clipStartsUs()[i], offsetUs = c.trimStartUs, lengthUs = c.outputUs, volume = c.volume, dialog = true,
+        )
+        update { q -> q.replaceClip(c.copy(muted = true)).copy(music = q.music + t) }
+        selectedMusicId = t.id
+        message = "Audio staccato: ora è una riga nella timeline. Trascinalo o allungalo con le maniglie per farlo iniziare prima o finire dopo il taglio."
+    }
+
+    fun setDuck(on: Boolean? = null, db: Int? = null) = update(rebuild = false) { it.copy(duck = on ?: it.duck, duckDb = db ?: it.duckDb) }
+
     /** Correzione colore copiata (per "Incolla" su un'altra clip). */
     var copiedGrade by mutableStateOf<Grade?>(null)
 
@@ -1369,6 +1449,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     override fun onCleared() {
+        runCatching { recorder?.release() }
         project?.let { store.save(it) }
         releasePlayer()
     }

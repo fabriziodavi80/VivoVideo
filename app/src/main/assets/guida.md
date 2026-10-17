@@ -3,10 +3,11 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
-- **Colore per singola clip** (Colore → schede **Base, Ruote, HSL, Progetto**), con **istogramma** del fotogramma sotto l'indicatore e avviso di luci bruciate / ombre chiuse.
-- **Base**: esposizione, contrasto, alte luci, ombre, temperatura, tinta, saturazione, vividezza. **Ruote**: spingi ombre, toni medi e luci verso un colore (c'è anche "Look cinema"). **HSL**: cambia un solo colore (tonalità, saturazione, luminosità).
-- **Copia / Incolla** la correzione fra clip, **Applica a tutte le clip**, **Reimposta**.
-- Album interi anche per i progetti manuali; Freesound di nuovo pieno di effetti.
+- **Voce fuori campo** (Audio → **Voce**): registri mentre il video scorre, la voce diventa una riga sincronizzata nella timeline.
+- **Stacca l'audio** di una clip (Audio → Clip, o tieni premuta la clip): diventa una riga a sé che puoi far iniziare prima o finire dopo il taglio (tagli a J e a L).
+- **Ducking**: "Abbassa la musica quando si parla" (Audio → Brano o Voce), di quanti dB scegli tu.
+- **Volume uniformato** a –14 LUFS in esportazione (come YouTube e Instagram), acceso di serie: niente video troppo bassi o troppo forti, picchi sotto –1 dB.
+- Colore per singola clip (Base, Ruote, HSL) con istogramma.
 
 ## Primi passi
 - Dalla schermata dei progetti tocca **Nuovo progetto**: **Scegli foto e video** (fino a 100) oppure **Album interi** (uno o più album, tutto in ordine di data). Lo stesso vale per **+** e **Aggiungi** dentro l'editor.
@@ -86,6 +87,13 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - La correzione si applica dopo LOG, LUT e filtro del progetto.
 - **LOG**: le clip girate in LOG si convertono in colori normali (riconosciute da sole, interruttore nel pannello).
 - Filtri pronti, **LUT .cube** personalizzate, **Alte luci/cielo** e **Riduzione rumore** per tutto il progetto.
+
+## Voce fuori campo, audio staccato, ducking
+- **Audio → Voce → Registra la voce**: porta l'indicatore dove vuoi iniziare, tocca e parla mentre il video scorre; tocca di nuovo per fermare. La voce diventa una riga ("Voce 1"…) nella timeline: si sposta, si accorcia, si divide come un brano. La prima volta l'app chiede il permesso del microfono.
+- **Silenzia l'anteprima mentre registro** (acceso di serie): senza cuffie evita che il microfono registri anche l'audio del video.
+- **Stacca l'audio** (Audio → Clip, o tieni premuta la clip): l'audio della clip diventa una riga a sé e la clip resta muta. Allungando la riga all'indietro la voce arriva prima dell'immagine (taglio a J); in avanti continua sopra la clip successiva (taglio a L). Serve la clip a velocità normale.
+- **Abbassa la musica quando si parla** (ducking): dove ci sono voci, audio delle clip o audio staccato, la musica scende dei dB scelti e poi risale dolcemente. Si sente nel video esportato.
+- **Volume uniformato** (Esporta, acceso di serie): il video finito ha il volume standard di YouTube e Instagram (–14 LUFS), con i picchi sotto –1 dB.
 
 ## Audio delle clip
 - **Audio → scheda Clip**: volume (0–200%) o audio disattivato della clip selezionata (o sotto l'indicatore).

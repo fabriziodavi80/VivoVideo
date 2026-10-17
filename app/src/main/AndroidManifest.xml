@@ -3,6 +3,8 @@
 
     <!-- Libreria di musica ed effetti sonori liberi (Openverse, Jamendo, Freesound). -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Voce fuori campo. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <!-- Per il video automatico: leggere gli album della galleria. -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />

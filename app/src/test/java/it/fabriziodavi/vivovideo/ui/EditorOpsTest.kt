@@ -309,4 +309,24 @@ class EditorOpsTest {
         vm.updateSelected { it.withMode(FrameMode.FIT) }
         assertTrue(!vm.project!!.followsPresets())
     }
+
+    @Test fun detachAudioMakesADialogLaneAndDucking() {
+        val vm = vm()
+        vm.selectedClipId = "b"
+        vm.detachAudio()
+        val p = vm.project!!
+        val t = p.music.single()
+        assertTrue(t.dialog && p.clips[1].muted)
+        assertEquals(p.clipStartsUs()[1], t.startUs)
+        assertEquals(p.clips[1].trimStartUs, t.offsetUs)
+        assertEquals(p.clips[1].outputUs, t.lengthUs)
+        vm.undo()
+        assertTrue(vm.project!!.music.isEmpty() && !vm.project!!.clips[1].muted)
+        // Le foto non hanno audio da staccare.
+        vm.selectedClipId = "p"; vm.detachAudio()
+        assertTrue(vm.project!!.music.isEmpty())
+        vm.message = null
+        vm.setDuck(on = true, db = 18)
+        assertTrue(vm.project!!.duck); assertEquals(18, vm.project!!.duckDb)
+    }
 }

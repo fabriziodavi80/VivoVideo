@@ -194,7 +194,7 @@ fun ToolGroup.panel(): Tool? = when (this) {
 }
 
 /** Schede in cima ai pannelli più ricchi. */
-val MUSIC_TABS = listOf("Brano", "Ritmo", "Battiti", "Clip")
+val MUSIC_TABS = listOf("Brano", "Ritmo", "Battiti", "Voce", "Clip")
 val TEXT_TABS = listOf("Stile", "Animazione", "Movimento")
 val LAYER_TABS = listOf("Aspetto", "Forma", "Animazione")
 /** Animazioni per i livelli (quelle lettera per lettera, glitch e luccichio sono solo per i testi). */
@@ -525,7 +525,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
     val panelHeader: @Composable (Tool) -> Unit = { t ->
         Row(Modifier.fillMaxWidth().padding(start = 16.dp, end = 4.dp, top = 2.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(t.label, style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
-            if (clip != null && (t.needsClip || t == Tool.TRANSITION || (t == Tool.MUSIC && tab == 3))) {
+            if (clip != null && (t.needsClip || t == Tool.TRANSITION || (t == Tool.MUSIC && tab == 4))) {
                 Text("Clip ${project.clips.indexOf(clip) + 1} di ${project.clips.size}", style = MaterialTheme.typography.bodySmall)
             }
             IconBtn(VVIcons.Check, "Chiudi", enabled = !running) { activeTool = null }
@@ -618,6 +618,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
                         MenuRow(VVIcons.MoveRight, "Sposta dopo", enabled = idx < project.clips.lastIndex) { act { vm.moveSelected(+1) } }
                         MenuRow(VVIcons.Copy, "Duplica") { act { vm.duplicateSelected() } }
                         MenuRow(VVIcons.Split, "Dividi all'indicatore") { act { vm.splitAtPlayhead() } }
+                        if (!c.isPhoto && !c.muted) MenuRow(VVIcons.Volume, "Stacca l'audio") { act { vm.detachAudio() } }
                     }
                     MenuRow(VVIcons.Add, "Aggiungi video e foto") { act { pickVideos() } }
                     if (c != null) MenuRow(VVIcons.Delete, "Elimina", tint = VV.Danger) { act { vm.deleteSelected() } }
@@ -1036,7 +1037,8 @@ private fun TransitionPanel(vm: EditorViewModel, running: Boolean) {
 private fun MusicPanel(vm: EditorViewModel, running: Boolean, tab: Int, onAdd: () -> Unit) {
     val p = vm.project ?: return
     val enabled = !running
-    if (tab == 3) { ClipAudioTab(vm, running); return }
+    if (tab == 4) { ClipAudioTab(vm, running); return }
+    if (tab == 3) { VoiceTab(vm, running); return }
     // Nessun brano selezionato: prende quello sotto l'indicatore (o il primo).
     if (vm.selectedMusic == null && p.music.isNotEmpty()) {
         LaunchedEffect(Unit) {
@@ -1097,6 +1099,9 @@ private fun MusicPanel(vm: EditorViewModel, running: Boolean, tab: Int, onAdd: (
                 SecondaryButton("Dividi qui", onClick = { if (enabled) vm.splitMusicAtPlayhead() })
                 SecondaryButton("Elimina brano", onClick = { if (enabled) vm.deleteMusic() })
             }
+            PanelLabel("Voci e musica")
+            ToggleRow("Abbassa la musica quando si parla", p.duck, enabled) { vm.setDuck(on = it) }
+            if (p.duck) LabeledSlider("Quanto abbassarla", "Si sente nel video esportato.", p.duckDb, enabled, range = 4..24, format = { "–$it dB" }) { vm.setDuck(db = it) }
             PanelLabel("Aggiungi")
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 SecondaryButton("Libreria", Modifier.weight(1f), onClick = { if (enabled) vm.openLibrary(effects = false) })
@@ -1161,6 +1166,42 @@ private fun MusicPanel(vm: EditorViewModel, running: Boolean, tab: Int, onAdd: (
 }
 
 /** Scheda "Clip" del pannello Audio: volume della clip sotto l'indicatore. */
+/** Voce fuori campo: si registra mentre l'anteprima scorre dall'indicatore. */
+@Composable
+private fun VoiceTab(vm: EditorViewModel, running: Boolean) {
+    val ctx = LocalContext.current
+    val p = vm.project ?: return
+    val perm = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { ok ->
+        if (ok) vm.startVoice() else vm.message = "Per registrare la voce serve il permesso del microfono."
+    }
+    Hint("Porta l'indicatore dove vuoi iniziare, tocca Registra e parla mentre il video scorre; tocca di nuovo per fermare. La voce diventa una riga nella timeline, sincronizzata.")
+    Box(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(if (vm.recording) VV.Danger else VV.Tally)
+            .clickable(enabled = !running) {
+                when {
+                    vm.recording -> vm.stopVoice()
+                    ctx.checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) == android.content.pm.PackageManager.PERMISSION_GRANTED -> vm.startVoice()
+                    else -> perm.launch(android.Manifest.permission.RECORD_AUDIO)
+                }
+            }.padding(vertical = 16.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            if (vm.recording) "■  Ferma la registrazione  ${formatTime(vm.playheadUs)}" else "●  Registra la voce",
+            style = MaterialTheme.typography.titleSmall, color = if (vm.recording) Color.White else VV.TallyInk,
+        )
+    }
+    ToggleRow("Silenzia l'anteprima mentre registro", vm.muteWhileRecording, !vm.recording) { vm.muteWhileRecording = it }
+    Hint("Con le cuffie puoi lasciare l'audio acceso e sentire il video mentre parli; senza cuffie meglio silenziarlo, così il microfono registra solo la tua voce.")
+    ToggleRow("Abbassa la musica quando si parla", p.duck, !running) { vm.setDuck(on = it) }
+    val voices = p.music.filter { it.dialog }
+    if (voices.isNotEmpty()) {
+        PanelLabel("Voci e audio staccati")
+        PillRow(voices, vm.selectedMusic?.takeIf { it.dialog }, { it?.name ?: "" }, !running) { v -> if (v != null) vm.selectedMusicId = v.id }
+        Hint("Selezionata una voce, nella scheda Brano ne regoli volume, dissolvenze, divisione ed eliminazione.")
+    }
+}
+
 @Composable
 private fun ClipAudioTab(vm: EditorViewModel, running: Boolean) {
     val p = vm.project ?: return
@@ -1175,6 +1216,8 @@ private fun ClipAudioTab(vm: EditorViewModel, running: Boolean) {
         "Volume", null, (clip.volume * 100).toInt(), enabled = !running && !clip.muted, range = 0..200,
         format = { "$it%" },
     ) { v -> vm.updateSelected { it.copy(volume = v / 100f) } }
+    SecondaryButton("Stacca l'audio", Modifier.fillMaxWidth(), onClick = { if (!running) vm.detachAudio() })
+    Hint("Stacca l'audio: diventa una riga a sé nella timeline; allungandola o spostandola, la voce può iniziare prima dell'immagine o continuare dopo il taglio (tagli a J e a L).")
     Hint("Tocca un'altra clip nella timeline per regolarne il volume. Nei cambi di velocità l'audio esportato mantiene il tono naturale (impostazione in Esporta).")
 }
 
@@ -1821,6 +1864,7 @@ private fun ExportPanel(vm: EditorViewModel, onOpen: (android.net.Uri) -> Unit) 
     PanelLabel("Codec")
     Segmented(OutputCodec.entries, o.codec, { it.label }, !running) { vm.exportOptions = o.copy(codec = it) }
     ToggleRow("Audio a tono naturale nei cambi di velocità", o.keepPitch, !running) { vm.exportOptions = o.copy(keepPitch = it) }
+    ToggleRow("Volume uniformato (–14 LUFS, come YouTube e Instagram)", o.loudness, !running) { vm.exportOptions = o.copy(loudness = it) }
     PanelLabel("Sperimentale: dissolvenze incrociate e video sovrapposti")
     ToggleRow("Nel video esportato", vm.multiExportEnabled, !running) { vm.setMultiExport(it) }
     Hint("In anteprima la dissolvenza incrociata si prepara in anticipo (pochi secondi dopo una modifica) e i video sovrapposti si vedono come immagine ferma. Se l'app si chiude per un errore, questa opzione si spegne da sola.")
