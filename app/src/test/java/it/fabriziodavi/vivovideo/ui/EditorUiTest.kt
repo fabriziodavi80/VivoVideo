@@ -115,6 +115,8 @@ class EditorUiTest {
     @Test fun tappingSameEntryClosesPanel() {
         val vm = vm(); show(vm)
         bar("Colore").performClick()
+        compose.onNodeWithText("Esposizione").assertIsDisplayed()
+        compose.onNodeWithText("Progetto").performClick()
         compose.onNodeWithText("Tutto il progetto").assertIsDisplayed()
         bar("Colore").performClick()
         compose.onNodeWithText("Tutto il progetto").assertDoesNotExist()
