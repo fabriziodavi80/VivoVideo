@@ -158,15 +158,20 @@ object Backup {
      */
     fun findByName(ctx: Context, ref: MediaRef): String? {
         if (ref.name.isBlank()) return null
-        val sel = MediaStore.MediaColumns.DISPLAY_NAME + "=?" + if (ref.size > 0) " AND " + MediaStore.MediaColumns.SIZE + "=?" else ""
-        val args = if (ref.size > 0) arrayOf(ref.name, ref.size.toString()) else arrayOf(ref.name)
+        // Per nome; la dimensione serve solo a scegliere fra file con lo stesso nome (Android la aggiorna con calma).
         for (base in listOf(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, MediaStore.Images.Media.EXTERNAL_CONTENT_URI, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI)) {
-            val hit = runCatching {
-                ctx.contentResolver.query(base, arrayOf(MediaStore.MediaColumns._ID), sel, args, MediaStore.MediaColumns.DATE_MODIFIED + " DESC")?.use { c ->
-                    if (c.moveToFirst()) ContentUris.withAppendedId(base, c.getLong(0)).toString() else null
+            val hits = runCatching {
+                ctx.contentResolver.query(
+                    base, arrayOf(MediaStore.MediaColumns._ID, MediaStore.MediaColumns.SIZE),
+                    MediaStore.MediaColumns.DISPLAY_NAME + "=?", arrayOf(ref.name), MediaStore.MediaColumns.DATE_MODIFIED + " DESC",
+                )?.use { c ->
+                    val out = ArrayList<Pair<String, Long>>()
+                    while (c.moveToNext()) out += ContentUris.withAppendedId(base, c.getLong(0)).toString() to (if (c.isNull(1)) 0L else c.getLong(1))
+                    out
                 }
-            }.getOrNull()
-            if (hit != null && exists(ctx, hit)) return hit
+            }.getOrNull().orEmpty()
+            val best = hits.sortedByDescending { ref.size > 0 && it.second == ref.size }.firstOrNull { exists(ctx, it.first) }
+            if (best != null) return best.first
         }
         return null
     }
