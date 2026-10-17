@@ -168,6 +168,12 @@ data class Clip(
     val fadeAudio: Boolean = true,
     /** Pezzo già elaborato (dissolvenza preparata per l'anteprima): niente colori né effetti da riapplicare. */
     val baked: Boolean = false,
+    /** Clip al contrario: qui c'è l'originale, per tornare al verso normale. */
+    val reversed: ReversedSource? = null,
+    /** Stabilizzazione (movimento della camera misurato), o null. */
+    val stab: Stabilization? = null,
+    /** Fermo immagine preso da un video (foto creata dall'app). */
+    val freeze: Boolean = false,
     val width: Int = 0,
     val height: Int = 0,
     val fps: Float = 30f,

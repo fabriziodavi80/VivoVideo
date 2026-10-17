@@ -3,6 +3,7 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **Fermo immagine**, **Al contrario** e **Stabilizzazione** (vedi "Fermo immagine, al contrario, stabilizzazione").
 - **Selezione multipla e copia/incolla degli attributi**: tieni premuta una clip → Copia attributi / Seleziona più clip → Incolla attributi su tutte le clip scelte (vedi "Selezionare").
 - **Esportazione HDR a 10 bit** (Esporta → "HDR 10 bit, come l'hai girato"): compare quando nel progetto ci sono video HDR. Luci e colori pieni come li ha ripresi il telefono; filtri, transizioni e correzioni di colore hanno lo stesso aspetto che in SDR. Se qualcosa non regge l'HDR, l'app esporta in SDR e lo scrive nel risultato (riga **Colore**).
 - Prima: preimpostazioni **Pronto per** (YouTube, Reels/TikTok, WhatsApp) con peso stimato, copie leggere per 4K/8K/120 fps, video sovrapposti che si muovono in anteprima.
@@ -28,6 +29,12 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - **Maniglie arancioni** ai lati della clip selezionata: trascinale per accorciare o allungare.
 - **Modifica → Dividi**: taglia nel punto dell'indicatore (anche un brano musicale, se selezionato).
 - **Tieni premuta una clip** (oppure Modifica → **Altro**): Sposta prima/dopo, Duplica, Dividi, Aggiungi video e foto, Elimina.
+
+## Fermo immagine, al contrario, stabilizzazione
+- **Fermo immagine**: metti l'indicatore sul fotogramma, tieni premuta la clip → **Fermo immagine all'indicatore**. La clip si divide e in mezzo compare una foto di 2 s (segno FERMO) con lo stesso colore e inquadratura; allungala o accorciala come una foto. Testi e livelli che vengono dopo si spostano con lei.
+- **Al contrario**: tieni premuta la clip → **Al contrario** (fino a 60 s). L'app prepara una copia rovesciata, anche l'audio (segno ◀); keyframe e curva di velocità si specchiano. La copia è al massimo in 1080p. **Di nuovo nel verso normale** torna all'originale.
+- **Stabilizzazione**: Modifica → **Inquadra** → **Stabilizza la clip**. L'app misura il tremolio della camera e lo leviga con un leggero zoom (segno STAB). **Forza** regola quanto: più forza = immagine più ferma ma più zoom (al massimo 20%). Si vede subito in anteprima. Se poi accorci o allunghi molto la clip, rifai la stabilizzazione.
+- Durante al contrario e stabilizzazione l'anteprima si ferma; c'è **Annulla**.
 
 ## Velocità
 - **Velocità** sulla clip: Normale, Lenta, Veloce o **Curva** (speed ramp disegnabile).

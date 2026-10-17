@@ -38,6 +38,11 @@ import androidx.test.platform.app.InstrumentationRegistry
 import it.fabriziodavi.vivovideo.engine.CompositionFactory
 import it.fabriziodavi.vivovideo.engine.CrossfadePreview
 import it.fabriziodavi.vivovideo.engine.Proxies
+import it.fabriziodavi.vivovideo.engine.Reverser
+import it.fabriziodavi.vivovideo.engine.Stabilizer
+import it.fabriziodavi.vivovideo.model.ClipTools
+import it.fabriziodavi.vivovideo.model.StabMath
+import it.fabriziodavi.vivovideo.ui.EditorViewModel
 import it.fabriziodavi.vivovideo.engine.FxEffect
 import it.fabriziodavi.vivovideo.engine.TransitionEffect
 import it.fabriziodavi.vivovideo.engine.GradeEffect
@@ -601,5 +606,84 @@ class DeviceTest {
         val p = Project(name = "hdr", clips = listOf(video("a", videoA).copy(hdr = 1), video("b", videoB, s = 1_000_000, e = 3_000_000)))
         exportAndCheck(p, options = ExportOptions(hdr = true))
         assertTrue(lastDetails, lastDetails.contains("Colore: SDR") || lastDetails.contains("10 bit"))
+    }
+
+    private fun redAt(uri: Uri, us: Long): Int {
+        val r = MediaMetadataRetriever()
+        try {
+            r.setDataSource(ctx, uri)
+            val b = r.getFrameAtTime(us, MediaMetadataRetriever.OPTION_CLOSEST)!!
+            return Color.red(b.getPixel(4, 4))
+        } finally { r.release() }
+    }
+
+    /** Al contrario: il primo fotogramma è l'ultimo dell'originale (rosso scuro), l'audio c'è, la durata torna. */
+    @Test fun reverseClip() {
+        val c = video("a", videoA)
+        val r = runBlocking { Reverser.reverse(ctx, c) {} }
+        assertTrue("durata ${r.durationUs}", abs(r.durationUs - 6_000_000) < 150_000)
+        val uri = Uri.fromFile(r.file)
+        assertTrue("originale: inizio rosso pieno", redAt(videoA, 100_000) > 230)
+        val first = redAt(uri, 100_000); val last = redAt(uri, 5_800_000)
+        assertTrue("al contrario: inizio $first (atteso rosso scuro)", first in 170..229)
+        assertTrue("al contrario: fine $last (atteso rosso pieno)", last > 230)
+        val m = MediaMetadataRetriever().apply { setDataSource(ctx, uri) }
+        assertTrue("niente audio", m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_HAS_AUDIO) == "yes"); m.release()
+        // E la clip al contrario si esporta come le altre.
+        val rc = ClipTools.reversed(c, uri.toString(), r.durationUs, r.width, r.height)
+        exportAndCheck(Project(name = "contrario", clips = listOf(rc, video("b", videoB))))
+    }
+
+    /** Video che trema (macchie spostate a caso a ogni fotogramma): la misura trova il tremolio e l'esportazione lo usa. */
+    @Test fun stabilizeShakyVideo() {
+        val out = File(ctx.cacheDir, "prove/tremolio.mp4")
+        if (!out.exists()) {
+            val rnd = java.util.Random(7)
+            val base = Bitmap.createBitmap(W + 80, H + 80, Bitmap.Config.ARGB_8888)
+            Canvas(base).apply {
+                drawColor(Color.DKGRAY)
+                val p = Paint(Paint.ANTI_ALIAS_FLAG)
+                repeat(60) { p.color = Color.rgb(rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256)); drawCircle(rnd.nextFloat() * (W + 80), rnd.nextFloat() * (H + 80), 8f + rnd.nextFloat() * 30f, p) }
+            }
+            val seq = EditedMediaItemSequence.Builder(setOf(C.TRACK_TYPE_VIDEO))
+            for (k in 0 until 60) {
+                val ox = if (k % 2 == 0) 40 + 12 else 40 - 12
+                val oy = 40 + (k % 3 - 1) * 8
+                val f = Bitmap.createBitmap(base, ox, oy, W, H)
+                val img = File(ctx.cacheDir, "prove/trem_$k.png").also { file -> file.outputStream().use { f.compress(Bitmap.CompressFormat.PNG, 100, it) } }
+                seq.addItem(EditedMediaItem.Builder(MediaItem.Builder().setUri(Uri.fromFile(img)).setMimeType(MimeTypes.IMAGE_PNG).setImageDurationMs(33).build())
+                    .setDurationUs(33_333).setFrameRate(30).build())
+            }
+            transform(Composition.Builder(listOf(seq.build())).build(), out)
+        }
+        val c = Clip(id = "t", uri = Uri.fromFile(out).toString(), sourceDurationUs = 2_000_000, trimEndUs = 1_900_000, width = W, height = H, fps = 30f)
+        val s = runBlocking { Stabilizer.analyze(ctx, c, 0.7f) {} }
+        assertTrue("campioni ${s.dx.size}", s.dx.size >= 50)
+        // Fra un fotogramma e l'altro l'immagine salta di circa 24 px su $W: la misura deve vederlo.
+        val steps = (1 until s.dx.size).map { abs(s.dx[it] - s.dx[it - 1]) }
+        assertTrue("salti misurati ${steps.take(8)}", steps.count { it > 0.02f } > steps.size / 3)
+        val plan = StabMath.plan(s)
+        assertTrue("zoom ${plan.zoom}", plan.zoom > 1.02f)
+        exportAndCheck(Project(name = "stab", clips = listOf(c.copy(stab = s), video("a", videoA))))
+    }
+
+    /** Fermo immagine dall'editor: compare una foto in mezzo alla clip e il progetto si esporta. */
+    @Test fun freezeFrameFromEditor() {
+        val vmRef = AtomicReference<EditorViewModel>()
+        val made = CountDownLatch(1)
+        main.post {
+            val vm = EditorViewModel(ctx.applicationContext as android.app.Application)
+            vm.openProject(Project(name = "fermo", clips = listOf(video("a", videoA), video("b", videoB))), startPreview = false)
+            vm.seekTo(3_000_000)
+            vm.freezeFrame()
+            vmRef.set(vm); made.countDown()
+        }
+        assertTrue(made.await(10, TimeUnit.SECONDS))
+        var p: Project? = null
+        repeat(100) { if (p == null) { Thread.sleep(200); p = vmRef.get().project?.takeIf { q -> q.clips.size == 4 } } }
+        val q = p ?: run { fail("il fermo immagine non è comparso: ${vmRef.get().message}"); return }
+        assertTrue(q.clips[1].freeze && q.clips[1].isPhoto)
+        assertTrue(abs(q.durationUs - 14_000_000) < 50_000)
+        exportAndCheck(q)
     }
 }

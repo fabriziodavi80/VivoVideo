@@ -229,6 +229,7 @@ class CompositionFactory(private val context: Context) {
             val clipStart = starts[project.clips.indexOf(clip)]
             val effects = buildList<Effect> {
                 addAll(colorEffects(clip, project))
+                if (clip.stab != null && !clip.baked) add(StabilizeTransformation(clip, clipStart))
                 add(framing(clip, outW, outH))
                 if (clip.frame != Transform()) add(FrameTransformation(clip.frame, outW.toFloat() / outH))
                 if (clip.keyframes.any { it.value.x != 0f || it.value.y != 0f || it.value.scale != 1f || it.value.rotation != 0f }) {
@@ -348,6 +349,7 @@ class CompositionFactory(private val context: Context) {
                 .build()
             val effects: List<Effect> = if (light) listOf(Presentation.createForWidthAndHeight(outW, outH, Presentation.LAYOUT_SCALE_TO_FIT)) else buildList<Effect> {
                 addAll(colorEffects(clip, project))
+                if (clip.stab != null && !clip.baked && !clip.isPhoto) add(StabilizeTransformation(clip, startUs))
                 add(framing(clip, outW, outH))
                 if (clip.frame != Transform()) {
                     add(FrameTransformation(clip.frame, outW.toFloat() / outH))

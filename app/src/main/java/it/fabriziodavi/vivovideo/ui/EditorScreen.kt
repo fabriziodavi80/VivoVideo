@@ -147,6 +147,7 @@ import it.fabriziodavi.vivovideo.engine.OutputFps
 import it.fabriziodavi.vivovideo.engine.OutputSize
 import it.fabriziodavi.vivovideo.model.Clip
 import it.fabriziodavi.vivovideo.model.ClipStyle
+import it.fabriziodavi.vivovideo.model.StabMath
 import it.fabriziodavi.vivovideo.model.ClipAttr
 import it.fabriziodavi.vivovideo.engine.ExportPreset
 import kotlin.math.ln
@@ -392,6 +393,20 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
                         .background(Color(0x99000000), RoundedCornerShape(6.dp)).padding(horizontal = 8.dp, vertical = 4.dp),
                 )
             }
+            vm.clipWork?.let { label ->
+                Column(
+                    Modifier.align(Alignment.Center).padding(24.dp).background(Color(0xCC000000), RoundedCornerShape(10.dp)).padding(14.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Text("$label  ${(vm.clipWorkProgress * 100).toInt()}%", color = Color.White, fontSize = 13.sp)
+                    LinearProgressIndicator(
+                        progress = { vm.clipWorkProgress },
+                        modifier = Modifier.width(200.dp).height(4.dp).clip(RoundedCornerShape(2.dp)),
+                        color = VV.Tally, trackColor = VV.Raised2,
+                    )
+                    TextButton(onClick = vm::cancelClipWork) { Text("Annulla", color = VV.Dim) }
+                }
+            }
             vm.previewError?.let {
                 Text(it, color = VV.Danger, fontSize = 12.sp, modifier = Modifier.align(Alignment.TopCenter).padding(8.dp))
             }
@@ -630,6 +645,10 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
                         MenuRow(VVIcons.MoveRight, "Sposta dopo", enabled = idx < project.clips.lastIndex) { act { vm.moveSelected(+1) } }
                         MenuRow(VVIcons.Copy, "Duplica") { act { vm.duplicateSelected() } }
                         MenuRow(VVIcons.Split, "Dividi all'indicatore") { act { vm.splitAtPlayhead() } }
+                        if (!c.isPhoto) {
+                            MenuRow(VVIcons.Pause, "Fermo immagine all'indicatore") { act { vm.freezeFrame() } }
+                            MenuRow(VVIcons.MoveLeft, if (c.reversed != null) "Di nuovo nel verso normale" else "Al contrario") { act { vm.toggleReverse() } }
+                        }
                         if (!c.isPhoto && !c.muted) MenuRow(VVIcons.Volume, "Stacca l'audio") { act { vm.detachAudio() } }
                         MenuRow(VVIcons.Copy, "Copia attributi") { act { vm.copyStyle() } }
                         if (vm.copiedStyle != null && vm.copiedStyle?.id != c.id) MenuRow(VVIcons.Copy, "Incolla attributi") { act { pasteDialog = true } }
@@ -1280,6 +1299,18 @@ private fun FramePanel(vm: EditorViewModel, running: Boolean) {
         SecondaryButton("Reimposta", onClick = { if (enabled) { vm.setFrame(Transform()); vm.project?.let { p -> vm.updateSelected { it.withMode(p.presetModeFor(it)) } } } })
     }
     SecondaryButton("Applica a tutte le clip", selected = vm.project?.frameOnAll(clip) == true, onClick = { if (enabled) vm.applyFrameToAll() })
+    if (!clip.isPhoto) {
+        PanelLabel("Stabilizzazione")
+        val st = clip.stab
+        if (st == null) {
+            SecondaryButton("Stabilizza la clip", Modifier.fillMaxWidth(), onClick = { if (enabled && vm.clipWork == null) vm.stabilize() })
+            Hint("Misura il tremolio della camera e lo leviga, con un leggero zoom per nascondere i bordi. Video lunghi o in 4K/8K richiedono un po' di tempo.")
+        } else {
+            LabeledSlider("Forza", null, (st.strength * 100).toInt(), enabled, range = 0..100, format = { "$it%" }) { vm.setStabStrength(it / 100f) }
+            Hint("Zoom usato: ${"%.0f".format((StabMath.plan(st).zoom - 1) * 100)}%. Più forza = movimento più fermo, ma più zoom.")
+            SecondaryButton("Togli la stabilizzazione", selected = false, onClick = { if (enabled) vm.removeStab() })
+        }
+    }
 }
 
 private val TEXT_COLORS = listOf(

@@ -10,6 +10,11 @@ import it.fabriziodavi.vivovideo.engine.Whisper
 import it.fabriziodavi.vivovideo.engine.Proxies
 import it.fabriziodavi.vivovideo.model.ClipAttr
 import it.fabriziodavi.vivovideo.model.ClipStyle
+import it.fabriziodavi.vivovideo.model.ClipTools
+import it.fabriziodavi.vivovideo.model.StabMath
+import it.fabriziodavi.vivovideo.model.insertAt
+import it.fabriziodavi.vivovideo.engine.Reverser
+import it.fabriziodavi.vivovideo.engine.Stabilizer
 import it.fabriziodavi.vivovideo.engine.ExportEstimate
 import it.fabriziodavi.vivovideo.engine.OutputCodec
 import it.fabriziodavi.vivovideo.renderTimelineAudio
@@ -941,6 +946,113 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         update { it.addClips(listOf(copy), p.clips.indexOf(c) + 1) }
         selectedClipId = copy.id
     }
+
+    // ---------------- Fermo immagine, al contrario, stabilizzazione ----------------
+
+    /** Lavoro lungo su una clip (al contrario, stabilizzazione): testo e avanzamento 0…1. */
+    var clipWork by mutableStateOf<String?>(null)
+        private set
+    var clipWorkProgress by mutableStateOf(0f)
+        private set
+    private var clipJob: kotlinx.coroutines.Job? = null
+
+    /** Clip su cui lavorano gli strumenti: quella selezionata, altrimenti quella sotto l'indicatore. */
+    private fun workClip(): Clip? = selectedClip ?: project?.let { p -> p.locate(playheadUs)?.let { p.clips[it.first] } }
+
+    fun cancelClipWork() { clipJob?.cancel() }
+
+    private fun runClipWork(label: String, block: suspend (onProgress: (Float) -> Unit) -> Unit) {
+        if (clipWork != null) return
+        pause()
+        cancelPrerender()
+        val pos = playheadUs
+        // Decoder ed encoder servono al lavoro: l'anteprima si ferma e riparte alla fine.
+        releasePlayer()
+        playheadUs = pos
+        clipWork = label; clipWorkProgress = 0f
+        clipJob = viewModelScope.launch {
+            try {
+                block { p -> viewModelScope.launch { clipWorkProgress = p } }
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                message = "Annullato."
+            } catch (e: Throwable) {
+                message = "Non riuscito: ${e.message ?: e.javaClass.simpleName}"
+            } finally {
+                clipWork = null; clipJob = null
+                rebuildPreview(playheadUs / 1000)
+            }
+        }
+    }
+
+    /** Fermo immagine all'indicatore: il fotogramma diventa una foto di 2 secondi in mezzo alla clip. */
+    fun freezeFrame() {
+        val p = project ?: return
+        val (i, off) = p.locate(playheadUs) ?: return
+        val c = p.clips[i]
+        if (c.isPhoto) { message = "Il fermo immagine si fa sui video."; return }
+        val ctx = getApplication<Application>()
+        val at = playheadUs
+        viewModelScope.launch {
+            val made = withContext(Dispatchers.IO) {
+                runCatching {
+                    val src = c.trimStartUs + c.speedCurve().sourceTimeAt(off)
+                    val r = android.media.MediaMetadataRetriever()
+                    val bmp = (try {
+                        r.setDataSource(ctx, Uri.parse(c.uri))
+                        val long = maxOf(c.width, c.height).coerceAtLeast(1)
+                        val k = minOf(1f, 3840f / long)
+                        r.getScaledFrameAtTime(src, android.media.MediaMetadataRetriever.OPTION_CLOSEST, (c.width * k).toInt().coerceAtLeast(2), (c.height * k).toInt().coerceAtLeast(2))
+                    } finally { r.release() }) ?: error("fotogramma non leggibile")
+                    val f = File(File(ctx.filesDir, "fermi").apply { mkdirs() }, "fermo_${System.currentTimeMillis()}.jpg")
+                    f.outputStream().use { bmp.compress(android.graphics.Bitmap.CompressFormat.JPEG, 95, it) }
+                    Triple(f, bmp.width, bmp.height).also { bmp.recycle() }
+                }
+            }
+            made.onSuccess { (f, w, h) ->
+                val photo = ClipTools.freezeClip(c, Uri.fromFile(f).toString(), w, h)
+                update { it.insertAt(at, photo) }
+                selectedClipId = photo.id
+                message = "Fermo immagine aggiunto (2 s): allungalo o accorcialo come una foto."
+            }.onFailure { message = "Fermo immagine non riuscito: ${it.message}" }
+        }
+    }
+
+    /** Al contrario (o di nuovo nel verso normale) la clip selezionata. */
+    fun toggleReverse() {
+        val c = workClip() ?: return
+        if (c.isPhoto) { message = "Le foto non hanno un verso."; return }
+        if (c.reversed != null) {
+            update { it.replaceClip(ClipTools.unreversed(c)) }
+            message = "Clip di nuovo nel verso normale."
+            return
+        }
+        if (c.trimmedUs > Reverser.MAX_US) { message = "Al contrario si possono mettere clip fino a 60 secondi: accorciala prima."; return }
+        val ctx = getApplication<Application>()
+        runClipWork("Metto la clip al contrario…") { prog ->
+            val r = Reverser.reverse(ctx, c, prog)
+            val now = project?.clips?.firstOrNull { it.id == c.id }
+            if (now == null || now.uri != c.uri) { r.file.delete(); return@runClipWork }
+            update { it.replaceClip(ClipTools.reversed(now, Uri.fromFile(r.file).toString(), r.durationUs, r.width, r.height)) }
+            message = "Clip al contrario. Si torna indietro da qui o con Annulla."
+        }
+    }
+
+    /** Misura il movimento della clip e lo leviga. */
+    fun stabilize(strength: Float = 0.6f) {
+        val c = workClip() ?: return
+        if (c.isPhoto) { message = "La stabilizzazione è per i video."; return }
+        val ctx = getApplication<Application>()
+        runClipWork("Misuro il movimento della camera…") { prog ->
+            val s = Stabilizer.analyze(ctx, c, strength, prog)
+            val now = project?.clips?.firstOrNull { it.id == c.id } ?: return@runClipWork
+            if (now.uri != c.uri || now.trimStartUs != c.trimStartUs || now.trimEndUs != c.trimEndUs) { message = "La clip è cambiata: riprova."; return@runClipWork }
+            update { it.replaceClip(now.copy(stab = s)) }
+            message = "Clip stabilizzata (zoom ${"%.0f".format((StabMath.plan(s).zoom - 1) * 100)}%)."
+        }
+    }
+
+    fun setStabStrength(v: Float) = updateSelected { c -> c.stab?.let { c.copy(stab = it.copy(strength = v.coerceIn(0f, 1f))) } ?: c }
+    fun removeStab() = updateSelected { it.copy(stab = null) }
 
     // ---------------- Selezione multipla e copia/incolla degli attributi ----------------
 

@@ -413,6 +413,9 @@ private fun ClipBox(
             if (clip.isPhoto) Badge("FOTO")
             Badge(label)
             if (clip.log) Badge("LOG")
+            if (clip.reversed != null) Badge("◀")
+            if (clip.stab != null) Badge("STAB")
+            if (clip.freeze) Badge("FERMO")
         }
         // Punti velocità (pallini in basso) nella loro posizione sul video finale.
         if (clip.speed == ClipSpeed.RAMP) {
