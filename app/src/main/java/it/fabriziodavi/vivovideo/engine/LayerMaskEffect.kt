@@ -23,7 +23,7 @@ class LayerMaskEffect(private val layer: Layer) : GlEffect {
 }
 
 private class MaskProgram(private val l: Layer, useHdr: Boolean) : BaseGlShaderProgram(useHdr, 1) {
-    private val program: GlProgram = try { GlProgram(VERTEX, FRAGMENT) } catch (e: GlUtil.GlException) { throw VideoFrameProcessingException(e) }
+    private val program: GlProgram = try { GlProgram(VERTEX, HdrGl.fragment(FRAGMENT, useHdr)) } catch (e: GlUtil.GlException) { throw VideoFrameProcessingException(e) }
     private var w = 1f
     private var h = 1f
 

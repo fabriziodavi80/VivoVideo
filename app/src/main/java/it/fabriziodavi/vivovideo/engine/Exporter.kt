@@ -23,6 +23,7 @@ import androidx.media3.transformer.VideoEncoderSettings
 import it.fabriziodavi.vivovideo.Safety
 import it.fabriziodavi.vivovideo.model.Project
 import it.fabriziodavi.vivovideo.renderTimelineAudio
+import it.fabriziodavi.vivovideo.readVideoInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -137,6 +138,7 @@ class Exporter(
                 audio?.delete()
                 transformer = null
                 val seconds = (SystemClock.elapsedRealtime() - startedAt) / 1000.0
+                val color = outputColor(outFile)
                 scope.launch {
                     val saved = withContext(Dispatchers.IO) { runCatching { saveToGallery(outFile) } }
                     saved.onSuccess { uri ->
@@ -147,8 +149,10 @@ class Exporter(
                             append("\nTempo di esportazione: ${"%.1f".format(seconds)} s")
                             append("\nCodec: ${options.codec.label}, ${bitrate / 1_000_000} Mbps, max ${"%.0f".format(outFps)} fps")
                             exportResult.videoEncoderName?.let { append("\nEncoder: $it ($mode)") }
+                            append("\nColore: $color")
+                            if (log.any { it.startsWith("• HDR") }) append(" (l'HDR non è riuscito: vedi sotto)")
                             if (audio != null) append("\nAudio: tono naturale (Signalsmith)")
-                            if (log.isNotEmpty()) append("\nTentativi falliti prima: ${log.size}")
+                            if (log.isNotEmpty()) append("\nTentativi falliti prima: ${log.size}\n" + log.joinToString("\n"))
                             if (!allowMulti && (project.layers.any { it.isVideo } || project.crossfades().isNotEmpty())) {
                                 append("\nAttenzione: esportato senza video sovrapposti e con le dissolvenze incrociate come passaggio al nero (il compositore ha dato errore).")
                             }
@@ -168,6 +172,15 @@ class Exporter(
                 val retryable = exportException.errorCode == ExportException.ERROR_CODE_ENCODER_INIT_FAILED ||
                     exportException.errorCode == ExportException.ERROR_CODE_DECODER_INIT_FAILED ||
                     exportException.errorCode == ExportException.ERROR_CODE_MUXING_TIMEOUT
+                if (options.hdr && !cancelled) {
+                    // L'HDR non è riuscito (encoder o un filtro che non lo regge): di nuovo, in SDR.
+                    val why = generateSequence(exportException as Throwable) { it.cause }.take(3)
+                        .joinToString(" ← ") { it.message?.take(100) ?: it.javaClass.simpleName }
+                    log += "• HDR: $why"
+                    onState(ExportState.Running(null, "HDR non riuscito, esporto in SDR…"))
+                    handler.post { attempt(project, options.copy(hdr = false), audio, 0, log, allowMulti) }
+                    return
+                }
                 if (retryable && step < 3 && !cancelled) {
                     onState(ExportState.Running(null, "Nuovo tentativo con impostazioni più prudenti…"))
                     handler.post { attempt(project, options, audio, attempt + 1, log, allowMulti) }
@@ -195,7 +208,7 @@ class Exporter(
         val t = Transformer.Builder(context)
             // Se per un minuto non esce nulla la libreria si è inceppata (capita di rado): si riprova da capo.
             .setMaxDelayBetweenMuxerSamplesMs(60_000)
-            .setVideoMimeType(options.codec.mime)
+            .setVideoMimeType(if (options.hdr) OutputCodec.H265.mime else options.codec.mime)
             .setEncoderFactory(
                 DefaultEncoderFactory.Builder(context).setRequestedVideoEncoderSettings(settings.build()).build()
             )
@@ -213,6 +226,12 @@ class Exporter(
         }
         pollProgress(if (attempt > 0) "Esportazione (nuovo tentativo)…" else "Esportazione…")
     }
+
+    /** Colore del file uscito: "HDR HLG 10 bit", "HDR10 10 bit" o "SDR". */
+    private fun outputColor(f: File): String = runCatching {
+        val i = readVideoInfo(context, Uri.fromFile(f))
+        if (i.isHdr) "${i.hdr} 10 bit" else "SDR"
+    }.getOrDefault("?")
 
     private fun pollProgress(label: String) {
         val holder = ProgressHolder()

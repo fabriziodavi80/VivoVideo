@@ -1873,7 +1873,14 @@ private fun ExportPanel(vm: EditorViewModel, onOpen: (android.net.Uri) -> Unit) 
     PanelLabel("Fotogrammi al secondo")
     Segmented(OutputFps.entries, o.fps, { it.label }, !running) { vm.exportOptions = o.copy(fps = it, maxBitrate = null) }
     PanelLabel("Codec")
-    Segmented(OutputCodec.entries, o.codec, { it.label }, !running) { vm.exportOptions = o.copy(codec = it, maxBitrate = null) }
+    Segmented(OutputCodec.entries, if (o.hdr && vm.hasHdr) OutputCodec.H265 else o.codec, { it.label }, !running) {
+        vm.exportOptions = o.copy(codec = it, maxBitrate = null, hdr = o.hdr && it == OutputCodec.H265)
+    }
+    if (vm.hasHdr) {
+        ToggleRow("HDR 10 bit, come l'hai girato", o.hdr, !running) { vm.exportOptions = o.copy(hdr = it, codec = if (it) OutputCodec.H265 else o.codec) }
+        Hint(if (o.hdr) "Luci e colori pieni sugli schermi HDR (YouTube, Instagram, galleria del telefono). Si usa H.265. Se qualcosa non lo regge, l'app esporta in SDR e te lo scrive nel risultato."
+            else "Nel progetto ci sono video HDR: ora vengono convertiti in SDR, il formato che si vede bene ovunque.")
+    }
     ToggleRow("Audio a tono naturale nei cambi di velocità", o.keepPitch, !running) { vm.exportOptions = o.copy(keepPitch = it) }
     ToggleRow("Volume uniformato (–14 LUFS, come YouTube e Instagram)", o.loudness, !running) { vm.exportOptions = o.copy(loudness = it) }
     PanelLabel("Sperimentale: dissolvenze incrociate e video sovrapposti")

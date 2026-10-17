@@ -19,7 +19,7 @@ class GradeEffect(val grade: Grade) : GlEffect {
 }
 
 private class GradeProgram(private val g: Grade, useHdr: Boolean) : BaseGlShaderProgram(useHdr, 1) {
-    private val program: GlProgram = try { GlProgram(VERTEX, GRADE_FRAGMENT) } catch (e: GlUtil.GlException) { throw VideoFrameProcessingException(e) }
+    private val program: GlProgram = try { GlProgram(VERTEX, HdrGl.fragment(GRADE_FRAGMENT, useHdr)) } catch (e: GlUtil.GlException) { throw VideoFrameProcessingException(e) }
 
     init {
         program.setBufferAttribute("aFramePosition", GlUtil.getNormalizedCoordinateBounds(), GlUtil.HOMOGENEOUS_COORDINATE_VECTOR_SIZE)

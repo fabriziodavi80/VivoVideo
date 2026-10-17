@@ -78,7 +78,7 @@ class TransitionEffect(
 }
 
 private class TransitionProgram(private val effect: TransitionEffect, useHdr: Boolean) : BaseGlShaderProgram(useHdr, 1) {
-    private val program: GlProgram = try { GlProgram(VERTEX, FRAGMENT) } catch (e: GlUtil.GlException) { throw VideoFrameProcessingException(e) }
+    private val program: GlProgram = try { GlProgram(VERTEX, HdrGl.fragment(FRAGMENT, useHdr)) } catch (e: GlUtil.GlException) { throw VideoFrameProcessingException(e) }
     private var aspect = 1f
 
     init {

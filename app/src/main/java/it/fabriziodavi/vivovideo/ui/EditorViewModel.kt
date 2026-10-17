@@ -9,6 +9,7 @@ import it.fabriziodavi.vivovideo.model.Subtitles
 import it.fabriziodavi.vivovideo.engine.Whisper
 import it.fabriziodavi.vivovideo.engine.Proxies
 import it.fabriziodavi.vivovideo.engine.ExportEstimate
+import it.fabriziodavi.vivovideo.engine.OutputCodec
 import it.fabriziodavi.vivovideo.renderTimelineAudio
 import it.fabriziodavi.vivovideo.model.Grade
 import it.fabriziodavi.vivovideo.decodePhotoThumb
@@ -151,7 +152,26 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         selectedClipId = p.clips.firstOrNull()?.id
         exportState = ExportState.Idle
         if (startPreview) rebuildPreview(0)
+        detectHdr(p)
     }
+
+    /** I progetti fatti prima non sapevano quali video sono HDR: lo si legge (solo i dati del file, è rapido). */
+    private fun detectHdr(p: Project) {
+        val ctx = getApplication<Application>()
+        viewModelScope.launch {
+            val kinds = withContext(Dispatchers.IO) {
+                p.clips.filter { !it.isPhoto && !it.baked && it.hdr == 0 }.associate { c ->
+                    c.id to (runCatching { readVideoInfo(ctx, Uri.parse(c.uri)).hdrKind }.getOrNull() ?: 0)
+                }.filterValues { it > 0 }
+            }
+            if (kinds.isEmpty() || project?.id != p.id) return@launch
+            project = project?.let { q -> q.copy(clips = q.clips.map { c -> kinds[c.id]?.let { c.copy(hdr = it) } ?: c }) }
+            scheduleSave()
+        }
+    }
+
+    /** C'è almeno un video HDR: si può esportare in HDR. */
+    val hasHdr: Boolean get() = project?.clips?.any { it.hdr > 0 } == true
 
     fun closeProject() {
         cancelPrerender()
@@ -225,6 +245,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                 uri = uri.toString(),
                 sourceDurationUs = info.durationMs * 1000,
                 log = info.tenBit && !info.isHdr,
+                hdr = info.hdrKind,
                 width = info.displayWidth,
                 height = info.displayHeight,
                 fps = info.fps ?: 30f,
@@ -1396,8 +1417,8 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         val (w, h) = factory.outputSize(p, o.size.shortSide)
         val maxFps = p.clips.maxOfOrNull { it.fps } ?: 30f
         val fps = o.fps.max?.let { minOf(it.toFloat(), maxFps) } ?: maxFps
-        val bytes = ExportEstimate.bytes(w, h, fps, o.codec, p.durationUs, o.maxBitrate)
-        return "${w}×$h · ${"%.0f".format(fps)} fps · " + ExportEstimate.label(bytes)
+        val bytes = ExportEstimate.bytes(w, h, fps, if (o.hdr) OutputCodec.H265 else o.codec, p.durationUs, o.maxBitrate)
+        return "${w}×$h · ${"%.0f".format(fps)} fps" + (if (o.hdr && hasHdr) " · HDR" else "") + " · " + ExportEstimate.label(bytes)
     }
     var exportState by mutableStateOf<ExportState>(ExportState.Idle)
         private set

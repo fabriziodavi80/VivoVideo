@@ -3,10 +3,8 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
-- **Esporta → Pronto per**: preimpostazioni **YouTube 4K**, **YouTube 1080p**, **Reels e TikTok**, **WhatsApp**, con misure e **peso stimato** del file prima di esportare.
-- **Copie leggere** per i video 4K, 8K e 120 fps: l'anteprima scorre fluida (copia a 720p preparata in sottofondo); l'esportazione usa sempre gli originali.
-- **Video sovrapposti che si muovono anche in anteprima**: il tratto si prepara in anticipo, come le dissolvenze incrociate.
-- Prima: sottotitoli automatici, audio professionale (voce, ducking, –14 LUFS), colore per clip con istogramma.
+- **Esportazione HDR a 10 bit** (Esporta → "HDR 10 bit, come l'hai girato"): compare quando nel progetto ci sono video HDR. Luci e colori pieni come li ha ripresi il telefono; filtri, transizioni e correzioni di colore hanno lo stesso aspetto che in SDR. Se qualcosa non regge l'HDR, l'app esporta in SDR e lo scrive nel risultato (riga **Colore**).
+- Prima: preimpostazioni **Pronto per** (YouTube, Reels/TikTok, WhatsApp) con peso stimato, copie leggere per 4K/8K/120 fps, video sovrapposti che si muovono in anteprima.
 
 ## Primi passi
 - Dalla schermata dei progetti tocca **Nuovo progetto**: **Scegli foto e video** (fino a 100) oppure **Album interi** (uno o più album, tutto in ordine di data). Lo stesso vale per **+** e **Aggiungi** dentro l'editor.
@@ -139,6 +137,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - **Esporta** in alto. **Pronto per**: YouTube 4K (4K, fino a 60 fps, H.265), YouTube 1080p, Reels e TikTok (1080p 30 fps; meglio con formato verticale), WhatsApp (720p, file leggero). Sotto si vedono misure e peso stimato.
 - Oppure a mano: risoluzione (Originale, 4K, 1080p, 720p), fotogrammi al secondo, codec (**H.265** consigliato, H.264 più compatibile).
 - **Copie leggere per i video 4K, 8K e 120 fps** (acceso di serie): solo per un'anteprima fluida; la prima volta si preparano in sottofondo ("Preparo le copie leggere…").
+- **HDR 10 bit** (solo se nel progetto ci sono video HDR, HLG, HDR10 o Dolby Vision): il video esportato resta HDR, in H.265. Spento, l'HDR viene convertito in SDR, che si vede bene su ogni schermo. WhatsApp esporta sempre in SDR. Nel risultato la riga **Colore** dice com'è uscito davvero.
 - Il video finito va in galleria, cartella Movies/VivoVideo.
 - **Sperimentale**: "Nel video esportato" attiva dissolvenze incrociate vere e video sovrapposti (acceso di serie).
 

@@ -60,6 +60,8 @@ data class ExportOptions(
     val loudness: Boolean = true,
     /** Tetto alla qualità (bit al secondo), per i video da mandare in chat. */
     val maxBitrate: Int? = null,
+    /** HDR a 10 bit (H.265) come l'ha girato il telefono, invece di convertire in SDR. */
+    val hdr: Boolean = false,
 )
 
 /** Preimpostazioni pronte per dove finirà il video. */
@@ -70,9 +72,13 @@ enum class ExportPreset(val label: String, val hint: String, val options: Export
     WHATSAPP("WhatsApp", "720p, 30 fps, leggero", ExportOptions(OutputSize.P720, OutputFps.F30, OutputCodec.H264, maxBitrate = 3_000_000));
 
     /** Vale se le opzioni scelte sono proprio queste (il resto, come il volume, non conta). */
-    fun matches(o: ExportOptions) = o.size == options.size && o.fps == options.fps && o.codec == options.codec && o.maxBitrate == options.maxBitrate
+    fun matches(o: ExportOptions) = o.size == options.size && o.fps == options.fps && o.maxBitrate == options.maxBitrate &&
+        (o.codec == options.codec || o.hdr)
 
-    fun applyTo(o: ExportOptions) = o.copy(size = options.size, fps = options.fps, codec = options.codec, maxBitrate = options.maxBitrate)
+    fun applyTo(o: ExportOptions) = o.copy(
+        size = options.size, fps = options.fps, codec = if (o.hdr && this != WHATSAPP) OutputCodec.H265 else options.codec,
+        maxBitrate = options.maxBitrate, hdr = o.hdr && this != WHATSAPP,
+    )
 }
 
 /** Qualità (bit al secondo) e peso stimato del video esportato: la stessa formula dell'esportazione. */
@@ -307,6 +313,9 @@ class CompositionFactory(private val context: Context) {
         crossfadesOverride: List<Project.Crossfade>? = null,
     ): Composition {
         val (outW, outH) = sizeOverride ?: outputSize(project, if (forPreview) 1080 else options.size.shortSide)
+        val keepHdr = !forPreview && options.hdr && project.clips.any { it.hdr > 0 }
+        if (keepHdr) HdrGl.gain = HdrGl.gainFor(project.clips.count { it.hdr == 2 }, project.clips.count { it.hdr == 1 })
+        val hdrMode = if (keepHdr) Composition.HDR_MODE_KEEP_HDR else Composition.HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_OPEN_GL
         val starts = project.clipStartsUs()
         val beats = project.beatTimes()
         val videoLayers = project.layers.filter { it.isVideo }
@@ -419,7 +428,7 @@ class CompositionFactory(private val context: Context) {
             }
             val ov = overlaysFor(0, Long.MAX_VALUE)
             return Composition.Builder(sequences)
-                .setHdrMode(Composition.HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_OPEN_GL)
+                .setHdrMode(hdrMode)
                 .setVideoCompositorSettings(LayerCompositorSettings(outW, outH, lanes, crossfades))
                 .setEffects(Effects(emptyList(), if (ov.isEmpty()) emptyList() else listOf(OverlayEffect(ov))))
                 .build()
@@ -438,9 +447,9 @@ class CompositionFactory(private val context: Context) {
             // Le dissolvenze si applicano nel video esportato.
             sequences += musicSequences(project)
         }
-        // Tutto in SDR: i filtri e le LUT sono pensati per colori normali.
+        // Di solito tutto in SDR; in HDR i nostri filtri lavorano in una scala con gamma (HdrGl).
         return Composition.Builder(sequences)
-            .setHdrMode(Composition.HDR_MODE_TONE_MAP_HDR_TO_SDR_USING_OPEN_GL)
+            .setHdrMode(hdrMode)
             .build()
     }
 }

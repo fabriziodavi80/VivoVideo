@@ -20,6 +20,8 @@ data class VideoInfo(
     val bitrate: Int?,
     val color: String? = null,
     val tenBit: Boolean = false,
+    /** 1 = HLG, 2 = HDR10 (PQ), 0 = SDR. */
+    val hdrKind: Int = 0,
 ) {
     /** Dimensioni come appaiono a schermo (tenendo conto della rotazione). */
     val displayWidth get() = if (rotation % 180 == 0) width else height
@@ -97,7 +99,7 @@ fun readVideoInfo(context: Context, uri: Uri): VideoInfo {
                     else -> null
                 }
             }
-            if (mime == MediaFormat.MIMETYPE_VIDEO_DOLBY_VISION) hdr = "Dolby Vision"
+            if (mime == MediaFormat.MIMETYPE_VIDEO_DOLBY_VISION) hdr = if (hdr == "HDR10") "HDR10" else "Dolby Vision"
             color = describeColor(format, mime)
             tenBit = color?.contains("10 bit") == true
             break
@@ -108,7 +110,9 @@ fun readVideoInfo(context: Context, uri: Uri): VideoInfo {
         extractor.release()
     }
 
-    return VideoInfo(width, height, rotation, durationMs, fps, codec, hdr, bitrate, color, tenBit)
+    // Dolby Vision dei telefoni (profilo 8.4) ha la base HLG.
+    val kind = when (hdr) { "HDR10" -> 2; "HDR HLG", "Dolby Vision" -> 1; else -> 0 }
+    return VideoInfo(width, height, rotation, durationMs, fps, codec, hdr, bitrate, color, tenBit, kind)
 }
 
 /** Spazio colore, curva e profondità: serve a riconoscere i video LOG. */

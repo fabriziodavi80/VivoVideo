@@ -78,7 +78,7 @@ class FxEffect(
 }
 
 private class FxProgram(private val effect: FxEffect, useHdr: Boolean) : BaseGlShaderProgram(useHdr, 1) {
-    private val program: GlProgram = try { GlProgram(VERTEX, FX_FRAGMENT) } catch (e: GlUtil.GlException) { throw VideoFrameProcessingException(e) }
+    private val program: GlProgram = try { GlProgram(VERTEX, HdrGl.fragment(FX_FRAGMENT, useHdr)) } catch (e: GlUtil.GlException) { throw VideoFrameProcessingException(e) }
     private var w = 1f
     private var h = 1f
     private val amounts = FxType.entries.associateWith { effect.amount(it) }

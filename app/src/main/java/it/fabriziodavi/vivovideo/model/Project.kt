@@ -138,6 +138,8 @@ data class Clip(
     val speed: ClipSpeed = ClipSpeed.NORMAL,
     /** Video girato in LOG: applica la conversione colore. */
     val log: Boolean = false,
+    /** Video HDR: 0 = no (SDR), 1 = HLG, 2 = HDR10 (PQ). */
+    val hdr: Int = 0,
     val muted: Boolean = false,
     /** Volume dell'audio originale: 1 = invariato, da 0 a 2. */
     val volume: Float = 1f,

@@ -33,7 +33,7 @@ internal fun fitRect(inW: Int, inH: Int, outW: Int, outH: Int): FloatArray {
 }
 
 private class BlurFillProgram(private val outW: Int, private val outH: Int, useHdr: Boolean) : BaseGlShaderProgram(useHdr, 1) {
-    private val program: GlProgram = try { GlProgram(VERTEX, FRAGMENT) } catch (e: GlUtil.GlException) { throw VideoFrameProcessingException(e) }
+    private val program: GlProgram = try { GlProgram(VERTEX, HdrGl.fragment(FRAGMENT, useHdr)) } catch (e: GlUtil.GlException) { throw VideoFrameProcessingException(e) }
     private var rect = floatArrayOf(0f, 0f, 1f, 1f)
     private var fillScale = floatArrayOf(1f, 1f)
 

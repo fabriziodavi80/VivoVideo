@@ -1,6 +1,7 @@
 package it.fabriziodavi.vivovideo
 
 import android.content.Context
+import it.fabriziodavi.vivovideo.engine.HdrGl
 import android.opengl.GLES20
 import androidx.media3.common.VideoFrameProcessingException
 import androidx.media3.common.util.GlProgram
@@ -24,7 +25,7 @@ private class DenoiseShaderProgram(amount: Float, useHdr: Boolean) :
     BaseGlShaderProgram(useHdr, 1) {
 
     private val program: GlProgram = try {
-        GlProgram(VERTEX, FRAGMENT)
+        GlProgram(VERTEX, HdrGl.fragment(FRAGMENT, useHdr))
     } catch (e: GlUtil.GlException) {
         throw VideoFrameProcessingException(e)
     }

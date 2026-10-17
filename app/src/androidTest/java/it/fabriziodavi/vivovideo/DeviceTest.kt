@@ -38,6 +38,14 @@ import androidx.test.platform.app.InstrumentationRegistry
 import it.fabriziodavi.vivovideo.engine.CompositionFactory
 import it.fabriziodavi.vivovideo.engine.CrossfadePreview
 import it.fabriziodavi.vivovideo.engine.Proxies
+import it.fabriziodavi.vivovideo.engine.FxEffect
+import it.fabriziodavi.vivovideo.engine.TransitionEffect
+import it.fabriziodavi.vivovideo.engine.GradeEffect
+import it.fabriziodavi.vivovideo.engine.BlurFillEffect
+import it.fabriziodavi.vivovideo.engine.LayerMaskEffect
+import it.fabriziodavi.vivovideo.engine.HdrGl
+import it.fabriziodavi.vivovideo.model.Grade
+import androidx.media3.common.util.GlUtil
 import it.fabriziodavi.vivovideo.engine.ExportOptions
 import it.fabriziodavi.vivovideo.engine.ExportState
 import it.fabriziodavi.vivovideo.engine.Exporter
@@ -335,9 +343,11 @@ class DeviceTest {
         playFor(wowProject())
     }
 
-    private fun exportAndCheck(p: Project, extraLayers: List<Layer> = emptyList(), multi: Boolean = true) { exportAndCheckUri(p, extraLayers, multi) }
+    private var lastDetails = ""
 
-    private fun exportAndCheckUri(p: Project, extraLayers: List<Layer> = emptyList(), multi: Boolean = true): Uri {
+    private fun exportAndCheck(p: Project, extraLayers: List<Layer> = emptyList(), multi: Boolean = true, options: ExportOptions = ExportOptions()) { exportAndCheckUri(p, extraLayers, multi, options) }
+
+    private fun exportAndCheckUri(p: Project, extraLayers: List<Layer> = emptyList(), multi: Boolean = true, options: ExportOptions = ExportOptions()): Uri {
         val project = p.copy(layers = p.layers + extraLayers)
         Safety.setMultiExport(ctx, multi)
         val state = AtomicReference<ExportState>(ExportState.Idle)
@@ -347,7 +357,7 @@ class DeviceTest {
             state.set(s)
             if (s is ExportState.Done || s is ExportState.Failed) done.countDown()
         }
-        main.post { exporter.start(project, ExportOptions()) }
+        main.post { exporter.start(project, options) }
         assertTrue("esportazione bloccata (${state.get()})", done.await(600, TimeUnit.SECONDS))
         val s = state.get()
         if (s is ExportState.Failed) fail("esportazione fallita: ${s.message}")
@@ -360,6 +370,7 @@ class DeviceTest {
             assertTrue("niente audio", r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_HAS_AUDIO) == "yes")
             assertTrue("niente video", r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_HAS_VIDEO) == "yes")
             assertTrue("solo note su sovrapposizioni mancanti", !s.details.contains("Attenzione") || !multi)
+            lastDetails = s.details
         } finally { r.release() }
         return uri
     }
@@ -553,5 +564,42 @@ class DeviceTest {
         val shown = Proxies.forPreview(ctx, p)
         assertTrue(shown.clips[0].uri.startsWith("file:") && shown.clips[0].uri.contains("copie_leggere"))
         playFor(shown, seconds = 5)
+    }
+
+    /** Tutti i nostri shader si compilano anche nella versione HDR (luce lineare ↔ gamma). */
+    @Test fun shadersCompileForHdr() {
+        val l = Layer(uri = "x", width = W, height = H, mask = LayerMask.HEART)
+        val effects = listOf(
+            FxEffect(FxType.entries.map { ClipFx(it, 0.5f) }, listOf(500_000L), 0, 3_000_000, 500_000, 500_000),
+            TransitionEffect(0, 3_000_000, TransitionType.GLITCH, 500_000, TransitionType.PRISM, 500_000),
+            GradeEffect(Grade(exposure = 0.5f, contrast = 0.2f)),
+            BlurFillEffect(W, H),
+            LayerMaskEffect(l),
+            DenoiseEffect(0.5f),
+            HighlightEffect(0.5f),
+        )
+        val error = AtomicReference<String?>(null)
+        val done = CountDownLatch(1)
+        Thread {
+            try {
+                val display = GlUtil.getDefaultEglDisplay()
+                val egl = GlUtil.createEglContext(display)
+                GlUtil.createFocusedPlaceholderEglSurface(egl, display)
+                HdrGl.gain = 10f
+                for (hdr in listOf(false, true)) for (e in effects) {
+                    try { e.toGlShaderProgram(ctx, hdr).release() } catch (t: Throwable) { error.set("${e.javaClass.simpleName} hdr=$hdr: ${chain(t)}"); break }
+                }
+                HdrGl.gain = 1f
+            } catch (t: Throwable) { error.set(chain(t)) } finally { done.countDown() }
+        }.start()
+        assertTrue(done.await(60, TimeUnit.SECONDS))
+        error.get()?.let { fail(it) }
+    }
+
+    /** Con l'opzione HDR su video SDR l'esportazione va comunque e il risultato dice il colore vero. */
+    @Test fun exportWithHdrOption() {
+        val p = Project(name = "hdr", clips = listOf(video("a", videoA).copy(hdr = 1), video("b", videoB, s = 1_000_000, e = 3_000_000)))
+        exportAndCheck(p, options = ExportOptions(hdr = true))
+        assertTrue(lastDetails, lastDetails.contains("Colore: SDR") || lastDetails.contains("10 bit"))
     }
 }
