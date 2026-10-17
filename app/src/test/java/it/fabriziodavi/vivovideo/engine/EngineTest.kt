@@ -244,6 +244,17 @@ class EngineTest {
             .forEach { u -> assertTrue("$u nello shader", Regex("\\b$u\\b").findAll(GRADE_FRAGMENT).count() >= 2) }
     }
 
+    @Test fun karaokeColorsTheSpokenWord() {
+        fun amber(b: Bitmap): Int { var n = 0; for (y in 0 until b.height) for (x in 0 until b.width) { val c = b.getPixel(x, y)
+            if (Color.alpha(c) > 200 && Color.red(c) > 200 && Color.green(c) in 140..210 && Color.blue(c) < 120) n++ }; return n }
+        val t = TextItem(text = "che bella giornata", look = TextLook.SEMPLICE, wordsUs = listOf(0, 300_000, 600_000), wordMode = 1)
+        assertEquals(0, amber(TextRenderer.render(app, t, 1080, 1920)))
+        assertTrue(amber(TextRenderer.render(app, t, 1080, 1920, highlight = 4..8)) > 30)
+        // Il livello del testo sceglie la parola giusta nel tempo.
+        val ov = TimedTextOverlay(app, t, 1080, 1920)
+        assertTrue(amber(ov.getBitmap(400_000)) > 30)
+    }
+
     @Test fun wowTransitionsPeakAtTheCutAndVanishAway() {
         val wow = listOf(TransitionType.GLITCH, TransitionType.PRISM, TransitionType.LEAK, TransitionType.IRIS, TransitionType.PIXELATE, TransitionType.SHAKE)
         wow.forEach { t ->

@@ -1278,6 +1278,7 @@ private fun TextPanel(vm: EditorViewModel, running: Boolean, tab: Int) {
             PillRow(p.texts, null as TextItem?, { it?.text?.lines()?.firstOrNull()?.take(18) ?: "" }, enabled) { x -> if (x != null) vm.selectText(x.id) }
         }
         PrimaryButton("Aggiungi testo", Modifier.fillMaxWidth(), enabled = enabled, onClick = vm::addText)
+        SecondaryButton("Sottotitoli automatici", Modifier.fillMaxWidth(), onClick = { if (enabled) { vm.pause(); vm.showSubtitles = true } })
         Hint("Il testo parte dall'indicatore. Nella timeline lo sposti trascinandolo e ne cambi la durata con le maniglie.")
         return
     }
@@ -1356,6 +1357,7 @@ private fun TextPanel(vm: EditorViewModel, running: Boolean, tab: Int) {
         SecondaryButton("Elimina", onClick = { if (enabled) vm.deleteText() })
     }
     SecondaryButton("Stile a tutti i testi", selected = p.textStyleOnAll(t), onClick = { if (enabled) vm.applyTextStyleToAll() })
+    SecondaryButton("Sottotitoli automatici", Modifier.fillMaxWidth(), onClick = { if (enabled) { vm.pause(); vm.showSubtitles = true } })
 }
 
 /**

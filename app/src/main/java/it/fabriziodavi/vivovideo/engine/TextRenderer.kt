@@ -22,6 +22,7 @@ import it.fabriziodavi.vivovideo.model.TextAnim
 import it.fabriziodavi.vivovideo.model.TextFont
 import it.fabriziodavi.vivovideo.model.TextItem
 import it.fabriziodavi.vivovideo.model.TextLook
+import it.fabriziodavi.vivovideo.model.Subtitles
 import kotlin.math.ceil
 import kotlin.math.max
 
@@ -62,7 +63,7 @@ object TextRenderer {
 
     private class Prepared(val layout: StaticLayout, val width: Int, val pad: Int, val paint: TextPaint)
 
-    private fun prepare(context: Context, item: TextItem, frameW: Int, frameH: Int, visible: Int): Prepared {
+    private fun prepare(context: Context, item: TextItem, frameW: Int, frameH: Int, visible: Int, highlight: IntRange? = null): Prepared {
         val paint = TextPaint(Paint.ANTI_ALIAS_FLAG or Paint.SUBPIXEL_TEXT_FLAG).apply {
             typeface = typeface(context, item.font)
             textSize = (item.size * frameH).coerceAtLeast(4f)
@@ -72,8 +73,12 @@ object TextRenderer {
         val text = displayText(item).ifEmpty { " " }
         // Larghezza massima: 90% del quadro; poi si stringe alla riga più lunga.
         val maxW = (frameW * 0.9f).toInt().coerceAtLeast(16)
-        val content: CharSequence = if (visible >= text.length) text else SpannableString(text).apply {
-            setSpan(ForegroundColorSpan(Color.TRANSPARENT), visible.coerceAtLeast(0), text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        val content: CharSequence = if (visible >= text.length && highlight == null) text else SpannableString(text).apply {
+            if (visible < text.length) setSpan(ForegroundColorSpan(Color.TRANSPARENT), visible.coerceAtLeast(0), text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            // Karaoke: la parola detta in questo momento ha il colore di risalto.
+            if (highlight != null && highlight.first >= 0 && highlight.last < text.length) {
+                setSpan(ForegroundColorSpan(item.highlight), highlight.first, highlight.last + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
         }
         var layout = StaticLayout.Builder.obtain(content, 0, content.length, paint, maxW)
             .setAlignment(Layout.Alignment.ALIGN_CENTER).setIncludePad(true).build()
@@ -92,11 +97,11 @@ object TextRenderer {
         return (p.width + 2 * p.pad) to (p.layout.height + 2 * p.pad)
     }
 
-    fun render(context: Context, item: TextItem, frameW: Int, frameH: Int, visible: Int = Int.MAX_VALUE): Bitmap {
+    fun render(context: Context, item: TextItem, frameW: Int, frameH: Int, visible: Int = Int.MAX_VALUE, highlight: IntRange? = null): Bitmap {
         val v = visible.coerceAtMost(displayText(item).length)
-        val key = "${item.text.hashCode()}|${item.font}|${item.look}|${item.color}|${item.gradientTo}|${item.spacing}|${item.upper}|${item.size}|$frameW|$frameH|$v"
+        val key = "${item.text.hashCode()}|${item.font}|${item.look}|${item.color}|${item.gradientTo}|${item.spacing}|${item.upper}|${item.size}|$frameW|$frameH|$v|$highlight|${item.highlight}"
         cache.get(key)?.let { return it }
-        val p = prepare(context, item, frameW, frameH, v)
+        val p = prepare(context, item, frameW, frameH, v, highlight)
         val bw = p.width + 2 * p.pad
         val bh = p.layout.height + 2 * p.pad
         val bmp = Bitmap.createBitmap(bw.coerceAtLeast(2), bh.coerceAtLeast(2), Bitmap.Config.ARGB_8888)
@@ -490,6 +495,15 @@ class TimedTextOverlay(
         }
         if (item.animIn == TextAnim.SHINE) {
             shinePhase(local)?.let { return TextRenderer.renderShine(context, item, frameW, frameH, quant(it, 30)) }
+        }
+        // Sottotitoli con i tempi del parlato: karaoke (parola colorata) o parole che compaiono mentre sono dette.
+        if (item.wordMode != 0 && item.wordsUs.isNotEmpty()) {
+            val ranges = Regex("\\S+").findAll(TextRenderer.displayText(item)).map { it.range }.toList()
+            val k = Subtitles.wordAt(item.wordsUs, local).coerceAtMost(ranges.lastIndex)
+            if (ranges.isNotEmpty()) {
+                return if (item.wordMode == 1) TextRenderer.render(context, item, frameW, frameH, highlight = if (k >= 0) ranges[k] else null)
+                else TextRenderer.render(context, item, frameW, frameH, visible = if (k >= 0) ranges[k].last + 1 else 0)
+            }
         }
         if (item.animIn == TextAnim.WORDS) {
             // Parola per parola: ogni parola compare a turno (~0,25 s l'una).

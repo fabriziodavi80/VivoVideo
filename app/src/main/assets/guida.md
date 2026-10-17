@@ -3,11 +3,9 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
-- **Voce fuori campo** (Audio → **Voce**): registri mentre il video scorre, la voce diventa una riga sincronizzata nella timeline.
-- **Stacca l'audio** di una clip (Audio → Clip, o tieni premuta la clip): diventa una riga a sé che puoi far iniziare prima o finire dopo il taglio (tagli a J e a L).
-- **Ducking**: "Abbassa la musica quando si parla" (Audio → Brano o Voce), di quanti dB scegli tu.
-- **Volume uniformato** a –14 LUFS in esportazione (come YouTube e Instagram), acceso di serie: niente video troppo bassi o troppo forti, picchi sotto –1 dB.
-- Colore per singola clip (Base, Ruote, HSL) con istogramma.
+- **Sottotitoli automatici** (Testo → **Sottotitoli automatici**): l'app ascolta il parlato e scrive i sottotitoli con i tempi di ogni parola. Stili **Classico, Karaoke** (la parola detta si colora), **Parola per parola**, **Riquadro**. Tutto sul telefono, senza internet (il modello si scarica una volta sola).
+- Audio professionale: voce fuori campo, audio staccato (tagli J/L), ducking, volume uniformato a –14 LUFS.
+- Colore per singola clip con istogramma.
 
 ## Primi passi
 - Dalla schermata dei progetti tocca **Nuovo progetto**: **Scegli foto e video** (fino a 100) oppure **Album interi** (uno o più album, tutto in ordine di data). Lo stesso vale per **+** e **Aggiungi** dentro l'editor.
@@ -120,6 +118,14 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - Animazioni di entrata/uscita (anche **Macchina da scrivere** e **Parola per parola**).
 - **Animazioni Wow**: **Lettere cadono** (rimbalzano al loro posto; in uscita cadono), **Lettere sfumate**, **Onda** (le lettere saltano una dopo l'altra), **Glitch** (con qualche sussulto anche mentre il testo resta), **Luccichio** (una striscia di luce attraversa il testo ogni 3 secondi; solo in entrata).
 - **Movimento**: posizione iniziale → finale (scegli quale modificare, sistemala con le dita).
+
+## Sottotitoli automatici
+- **Testo → Sottotitoli automatici**. L'app ascolta l'audio delle clip, la voce fuori campo e l'audio staccato (la musica no) e crea i sottotitoli, divisi in righe brevi da leggere, con i tempi di ogni parola.
+- **Riconoscimento**: **Preciso** (consigliato per l'italiano, 190 MB) o **Veloce** (60 MB). Il modello si scarica una volta sola, poi funziona anche senza internet: l'audio non esce mai dal telefono.
+- **Lingua**: Italiano, Inglese o Automatica. **Posizione**: in basso, al centro, in alto.
+- **Stili**: **Classico** (bianco con ombra), **Karaoke** (la parola detta si colora d'arancio), **Parola per parola** (le parole compaiono mentre sono dette), **Riquadro** (fondo scuro).
+- I sottotitoli sono testi normali nella timeline: toccane uno per correggere una parola, spostarlo o cambiarne lo stile. Rifacendo i sottotitoli, quelli automatici di prima vengono sostituiti; **Togli i sottotitoli automatici** li elimina tutti; Annulla torna indietro.
+- Su un video lungo l'ascolto richiede un po' (con "Preciso" circa un terzo della durata del video, a seconda del telefono): si può annullare.
 
 ## Livelli (immagini e video sopra al video)
 - **Livelli** nella barra principale: foto, loghi, adesivi PNG con trasparenza, oppure altri **video** (picture-in-picture). Schede **Aspetto**, **Forma**, **Animazione**.

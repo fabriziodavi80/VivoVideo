@@ -11,6 +11,10 @@ import android.media.MediaMetadataRetriever
 import android.net.Uri
 import it.fabriziodavi.vivovideo.online.Library
 import it.fabriziodavi.vivovideo.engine.AudioDsp
+import it.fabriziodavi.vivovideo.engine.Whisper
+import it.fabriziodavi.vivovideo.model.Subtitles
+import it.fabriziodavi.vivovideo.model.SubStyle
+import it.fabriziodavi.vivovideo.model.SubPosition
 import it.fabriziodavi.vivovideo.online.LibraryKeys
 import it.fabriziodavi.vivovideo.online.LibrarySource
 import kotlinx.coroutines.runBlocking
@@ -261,6 +265,31 @@ class DeviceTest {
         val lufs = AudioDsp.LoudnessMeter().apply { addInterleaved(pcm) }.lufs()
         android.util.Log.i("VivoVideoTest", "volume del video esportato: $lufs LUFS")
         assertTrue("volume $lufs invece di circa -14 LUFS", lufs in -16.5..-12.0 || lufs < -16.5 && pcm.maxOf { kotlin.math.abs(it) } > 0.85f)
+    }
+
+    /** Sottotitoli: riconoscimento vocale vero (modello minimo) sull'audio d'esempio di whisper.cpp. */
+    @Test fun whisperTranscribes() {
+        val m = try {
+            runBlocking { Whisper.download(ctx, Whisper.Model.TINY) {} }
+        } catch (e: java.net.UnknownHostException) { org.junit.Assume.assumeNoException(e); return }
+        val wav = File(ctx.cacheDir, "jfk.wav")
+        if (!wav.exists()) {
+            val c = java.net.URL("https://raw.githubusercontent.com/ggml-org/whisper.cpp/master/samples/jfk.wav").openConnection() as java.net.HttpURLConnection
+            c.inputStream.use { i -> wav.outputStream().use { i.copyTo(it) } }
+        }
+        val bytes = wav.readBytes()
+        // Dati PCM dopo il blocco "data" (16 kHz, mono, 16 bit).
+        val dataAt = (0 until bytes.size - 4).first { i -> bytes[i] == 'd'.code.toByte() && bytes[i + 1] == 'a'.code.toByte() && bytes[i + 2] == 't'.code.toByte() && bytes[i + 3] == 'a'.code.toByte() } + 8
+        val bb = java.nio.ByteBuffer.wrap(bytes, dataAt, bytes.size - dataAt).order(java.nio.ByteOrder.LITTLE_ENDIAN)
+        val pcm = FloatArray((bytes.size - dataAt) / 2) { bb.getShort().toFloat() / 32768f }
+        val t0 = System.currentTimeMillis()
+        val words = runBlocking { Whisper.transcribe(m, pcm, "en") }
+        android.util.Log.i("VivoVideoTest", "whisper: ${words.size} parole in ${System.currentTimeMillis() - t0} ms: ${words.joinToString(" ") { it.text }}")
+        val text = words.joinToString(" ") { it.text.lowercase() }
+        assertTrue("trascrizione: $text", text.contains("country"))
+        assertTrue(words.zipWithNext().all { (a, b) -> a.startUs <= b.startUs })
+        val subs = Subtitles.build(words, SubStyle.KARAOKE, SubPosition.BOTTOM, 11_000_000)
+        assertTrue(subs.isNotEmpty())
     }
 
     /** Libreria in rete: una ricerca vera su Openverse (musica ed effetti) e lo scaricamento di un brano. */

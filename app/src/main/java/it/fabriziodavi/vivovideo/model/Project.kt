@@ -337,6 +337,13 @@ data class TextItem(
     /** Spaziatura fra le lettere, in frazioni della misura del carattere. */
     val spacing: Float = 0f,
     val upper: Boolean = false,
+    /** Sottotitolo automatico (si può rifare o togliere in blocco). */
+    val subtitle: Boolean = false,
+    /** Inizio di ogni parola rispetto a [startUs] (sottotitoli con i tempi del parlato). */
+    val wordsUs: List<Long> = emptyList(),
+    /** 0 = testo intero; 1 = karaoke (la parola detta si colora di [highlight]); 2 = le parole compaiono mentre sono dette. */
+    val wordMode: Int = 0,
+    val highlight: Int = 0xFFF2B33D.toInt(),
 ) {
     val endUs: Long get() = startUs + durationUs
 

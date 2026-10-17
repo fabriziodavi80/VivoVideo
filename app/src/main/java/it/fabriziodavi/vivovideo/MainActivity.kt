@@ -13,6 +13,7 @@ import it.fabriziodavi.vivovideo.ui.EditorScreen
 import it.fabriziodavi.vivovideo.ui.AutoScreen
 import it.fabriziodavi.vivovideo.ui.LibraryScreen
 import it.fabriziodavi.vivovideo.ui.AlbumPickerScreen
+import it.fabriziodavi.vivovideo.ui.SubtitlesScreen
 import androidx.compose.foundation.layout.fillMaxSize
 import it.fabriziodavi.vivovideo.ui.GuideScreen
 import it.fabriziodavi.vivovideo.ui.EditorViewModel
@@ -62,6 +63,7 @@ class MainActivity : ComponentActivity() {
                     }
                     if (vm.library != null) LibraryScreen(vm)
                     if (vm.albumPick != null) AlbumPickerScreen(vm)
+                    if (vm.showSubtitles && vm.project != null) SubtitlesScreen(vm)
                 }
             }
         }

@@ -3,6 +3,11 @@ package it.fabriziodavi.vivovideo.ui
 import it.fabriziodavi.vivovideo.model.TextItem
 import it.fabriziodavi.vivovideo.model.TransitionSpec
 import it.fabriziodavi.vivovideo.model.Clip
+import it.fabriziodavi.vivovideo.model.SubStyle
+import it.fabriziodavi.vivovideo.model.SubPosition
+import it.fabriziodavi.vivovideo.model.Subtitles
+import it.fabriziodavi.vivovideo.engine.Whisper
+import it.fabriziodavi.vivovideo.renderTimelineAudio
 import it.fabriziodavi.vivovideo.model.Grade
 import it.fabriziodavi.vivovideo.decodePhotoThumb
 import it.fabriziodavi.vivovideo.model.FrameMode
@@ -975,6 +980,59 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     fun setFormat(format: VideoFormat? = null, same: FrameMode? = null, other: FrameMode? = null) = update { p ->
         p.copy(format = format ?: p.format, sameMode = same ?: p.sameMode, otherMode = other ?: p.otherMode).applyFramePresets()
     }
+
+    // ---------------- Sottotitoli automatici ----------------
+
+    var showSubtitles by mutableStateOf(false)
+    private var subtitleJob: kotlinx.coroutines.Job? = null
+
+    /**
+     * Ascolta l'audio del video (clip, voci, audio staccato; la musica no) e crea i sottotitoli,
+     * sostituendo quelli automatici di prima. Il modello si scarica la prima volta.
+     */
+    fun autoSubtitles(model: Whisper.Model, lang: String, style: SubStyle, pos: SubPosition) {
+        val ctx = getApplication<Application>()
+        val p = project ?: return
+        if (p.clips.isEmpty() || busy != null) return
+        pause()
+        subtitleJob = viewModelScope.launch {
+            try {
+                if (!Whisper.isDownloaded(ctx, model)) {
+                    busy = "Scarico il modello ${model.label} (${model.sizeMb} MB, solo la prima volta)…"
+                    Whisper.download(ctx, model) { f -> handler.post { busy = "Scarico il modello ${model.label}… ${(f * 100).toInt()}%" } }
+                }
+                busy = "Preparo l'audio…"
+                val voiceOnly = p.copy(music = p.music.filter { it.dialog })
+                val pcm = withContext(Dispatchers.Default) {
+                    val wav = renderTimelineAudio(ctx, voiceOnly, loudness = false)
+                    try { Whisper.wavTo16kMono(wav) } finally { wav.delete() }
+                }
+                busy = "Ascolto il video… 0%"
+                val poll = launch { while (true) { kotlinx.coroutines.delay(400); busy = "Ascolto il video… ${Whisper.progress()}%" } }
+                val words = try { Whisper.transcribe(Whisper.modelFile(ctx, model), pcm, lang) } finally { poll.cancel() }
+                busy = null
+                val subs = Subtitles.build(words, style, pos, p.durationUs)
+                if (subs.isEmpty()) { message = "Non ho sentito parole nel video (la musica non viene ascoltata, solo l'audio delle clip e le voci)."; return@launch }
+                update { it.copy(texts = it.texts.filterNot { t -> t.subtitle } + subs) }
+                showSubtitles = false
+                message = "${subs.size} sottotitoli creati. Tocca un sottotitolo nella timeline per correggere una parola, spostarlo o cambiarne lo stile; Annulla li toglie tutti."
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                busy = null; throw e
+            } catch (e: Exception) {
+                busy = null
+                message = "Sottotitoli non riusciti: ${e.message ?: e.javaClass.simpleName}"
+            }
+        }
+    }
+
+    fun cancelSubtitles() {
+        Whisper.abort()
+        subtitleJob?.cancel()
+        busy = null
+    }
+
+    /** Toglie tutti i sottotitoli automatici. */
+    fun removeSubtitles() = update { it.copy(texts = it.texts.filterNot { t -> t.subtitle }) }
 
     // ---------------- Voce fuori campo, audio staccato, ducking ----------------
 
