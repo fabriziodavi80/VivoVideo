@@ -34,7 +34,8 @@ data class BackupManifest(val version: Int = 1, val app: String = "VivoVideo", v
 object ProjectRefs {
     private const val PACK = "vivo-pack:"
 
-    fun isRef(s: String) = s.startsWith("content://") || s.startsWith("file://") || (s.startsWith("/") && s.length > 3 && File(s).isAbsolute && s.contains("/files/"))
+    fun isRef(s: String) = s.startsWith("content://") || s.startsWith("file://") ||
+        (s.startsWith("/") && s.length in 4..1024 && '\n' !in s && runCatching { File(s).isFile }.getOrDefault(false))
 
     fun walk(e: JsonElement, f: (String) -> String?): JsonElement = when (e) {
         is JsonObject -> JsonObject(e.mapValues { (_, v) -> walk(v, f) })
