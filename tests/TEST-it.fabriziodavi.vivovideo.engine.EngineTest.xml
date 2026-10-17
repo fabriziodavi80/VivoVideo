@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.engine.EngineTest" tests="25" skipped="0" failures="0" errors="0" timestamp="2026-10-17T12:54:50.854Z" hostname="runnervm8k3b6" time="5.496">
+  <properties/>
+  <testcase name="everyEffectHasItsUniformInTheShader" classname="it.fabriziodavi.vivovideo.engine.EngineTest" time="2.331"/>
+  <testcase name="pulseFollowsBeats" classname="it.fabriziodavi.vivovideo.engine.EngineTest" time="0.026"/>
+  <testcase name="transitionPeaksAtTheCut" classname="it.fabriziodavi.vivovideo.engine.EngineTest" time="0.021"/>
+  <testcase name="karaokeColorsTheSpokenWord" classname="it.fabriziodavi.vivovideo.engine.EngineTest" time="0.476"/>
+  <testcase name="strobeOnBeats" classname="it.fabriziodavi.vivovideo.engine.EngineTest" time="0.016"/>
+  <testcase name="previewProjectSwapsReadyCrossfadesKeepingDuration" classname="it.fabriziodavi.vivovideo.engine.EngineTest" time="0.102"/>
+  <testcase name="wowTextFramesDraw" classname="it.fabriziodavi.vivovideo.engine.EngineTest" time="0.83"/>
+  <testcase name="withoutCompositorCrossfadeBecomesSingleTrack" classname="it.fabriziodavi.vivovideo.engine.EngineTest" time="0.022"/>
+  <testcase name="clipGradeAddsItsShaderOnlyWhenNeeded" classname="it.fabriziodavi.vivovideo.engine.EngineTest" time="0.01"/>
+  <testcase name="wowTextPresetsAreRecognized" classname="it.fabriziodavi.vivovideo.engine.EngineTest" time="0.014"/>
+  <testcase name="hitFollowsBeats" classname="it.fabriziodavi.vivovideo.engine.EngineTest" time="0.012"/>
+  <testcase name="lettersArriveInTurnAndLeave" classname="it.fabriziodavi.vivovideo.engine.EngineTest" time="0.011"/>
+  <testcase name="compositorAlphaForCrossfadeAndLayers" classname="it.fabriziodavi.vivovideo.engine.EngineTest" time="0.013"/>
+  <testcase name="wowTransitionsPeakAtTheCutAndVanishAway" classname="it.fabriziodavi.vivovideo.engine.EngineTest" time="0.011"/>
+  <testcase name="clipFadesInAndOut" classname="it.fabriziodavi.vivovideo.engine.EngineTest" time="0.013"/>
+  <testcase name="simpleProjectIsOneSequenceWithRightDuration" classname="it.fabriziodavi.vivovideo.engine.EngineTest" time="0.021"/>
+  <testcase name="musicAddsAudioSequencesAndNativeAudioReplacesThem" classname="it.fabriziodavi.vivovideo.engine.EngineTest" time="0.015"/>
+  <testcase name="animationsStartAndEndInvisible" classname="it.fabriziodavi.vivovideo.engine.EngineTest" time="0.012"/>
+  <testcase name="crossfadeExportUsesCompositorWithPaddedLane" classname="it.fabriziodavi.vivovideo.engine.EngineTest" time="0.013"/>
+  <testcase name="formatsSetTheOutputSizeAndBlurredBackgroundReplacesTheBands" classname="it.fabriziodavi.vivovideo.engine.EngineTest" time="0.013"/>
+  <testcase name="layerShapesBordersAndKey" classname="it.fabriziodavi.vivovideo.engine.EngineTest" time="0.351"/>
+  <testcase name="everyFontAndLookDraws" classname="it.fabriziodavi.vivovideo.engine.EngineTest" time="0.93"/>
+  <testcase name="localTimeIsClipRelativeAndClamped" classname="it.fabriziodavi.vivovideo.engine.EngineTest" time="0.011"/>
+  <testcase name="videoLayersMakeOneLanePerOverlap" classname="it.fabriziodavi.vivovideo.engine.EngineTest" time="0.011"/>
+  <testcase name="everyFeatureTogetherBuildsInBothModes" classname="it.fabriziodavi.vivovideo.engine.EngineTest" time="0.208"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

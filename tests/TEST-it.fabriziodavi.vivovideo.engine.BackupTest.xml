@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.engine.BackupTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-17T12:54:47.119Z" hostname="runnervm8k3b6" time="3.424">
+  <properties/>
+  <testcase name="lightBackupRoundTrip" classname="it.fabriziodavi.vivovideo.engine.BackupTest" time="3.343"/>
+  <testcase name="missingFilesAreReported" classname="it.fabriziodavi.vivovideo.engine.BackupTest" time="0.049"/>
+  <testcase name="refsFindEveryFileInAnyField" classname="it.fabriziodavi.vivovideo.engine.BackupTest" time="0.032"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[[Robolectric] WARN: Android SDK 36 requires Java 21 (have Java 17). Tests won't be run on SDK 36 unless explicitly requested.
+[Robolectric] WARN: Android SDK 37 requires Java 21 (have Java 17). Tests won't be run on SDK 37 unless explicitly requested.
+]]></system-err>
+</testsuite>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.ui.EditorOpsTest" tests="16" skipped="0" failures="0" errors="0" timestamp="2026-10-17T12:54:56.815Z" hostname="runnervm8k3b6" time="1.382">
+  <properties/>
+  <testcase name="multiSelectPasteAndDelete" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.467"/>
+  <testcase name="detachAudioMakesADialogLaneAndDucking" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.112"/>
+  <testcase name="tapToTheBeatAlsoCutsTheClipsOnPause" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.071"/>
+  <testcase name="framingAppliesToAll" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.042"/>
+  <testcase name="alignCutsAndSlideshow" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.048"/>
+  <testcase name="transitionsToAllCutsAndEffectsToAllClips" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.046"/>
+  <testcase name="undoRedoRestoreEveryChange" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.052"/>
+  <testcase name="formatPresetsApplyToEveryClip" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.031"/>
+  <testcase name="selectionsAreExclusive" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.028"/>
+  <testcase name="anotherProposalRebuildsAndUndoGoesBack" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.274"/>
+  <testcase name="layerPosesStartAndEnd" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.028"/>
+  <testcase name="fadesOnVideoEndsAndToAll" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.039"/>
+  <testcase name="photoDurationAndMotion" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.021"/>
+  <testcase name="musicSplitBeatsAndSnap" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.04"/>
+  <testcase name="splitDuplicateMoveDelete" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.042"/>
+  <testcase name="textEditingPresetsAndMotion" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.038"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
