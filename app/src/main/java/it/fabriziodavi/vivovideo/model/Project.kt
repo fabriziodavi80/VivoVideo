@@ -174,6 +174,10 @@ data class Clip(
     val stab: Stabilization? = null,
     /** Fermo immagine preso da un video (foto creata dall'app). */
     val freeze: Boolean = false,
+    /** Segui il soggetto: con "Riempi", l'inquadratura si sposta per tenerlo in centro. */
+    val reframe: Reframe? = null,
+    /** Persona scontornata: cosa fare dello sfondo. */
+    val person: PersonFx? = null,
     val width: Int = 0,
     val height: Int = 0,
     val fps: Float = 30f,
@@ -402,6 +406,8 @@ data class Layer(
     val key: KeyColor = KeyColor.NONE,
     /** Tolleranza dello scontorno (0..1). */
     val keyTolerance: Float = 0.35f,
+    /** Video sovrapposto: si vede solo la persona (sfondo trasparente). */
+    val person: PersonFx? = null,
 ) {
     val endUs: Long get() = startUs + durationUs
 

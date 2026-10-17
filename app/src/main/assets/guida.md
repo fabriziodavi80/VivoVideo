@@ -3,10 +3,11 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
-- **Fermo immagine**, **Al contrario** e **Stabilizzazione** (vedi "Fermo immagine, al contrario, stabilizzazione").
-- **Selezione multipla e copia/incolla degli attributi**: tieni premuta una clip → Copia attributi / Seleziona più clip → Incolla attributi su tutte le clip scelte (vedi "Selezionare").
-- **Esportazione HDR a 10 bit** (Esporta → "HDR 10 bit, come l'hai girato"): compare quando nel progetto ci sono video HDR. Luci e colori pieni come li ha ripresi il telefono; filtri, transizioni e correzioni di colore hanno lo stesso aspetto che in SDR. Se qualcosa non regge l'HDR, l'app esporta in SDR e lo scrive nel risultato (riga **Colore**).
-- Prima: preimpostazioni **Pronto per** (YouTube, Reels/TikTok, WhatsApp) con peso stimato, copie leggere per 4K/8K/120 fps, video sovrapposti che si muovono in anteprima.
+- **Regia intelligente** nel video automatico (acceso di serie): l'app guarda ogni video e prende il tratto migliore (nitido, ben illuminato, con volti e sorrisi); i video con l'orientamento opposto riempiono il quadro **seguendo le persone**. Ogni "Altra proposta" prova anche altri tratti.
+- **Momento migliore** (tieni premuta una clip): stessa durata, ma sul tratto migliore del video. Toccandolo di nuovo propone il secondo e il terzo.
+- **Segui il soggetto** (Modifica → Inquadra): l'inquadratura si sposta da sola per tenere al centro volti o soggetto. Perfetto per un video orizzontale in un progetto verticale.
+- **Scontorno della persona** senza telo verde (Effetti → **Persona**): sfondo sfocato, a colore o in bianco e nero. Nei video sovrapposti (Livelli → Forma → **Scontorna la persona**) resta solo la persona sopra al video principale.
+- Prima: fermo immagine, al contrario, stabilizzazione, selezione multipla con copia/incolla degli attributi, esportazione HDR a 10 bit.
 
 ## Primi passi
 - Dalla schermata dei progetti tocca **Nuovo progetto**: **Scegli foto e video** (fino a 100) oppure **Album interi** (uno o più album, tutto in ordine di data). Lo stesso vale per **+** e **Aggiungi** dentro l'editor.
@@ -35,6 +36,14 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - **Al contrario**: tieni premuta la clip → **Al contrario** (fino a 60 s). L'app prepara una copia rovesciata, anche l'audio (segno ◀); keyframe e curva di velocità si specchiano. La copia è al massimo in 1080p. **Di nuovo nel verso normale** torna all'originale.
 - **Stabilizzazione**: Modifica → **Inquadra** → **Stabilizza la clip**. L'app misura il tremolio della camera e lo leviga con un leggero zoom (segno STAB). **Forza** regola quanto: più forza = immagine più ferma ma più zoom (al massimo 20%). Si vede subito in anteprima. Se poi accorci o allunghi molto la clip, rifai la stabilizzazione.
 - Durante al contrario e stabilizzazione l'anteprima si ferma; c'è **Annulla**.
+
+## Funzioni intelligenti
+- Tutto sul telefono, senza internet: riconoscimento dei volti (con sorrisi e occhi aperti) e della persona.
+- **Video automatico → Regia intelligente**: per ogni video si guardano i fotogrammi chiave (nitidezza, luce, movimento, volti) e si sceglie il tratto migliore. Nell'orientamento opposto, se ci sono persone, il quadro si riempie seguendole invece dello sfondo sfocato. La prima volta ci vuole un po' (scritta "Cerco i momenti migliori…"); i risultati restano, e le proposte successive sono subito pronte.
+- **Momento migliore**: tieni premuta una clip video più corta del suo file. Il taglio si sposta sul tratto migliore della stessa durata; di nuovo = secondo e terzo tratto.
+- **Segui il soggetto**: Inquadra → Segui il soggetto. Mette "Riempi" e muove l'inquadratura con calma, seguendo i volti (o, senza volti, la zona con più dettagli). Segno SEGUE nella timeline. "Smetti di seguire" per toglierlo; con "Adatta" o "Sfocato" non ha effetto.
+- **Persona** (Effetti → Persona): Scontorna la persona (circa il tempo della clip), poi scegli lo sfondo: **sfocato**, **a colore** o **in bianco e nero** (colore solo sulla persona). Segno PERSONA. Se cambi molto il taglio, "Rifai lo scontorno".
+- **Solo la persona** nei video sovrapposti: Livelli → Forma → Scontorna la persona. Lo sfondo diventa trasparente: la persona sta sopra al video principale. In anteprima si vede quando il tratto è pronto.
 
 ## Velocità
 - **Velocità** sulla clip: Normale, Lenta, Veloce o **Curva** (speed ramp disegnabile).

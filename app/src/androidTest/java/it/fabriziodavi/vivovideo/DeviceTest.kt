@@ -39,6 +39,12 @@ import it.fabriziodavi.vivovideo.engine.CompositionFactory
 import it.fabriziodavi.vivovideo.engine.CrossfadePreview
 import it.fabriziodavi.vivovideo.engine.Proxies
 import it.fabriziodavi.vivovideo.engine.Reverser
+import it.fabriziodavi.vivovideo.engine.SmartAnalyzer
+import it.fabriziodavi.vivovideo.engine.PersonMasks
+import it.fabriziodavi.vivovideo.model.Moments
+import it.fabriziodavi.vivovideo.model.PersonMode
+import it.fabriziodavi.vivovideo.model.Reframe
+import it.fabriziodavi.vivovideo.model.VideoFormat
 import it.fabriziodavi.vivovideo.engine.Stabilizer
 import it.fabriziodavi.vivovideo.model.ClipTools
 import it.fabriziodavi.vivovideo.model.StabMath
@@ -685,5 +691,52 @@ class DeviceTest {
         assertTrue(q.clips[1].freeze && q.clips[1].isPhoto)
         assertTrue(abs(q.durationUs - 14_000_000) < 50_000)
         exportAndCheck(q)
+    }
+
+    /** Video mosso nei primi 3 s e nitido negli ultimi 3: il momento migliore cade nella parte nitida. */
+    @Test fun bestMomentFindsTheSharpPart() {
+        val out = File(ctx.cacheDir, "prove/mosso_nitido.mp4")
+        if (!out.exists()) {
+            val sharp = Bitmap.createBitmap(W, H, Bitmap.Config.ARGB_8888).also { b ->
+                val c = Canvas(b); c.drawColor(Color.GRAY)
+                val p = Paint().apply { color = Color.WHITE }
+                for (x in 0 until W step 8) for (y in 0 until H step 8) if ((x / 8 + y / 8) % 2 == 0) c.drawRect(x.toFloat(), y.toFloat(), x + 8f, y + 8f, p)
+            }
+            val blurry = Bitmap.createBitmap(W, H, Bitmap.Config.ARGB_8888).also { b ->
+                val c = Canvas(b); c.drawColor(Color.GRAY)
+                val p = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.LTGRAY; maskFilter = android.graphics.BlurMaskFilter(60f, android.graphics.BlurMaskFilter.Blur.NORMAL) }
+                c.drawCircle(W / 2f, H / 2f, H / 3f, p)
+            }
+            val fs = save(sharp, "nitido.png", png = true); val fb = save(blurry, "mosso.png", png = true)
+            val seq = EditedMediaItemSequence.Builder(setOf(C.TRACK_TYPE_VIDEO))
+            for (k in 0 until 12) {
+                val f = if (k < 6) fb else fs
+                seq.addItem(EditedMediaItem.Builder(MediaItem.Builder().setUri(Uri.fromFile(f)).setMimeType(MimeTypes.IMAGE_PNG).setImageDurationMs(500).build())
+                    .setDurationUs(500_000).setFrameRate(30).build())
+            }
+            transform(Composition.Builder(listOf(seq.build())).build(), out)
+        }
+        val uri = Uri.fromFile(out).toString()
+        val scan = runBlocking { SmartAnalyzer.scan(ctx, uri, false, 6_000_000) }
+        assertTrue("campioni ${scan.samples.size}", scan.samples.size >= 4)
+        val best = Moments.bestStarts(scan, 2_000_000, 1).first()
+        assertTrue("migliore a $best (${scan.samples.map { it.tUs to it.sharp.toInt() }})", best >= 2_800_000)
+        // Seconda volta: dalla cartella dei risultati, subito.
+        assertTrue(SmartAnalyzer.cached(ctx, uri, 6_000_000) != null)
+    }
+
+    /** Scontorno della persona: le maschere si calcolano, la clip (sfondo sfocato) e il video sovrapposto (solo persona) si esportano. */
+    @Test fun personMasksAndExport() {
+        val fx = runBlocking { PersonMasks.analyze(ctx, videoA.toString(), 0, 6_000_000, PersonMode.BLUR) {} }
+        assertTrue("maschere ${fx.count}", fx.count in 80..95)
+        val m = PersonMasks.load(fx.maskFile)!!
+        assertTrue(m.count == fx.count && m.side == PersonMasks.SIDE)
+        val clip = video("a", videoA).copy(person = fx)
+        val pip = Layer(uri = videoB.toString(), name = "pip", width = W, height = H, isVideo = true, sourceDurationUs = 6_000_000,
+            startUs = 1_000_000, durationUs = 3_000_000, pose = Transform(scale = 0.5f), person = fx.copy(mode = PersonMode.REMOVE))
+        exportAndCheck(Project(name = "persona", clips = listOf(clip, video("c", videoC)), layers = listOf(pip)))
+        // Anche "segui il soggetto" (orizzontale in verticale) passa dall'esportazione.
+        val follow = video("b", videoB).copy(fill = true, reframe = Reframe(listOf(0, 3_000_000), listOf(0.2f, 0.8f), listOf(0.5f, 0.5f)))
+        exportAndCheck(Project(name = "segui", clips = listOf(follow), format = VideoFormat.VERTICAL))
     }
 }

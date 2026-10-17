@@ -84,6 +84,8 @@ data class AutoOptions(
     val variant: Int = 0,
     /** Formato del video: AUTO = l'orientamento più frequente fra foto e video scelti. */
     val format: VideoFormat = VideoFormat.AUTO,
+    /** Regia intelligente: momenti migliori dei video e, nell'orientamento opposto, inquadratura che segue i volti. */
+    val smart: Boolean = true,
 )
 
 /** Un elemento della galleria da cui è nato il video automatico. */
@@ -142,7 +144,7 @@ object AutoEdit {
      * Monta il video: [sources] sono le clip importate in ordine di data, [music] il brano (facoltativo,
      * con i battiti già trovati). Restituisce il progetto pronto, tutto ritoccabile nell'editor.
      */
-    fun build(name: String, sources: List<Clip>, music: MusicTrack?, o: AutoOptions): Project {
+    fun build(name: String, sources: List<Clip>, music: MusicTrack?, o: AutoOptions, scans: Map<String, MomentScan> = emptyMap()): Project {
         val style = o.style
         val rnd = Random(o.seed)
         val beats = music?.beatsUs.orEmpty().filter { it > 0 }
@@ -171,8 +173,15 @@ object AutoEdit {
                 prevMotion = m
                 src.copy(trimStartUs = 0, trimEndUs = len, keyframes = m.keyframes(len))
             } else {
-                val pos = if (o.variant == 0) 0.4 else 0.2 + rnd.nextDouble() * 0.45
-                val start = ((src.sourceDurationUs - len) * pos).toLong().coerceAtLeast(0)
+                val scan = scans[src.uri]?.takeIf { o.smart && it.samples.size >= 2 }
+                val start = if (scan != null) {
+                    // Il tratto migliore (dalle proposte successive, il secondo o il terzo).
+                    val best = Moments.bestStarts(scan, len, 3)
+                    best[o.variant % best.size].coerceIn(0, (src.sourceDurationUs - len).coerceAtLeast(0))
+                } else {
+                    val pos = if (o.variant == 0) 0.4 else 0.2 + rnd.nextDouble() * 0.45
+                    ((src.sourceDurationUs - len) * pos).toLong().coerceAtLeast(0)
+                }
                 src.copy(trimStartUs = start, trimEndUs = start + len, speed = ClipSpeed.NORMAL, keyframes = emptyList())
             }
             c = c.copy(muted = music != null || c.muted, fx = style.fx, fadeInUs = 0, fadeOutUs = 0, transitionOut = null)
@@ -204,6 +213,16 @@ object AutoEdit {
         // Formato e inquadratura: stesso orientamento = riempi, orientamento opposto = sfondo sfocato.
         val format = if (o.format == VideoFormat.AUTO) VideoFormat.majority(sources) else o.format
         var p = Project(name = name, clips = clips, format = format).applyFramePresets()
+        if (o.smart) {
+            // Orientamento opposto con delle persone: si riempie il quadro seguendo i volti, invece delle bande.
+            val out = p.outputOrientation()
+            p = p.copy(clips = p.clips.map { c ->
+                val scan = scans[c.uri]
+                if (c.orientation != out && out != Orientation.SQUARE && scan?.hasFaces == true) {
+                    Moments.subjectPath(scan)?.let { path -> c.withMode(FrameMode.FILL).copy(reframe = path) } ?: c
+                } else c
+            })
+        }
         val total = p.durationUs
 
         // 4. Titolo (e sottotitolo) all'inizio, nello stile della regia.

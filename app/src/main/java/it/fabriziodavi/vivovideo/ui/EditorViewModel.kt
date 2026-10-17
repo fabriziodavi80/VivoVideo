@@ -14,6 +14,12 @@ import it.fabriziodavi.vivovideo.model.ClipTools
 import it.fabriziodavi.vivovideo.model.StabMath
 import it.fabriziodavi.vivovideo.model.insertAt
 import it.fabriziodavi.vivovideo.engine.Reverser
+import it.fabriziodavi.vivovideo.engine.SmartAnalyzer
+import it.fabriziodavi.vivovideo.engine.PersonMasks
+import it.fabriziodavi.vivovideo.model.PersonMode
+import it.fabriziodavi.vivovideo.model.withMode
+import it.fabriziodavi.vivovideo.model.MomentScan
+import it.fabriziodavi.vivovideo.model.Moments
 import it.fabriziodavi.vivovideo.engine.Stabilizer
 import it.fabriziodavi.vivovideo.engine.ExportEstimate
 import it.fabriziodavi.vivovideo.engine.OutputCodec
@@ -578,9 +584,10 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                 val r = findBeats(ctx, m0)
                 if (r != null) music = m0.copy(beatsUs = r.beatsUs, bpm = r.bpm)
             }
+            val scans = smartScans(ctx, clips, o.smart)
             busy = "Montaggio…"
             val name = options.title.ifBlank { "Video automatico" }.take(40)
-            val built = withContext(Dispatchers.Default) { AutoEdit.build(name, clips, music, o) }
+            val built = withContext(Dispatchers.Default) { AutoEdit.build(name, clips, music, o, scans) }
             var p = built.copy(auto = AutoRecipe(sources, o, music, round = 1, imported = imported))
             if (clips.any { it.log }) p = p.copy(color = p.color.copy(denoise = 40))
             busy = null
@@ -591,6 +598,19 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                 (if (clips.size < picked.size) " ${picked.size - clips.size} file non leggibili saltati." else "") +
                 " Guardalo in anteprima, ritocca quello che vuoi ed esporta."
         }
+    }
+
+    /** Regia intelligente: analisi di foto e video (momenti migliori, volti); quelle già fatte sono immediate. */
+    private suspend fun smartScans(ctx: Application, clips: List<Clip>, smart: Boolean): Map<String, MomentScan> {
+        if (!smart) return emptyMap()
+        val out = HashMap<String, MomentScan>()
+        clips.distinctBy { it.uri }.forEachIndexed { i, c ->
+            busy = "Cerco i momenti migliori… ${i + 1} di ${clips.size}"
+            runCatching { SmartAnalyzer.scan(ctx, c.uri, c.isPhoto, c.sourceDurationUs) }
+                .onFailure { if (it is kotlinx.coroutines.CancellationException) throw it }
+                .getOrNull()?.let { out[c.uri] = it }
+        }
+        return out
     }
 
     /** Importa le fonti che mancano (con avanzamento) e restituisce tutte quelle importate, per indirizzo. */
@@ -619,8 +639,9 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             val picked = AutoEdit.pick(r.sources.map { it.item() }, o.style, o.targetUs, variant = round).map { r.sources[it] }
             val imported = importSources(ctx, picked, r.imported)
             val clips = picked.mapNotNull { imported[it.uri] }
+            val scans = smartScans(ctx, clips, o.smart)
             busy = "Nuova proposta…"
-            val built = withContext(Dispatchers.Default) { AutoEdit.build(p.name, clips, r.music, o) }
+            val built = withContext(Dispatchers.Default) { AutoEdit.build(p.name, clips, r.music, o, scans) }
             busy = null
             if (built.clips.isEmpty()) { message = "Non sono riuscito a leggere le foto e i video degli album."; return@launch }
             pause()
@@ -1048,6 +1069,76 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             if (now.uri != c.uri || now.trimStartUs != c.trimStartUs || now.trimEndUs != c.trimEndUs) { message = "La clip è cambiata: riprova."; return@runClipWork }
             update { it.replaceClip(now.copy(stab = s)) }
             message = "Clip stabilizzata (zoom ${"%.0f".format((StabMath.plan(s).zoom - 1) * 100)}%)."
+        }
+    }
+
+    // ---------------- Funzioni intelligenti ----------------
+
+    /** Tiene la stessa durata ma sposta il taglio sul tratto migliore del video; ripetuto, propone il successivo. */
+    fun bestMoment() {
+        val c = workClip() ?: return
+        if (c.isPhoto) { message = "Il momento migliore si cerca nei video."; return }
+        if (c.trimmedUs >= c.sourceDurationUs - 100_000) { message = "La clip usa già tutto il video: accorciala prima, poi cerco il tratto migliore di quella durata."; return }
+        val ctx = getApplication<Application>()
+        runClipWork("Cerco il momento migliore…") { prog ->
+            prog(0.1f)
+            val scan = SmartAnalyzer.scan(ctx, c.uri, false, c.sourceDurationUs)
+            val best = Moments.bestStarts(scan, c.trimmedUs, 3)
+            val now = project?.clips?.firstOrNull { it.id == c.id } ?: return@runClipWork
+            val cur = best.indexOfFirst { kotlin.math.abs(it - now.trimStartUs) < 250_000 }
+            val k = (cur + 1) % best.size
+            val start = best[k]
+            update { it.replaceClip(now.copy(trimStartUs = start, trimEndUs = start + now.trimmedUs)) }
+            message = "Tratto ${k + 1} di ${best.size} per qualità (nitidezza, luce, volti). Tocca di nuovo per il successivo."
+        }
+    }
+
+    /** Segui il soggetto: riempie il quadro e sposta l'inquadratura seguendo volti o soggetto. */
+    fun followSubject() {
+        val c = workClip() ?: return
+        val ctx = getApplication<Application>()
+        runClipWork("Cerco il soggetto…") { prog ->
+            prog(0.1f)
+            val scan = SmartAnalyzer.scan(ctx, c.uri, c.isPhoto, c.sourceDurationUs)
+            val path = Moments.subjectPath(scan)
+            val now = project?.clips?.firstOrNull { it.id == c.id } ?: return@runClipWork
+            if (path == null) { message = "Non ho trovato un soggetto chiaro da seguire."; return@runClipWork }
+            update { it.replaceClip(now.withMode(FrameMode.FILL).copy(reframe = path)) }
+            message = if (scan.hasFaces) "Inquadratura che segue i volti." else "Nessun volto: seguo la zona con più dettagli."
+        }
+    }
+
+    fun stopFollow() = updateSelected { it.copy(reframe = null) }
+
+    /** Scontorna la persona della clip (maschere calcolate una volta) e tratta lo sfondo come [mode]. */
+    fun cutPerson(mode: PersonMode = PersonMode.BLUR) {
+        val c = workClip() ?: return
+        if (c.isPhoto) { message = "Lo scontorno della persona è per i video."; return }
+        val ctx = getApplication<Application>()
+        runClipWork("Scontorno la persona…") { prog ->
+            val from = (c.trimStartUs - 500_000).coerceAtLeast(0)
+            val to = (c.trimEndUs + 500_000).coerceAtMost(c.sourceDurationUs)
+            val fx = PersonMasks.analyze(ctx, c.uri, from, to, mode, prog)
+            val now = project?.clips?.firstOrNull { it.id == c.id } ?: return@runClipWork
+            update { it.replaceClip(now.copy(person = fx)) }
+            message = "Persona scontornata: scegli cosa fare dello sfondo."
+        }
+    }
+
+    fun setPersonMode(m: PersonMode) = updateSelected { c -> c.person?.let { c.copy(person = it.copy(mode = m)) } ?: c }
+    fun setPersonColor(color: Int) = updateSelected { c -> c.person?.let { c.copy(person = it.copy(color = color)) } ?: c }
+    fun removePerson() = updateSelected { it.copy(person = null) }
+
+    /** Video sovrapposto: solo la persona (sfondo trasparente), per metterla sopra a un altro video. */
+    fun cutLayerPerson() {
+        val l = selectedLayer ?: return
+        if (!l.isVideo) { message = "Lo scontorno della persona è per i video sovrapposti."; return }
+        val ctx = getApplication<Application>()
+        runClipWork("Scontorno la persona…") { prog ->
+            val fx = PersonMasks.analyze(ctx, l.uri, l.sourceStartUs, l.sourceStartUs + l.durationUs, PersonMode.REMOVE, prog)
+            val now = project?.layers?.firstOrNull { it.id == l.id } ?: return@runClipWork
+            update { it.replaceLayer(now.copy(person = fx)) }
+            message = "Persona scontornata: in anteprima si vede appena il tratto è pronto, nel video esportato sempre."
         }
     }
 

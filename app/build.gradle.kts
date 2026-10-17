@@ -99,6 +99,10 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.2")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
 
+    // Funzioni intelligenti, tutto sul telefono (modelli inclusi nell'app): volti e scontorno della persona.
+    implementation("com.google.mlkit:face-detection:16.1.7")
+    implementation("com.google.mlkit:segmentation-selfie:16.0.0-beta6")
+
     testImplementation("junit:junit:4.13.2")
     testImplementation(platform("androidx.compose:compose-bom:2025.09.00"))
     testImplementation("androidx.compose.ui:ui-test-junit4")

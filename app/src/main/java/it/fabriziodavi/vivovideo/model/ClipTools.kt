@@ -144,7 +144,7 @@ object ClipTools {
             keyframes = c.keyframes.map { it.copy(timeUs = (durUs - it.timeUs * k).toLong().coerceIn(0, durUs)) }.sortedBy { it.timeUs },
             speedPoints = c.speedPoints.map { SpeedPoint(1f - it.t, it.speed) }.sortedBy { it.t },
             reversed = ReversedSource(c.uri, c.sourceDurationUs, c.trimStartUs, c.trimEndUs, c.width, c.height, c.hdr),
-            stab = null,
+            stab = null, reframe = null, person = null,
         )
     }
 

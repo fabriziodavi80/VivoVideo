@@ -148,6 +148,7 @@ import it.fabriziodavi.vivovideo.engine.OutputSize
 import it.fabriziodavi.vivovideo.model.Clip
 import it.fabriziodavi.vivovideo.model.ClipStyle
 import it.fabriziodavi.vivovideo.model.StabMath
+import it.fabriziodavi.vivovideo.model.PersonMode
 import it.fabriziodavi.vivovideo.model.ClipAttr
 import it.fabriziodavi.vivovideo.engine.ExportPreset
 import kotlin.math.ln
@@ -204,7 +205,7 @@ val TEXT_TABS = listOf("Stile", "Animazione", "Movimento")
 val LAYER_TABS = listOf("Aspetto", "Forma", "Animazione")
 /** Animazioni per i livelli (quelle lettera per lettera, glitch e luccichio sono solo per i testi). */
 val LAYER_ANIMS = TextAnim.entries.filter { !it.inOnly && !it.letters && it != TextAnim.GLITCH }
-val EFFECT_TABS = listOf("Effetti", "Dissolvenze")
+val EFFECT_TABS = listOf("Effetti", "Dissolvenze", "Persona")
 val COLOR_TABS = listOf("Base", "Ruote", "HSL", "Progetto")
 
 @Composable
@@ -647,6 +648,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
                         MenuRow(VVIcons.Split, "Dividi all'indicatore") { act { vm.splitAtPlayhead() } }
                         if (!c.isPhoto) {
                             MenuRow(VVIcons.Pause, "Fermo immagine all'indicatore") { act { vm.freezeFrame() } }
+                            MenuRow(VVIcons.Effects, "Momento migliore") { act { vm.bestMoment() } }
                             MenuRow(VVIcons.MoveLeft, if (c.reversed != null) "Di nuovo nel verso normale" else "Al contrario") { act { vm.toggleReverse() } }
                         }
                         if (!c.isPhoto && !c.muted) MenuRow(VVIcons.Volume, "Stacca l'audio") { act { vm.detachAudio() } }
@@ -1299,6 +1301,14 @@ private fun FramePanel(vm: EditorViewModel, running: Boolean) {
         SecondaryButton("Reimposta", onClick = { if (enabled) { vm.setFrame(Transform()); vm.project?.let { p -> vm.updateSelected { it.withMode(p.presetModeFor(it)) } } } })
     }
     SecondaryButton("Applica a tutte le clip", selected = vm.project?.frameOnAll(clip) == true, onClick = { if (enabled) vm.applyFrameToAll() })
+    PanelLabel("Segui il soggetto")
+    if (clip.reframe == null) {
+        SecondaryButton("Segui il soggetto", Modifier.fillMaxWidth(), onClick = { if (enabled && vm.clipWork == null) vm.followSubject() })
+        Hint("Riempie il quadro e sposta l'inquadratura per tenere al centro volti o soggetto: perfetto per mettere un video orizzontale in un progetto verticale.")
+    } else {
+        Hint(if (clip.fill) "L'inquadratura segue il soggetto." else "Per seguire il soggetto serve \"Riempi\" (in alto).")
+        SecondaryButton("Smetti di seguire", onClick = { if (enabled) vm.stopFollow() })
+    }
     if (!clip.isPhoto) {
         PanelLabel("Stabilizzazione")
         val st = clip.stab
@@ -1573,6 +1583,16 @@ private fun LayerPanel(vm: EditorViewModel, running: Boolean, tab: Int, onAdd: (
             PanelLabel(if (l.isVideo) "Cornice" else "Cornice e ombra")
             Segmented(LayerBorder.entries, l.border, { it.label }, enabled) { b -> vm.updateLayer { it.copy(border = b) } }
             if (!l.isVideo) ToggleRow("Ombra", l.shadow, enabled) { v -> vm.updateLayer { it.copy(shadow = v) } }
+            if (l.isVideo) {
+                PanelLabel("Solo la persona")
+                if (l.person == null) {
+                    SecondaryButton("Scontorna la persona", Modifier.fillMaxWidth(), onClick = { if (enabled && vm.clipWork == null) vm.cutLayerPerson() })
+                    Hint("Toglie lo sfondo dietro alla persona, senza telo verde: resta solo lei sopra al video principale.")
+                } else {
+                    Hint("Si vede solo la persona.")
+                    SecondaryButton("Rimetti lo sfondo", onClick = { if (enabled) vm.updateLayer { it.copy(person = null) } })
+                }
+            }
             PanelLabel("Scontorno (togli lo sfondo)")
             PillRow(KeyColor.entries, l.key, { it.label }, enabled) { k -> vm.updateLayer { it.copy(key = k) } }
             if (l.key != KeyColor.NONE) {
@@ -1674,6 +1694,7 @@ private fun EffectsPanel(vm: EditorViewModel, running: Boolean, tab: Int) {
     val p = vm.project ?: return
     val enabled = !running
     if (tab == 0) { FxTab(vm, clip, p, enabled); return }
+    if (tab == 2) { PersonTab(vm, clip, enabled); return }
     val secs = { v: Int -> if (v == 0) "No" else String.format(java.util.Locale.ITALIAN, "%.1f s", v / 10f) }
     val maxTenths = (clip.outputUs / 2 / 100_000).toInt().coerceIn(1, 50)
     PanelLabel("Dissolvenze della clip")
@@ -2038,4 +2059,38 @@ private fun PasteStyleDialog(src: Clip, targets: Int, onPaste: (Set<ClipAttr>) -
         confirmButton = { TextButton(onClick = { onPaste(chosen) }, enabled = chosen.isNotEmpty() && targets > 0) { Text("Incolla", color = VV.Tally) } },
         dismissButton = { TextButton(onClick = onDismiss) { Text("Annulla", color = VV.Dim) } },
     )
+}
+
+
+private val PERSON_COLORS = listOf(0xFF101418, 0xFFFFFFFF, 0xFF1F6FEB, 0xFF2DA44E, 0xFFF2B33D, 0xFFE5484D, 0xFF8E4EC6).map { it.toInt() }
+
+/** Scontorno della persona: cosa fare dello sfondo. */
+@Composable
+private fun PersonTab(vm: EditorViewModel, clip: Clip, enabled: Boolean) {
+    if (clip.isPhoto) { Hint("Lo scontorno della persona funziona sui video."); return }
+    val fx = clip.person
+    if (fx == null) {
+        PanelLabel("Persona e sfondo")
+        Hint("L'app riconosce la persona in ogni fotogramma (sul telefono, senza internet) e ti lascia sfocare lo sfondo, cambiarlo con un colore o metterlo in bianco e nero. Ci vuole circa il tempo della clip.")
+        PrimaryButton("Scontorna la persona", Modifier.fillMaxWidth(), enabled = enabled && vm.clipWork == null) { vm.cutPerson() }
+        return
+    }
+    PanelLabel("Sfondo")
+    PillRow(PersonMode.entries.filter { it != PersonMode.REMOVE }, fx.mode, { it.label }, enabled) { vm.setPersonMode(it) }
+    if (fx.mode == PersonMode.COLOR) {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            PERSON_COLORS.forEach { c ->
+                Box(
+                    Modifier.size(30.dp).clip(RoundedCornerShape(15.dp)).background(Color(c))
+                        .border(if (c == fx.color) 3.dp else 1.dp, if (c == fx.color) VV.Tally else VV.Line, RoundedCornerShape(15.dp))
+                        .clickable(enabled = enabled) { vm.setPersonColor(c) }
+                )
+            }
+        }
+    }
+    Hint("Se accorci o allunghi molto la clip, rifai lo scontorno.")
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        SecondaryButton("Rifai lo scontorno", onClick = { if (enabled && vm.clipWork == null) vm.cutPerson(fx.mode) })
+        SecondaryButton("Togli", onClick = { if (enabled) vm.removePerson() })
+    }
 }

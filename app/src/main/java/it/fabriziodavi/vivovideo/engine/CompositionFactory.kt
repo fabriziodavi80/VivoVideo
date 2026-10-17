@@ -26,6 +26,7 @@ import it.fabriziodavi.vivovideo.model.LayerMask
 import it.fabriziodavi.vivovideo.model.packLanes
 import it.fabriziodavi.vivovideo.model.FxType
 import it.fabriziodavi.vivovideo.model.Project
+import it.fabriziodavi.vivovideo.model.PersonMode
 import it.fabriziodavi.vivovideo.model.SpeedCurve
 import it.fabriziodavi.vivovideo.model.Transform
 import it.fabriziodavi.vivovideo.model.TransitionSpec
@@ -139,6 +140,15 @@ class CompositionFactory(private val context: Context) {
         if (!clip.grade.isIdentity) add(GradeEffect(clip.grade))
     }
 
+    /** Persona scontornata, stabilizzazione e "segui il soggetto": sulla sorgente, prima dell'inquadratura. */
+    private fun smartEffects(clip: Clip, startUs: Long, outW: Int, outH: Int): List<Effect> = if (clip.baked) emptyList() else buildList {
+        clip.person?.takeIf { it.maskFile.isNotEmpty() && !clip.isPhoto }?.let { fx ->
+            add(PersonEffect(fx) { t -> clip.trimStartUs + clip.speedCurve().sourceTimeAt(localTimeUs(t, startUs)) })
+        }
+        if (clip.stab != null && !clip.isPhoto) add(StabilizeTransformation(clip, startUs))
+        if (clip.reframe != null && clip.fill) add(ReframeTransformation(clip, startUs, outW.toFloat() / outH))
+    }
+
     private fun volumeProcessors(volume: Float): List<androidx.media3.common.audio.AudioProcessor> {
         if (volume == 1f) return emptyList()
         val p = androidx.media3.common.audio.ChannelMixingAudioProcessor()
@@ -202,6 +212,9 @@ class CompositionFactory(private val context: Context) {
                     .setEffects(Effects(
                         if (keepAudio && !l.muted) volumeProcessors(l.volume) else emptyList(),
                         buildList<Effect> {
+                            l.person?.takeIf { it.maskFile.isNotEmpty() }?.let { fx ->
+                                add(PersonEffect(fx.copy(mode = PersonMode.REMOVE)) { t -> l.sourceStartUs + (t - l.startUs).coerceAtLeast(0) })
+                            }
                             add(Presentation.createForWidthAndHeight(lw, lh, Presentation.LAYOUT_SCALE_TO_FIT))
                             if (l.shape != LayerMask.NONE || l.key != KeyColor.NONE || l.border != LayerBorder.NONE) add(LayerMaskEffect(l))
                         },
@@ -229,7 +242,7 @@ class CompositionFactory(private val context: Context) {
             val clipStart = starts[project.clips.indexOf(clip)]
             val effects = buildList<Effect> {
                 addAll(colorEffects(clip, project))
-                if (clip.stab != null && !clip.baked) add(StabilizeTransformation(clip, clipStart))
+                addAll(smartEffects(clip, clipStart, outW, outH))
                 add(framing(clip, outW, outH))
                 if (clip.frame != Transform()) add(FrameTransformation(clip.frame, outW.toFloat() / outH))
                 if (clip.keyframes.any { it.value.x != 0f || it.value.y != 0f || it.value.scale != 1f || it.value.rotation != 0f }) {
@@ -349,7 +362,7 @@ class CompositionFactory(private val context: Context) {
                 .build()
             val effects: List<Effect> = if (light) listOf(Presentation.createForWidthAndHeight(outW, outH, Presentation.LAYOUT_SCALE_TO_FIT)) else buildList<Effect> {
                 addAll(colorEffects(clip, project))
-                if (clip.stab != null && !clip.baked && !clip.isPhoto) add(StabilizeTransformation(clip, startUs))
+                addAll(smartEffects(clip, startUs, outW, outH))
                 add(framing(clip, outW, outH))
                 if (clip.frame != Transform()) {
                     add(FrameTransformation(clip.frame, outW.toFloat() / outH))

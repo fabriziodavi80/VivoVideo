@@ -416,6 +416,8 @@ private fun ClipBox(
             if (clip.reversed != null) Badge("◀")
             if (clip.stab != null) Badge("STAB")
             if (clip.freeze) Badge("FERMO")
+            if (clip.reframe != null && clip.fill) Badge("SEGUE")
+            if (clip.person != null) Badge("PERSONA")
         }
         // Punti velocità (pallini in basso) nella loro posizione sul video finale.
         if (clip.speed == ClipSpeed.RAMP) {
