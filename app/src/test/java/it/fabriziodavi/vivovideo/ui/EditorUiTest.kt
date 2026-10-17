@@ -140,7 +140,9 @@ class EditorUiTest {
 
     @Test fun addOffersWholeAlbums() {
         val vm = vm(); show(vm)
-        compose.onAllNodesWithContentDescription("Aggiungi video e foto")[0].performClick()
+        bar("Modifica").performClick()
+        compose.onNodeWithText("Altro").performClick()
+        compose.onNodeWithText("Aggiungi video e foto").performClick()
         compose.onNodeWithText("Scegli foto e video").assertIsDisplayed()
         compose.onNodeWithText("Album interi").performClick()
         assertEquals(false, vm.albumPick) // false = da aggiungere al progetto aperto
