@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,7 +16,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -60,11 +60,10 @@ fun TestPlanScreen(vm: EditorViewModel) {
                 "Provati $done di ${TestPlan.items.size}" + if (ko > 0) " · $ko con problemi" else "",
                 style = MaterialTheme.typography.labelLarge, color = if (ko > 0) VV.Danger else VV.Tally,
             )
-            LinearProgressIndicator(
-                progress = { done.toFloat() / TestPlan.items.size },
-                modifier = Modifier.fillMaxWidth().height(4.dp).clip(RoundedCornerShape(2.dp)),
-                color = VV.Tally, trackColor = VV.Raised2,
-            )
+            // Barra semplice (senza animazioni): quante prove sono fatte.
+            Box(Modifier.fillMaxWidth().height(4.dp).clip(RoundedCornerShape(2.dp)).background(VV.Raised2)) {
+                Box(Modifier.fillMaxWidth(done.toFloat() / TestPlan.items.size).height(4.dp).background(VV.Tally))
+            }
             Hint("Fai le prove con i tuoi video veri. Se qualcosa non va, tocca Problema e scrivi due parole: poi \"Segnala un problema\" prepara un file da mandarmi (con l'esito del collaudo, i dettagli del telefono e del progetto aperto; niente video e niente chiavi dei servizi).")
         }
         LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
