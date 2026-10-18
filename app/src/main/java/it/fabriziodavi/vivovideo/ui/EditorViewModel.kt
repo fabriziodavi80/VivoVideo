@@ -734,11 +734,16 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /** Battiti di un brano (null se non c'è un ritmo chiaro). */
-    private suspend fun findBeats(ctx: Application, t: MusicTrack): BeatDetector.Result? = withContext(Dispatchers.Default) {
+    private suspend fun findBeats(ctx: Application, t: MusicTrack): BeatDetector.Result? = findBeatsAndEnergy(ctx, t)?.first
+
+    /** Battiti e, per la regia automatica, l'energia del brano a ogni battito. */
+    private suspend fun findBeatsAndEnergy(ctx: Application, t: MusicTrack): Pair<BeatDetector.Result, List<Float>>? = withContext(Dispatchers.Default) {
         runCatching {
             val stereo = decodeAudioRange(ctx, Uri.parse(t.uri), 0, t.sourceDurationUs) ?: return@runCatching null
-            BeatDetector.detect(BeatDetector.toMono(stereo), 48_000)
-        }.getOrNull()?.takeIf { it.beatsUs.size >= 4 }
+            val mono = BeatDetector.toMono(stereo)
+            val r = BeatDetector.detect(mono, 48_000).takeIf { it.beatsUs.size >= 4 } ?: return@runCatching null
+            r to BeatDetector.energy(mono, 48_000, r.beatsUs)
+        }.getOrNull()
     }
 
     // ---------------- Video automatico ----------------
@@ -760,10 +765,10 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             }
             // Prima il ritmo: serve a sapere quante scene ci stanno nel brano.
             val m1 = music
-            if (m1 != null && m1.beatsUs.isEmpty()) {
+            if (m1 != null && (m1.beatsUs.isEmpty() || m1.energy.isEmpty())) {
                 busy = "Analisi del ritmo…"
-                val r = findBeats(ctx, m1)
-                if (r != null) music = m1.copy(beatsUs = r.beatsUs, bpm = r.bpm)
+                val r = findBeatsAndEnergy(ctx, m1)
+                if (r != null) music = m1.copy(beatsUs = r.first.beatsUs, bpm = r.first.bpm, energy = r.second)
             }
             val o = music?.let { m -> if (fitMusic) options.copy(targetUs = m.sourceDurationUs) else null } ?: options
             // Le fonti si ricordano (al massimo 1500, distribuite nel tempo) per poter fare altre proposte.

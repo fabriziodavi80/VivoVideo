@@ -36,10 +36,25 @@ enum class TransitionType(val label: String) {
     LEAK("Luce"),
     IRIS("Cerchio"),
     PIXELATE("Pixel"),
-    SHAKE("Scossa");
+    SHAKE("Scossa"),
+    // Premium 2026
+    PUNCH("Zoom punch"),
+    SWIRL("Vortice"),
+    LIQUID("Liquido"),
+    BURN("Pellicola bruciata"),
+    CUBE("Cubo 3D"),
+    LUMA("Luce che dissolve"),
+    RGB("Schiaffo RGB"),
+    SLIDE_UP("Scorrimento verticale");
 
     /** Transizioni adatte a uno slideshow "vario" (quelle più nervose solo se scelte apposta). */
-    val soft: Boolean get() = this != GLITCH && this != PIXELATE && this != SHAKE
+    val soft: Boolean get() = this != GLITCH && this != PIXELATE && this != SHAKE && this != RGB && this != PUNCH
+
+    /** Transizioni d'impatto, da mettere sui colpi forti della musica. */
+    val punchy: Boolean get() = this in setOf(PUNCH, FLASH, RGB, GLITCH, SHAKE, WHIP, SPIN, SLIDE_UP, ZOOM, SWIRL)
+
+    /** Premium: le novità da far vedere nel pannello in cima. */
+    val premium: Boolean get() = ordinal >= PUNCH.ordinal
 }
 
 @Serializable
@@ -219,7 +234,7 @@ data class ColorSettings(
 )
 
 /** Categorie degli effetti (per il pannello). */
-enum class FxCategory(val label: String) { WOW("Wow"), COLOR("Colore"), STYLE("Stile"), OPTICS("Ottica"), SHAPE("Forma"), MOTION("Movimento") }
+enum class FxCategory(val label: String) { WOW("Wow"), BEAT("A ritmo"), COLOR("Colore"), STYLE("Stile"), OPTICS("Ottica"), SHAPE("Forma"), MOTION("Movimento") }
 
 /** Effetti video per clip; [toggle] = acceso/spento senza intensità. L'ordine non conta (salvati per nome). */
 enum class FxType(val label: String, val category: FxCategory, val toggle: Boolean = false, val defaultAmount: Float = 0.6f) {
@@ -265,10 +280,23 @@ enum class FxType(val label: String, val category: FxCategory, val toggle: Boole
     BOKEH("Luci bokeh", FxCategory.WOW, defaultAmount = 0.6f),
     SPARKLE("Polvere d'oro", FxCategory.WOW, defaultAmount = 0.6f),
     PRISM("Prisma", FxCategory.WOW, defaultAmount = 0.5f),
-    SPEEDLINES("Linee di velocità", FxCategory.WOW, defaultAmount = 0.6f);
+    SPEEDLINES("Linee di velocità", FxCategory.WOW, defaultAmount = 0.6f),
+    // Premium 2026 (shader a parte: WowFxEffect)
+    DREAMY("Sogno", FxCategory.WOW, defaultAmount = 0.6f),
+    FILM35("Pellicola 35 mm", FxCategory.WOW, defaultAmount = 0.7f),
+    DUOPOP("Duotono pop", FxCategory.WOW, defaultAmount = 0.8f),
+    SWEEP("Lampo di luce", FxCategory.WOW, defaultAmount = 0.7f),
+    SPLIT3("Tre schermi", FxCategory.WOW, toggle = true, defaultAmount = 1f),
+    HOLO("Olografico", FxCategory.WOW, defaultAmount = 0.6f),
+    ZOOMBEAT("Zoom a ritmo", FxCategory.BEAT, defaultAmount = 0.6f),
+    SHAKEBEAT("Scossa a ritmo", FxCategory.BEAT, defaultAmount = 0.6f),
+    RGBBEAT("RGB a ritmo", FxCategory.BEAT, defaultAmount = 0.6f);
 
     /** Effetti che seguono i battiti della musica. */
-    val onBeats: Boolean get() = this == PULSE || this == STROBE || this == HIT
+    val onBeats: Boolean get() = this == PULSE || this == STROBE || this == HIT || category == FxCategory.BEAT
+
+    /** Effetti del secondo shader (premium). */
+    val wow2: Boolean get() = ordinal >= DREAMY.ordinal
 }
 
 /** Colore delle dissolvenze in entrata/uscita della clip. */
@@ -325,6 +353,13 @@ enum class TextAnim(val label: String, val inOnly: Boolean = false, val letters:
     WAVE("Onda", letters = true),
     GLITCH("Glitch"),
     SHINE("Luccichio", inOnly = true),
+    // Premium 2026
+    BOUNCE("Rimbalzo", letters = true),
+    FLIP("Ribalta 3D", letters = true),
+    SPIN("Vortice", letters = true),
+    SCATTER("Esplosione", letters = true),
+    BLUR("Messa a fuoco"),
+    FLICKER("Neon tremolante", inOnly = true),
 }
 
 /** Testo sovrapposto al video, dal tempo [startUs] della timeline per [durationUs]. */
@@ -452,7 +487,8 @@ data class SlideshowOptions(
 enum class TextPreset(val label: String) {
     CINEMA("Cinema"), DIDASCALIA("Didascalia"), POP("Pop"), ELEGANTE("Elegante"), NEON("Neon"),
     IMPATTO("Impatto"), FIRMA("Firma"), DIARIO("Diario"),
-    GLITCH("Glitch"), ONDA("Onda"), ORO("Oro"), CASCATA("Cascata");
+    GLITCH("Glitch"), ONDA("Onda"), ORO("Oro"), CASCATA("Cascata"),
+    CINEMA26("Cinema 2026"), SOGNO("Sogno"), TITOLO3D("Titolo 3D"), FESTA("Festa"), INSEGNA("Insegna"), ESPLOSIONE("Esplosione");
 
     fun applyTo(t: TextItem): TextItem = when (this) {
         CINEMA -> t.copy(font = TextFont.TITOLO, color = WHITE, gradientTo = 0xFFF2B33D.toInt(), spacing = 0.12f, upper = true, look = TextLook.OMBRA,
@@ -479,6 +515,18 @@ enum class TextPreset(val label: String) {
             size = 0.1f, x = 0f, y = 0f, rotation = 0f, animIn = TextAnim.SHINE, animOut = TextAnim.FADE, endPose = Transform(x = 0f, y = 0f, scale = 1.06f))
         CASCATA -> t.copy(font = TextFont.ELEGANTE, color = WHITE, gradientTo = null, spacing = 0.02f, upper = false, look = TextLook.OMBRA, size = 0.075f, x = 0f, y = 0f, rotation = 0f,
             animIn = TextAnim.DROP, animOut = TextAnim.RISE, endPose = null)
+        CINEMA26 -> t.copy(font = TextFont.TITOLO, color = 0xFFFFF4DA.toInt(), gradientTo = 0xFFE0A94A.toInt(), spacing = 0.28f, upper = true, look = TextLook.OMBRA,
+            size = 0.1f, x = 0f, y = 0f, rotation = 0f, animIn = TextAnim.BLUR, animOut = TextAnim.BLUR, endPose = Transform(x = 0f, y = 0f, scale = 1.1f))
+        SOGNO -> t.copy(font = TextFont.ELEGANTE, color = WHITE, gradientTo = 0xFFFFD6E8.toInt(), spacing = 0.06f, upper = false, look = TextLook.OMBRA,
+            size = 0.08f, x = 0f, y = 0f, rotation = 0f, animIn = TextAnim.BLUR, animOut = TextAnim.RISE, endPose = Transform(x = 0f, y = -0.015f, scale = 1.05f))
+        TITOLO3D -> t.copy(font = TextFont.POSTER, color = WHITE, gradientTo = 0xFF5BC0FF.toInt(), spacing = 0.05f, upper = true, look = TextLook.CONTORNO,
+            size = 0.1f, x = 0f, y = 0f, rotation = 0f, animIn = TextAnim.FLIP, animOut = TextAnim.FLIP, endPose = null)
+        FESTA -> t.copy(font = TextFont.POSTER, color = 0xFFFFE14D.toInt(), gradientTo = 0xFFFF5AA8.toInt(), spacing = 0.02f, upper = true, look = TextLook.CONTORNO,
+            size = 0.1f, x = 0f, y = 0f, rotation = -3f, animIn = TextAnim.BOUNCE, animOut = TextAnim.SCATTER, endPose = null)
+        INSEGNA -> t.copy(font = TextFont.CORSIVO, color = 0xFF5BF0FF.toInt(), gradientTo = null, spacing = 0f, upper = false, look = TextLook.NEON,
+            size = 0.1f, x = 0f, y = 0f, rotation = -4f, animIn = TextAnim.FLICKER, animOut = TextAnim.FADE, endPose = null)
+        ESPLOSIONE -> t.copy(font = TextFont.IMPATTO, color = WHITE, gradientTo = 0xFFFF7A3D.toInt(), spacing = 0.03f, upper = true, look = TextLook.CONTORNO,
+            size = 0.12f, x = 0f, y = 0f, rotation = 0f, animIn = TextAnim.SPIN, animOut = TextAnim.SCATTER, endPose = null)
     }
 
     companion object {
@@ -516,6 +564,8 @@ data class MusicTrack(
     /** Battiti rilevati (tempo nel file del brano) e tempo in BPM; vuoto = non ancora analizzato. */
     val beatsUs: List<Long> = emptyList(),
     val bpm: Float = 0f,
+    /** Energia del brano a ogni battito (0…1), per la regia automatica. */
+    val energy: List<Float> = emptyList(),
     /** Usa un battito ogni N (1 = tutti, 2, 4 = uno per battuta). */
     val beatEvery: Int = 1,
     /** Spostamento di tutti i battiti automatici (correzione fine), in µs. */

@@ -43,7 +43,8 @@ class ReframeTransformation(private val clip: Clip, private val startUs: Long, p
 
     override fun getMatrix(presentationTimeUs: Long): Matrix {
         val path = clip.reframe ?: return Matrix()
-        val src = if (clip.isPhoto) 0L else clip.trimStartUs + clip.speedCurve().sourceTimeAt(localTimeUs(presentationTimeUs, startUs))
+        // Foto: il percorso è nel tempo della clip (panoramica); video: nel tempo del file.
+        val src = if (clip.isPhoto) localTimeUs(presentationTimeUs, startUs) else clip.trimStartUs + clip.speedCurve().sourceTimeAt(localTimeUs(presentationTimeUs, startUs))
         val (cx, cy) = path.at(src)
         val (tx, ty) = Moments.panFor(cx, cy, srcAspect, outAspect)
         return Matrix().apply { postTranslate(tx, ty) }

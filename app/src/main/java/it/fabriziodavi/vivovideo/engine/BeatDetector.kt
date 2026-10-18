@@ -33,6 +33,28 @@ object BeatDetector {
         return Result(bpm, beats.map { it * 1_000_000L / FPS })
     }
 
+    /**
+     * Energia del brano a ogni battito (0 = parte più calma, 1 = la più carica): volume medio fra un battito e
+     * il successivo, riportato fra il 10° e il 90° percentile e levigato su tre battiti. Serve a capire intro e "drop".
+     */
+    fun energy(mono: FloatArray, sampleRate: Int, beatsUs: List<Long>): List<Float> {
+        if (beatsUs.size < 2) return emptyList()
+        val db = beatsUs.indices.map { i ->
+            val a = (beatsUs[i] * sampleRate / 1_000_000).toInt().coerceIn(0, mono.size)
+            val b = ((beatsUs.getOrNull(i + 1) ?: (beatsUs[i] + (beatsUs[i] - beatsUs[i - 1]))) * sampleRate / 1_000_000).toInt().coerceIn(a, mono.size)
+            var e = 0.0
+            var k = a
+            while (k < b) { e += mono[k] * mono[k]; k += 4 }
+            val n = ((b - a) / 4).coerceAtLeast(1)
+            (10 * kotlin.math.log10(e / n + 1e-10)).toFloat()
+        }
+        val sorted = db.sorted()
+        val lo = sorted[(sorted.size * 0.1).toInt()]
+        val hi = sorted[(sorted.size * 0.9).toInt().coerceAtMost(sorted.size - 1)]
+        val norm = db.map { ((it - lo) / (hi - lo).coerceAtLeast(1f)).coerceIn(0f, 1f) }
+        return norm.indices.map { i -> (norm[(i - 1).coerceAtLeast(0)] + 2 * norm[i] + norm[(i + 1).coerceAtMost(norm.lastIndex)]) / 4f }
+    }
+
     /** Stereo interleaved → mono. */
     fun toMono(stereo: FloatArray): FloatArray = FloatArray(stereo.size / 2) { (stereo[2 * it] + stereo[2 * it + 1]) * 0.5f }
 

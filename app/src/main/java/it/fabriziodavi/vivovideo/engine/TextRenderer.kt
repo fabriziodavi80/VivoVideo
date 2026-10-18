@@ -260,8 +260,10 @@ object TextRenderer {
         if (reuse == null) cache.get(key)?.let { return it }
         val p = prepare(context, item, frameW, frameH, Int.MAX_VALUE)
         val ts = p.paint.textSize
-        val exX = (ts * 0.4f).toInt()
-        val exY = (ts * 1.1f).toInt()
+        // Spazio intorno per le lettere che volano lontano (esplosione, vortice).
+        val wide = anim == TextAnim.SCATTER || anim == TextAnim.SPIN
+        val exX = (ts * if (wide) 2.2f else 0.4f).toInt()
+        val exY = (ts * if (wide) 1.8f else 1.1f).toInt()
         val bw = p.width + 2 * p.pad + 2 * exX
         val bh = p.layout.height + 2 * p.pad + 2 * exY
         // Fotogrammi in sequenza: si riusa l'immagine passata (stessa misura) invece di crearne una nuova.
@@ -284,14 +286,30 @@ object TextRenderer {
             if (f.alpha > 0.004f) {
                 paint.alpha = (f.alpha.coerceIn(0f, 1f) * 255).toInt()
                 c.save()
-                c.translate(0f, f.dy * ts)
+                c.translate(f.dx * ts, f.dy * ts)
                 c.rotate(f.rot, g.cx, g.cy)
-                c.scale(f.scale, f.scale, g.cx, g.cy)
+                c.scale(f.scale * f.sx, f.scale, g.cx, g.cy)
                 c.drawBitmap(g.bmp, g.left, g.top, paint)
                 c.restore()
             }
         }
         return if (reuse != null) bmp else keep(key, bmp)
+    }
+
+    /** Messa a fuoco: il testo sfocato (rimpicciolito e ingrandito con filtro), [amount] 0…1. */
+    fun renderBlur(context: Context, item: TextItem, frameW: Int, frameH: Int, amount: Float): Bitmap {
+        val key = baseKey(item, frameW, frameH) + "|B|${(amount * 100).toInt()}"
+        cache.get(key)?.let { return it }
+        val base = render(context, item, frameW, frameH)
+        val f = 1f + amount * 14f
+        val sw = (base.width / f).toInt().coerceAtLeast(2); val sh = (base.height / f).toInt().coerceAtLeast(2)
+        val small = Bitmap.createScaledBitmap(base, sw, sh, true)
+        // Due passaggi di riduzione danno una sfocatura più morbida.
+        val smaller = Bitmap.createScaledBitmap(small, (sw / 2).coerceAtLeast(2), (sh / 2).coerceAtLeast(2), true)
+        val mid = Bitmap.createScaledBitmap(smaller, sw, sh, true)
+        val out = Bitmap.createScaledBitmap(mid, base.width, base.height, true)
+        if (small !== base) small.recycle(); smaller.recycle(); if (mid !== out) mid.recycle()
+        return keep(key, out)
     }
 
     /** Glitch: il testo a strisce spostate, con i bordi rossi e azzurri sfasati ([amount] 0…1). */
@@ -346,7 +364,7 @@ object TextRenderer {
 }
 
 /** Una lettera durante l'animazione: trasparenza, spostamento verticale (in altezze del testo), scala, rotazione (gradi). */
-internal data class LetterFx(val alpha: Float, val dy: Float, val scale: Float, val rot: Float)
+internal data class LetterFx(val alpha: Float, val dy: Float, val scale: Float, val rot: Float, val dx: Float = 0f, val sx: Float = 1f)
 
 private fun bounceOut(x: Float): Float {
     val n = 7.5625f; val d = 2.75f
@@ -368,6 +386,23 @@ internal fun letterFx(anim: TextAnim, entering: Boolean, progress: Float, i: Int
     val q = ((progress - start) / win).coerceIn(0f, 1f)
     fun ease(x: Float) = 1 - (1 - x) * (1 - x) * (1 - x)
     val pi = Math.PI.toFloat()
+    // Valori casuali stabili per lettera (direzioni dell'esplosione).
+    fun rnd(k: Int): Float { val x = kotlin.math.sin(i * 12.9898f + k * 78.233f) * 43758.547f; return x - kotlin.math.floor(x) - 0.5f }
+    fun elastic(x: Float): Float = if (x <= 0f) 0f else if (x >= 1f) 1f else
+        (Math.pow(2.0, -10.0 * x) * kotlin.math.sin((x * 10f - 0.75f) * (2f * pi / 3f)) + 1.0).toFloat()
+    when (anim) {
+        TextAnim.BOUNCE -> return if (entering) LetterFx((q * 4f).coerceAtMost(1f), -0.25f * (1f - ease(q)), elastic(q).coerceAtLeast(0f), 0f)
+            else LetterFx(1f - q, 0f, if (q < 0.3f) 1f + 0.2f * (q / 0.3f) else 1.2f * (1f - (q - 0.3f) / 0.7f), 0f)
+        TextAnim.FLIP -> return if (entering) LetterFx(if (q > 0f) (q * 3f).coerceAtMost(1f) else 0f, 0f, 1f, 0f, sx = kotlin.math.cos((1f - ease(q)) * pi / 2f))
+            else LetterFx(1f - q * q, 0f, 1f, 0f, sx = kotlin.math.cos(ease(q) * pi / 2f))
+        TextAnim.SPIN -> return if (entering) LetterFx(ease(q), -0.3f * (1f - ease(q)), 0.3f + 0.7f * ease(q), (if (i % 2 == 0) -180f else 180f) * (1f - ease(q)))
+            else LetterFx(1f - ease(q), 0f, 1f - 0.7f * ease(q), 180f * ease(q))
+        TextAnim.SCATTER -> {
+            val k = if (entering) 1f - ease(q) else ease(q)
+            return LetterFx(if (entering) ease(q) else 1f - q, rnd(2) * 2.4f * k, 1f + 0.6f * k, rnd(3) * 260f * k, dx = rnd(1) * 3.2f * k)
+        }
+        else -> {}
+    }
     return if (entering) when (anim) {
         TextAnim.DROP -> LetterFx((q * 4f).coerceAtMost(1f), -1f * (1f - bounceOut(q)), 1f, 0f)
         TextAnim.RISE -> LetterFx(ease(q), 0.6f * (1f - ease(q)), 1f + 0.5f * (1f - ease(q)), 0f)
@@ -425,6 +460,8 @@ internal fun animFactors(animIn: TextAnim, animOut: TextAnim, local: Long, durat
         TextAnim.ZOOM -> { scale *= 1.6f - 0.6f * ease(pin); alpha *= ease(pin) }
         TextAnim.GLITCH -> alpha *= ease(pin * 1.5f)
         TextAnim.SHINE -> alpha *= ease(pin)
+        TextAnim.BLUR -> { scale *= 1.18f - 0.18f * ease(pin * 0.75f); alpha *= ease(pin * 1.6f) }
+        TextAnim.FLICKER -> alpha *= flicker(local)
         else -> {}
     }
     when (animOut) {
@@ -433,9 +470,35 @@ internal fun animFactors(animIn: TextAnim, animOut: TextAnim, local: Long, durat
         TextAnim.SLIDE -> { dy -= 0.08f * (1 - ease(pout)); alpha *= ease(pout) }
         TextAnim.ZOOM -> { scale *= 1f + 0.6f * (1 - ease(pout)); alpha *= ease(pout) }
         TextAnim.GLITCH -> alpha *= ease(pout * 1.5f)
+        TextAnim.BLUR -> { scale *= 1f + 0.15f * (1 - ease(pout)); alpha *= ease(pout) }
         else -> {}
     }
     return AnimFactors(alpha, scale, dy)
+}
+
+/** Neon che si accende a scatti (primo secondo), poi ogni tanto un tremolio. */
+internal fun flicker(local: Long): Float {
+    val ms = local / 1000
+    if (ms < 900) {
+        // Acceso/spento a intervalli irregolari, sempre più acceso.
+        val on = longArrayOf(0, 60, 140, 190, 330, 380, 520, 700)
+        val off = longArrayOf(40, 110, 170, 260, 360, 450, 600, 900)
+        for (k in on.indices) if (ms in on[k] until off[k]) return 0.35f + 0.65f * (k + 1) / on.size
+        return 0.05f
+    }
+    val ph = (ms - 900) % 4200
+    return if (ph in 3000..3060 || ph in 3120..3170) 0.3f else 1f
+}
+
+/** Messa a fuoco: quanto è sfocato il testo (1 = molto) a [local] µs. */
+internal fun blurAmount(item: TextItem, local: Long): Float {
+    val d = item.durationUs
+    val inUs = minOf(700_000L, d / 2).coerceAtLeast(1)
+    val outUs = minOf(500_000L, d / 2).coerceAtLeast(1)
+    var a = 0f
+    if (item.animIn == TextAnim.BLUR && local < inUs) a = maxOf(a, 1f - local.coerceAtLeast(0).toFloat() / inUs)
+    if (item.animOut == TextAnim.BLUR && local > d - outUs) a = maxOf(a, (local - (d - outUs)).toFloat() / outUs)
+    return a.coerceIn(0f, 1f).let { it * it }
 }
 
 /** Movimento morbido 0→1 lungo la durata. */
@@ -502,6 +565,10 @@ class TimedTextOverlay(
             // Ogni tanto un piccolo sussulto mentre il testo resta a schermo.
             val ph = local % 2_200_000L
             if (ph in 1_500_000L..1_650_000L) return TextRenderer.renderGlitch(context, item, frameW, frameH, 0.45f, local / 66_000)
+        }
+        if (item.animIn == TextAnim.BLUR || item.animOut == TextAnim.BLUR) {
+            val b = blurAmount(item, local)
+            if (b > 0.02f) return TextRenderer.renderBlur(context, item, frameW, frameH, quant(b, 24))
         }
         if (item.animIn == TextAnim.SHINE) {
             shinePhase(local)?.let { return TextRenderer.renderShine(context, item, frameW, frameH, quant(it, 30)) }

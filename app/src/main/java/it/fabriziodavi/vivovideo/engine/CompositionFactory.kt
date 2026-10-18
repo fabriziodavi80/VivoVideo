@@ -252,6 +252,7 @@ class CompositionFactory(private val context: Context) {
                 if (clip.fx.isNotEmpty() || clip.fadeInUs > 0 || clip.fadeOutUs > 0) {
                     add(FxEffect(clip.fx, beats, clipStart, clip.outputUs, clip.fadeInUs, clip.fadeOutUs, clip.fadeColor))
                 }
+                if (WowFxEffect.needed(clip.fx)) add(WowFxEffect(clip.fx, beats, clipStart))
             }
             val edited = if (clip.isPhoto) {
                 EditedMediaItem.Builder(
@@ -377,6 +378,7 @@ class CompositionFactory(private val context: Context) {
                     val needsBeats = clip.fx.any { f -> f.type.onBeats }
                     add(FxEffect(clip.fx, if (needsBeats) beats else emptyList(), startUs, clip.outputUs, clip.fadeInUs, clip.fadeOutUs, clip.fadeColor))
                 }
+                if (WowFxEffect.needed(clip.fx)) add(WowFxEffect(clip.fx, beats, startUs))
                 // Transizioni: metà alla fine di questa clip, metà all'inizio della successiva.
                 // (la dissolvenza incrociata la fa il compositore, non questo effetto)
                 fun adapt(t: TransitionSpec?) = when {

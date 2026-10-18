@@ -3,10 +3,13 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
-- **Collaudo** (Home → **Collaudo e segnalazioni**): l'elenco delle prove da fare con i tuoi video prima della versione ufficiale. Ogni prova dice come farla e cosa deve succedere; segna **Funziona** o **Problema** (con due parole).
-- **Segnala un problema** (nel Collaudo, o nell'editor → Progetto): prepara un file di testo da mandarmi, allegandolo nella chat. Dentro: versione, telefono, esito del collaudo, il progetto aperto (senza video), gli ultimi errori e il diario dell'app. Le chiavi dei servizi musicali vengono tolte.
-- **Schermo sempre acceso** mentre l'anteprima scorre, a schermo intero e durante esportazioni e lavori lunghi.
-- Prima: video automatico che dura esattamente quanto il brano; copie di sicurezza, ricollegamento, modelli, font tuoi.
+- **Pacchetto premium 2026**:
+  - **8 transizioni nuove** (in cima alla lista): Zoom punch, Vortice, Liquido, Pellicola bruciata, Cubo 3D, Luce che dissolve, Schiaffo RGB, Scorrimento verticale.
+  - **Effetti nuovi**: Sogno, Pellicola 35 mm, Duotono pop, Lampo di luce, Tre schermi, Olografico; e la scheda **A ritmo**: Zoom, Scossa e RGB sui battiti.
+  - **Testi animati**: Rimbalzo, Ribalta 3D, Vortice, Esplosione (lettera per lettera), Messa a fuoco, Neon tremolante; stili pronti **Cinema 2026, Sogno, Titolo 3D, Festa, Insegna, Esplosione**.
+- **Video automatico più "regista"**: legge l'energia del brano. Dove la musica è calma le scene durano di più e i passaggi sono morbidi; dove spinge si taglia su ogni colpo, con effetti a ritmo; sul **drop** (l'attacco del ritornello) un taglio esatto con Zoom punch. Rallenty nei momenti calmi con i video a 120 fps, accelerazioni a tempo nelle parti cariche. Le foto orizzontali in un video verticale (e viceversa) riempiono il quadro con una panoramica lenta invece delle bande.
+- Nuovi stili del video automatico: **Reel virale** e **Sogno**.
+- Collaudo e Segnala un problema; schermo sempre acceso durante l'anteprima.
 
 ## Primi passi
 - Dalla schermata dei progetti tocca **Nuovo progetto**: **Scegli foto e video** (fino a 100) oppure **Album interi** (uno o più album, tutto in ordine di data). Lo stesso vale per **+** e **Aggiungi** dentro l'editor.
@@ -48,6 +51,9 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - Home → **Video automatico**: album, stile, musica, regia, formato, durata, titolo.
 - **Durata**: "Come il brano" (con la musica) fa durare il video esattamente quanto il brano, che finisce col suo finale; le altre durate (30 s, 1 min, …) sono rispettate al decimo di secondo; "Tutto" usa tutto quello che c'è negli album.
 - Con la musica ogni taglio cade su un battito; se le foto e i video sono pochi per la durata, le scene si allungano di battiti interi.
+- **Energia del brano**: l'app sente dove la musica è calma (scene più lunghe, passaggi morbidi, rallenty) e dove spinge (un taglio a ogni colpo, zoom e scosse a ritmo, accelerazioni); sul drop mette un taglio esatto con una transizione d'impatto.
+- **Orientamento**: il formato segue le foto e i video più numerosi; quelli girati nell'altro verso seguono le persone (regia intelligente) o, se sono foto, si attraversano con una panoramica; lo sfondo sfocato resta solo se non c'è un soggetto chiaro.
+- **Stili**: Cinema, Energico, Reel virale, Ricordi, Sogno, Elegante, Viaggio.
 - **Altra proposta** rifà il montaggio con altre scene e altri tratti, **Stile** lo cambia: tutto resta ritoccabile a mano.
 
 ## Funzioni intelligenti

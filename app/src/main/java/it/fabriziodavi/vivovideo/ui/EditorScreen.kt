@@ -205,6 +205,11 @@ val MUSIC_TABS = listOf("Brano", "Ritmo", "Battiti", "Voce", "Clip")
 val TEXT_TABS = listOf("Stile", "Animazione", "Movimento")
 val LAYER_TABS = listOf("Aspetto", "Forma", "Animazione")
 /** Animazioni per i livelli (quelle lettera per lettera, glitch e luccichio sono solo per i testi). */
+/** Le novità premium in testa alle liste: si vedono subito. */
+val TRANSITIONS_NEW_FIRST: List<TransitionType> = TransitionType.entries.filter { it.premium } + TransitionType.entries.filter { !it.premium }
+val PRESETS_NEW_FIRST: List<TextPreset> = TextPreset.entries.filter { it.ordinal >= TextPreset.CINEMA26.ordinal } + TextPreset.entries.filter { it.ordinal < TextPreset.CINEMA26.ordinal }
+val ANIMS_NEW_FIRST: List<TextAnim> = listOf(TextAnim.NONE) + TextAnim.entries.filter { it.ordinal >= TextAnim.BOUNCE.ordinal } +
+    TextAnim.entries.filter { it != TextAnim.NONE && it.ordinal < TextAnim.BOUNCE.ordinal }
 val LAYER_ANIMS = TextAnim.entries.filter { !it.inOnly && !it.letters && it != TextAnim.GLITCH }
 val EFFECT_TABS = listOf("Effetti", "Dissolvenze", "Persona")
 val COLOR_TABS = listOf("Base", "Ruote", "HSL", "Progetto")
@@ -1135,7 +1140,7 @@ private fun TransitionPanel(vm: EditorViewModel, running: Boolean) {
     }
     val spec = clip.transitionOut
     PanelLabel("Verso la clip ${index + 2}")
-    val options: List<TransitionType?> = listOf(null) + TransitionType.entries
+    val options: List<TransitionType?> = listOf(null) + TRANSITIONS_NEW_FIRST
     PillRow(options, spec?.type, { it?.label ?: "Nessuna" }, !running) { t ->
         vm.setTransition(t?.let { TransitionSpec(it, spec?.durationUs ?: 500_000L) })
     }
@@ -1446,7 +1451,7 @@ private fun TextPanel(vm: EditorViewModel, running: Boolean, tab: Int, onPickFon
     when (tab) {
         0 -> {
             PanelLabel("Stili pronti")
-            PillRow(TextPreset.entries, TextPreset.matching(t), { it?.label ?: "" }, enabled) { pr -> if (pr != null) vm.applyTextPreset(pr) }
+            PillRow(PRESETS_NEW_FIRST, TextPreset.matching(t), { it?.label ?: "" }, enabled) { pr -> if (pr != null) vm.applyTextPreset(pr) }
             PanelLabel("Carattere")
             PillRow(TextFont.entries.map<TextFont, TextFont?> { it }, if (t.fontFile == null) t.font else null, { it?.label ?: "" }, enabled) { f -> if (f != null) vm.updateText { it.copy(font = f, fontFile = null) } }
             PanelLabel("I tuoi font")
@@ -1495,9 +1500,9 @@ private fun TextPanel(vm: EditorViewModel, running: Boolean, tab: Int, onPickFon
         }
         1 -> {
             PanelLabel("In entrata")
-            PillRow(TextAnim.entries, t.animIn, { it.label }, enabled) { a -> vm.updateText { it.copy(animIn = a) } }
+            PillRow(ANIMS_NEW_FIRST, t.animIn, { it.label }, enabled) { a -> vm.updateText { it.copy(animIn = a) } }
             PanelLabel("In uscita")
-            PillRow(TextAnim.entries.filter { !it.inOnly }, t.animOut, { it.label }, enabled) { a -> vm.updateText { it.copy(animOut = a) } }
+            PillRow(ANIMS_NEW_FIRST.filter { !it.inOnly }, t.animOut, { it.label }, enabled) { a -> vm.updateText { it.copy(animOut = a) } }
         }
         else -> {
             PanelLabel("Posizione")
@@ -1766,7 +1771,7 @@ private fun SlideshowPanel(vm: EditorViewModel, running: Boolean) {
     val motions: List<MotionStyle?> = listOf(null) + MotionStyle.entries
     PillRow(motions, motion, { it?.label ?: "Vario" }, enabled) { motion = it }
     PanelLabel("Transizioni")
-    val trans: List<TransitionType?> = listOf(null) + TransitionType.entries
+    val trans: List<TransitionType?> = listOf(null) + TRANSITIONS_NEW_FIRST
     PillRow(listOf<Any?>("none") + trans, if (noTransitions) "none" else transition, { a ->
         when (a) { "none" -> "Nessuna"; null -> "Varie"; else -> (a as TransitionType).label }
     }, enabled) { a ->

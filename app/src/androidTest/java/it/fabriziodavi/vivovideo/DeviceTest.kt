@@ -58,6 +58,7 @@ import it.fabriziodavi.vivovideo.engine.GradeEffect
 import it.fabriziodavi.vivovideo.engine.BlurFillEffect
 import it.fabriziodavi.vivovideo.engine.LayerMaskEffect
 import it.fabriziodavi.vivovideo.engine.HdrGl
+import it.fabriziodavi.vivovideo.engine.WowFxEffect
 import it.fabriziodavi.vivovideo.model.Grade
 import androidx.media3.common.util.GlUtil
 import it.fabriziodavi.vivovideo.engine.ExportOptions
@@ -256,12 +257,15 @@ class DeviceTest {
 
     /** Le transizioni e le animazioni dei testi "wow", tutte insieme. */
     private fun wowProject(): Project {
-        val wow = listOf(TransitionType.GLITCH, TransitionType.PRISM, TransitionType.LEAK, TransitionType.IRIS, TransitionType.PIXELATE, TransitionType.SHAKE)
+        val wow = listOf(TransitionType.GLITCH, TransitionType.PRISM, TransitionType.LEAK, TransitionType.IRIS, TransitionType.PIXELATE, TransitionType.SHAKE) +
+            TransitionType.entries.filter { it.premium }
         val clips = (0..wow.size).map { i ->
             video("w$i", listOf(videoA, videoB, videoC)[i % 3], s = 1_000_000, e = 2_500_000)
-                .copy(transitionOut = wow.getOrNull(i)?.let { TransitionSpec(it, 600_000) })
+                .copy(transitionOut = wow.getOrNull(i)?.let { TransitionSpec(it, 600_000) },
+                    fx = FxType.entries.filter { it.wow2 }.let { w -> listOf(ClipFx(w[i % w.size])) })
         }
-        val anims = listOf(TextAnim.DROP, TextAnim.RISE, TextAnim.WAVE, TextAnim.GLITCH, TextAnim.SHINE)
+        val anims = listOf(TextAnim.DROP, TextAnim.RISE, TextAnim.WAVE, TextAnim.GLITCH, TextAnim.SHINE,
+            TextAnim.BOUNCE, TextAnim.FLIP, TextAnim.SPIN, TextAnim.SCATTER, TextAnim.BLUR, TextAnim.FLICKER)
         return Project(
             name = "wow",
             clips = clips,
@@ -591,6 +595,7 @@ class DeviceTest {
             LayerMaskEffect(l),
             DenoiseEffect(0.5f),
             HighlightEffect(0.5f),
+            WowFxEffect(FxType.entries.filter { it.wow2 }.map { ClipFx(it, 0.6f) }, listOf(500_000L)),
         )
         val error = AtomicReference<String?>(null)
         val done = CountDownLatch(1)

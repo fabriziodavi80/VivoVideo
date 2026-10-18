@@ -13,56 +13,103 @@ enum class AutoStyle(
     val photoUs: Long,
     val videoUs: Long,
     val beatsPerSlot: Int,
+    /** Transizioni dei momenti calmi. */
     val transitions: List<TransitionType>,
     val transitionUs: Long,
     val fx: List<ClipFx>,
     val accents: List<ClipFx>,
     val title: TextPreset,
+    /** Transizioni d'impatto: sui colpi forti e sui "drop" della musica. */
+    val impact: List<TransitionType> = emptyList(),
+    /** Effetti a ritmo nelle parti cariche del brano. */
+    val beatFx: List<ClipFx> = emptyList(),
+    /** Accelerazioni e rallenty a tempo nei video (parti cariche). */
+    val ramps: Boolean = false,
+    /** Rallenty nei video a 100+ fps (parti calme). */
+    val slowmo: Boolean = false,
 ) {
     CINEMA(
-        "Cinema", "Solenne: look da film con bande nere, dissolvenze incrociate, luce calda.",
+        "Cinema", "Solenne: look da film, messa a fuoco del titolo, dissolvenze di luce e pellicola, rallenty sui momenti calmi.",
         photoUs = 3_500_000, videoUs = 4_000_000, beatsPerSlot = 4,
-        transitions = listOf(TransitionType.CROSSFADE, TransitionType.CROSSFADE, TransitionType.CROSSFADE, TransitionType.LEAK, TransitionType.FADE_BLACK),
+        transitions = listOf(TransitionType.CROSSFADE, TransitionType.CROSSFADE, TransitionType.LUMA, TransitionType.LEAK, TransitionType.BURN),
         transitionUs = 1_000_000,
-        fx = listOf(ClipFx(FxType.CINEMATIC, 0.8f)),
-        accents = listOf(ClipFx(FxType.RAYS, 0.4f)),
-        title = TextPreset.CINEMA,
+        fx = listOf(ClipFx(FxType.CINEMATIC, 0.8f), ClipFx(FxType.FILM35, 0.35f)),
+        accents = listOf(ClipFx(FxType.RAYS, 0.4f), ClipFx(FxType.SWEEP, 0.4f)),
+        title = TextPreset.CINEMA26,
+        impact = listOf(TransitionType.PUNCH, TransitionType.FLASH, TransitionType.CUBE),
+        beatFx = listOf(ClipFx(FxType.ZOOMBEAT, 0.35f)),
+        slowmo = true,
     ),
     ENERGICO(
-        "Energico", "Ritmo serrato: tagli a tempo, colpi sui battiti, zoom, glitch e lampi.",
+        "Energico", "Ritmo serrato: tagli su ogni colpo nelle parti cariche, zoom punch, schiaffi RGB, scosse e accelerazioni.",
         photoUs = 1_500_000, videoUs = 1_800_000, beatsPerSlot = 2,
-        transitions = listOf(TransitionType.ZOOM, TransitionType.WHIP, TransitionType.GLITCH, TransitionType.FLASH, TransitionType.SHAKE, TransitionType.PRISM),
+        transitions = listOf(TransitionType.ZOOM, TransitionType.WHIP, TransitionType.SWIRL, TransitionType.SLIDE_UP, TransitionType.PRISM),
         transitionUs = 350_000,
-        fx = listOf(ClipFx(FxType.HIT, 0.6f), ClipFx(FxType.VIVID, 0.35f)),
-        accents = listOf(ClipFx(FxType.SPEEDLINES, 0.5f), ClipFx(FxType.PRISM, 0.4f)),
-        title = TextPreset.GLITCH,
+        fx = listOf(ClipFx(FxType.HIT, 0.5f), ClipFx(FxType.VIVID, 0.35f)),
+        accents = listOf(ClipFx(FxType.SPEEDLINES, 0.5f), ClipFx(FxType.RGBBEAT, 0.6f)),
+        title = TextPreset.ESPLOSIONE,
+        impact = listOf(TransitionType.PUNCH, TransitionType.RGB, TransitionType.GLITCH, TransitionType.FLASH, TransitionType.SHAKE),
+        beatFx = listOf(ClipFx(FxType.ZOOMBEAT, 0.6f), ClipFx(FxType.SHAKEBEAT, 0.45f)),
+        ramps = true,
+    ),
+    VIRALE(
+        "Reel virale", "Da social: intro che sale, sul drop un taglio a ogni battito, velocità a scatti, duotono e lampi di luce.",
+        photoUs = 1_200_000, videoUs = 1_500_000, beatsPerSlot = 2,
+        transitions = listOf(TransitionType.WHIP, TransitionType.SLIDE_UP, TransitionType.ZOOM, TransitionType.CUBE),
+        transitionUs = 300_000,
+        fx = listOf(ClipFx(FxType.VIVID, 0.45f)),
+        accents = listOf(ClipFx(FxType.DUOPOP, 0.55f), ClipFx(FxType.SWEEP, 0.6f), ClipFx(FxType.SPLIT3, 1f)),
+        title = TextPreset.FESTA,
+        impact = listOf(TransitionType.PUNCH, TransitionType.RGB, TransitionType.FLASH, TransitionType.SWIRL),
+        beatFx = listOf(ClipFx(FxType.ZOOMBEAT, 0.7f), ClipFx(FxType.RGBBEAT, 0.4f)),
+        ramps = true,
     ),
     RICORDI(
-        "Ricordi", "Nostalgico: pellicola, luce calda, passaggi morbidi.",
+        "Ricordi", "Nostalgico: pellicola 35 mm, luce calda, bruciature di pellicola, passaggi morbidi.",
         photoUs = 3_000_000, videoUs = 3_000_000, beatsPerSlot = 4,
-        transitions = listOf(TransitionType.CROSSFADE, TransitionType.CROSSFADE, TransitionType.LEAK, TransitionType.BLUR),
+        transitions = listOf(TransitionType.CROSSFADE, TransitionType.CROSSFADE, TransitionType.BURN, TransitionType.LEAK, TransitionType.LUMA),
         transitionUs = 900_000,
-        fx = listOf(ClipFx(FxType.FILM, 0.45f), ClipFx(FxType.LIGHTLEAK, 0.35f), ClipFx(FxType.VIGNETTE, 0.5f)),
-        accents = listOf(ClipFx(FxType.BOKEH, 0.35f)),
+        fx = listOf(ClipFx(FxType.FILM35, 0.6f), ClipFx(FxType.LIGHTLEAK, 0.3f), ClipFx(FxType.VIGNETTE, 0.5f)),
+        accents = listOf(ClipFx(FxType.BOKEH, 0.35f), ClipFx(FxType.DREAMY, 0.4f)),
         title = TextPreset.CASCATA,
+        impact = listOf(TransitionType.FLASH, TransitionType.BURN),
+        slowmo = true,
+    ),
+    SOGNO(
+        "Sogno", "Morbido e luminoso: alone di luce, riflessi iridescenti, dissolvenze di luce, titolo che va a fuoco.",
+        photoUs = 3_200_000, videoUs = 3_400_000, beatsPerSlot = 4,
+        transitions = listOf(TransitionType.CROSSFADE, TransitionType.LUMA, TransitionType.LIQUID, TransitionType.LEAK),
+        transitionUs = 1_000_000,
+        fx = listOf(ClipFx(FxType.DREAMY, 0.55f), ClipFx(FxType.VIVID, 0.15f)),
+        accents = listOf(ClipFx(FxType.HOLO, 0.4f), ClipFx(FxType.SPARKLE, 0.45f)),
+        title = TextPreset.SOGNO,
+        impact = listOf(TransitionType.LUMA, TransitionType.SWIRL, TransitionType.FLASH),
+        beatFx = listOf(ClipFx(FxType.ZOOMBEAT, 0.25f)),
+        slowmo = true,
     ),
     ELEGANTE(
-        "Elegante", "Luminoso e raffinato: colori puliti, luci bokeh e polvere d'oro, titolo dorato.",
+        "Elegante", "Luminoso e raffinato: colori puliti, luci bokeh e polvere d'oro, cubo 3D, titolo dorato.",
         photoUs = 3_000_000, videoUs = 3_200_000, beatsPerSlot = 4,
-        transitions = listOf(TransitionType.CROSSFADE, TransitionType.CROSSFADE, TransitionType.ZOOM, TransitionType.LEAK, TransitionType.IRIS),
+        transitions = listOf(TransitionType.CROSSFADE, TransitionType.CROSSFADE, TransitionType.CUBE, TransitionType.LEAK, TransitionType.IRIS),
         transitionUs = 800_000,
         fx = listOf(ClipFx(FxType.VIVID, 0.25f), ClipFx(FxType.GLOW, 0.3f)),
-        accents = listOf(ClipFx(FxType.SPARKLE, 0.5f), ClipFx(FxType.BOKEH, 0.4f)),
+        accents = listOf(ClipFx(FxType.SPARKLE, 0.5f), ClipFx(FxType.SWEEP, 0.45f)),
         title = TextPreset.ORO,
+        impact = listOf(TransitionType.PUNCH, TransitionType.FLASH, TransitionType.LUMA),
+        beatFx = listOf(ClipFx(FxType.ZOOMBEAT, 0.3f)),
+        slowmo = true,
     ),
     VIAGGIO(
-        "Viaggio", "Dinamico: scorrimenti, zoom e rotazioni, colori vivaci e raggi di luce.",
+        "Viaggio", "Dinamico: scorrimenti con scia, vortici e cubi 3D, colori vivaci, raggi di luce, accelerazioni a tempo.",
         photoUs = 2_200_000, videoUs = 2_600_000, beatsPerSlot = 2,
-        transitions = listOf(TransitionType.WHIP, TransitionType.ZOOM, TransitionType.SPIN, TransitionType.CROSSFADE, TransitionType.PRISM),
+        transitions = listOf(TransitionType.WHIP, TransitionType.ZOOM, TransitionType.CUBE, TransitionType.CROSSFADE, TransitionType.SLIDE_UP),
         transitionUs = 500_000,
         fx = listOf(ClipFx(FxType.VIVID, 0.45f)),
-        accents = listOf(ClipFx(FxType.RAYS, 0.45f)),
-        title = TextPreset.ONDA,
+        accents = listOf(ClipFx(FxType.RAYS, 0.45f), ClipFx(FxType.SWEEP, 0.5f)),
+        title = TextPreset.TITOLO3D,
+        impact = listOf(TransitionType.PUNCH, TransitionType.SWIRL, TransitionType.SPIN, TransitionType.FLASH),
+        beatFx = listOf(ClipFx(FxType.ZOOMBEAT, 0.45f)),
+        ramps = true,
     );
 
     /** Durata media di una scena, per scegliere quanti elementi usare. */
@@ -159,12 +206,15 @@ object AutoEdit {
      */
     internal fun fit(clips: MutableList<Clip>, targetUs: Long, periodUs: Long, minSlot: Long) {
         if (clips.isEmpty() || targetUs <= 0) return
-        fun maxLen(c: Clip) = if (c.isPhoto) Clip.PHOTO_MAX_US else c.sourceDurationUs
-        fun withLen(c: Clip, len: Long): Clip {
+        // Tutto in durata sul video finale: con rallenty o accelerazioni il materiale usato è diverso.
+        fun ratio(c: Clip) = if (c.isPhoto || c.trimmedUs <= 0) 1.0 else c.outputUs.toDouble() / c.trimmedUs
+        fun maxOut(c: Clip): Long = if (c.isPhoto) Clip.PHOTO_MAX_US else (c.sourceDurationUs * ratio(c)).toLong()
+        fun withOut(c: Clip, out: Long): Clip {
             if (c.isPhoto) {
-                val k = len.toDouble() / c.trimmedUs.coerceAtLeast(1)
-                return c.copy(trimStartUs = 0, trimEndUs = len, keyframes = c.keyframes.map { it.copy(timeUs = (it.timeUs * k).toLong()) })
+                val k = out.toDouble() / c.trimmedUs.coerceAtLeast(1)
+                return c.copy(trimStartUs = 0, trimEndUs = out, keyframes = c.keyframes.map { it.copy(timeUs = (it.timeUs * k).toLong()) })
             }
+            val len = (out / ratio(c)).toLong().coerceIn(1, c.sourceDurationUs)
             val start = c.trimStartUs.coerceAtMost((c.sourceDurationUs - len).coerceAtLeast(0))
             return c.copy(trimStartUs = start, trimEndUs = start + len)
         }
@@ -176,7 +226,7 @@ object AutoEdit {
         if (deficit > 0) {
             repeat(3) {
                 if (deficit <= 0) return@repeat
-                val room = clips.map { (maxLen(it) - it.trimmedUs).coerceAtLeast(0) }
+                val room = clips.map { (maxOut(it) - it.outputUs).coerceAtLeast(0) }
                 val roomSum = room.sum()
                 if (roomSum <= 0) return@repeat
                 for (i in clips.indices) {
@@ -185,40 +235,72 @@ object AutoEdit {
                     if (periodUs > 0) add = add / periodUs * periodUs
                     add = if (periodUs > 0) minOf(add, deficit / periodUs * periodUs) else minOf(add, deficit, room[i])
                     if (add <= 0) continue
-                    clips[i] = withLen(clips[i], clips[i].trimmedUs + add)
-                    deficit -= add
+                    val before = clips[i].outputUs
+                    clips[i] = withOut(clips[i], before + add)
+                    deficit -= clips[i].outputUs - before
                 }
             }
         }
-        // Il resto (meno di un battito per scena) lo prende l'ultima, che finisce sul bersaglio: i tagli prima restano a tempo.
         // Se all'ultima resterebbe un pezzetto, la si toglie e il tempo va alla precedente.
         if (clips.size > 1 && targetUs - clips.dropLast(1).sumOf { it.outputUs } < minSlot) clips.removeAt(clips.lastIndex)
+        // Il resto (meno di un battito per scena) lo prende l'ultima, che finisce sul bersaglio: i tagli prima restano a tempo.
         val before = clips.dropLast(1).sumOf { it.outputUs }
-        val lastLen = (targetUs - before).coerceAtMost(maxLen(clips.last()))
-        if (lastLen >= minOf(minSlot, maxLen(clips.last()))) clips[clips.lastIndex] = withLen(clips.last(), lastLen)
+        val lastLen = (targetUs - before).coerceAtMost(maxOut(clips.last()))
+        if (lastLen >= minOf(minSlot, maxOut(clips.last()))) {
+            // La curva di velocità arrotonda a passi: si corregge finché la fine cade sul bersaglio.
+            var c = withOut(clips.last(), lastLen)
+            repeat(3) { val err = targetUs - before - c.outputUs; if (kotlin.math.abs(err) > 2_000) c = withOut(c, c.outputUs + err) }
+            clips[clips.lastIndex] = c
+        }
     }
 
     fun build(name: String, sources: List<Clip>, music: MusicTrack?, o: AutoOptions, scans: Map<String, MomentScan> = emptyMap()): Project {
         val style = o.style
         val rnd = Random(o.seed)
-        val beats = music?.beatsUs.orEmpty().filter { it > 0 }
-        val minSlot = 600_000L
+        // Battiti con la loro energia (0 calma … 1 carica), se il brano è stato analizzato.
+        val beatPairs = music?.beatsUs.orEmpty().mapIndexed { i, b -> b to (music?.energy?.getOrNull(i)) }.filter { it.first > 0 }
+        val beats = beatPairs.map { it.first }
+        val energy = beatPairs.map { it.second }.takeIf { e -> e.isNotEmpty() && e.all { it != null } }?.map { it!! }
         // Con la musica ogni scena dura [beatsPerSlot] battiti (al ritmo del brano).
         val period = beats.zipWithNext { a, b -> b - a }.sorted().let { if (it.isEmpty()) 0L else it[it.size / 2] }
         val beatSlot = period * style.beatsPerSlot
+        val minSlot = if (period in 250_000L..1_000_000L) 400_000L else 600_000L
 
-        // 1. Durata e pezzo di ogni scena (i video: un tratto centrale, dove di solito c'è l'azione).
+        fun beatIndex(tUs: Long): Int { var i = beats.binarySearch(tUs); if (i < 0) i = -i - 2; return i.coerceIn(0, (beats.size - 1).coerceAtLeast(0)) }
+        fun energyAt(tUs: Long): Float? = energy?.getOrNull(beatIndex(tUs))
+        // "Drop": un battito dove l'energia sale di colpo rispetto agli 8 prima (l'attacco del ritornello).
+        val drops: List<Long> = energy?.let { e ->
+            val out = mutableListOf<Long>()
+            for (i in 8 until e.size) {
+                val before = (i - 8 until i).map { e[it] }.average().toFloat()
+                if (e[i] >= 0.6f && e[i] - before >= 0.28f && (out.isEmpty() || beats[i] - out.last() >= period * 12)) out += beats[i]
+            }
+            out
+        }.orEmpty()
+
+        // 1. Durata e pezzo di ogni scena: con la musica, più corte dove il brano spinge e più lunghe dove respira.
         val clips = mutableListOf<Clip>()
         var t = 0L
         var prevMotion: MotionStyle? = null
+        var videoN = 0
+        val rampPresets = listOf(SpeedPreset.MONTAGE, SpeedPreset.BULLET, SpeedPreset.FLASH_IN, SpeedPreset.HERO)
         sources.forEach { src ->
-            val base = if (beatSlot in 500_000L..6_000_000L) beatSlot else if (src.isPhoto) style.photoUs else style.videoUs
+            val e = energyAt(t)
+            val bps = when {
+                e == null -> style.beatsPerSlot
+                e >= 0.72f -> (style.beatsPerSlot / 2).coerceAtLeast(1)
+                e <= 0.3f -> style.beatsPerSlot * 2
+                else -> style.beatsPerSlot
+            }
+            val slot = (period * bps).takeIf { it in 350_000L..6_000_000L } ?: beatSlot
+            val base = if (slot in 350_000L..6_000_000L) slot else if (src.isPhoto) style.photoUs else style.videoUs
             val ideal = if (src.isPhoto) base else minOf(base, src.sourceDurationUs)
             val maxLen = if (src.isPhoto) Clip.PHOTO_MAX_US else src.sourceDurationUs
             var len = ideal
             if (beats.size > style.beatsPerSlot) {
-                // Il taglio cade sul battito più vicino alla fine ideale (almeno [beatsPerSlot]/2 battiti dopo l'inizio).
-                val end = beatAround(beats, t + ideal, t + minSlot, t + maxLen)
+                // Il taglio cade sul battito più vicino alla fine ideale; se c'è un "drop" poco più in là, proprio su quello.
+                val drop = drops.firstOrNull { it > t + minSlot && it <= t + (ideal * 1.6).toLong() && it - t <= maxLen }
+                val end = drop ?: beatAround(beats, t + ideal, t + minSlot, t + maxLen)
                 if (end != null) len = end - t
             }
             len = len.coerceIn(minOf(minSlot, maxLen), maxLen)
@@ -227,35 +309,64 @@ object AutoEdit {
                 prevMotion = m
                 src.copy(trimStartUs = 0, trimEndUs = len, keyframes = m.keyframes(len))
             } else {
+                videoN++
+                // Velocità a tempo: rallenty nei momenti calmi (video a 100+ fps), accelerazioni nelle parti cariche.
+                var speed = ClipSpeed.NORMAL
+                var points = emptyList<SpeedPoint>()
+                var need = len
+                if (style.slowmo && src.fps >= 90f && (e == null || e < 0.55f) && rnd.nextFloat() < 0.65f && len * 0.5 <= src.sourceDurationUs) {
+                    speed = ClipSpeed.SLOW; need = len / 2
+                } else if (style.ramps && e != null && e >= 0.6f && videoN % 2 == 0 && src.fps >= 50f) {
+                    val preset = rampPresets[(videoN / 2 + o.variant) % rampPresets.size]
+                    val r = SpeedCurve.forClip(ClipSpeed.RAMP, 1_000_000L, preset.points).outputDurationUs() / 1e6
+                    var n = (len / r).toLong()
+                    // La curva lavora a passi: si corregge il materiale finché la durata torna col battito.
+                    repeat(3) {
+                        val out = SpeedCurve.forClip(ClipSpeed.RAMP, n, preset.points).outputDurationUs()
+                        if (out > 0) n = (n.toDouble() * len / out).toLong()
+                    }
+                    if (r > 0 && n <= src.sourceDurationUs) { speed = ClipSpeed.RAMP; points = preset.points; need = n }
+                }
                 val scan = scans[src.uri]?.takeIf { o.smart && it.samples.size >= 2 }
                 val start = if (scan != null) {
                     // Il tratto migliore (dalle proposte successive, il secondo o il terzo).
-                    val best = Moments.bestStarts(scan, len, 3)
-                    best[o.variant % best.size].coerceIn(0, (src.sourceDurationUs - len).coerceAtLeast(0))
+                    val best = Moments.bestStarts(scan, need, 3)
+                    best[o.variant % best.size].coerceIn(0, (src.sourceDurationUs - need).coerceAtLeast(0))
                 } else {
                     val pos = if (o.variant == 0) 0.4 else 0.2 + rnd.nextDouble() * 0.45
-                    ((src.sourceDurationUs - len) * pos).toLong().coerceAtLeast(0)
+                    ((src.sourceDurationUs - need) * pos).toLong().coerceAtLeast(0)
                 }
-                src.copy(trimStartUs = start, trimEndUs = start + len, speed = ClipSpeed.NORMAL, keyframes = emptyList())
+                src.copy(trimStartUs = start, trimEndUs = start + need, speed = speed, speedPoints = points, keyframes = emptyList())
             }
             c = c.copy(muted = music != null || c.muted, fx = style.fx, fadeInUs = 0, fadeOutUs = 0, transitionOut = null)
             clips += c
-            t += len
+            t += c.outputUs
         }
         if (clips.isEmpty()) return Project(name = name)
         // Durata richiesta (per esempio "come il brano"): si arriva esattamente lì.
         fit(clips, o.targetUs, period, minSlot)
 
-        // 2. Transizioni (mai due uguali di fila, tranne l'incrociata che è la "normale") ed effetti d'accento.
+        // 2. Transizioni: d'impatto sui colpi forti e sui drop, morbide dove il brano è calmo (mai due uguali di fila).
         var prevT: TransitionType? = null
+        val starts = run { var acc = 0L; clips.map { c -> acc.also { acc += c.outputUs } } }
         for (i in clips.indices) {
             var c = clips[i]
+            val cutAt = starts[i] + c.outputUs
+            val eCut = energyAt(cutAt)
+            val isDrop = drops.any { kotlin.math.abs(it - cutAt) < 40_000 }
             if (i < clips.lastIndex) {
-                val choices = style.transitions.filter { it != prevT || it == TransitionType.CROSSFADE }
-                val type = choices.random(rnd)
+                val strong = style.impact.isNotEmpty() && (isDrop || (eCut != null && eCut >= 0.65f && rnd.nextFloat() < 0.6f))
+                val list = if (strong) style.impact else style.transitions
+                val choices = list.filter { it != prevT || it == TransitionType.CROSSFADE }.ifEmpty { list }
+                val type = if (isDrop) style.impact.first() else choices.random(rnd)
                 prevT = type
-                c = c.copy(transitionOut = TransitionSpec(type, minOf(style.transitionUs, c.outputUs / 2, clips[i + 1].outputUs / 2)))
+                val dur = if (strong) minOf(style.transitionUs, 400_000L) else style.transitionUs
+                c = c.copy(transitionOut = TransitionSpec(type, minOf(dur, c.outputUs / 2, clips[i + 1].outputUs / 2)))
             }
+            // Effetti a ritmo nelle parti cariche; sul drop un colpo in più.
+            val eMid = energyAt(starts[i] + c.outputUs / 2)
+            if (eMid != null && eMid >= 0.6f && style.beatFx.isNotEmpty()) c = c.copy(fx = c.fx.filter { f -> style.beatFx.none { it.type == f.type } } + style.beatFx)
+            if (drops.any { kotlin.math.abs(it - starts[i]) < 40_000 }) c = c.copy(fx = c.fx.filter { it.type != FxType.HIT } + ClipFx(FxType.HIT, 0.8f))
             if (style.accents.isNotEmpty() && i % 3 == 1 + (o.variant % 2)) {
                 val a = style.accents[(i / 3) % style.accents.size]
                 c = c.copy(fx = c.fx.filter { it.type != a.type } + a)
@@ -270,13 +381,25 @@ object AutoEdit {
         val format = if (o.format == VideoFormat.AUTO) VideoFormat.majority(sources) else o.format
         var p = Project(name = name, clips = clips, format = format).applyFramePresets()
         if (o.smart) {
-            // Orientamento opposto con delle persone: si riempie il quadro seguendo i volti, invece delle bande.
+            // Orientamento opposto: si riempie il quadro seguendo i volti (o un soggetto chiaro) invece delle bande;
+            // le foto senza volti si attraversano con una panoramica lenta.
             val out = p.outputOrientation()
+            var dir = false
             p = p.copy(clips = p.clips.map { c ->
+                if (c.orientation == out || out == Orientation.SQUARE) return@map c
                 val scan = scans[c.uri]
-                if (c.orientation != out && out != Orientation.SQUARE && scan?.hasFaces == true) {
-                    Moments.subjectPath(scan)?.let { path -> c.withMode(FrameMode.FILL).copy(reframe = path) } ?: c
-                } else c
+                val clear = scan != null && (scan.hasFaces || scan.samples.count { it.hasSubject } * 2 >= scan.samples.size)
+                val path = if (clear) Moments.subjectPath(scan!!) else null
+                when {
+                    path != null && !c.isPhoto -> c.withMode(FrameMode.FILL).copy(reframe = path)
+                    c.isPhoto && path != null && scan?.hasFaces == true -> c.withMode(FrameMode.FILL).copy(reframe = path)
+                    c.isPhoto -> {
+                        dir = !dir
+                        val (a, b) = if (dir) 0.22f to 0.78f else 0.78f to 0.22f
+                        c.withMode(FrameMode.FILL).copy(reframe = Reframe(listOf(0L, c.trimmedUs), listOf(a, b), listOf(0.5f, 0.5f)))
+                    }
+                    else -> c
+                }
             })
         }
         val total = p.durationUs
