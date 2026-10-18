@@ -5,6 +5,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 ## Novità di questa versione
 - **Collaudo** (Home → **Collaudo e segnalazioni**): l'elenco delle prove da fare con i tuoi video prima della versione ufficiale. Ogni prova dice come farla e cosa deve succedere; segna **Funziona** o **Problema** (con due parole).
 - **Segnala un problema** (nel Collaudo, o nell'editor → Progetto): prepara un file di testo da mandarmi, allegandolo nella chat. Dentro: versione, telefono, esito del collaudo, il progetto aperto (senza video), gli ultimi errori e il diario dell'app. Le chiavi dei servizi musicali vengono tolte.
+- **Schermo sempre acceso** mentre l'anteprima scorre, a schermo intero e durante esportazioni e lavori lunghi.
 - Prima: video automatico che dura esattamente quanto il brano; copie di sicurezza, ricollegamento, modelli, font tuoi.
 
 ## Primi passi

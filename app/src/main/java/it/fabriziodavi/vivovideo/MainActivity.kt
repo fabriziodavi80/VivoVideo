@@ -50,6 +50,13 @@ class MainActivity : ComponentActivity() {
                 val landscape = androidx.compose.ui.platform.LocalConfiguration.current.orientation ==
                     android.content.res.Configuration.ORIENTATION_LANDSCAPE
                 val immersive = vm.project != null && (landscape || vm.fullscreen)
+                // Schermo sempre acceso mentre l'anteprima scorre, a schermo intero e durante i lavori lunghi.
+                val keepOn = vm.project != null && (vm.isPlaying || vm.fullscreen || vm.clipWork != null ||
+                    vm.exportState is ExportState.Running) || vm.busy != null
+                LaunchedEffect(keepOn) {
+                    if (keepOn) window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    else window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                }
                 LaunchedEffect(immersive) {
                     val c = androidx.core.view.WindowCompat.getInsetsController(window, window.decorView)
                     c.systemBarsBehavior = androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
