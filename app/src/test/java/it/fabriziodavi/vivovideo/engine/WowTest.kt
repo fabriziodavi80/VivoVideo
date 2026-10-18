@@ -155,7 +155,7 @@ class WowTest {
 
     @Test fun vintageThemesStampTheRealDateAndRomanticPhotosBreathe() {
         val photos = (0 until 12).map { Clip(id = "p$it", uri = "file:///p$it.jpg", sourceDurationUs = Clip.PHOTO_MAX_US, trimEndUs = 3_000_000, isPhoto = true, width = 4000, height = 3000) }
-        val day = 1_754_000_000_000L // agosto 2025
+        val day = 1_755_000_000_000L // 12 agosto 2025
         val dates = photos.associate { it.uri to day }
         val p = AutoEdit.build("Vacanze", photos, music(), AutoOptions(style = AutoStyle.SUPER8, targetUs = 30_000_000), dates = dates)
         val stamps = p.texts.filter { it.text.endsWith("2025") }
