@@ -78,9 +78,10 @@ object Moments {
 
     /**
      * I migliori [count] tratti lunghi [lenUs] (inizio nel file), che non si sovrappongono, dal migliore.
-     * Il tratto deve stare tutto nel video.
+     * Il tratto deve stare tutto nel video. Si evitano i primi e gli ultimi istanti (il telefono che si alza
+     * o si abbassa) e, se [calm], i tratti molto mossi.
      */
-    fun bestStarts(scan: MomentScan, lenUs: Long, count: Int = 3): List<Long> {
+    fun bestStarts(scan: MomentScan, lenUs: Long, count: Int = 3, calm: Boolean = false): List<Long> {
         val dur = scan.durationUs
         if (lenUs >= dur || scan.samples.isEmpty()) return listOf(0L)
         val sc = scores(scan)
@@ -98,7 +99,20 @@ object Moments {
                 val k = exp(-(d / 700_000f) * (d / 700_000f))
                 acc += sc[i] * k; w += k
             }
-            return if (w <= 1e-4f) 0f else acc / w
+            if (w <= 1e-4f) return 0f
+            var v = acc / w
+            // Bordi del video: inizio e fine spesso sono mossi o inquadrano a caso.
+            if (maxStart > 2 * EDGE_US) {
+                if (start < EDGE_US) v *= 0.85f
+                if (end > dur - EDGE_US) v *= 0.85f
+            }
+            if (calm) {
+                // Movimento medio dentro il tratto: nei temi calmi niente scene che sbandano.
+                var mAcc = 0f; var mN = 0
+                scan.samples.forEach { if (it.tUs in start..end) { mAcc += it.motion; mN++ } }
+                if (mN > 0) v -= 0.35f * (mAcc / mN - 0.45f).coerceAtLeast(0f)
+            }
+            return v
         }
         val ranked = cands.map { it to value(it) }.sortedByDescending { it.second }
         val out = mutableListOf<Long>()
@@ -108,6 +122,9 @@ object Moments {
         }
         return out.ifEmpty { listOf(0L) }
     }
+
+    /** Primi e ultimi istanti di un video da evitare. */
+    const val EDGE_US = 600_000L
 
     /** Quanto è riuscita una foto (o un istante), 0…1, senza confronti: per scartare le foto mosse. */
     fun photoScore(m: MomentSample): Float = scores(MomentScan("", 1, listOf(m))).first()

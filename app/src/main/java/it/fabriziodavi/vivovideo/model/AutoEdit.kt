@@ -45,6 +45,10 @@ enum class AutoStyle(
     val popScale: Float = 0.07f,
     /** Stile della data sulle scene (videocamera arancione o tappa di viaggio). */
     val stamp: TextPreset = TextPreset.DATA,
+    /** Durata minima di una scena (temi calmi): con brani veloci si usano più battiti per scena. */
+    val minSceneUs: Long = 0,
+    /** Nelle parti cariche del brano le scene si accorciano (i temi delicati restano distesi). */
+    val shorterOnEnergy: Boolean = true,
 ) {
     CINEMA(
         "Cinema", "Solenne: look da film, messa a fuoco del titolo, dissolvenze di luce e pellicola, rallenty sui momenti calmi.",
@@ -59,6 +63,7 @@ enum class AutoStyle(
         slowmo = true,
         grade = Grade(contrast = 0.12f, saturation = -0.05f, shadowWheel = Wheel(195f, 0.35f), highWheel = Wheel(32f, 0.3f)),
         intro = true,
+        minSceneUs = 2_400_000,
     ),
     ENERGICO(
         "Energico", "Ritmo serrato: tagli su ogni colpo nelle parti cariche, zoom punch, schiaffi RGB, scosse e accelerazioni.",
@@ -99,6 +104,7 @@ enum class AutoStyle(
         impact = listOf(TransitionType.FLASH, TransitionType.BURN),
         slowmo = true,
         grade = Grade(contrast = -0.12f, shadows = 0.25f, saturation = -0.12f, temperature = 0.35f, midWheel = Wheel(35f, 0.2f)),
+        minSceneUs = 2_600_000, shorterOnEnergy = false,
     ),
     SOGNO(
         "Sogno", "Morbido e luminoso: alone di luce, riflessi iridescenti, dissolvenze di luce, titolo che va a fuoco.",
@@ -112,6 +118,7 @@ enum class AutoStyle(
         beatFx = listOf(ClipFx(FxType.ZOOMBEAT, 0.25f)),
         slowmo = true,
         grade = Grade(exposure = 0.12f, contrast = -0.15f, highlights = -0.2f, saturation = -0.08f, tint = 0.12f, highWheel = Wheel(330f, 0.15f)),
+        minSceneUs = 3_000_000, shorterOnEnergy = false,
     ),
     ELEGANTE(
         "Elegante", "Luminoso e raffinato: colori puliti, luci bokeh e polvere d'oro, cubo 3D, titolo dorato.",
@@ -125,6 +132,7 @@ enum class AutoStyle(
         beatFx = listOf(ClipFx(FxType.ZOOMBEAT, 0.3f)),
         slowmo = true,
         grade = Grade(exposure = 0.06f, contrast = 0.06f, highlights = -0.15f, vibrance = 0.15f, highWheel = Wheel(45f, 0.12f)),
+        minSceneUs = 2_600_000, shorterOnEnergy = false,
     ),
     VIAGGIO(
         "Viaggio", "Dinamico: scorrimenti con scia, vortici e cubi 3D, colori vivaci, raggi di luce, accelerazioni a tempo.",
@@ -139,6 +147,7 @@ enum class AutoStyle(
         ramps = true,
         grade = Grade(contrast = 0.1f, vibrance = 0.3f, temperature = 0.12f),
         intro = true,
+        minSceneUs = 1_200_000,
     ),
     BLOCKBUSTER(
         "Blockbuster", "Trailer da cinema: intro a raffica, teal & orange, bande cinema, bagliori anamorfici, esplosioni di luce e momento eroe sul drop.",
@@ -153,6 +162,7 @@ enum class AutoStyle(
         ramps = true, slowmo = true,
         grade = Grade(contrast = 0.22f, saturation = 0.05f, shadows = -0.1f, shadowWheel = Wheel(190f, 0.5f), highWheel = Wheel(30f, 0.45f)),
         intro = true, hero = true,
+        minSceneUs = 1_000_000,
     ),
     NEON(
         "Neon notte", "Notturno elettrico: magenta e ciano, glitch, schiaffi RGB, strisce e riflessi olografici a tempo.",
@@ -225,6 +235,7 @@ enum class AutoStyle(
         slowmo = true,
         grade = Grade(exposure = 0.08f, contrast = -0.1f, highlights = -0.15f, saturation = -0.05f, temperature = 0.25f, tint = 0.1f, highWheel = Wheel(20f, 0.15f), shadowWheel = Wheel(330f, 0.12f)),
         gentlePops = true, popEvery = 4, popScale = 0.03f,
+        minSceneUs = 3_000_000, shorterOnEnergy = false,
     ),
     MATRIMONIO(
         "Matrimonio", "Elegante e luminoso: bianchi puliti e oro, luce soffusa, lampi di luce e polvere d'oro, passaggi lenti e solenni.",
@@ -239,6 +250,7 @@ enum class AutoStyle(
         slowmo = true,
         grade = Grade(exposure = 0.1f, contrast = 0.04f, highlights = -0.2f, saturation = -0.08f, temperature = 0.12f, highWheel = Wheel(42f, 0.15f)),
         gentlePops = true, popEvery = 4, popScale = 0.025f,
+        minSceneUs = 3_200_000, shorterOnEnergy = false,
     ),
     SUPER8(
         "Super 8", "Le pellicole di una volta, ma moderne: immagine che balla, colori caldi sbiaditi, bordo con i fori, proiettore, salti di pellicola e data della videocamera.",
@@ -252,6 +264,7 @@ enum class AutoStyle(
         beatFx = listOf(ClipFx(FxType.GLOWBEAT, 0.35f)),
         grade = Grade(contrast = -0.05f, shadows = 0.15f, saturation = -0.1f, temperature = 0.3f),
         dateStamp = true, gentlePops = true, popEvery = 2, popScale = 0.04f,
+        minSceneUs = 2_200_000, shorterOnEnergy = false,
     ),
     ANNI90(
         "Anni '90", "Videocamera di famiglia anni '90: VHS, riavvolgimenti, disturbi a tempo, colori saturi un po' sbavati e la data arancione.",
@@ -268,19 +281,20 @@ enum class AutoStyle(
         intro = true, dateStamp = true,
     ),
     NATURA(
-        "Natura", "Verdi e terre ricche, foschia che scorre, raggi di sole, passaggi lenti e rallenty; le foto respirano sulle battute.",
+        "Natura", "Verdi e azzurri ricchi, foschia leggera, raggi di sole, scene lunghe e passaggi morbidi; rallenty e foto che respirano.",
         photoUs = 3_400_000, videoUs = 3_600_000, beatsPerSlot = 4,
         transitions = listOf(TransitionType.CROSSFADE, TransitionType.CROSSFADE, TransitionType.LUMA, TransitionType.LIQUID, TransitionType.LEAK),
         transitionUs = 1_100_000,
         fx = listOf(ClipFx(FxType.SKYGRAD, 0.35f)),
-        accents = listOf(ClipFx(FxType.HAZE, 0.45f), ClipFx(FxType.RAYS, 0.4f), ClipFx(FxType.LEAVES, 0.35f)),
+        accents = listOf(ClipFx(FxType.HAZE, 0.4f), ClipFx(FxType.RAYS, 0.35f), ClipFx(FxType.DREAMY, 0.25f)),
         title = TextPreset.ELEGANTE,
-        impact = listOf(TransitionType.LUMA, TransitionType.FLASH, TransitionType.CUBE),
-        beatFx = listOf(ClipFx(FxType.GLOWBEAT, 0.35f)),
+        impact = listOf(TransitionType.LUMA, TransitionType.BOKEHFADE, TransitionType.LIQUID),
+        beatFx = listOf(ClipFx(FxType.GLOWBEAT, 0.25f)),
         slowmo = true,
         grade = Grade(contrast = 0.08f, shadows = 0.1f, vibrance = 0.3f, temperature = 0.08f,
             hsl = List(8) { if (it == HslBand.GREEN.ordinal) Hsl(hue = -0.15f, sat = 0.15f, lum = -0.1f) else if (it == HslBand.BLUE.ordinal) Hsl(sat = 0.2f, lum = -0.1f) else Hsl() }),
         gentlePops = true, popEvery = 4, popScale = 0.03f,
+        minSceneUs = 3_200_000, shorterOnEnergy = false,
     ),
     MARE(
         "Mare", "Turchesi e luce calda d'estate: riflessi d'acqua, scorrimenti, transizioni liquide e lampi di sole a tempo.",
@@ -296,6 +310,7 @@ enum class AutoStyle(
         grade = Grade(exposure = 0.08f, contrast = 0.1f, vibrance = 0.3f, temperature = 0.15f,
             hsl = List(8) { if (it == HslBand.AQUA.ordinal) Hsl(sat = 0.35f, lum = 0.05f) else if (it == HslBand.BLUE.ordinal) Hsl(hue = -0.2f, sat = 0.25f) else Hsl() }),
         intro = true,
+        minSceneUs = 1_400_000,
     ),
     MONTAGNA(
         "Montagna", "Aria tersa e cielo drammatico, bagliori sulle vette, cubi 3D e lenti, accelerazioni sui panorami e momento eroe sul drop.",
@@ -310,6 +325,7 @@ enum class AutoStyle(
         ramps = true, slowmo = true,
         grade = Grade(contrast = 0.18f, highlights = -0.2f, shadows = 0.08f, vibrance = 0.25f, temperature = -0.08f, shadowWheel = Wheel(210f, 0.2f)),
         intro = true, hero = true,
+        minSceneUs = 1_800_000,
     ),
     DIARIO(
         "Diario di viaggio", "Vlog moderno: la data di ogni tappa, scorrimenti e zoom puliti, colori vivaci ma naturali, foto che respirano a tempo.",
@@ -325,6 +341,7 @@ enum class AutoStyle(
         grade = Grade(contrast = 0.1f, vibrance = 0.25f, temperature = 0.06f),
         intro = true, dateStamp = true, gentlePops = true, popEvery = 2, popScale = 0.035f,
         stamp = TextPreset.TAPPA,
+        minSceneUs = 1_500_000,
     );
 
     /** Durata media di una scena, per scegliere quanti elementi usare. */
@@ -354,8 +371,12 @@ data class AutoOptions(
 
 /** Un elemento della galleria da cui è nato il video automatico. */
 @Serializable
-data class AutoSource(val uri: String, val isVideo: Boolean, val durationUs: Long, val dateMs: Long) {
+data class AutoSource(
+    val uri: String, val isVideo: Boolean, val durationUs: Long, val dateMs: Long,
+    val width: Int = 0, val height: Int = 0,
+) {
     fun item() = AutoItem(isVideo, durationUs, dateMs)
+    val orientation: Orientation? get() = if (width <= 0 || height <= 0) null else orientationOf(width, height)
 }
 
 /**
@@ -410,11 +431,53 @@ object AutoEdit {
      * Monta il video: [sources] sono le clip importate in ordine di data, [music] il brano (facoltativo,
      * con i battiti già trovati). Restituisce il progetto pronto, tutto ritoccabile nell'editor.
      */
+    /**
+     * Foto e video nello stesso verso del video finale: mescolare orizzontali e verticali rende male.
+     * Si tengono quelli nel verso giusto (o di misura ignota); gli altri solo se senza non bastano per [wanted] scene.
+     */
+    fun preferOrientation(items: List<AutoSource>, format: VideoFormat, wanted: Int): List<AutoSource> {
+        val known = items.mapNotNull { it.orientation }
+        val out = when (format) {
+            VideoFormat.VERTICAL -> Orientation.PORTRAIT
+            VideoFormat.HORIZONTAL -> Orientation.LANDSCAPE
+            VideoFormat.SQUARE -> return items
+            VideoFormat.AUTO -> if (known.isEmpty()) return items else
+                if (known.count { it == Orientation.PORTRAIT } > known.count { it == Orientation.LANDSCAPE }) Orientation.PORTRAIT else Orientation.LANDSCAPE
+        }
+        val same = items.filter { it.orientation == null || it.orientation == out || it.orientation == Orientation.SQUARE }
+        return if (same.size >= (wanted * 0.75).toInt().coerceAtLeast(2)) same else items
+    }
+
+    /**
+     * Raffiche: foto scattate a pochi secondi l'una dall'altra sono quasi uguali. Si tiene solo la migliore
+     * di ogni gruppo (secondo [score]; senza punteggio, quella di mezzo). I video restano tutti.
+     */
+    fun dedupeBursts(items: List<AutoSource>, score: (AutoSource) -> Float?, gapMs: Long = 4_000): List<AutoSource> {
+        val sorted = items.sortedBy { it.dateMs }
+        val out = mutableListOf<AutoSource>()
+        var group = mutableListOf<AutoSource>()
+        fun flush() {
+            if (group.isEmpty()) return
+            out += if (group.size == 1) group[0] else group.maxByOrNull { score(it) ?: -1f }?.takeIf { score(it) != null } ?: group[group.size / 2]
+            group = mutableListOf()
+        }
+        for (it in sorted) {
+            if (it.isVideo) { out += it; continue }
+            val last = group.lastOrNull()
+            if (last != null && it.dateMs - last.dateMs > gapMs) flush()
+            group += it
+        }
+        flush()
+        return out
+    }
+
     /** Durata di una scena con la musica (in battiti dello stile), o null se senza musica o con battiti strani. */
     fun beatSlotUs(style: AutoStyle, music: MusicTrack?): Long? {
         val beats = music?.beatsUs.orEmpty().filter { it > 0 }
         val period = beats.zipWithNext { a, b -> b - a }.sorted().let { if (it.isEmpty()) 0L else it[it.size / 2] }
-        return (period * style.beatsPerSlot).takeIf { it in 500_000L..6_000_000L }
+        var bps = style.beatsPerSlot
+        if (style.minSceneUs > 0 && period > 0) while (period * bps < style.minSceneUs && bps < 32) bps++
+        return (period * bps).takeIf { it in 500_000L..6_000_000L }
     }
 
     /**
@@ -532,7 +595,7 @@ object AutoEdit {
                 } else {
                     val n = minOf(len, src.sourceDurationUs)
                     val scan = scans[src.uri]?.takeIf { o.smart && it.samples.size >= 2 }
-                    val start = scan?.let { Moments.bestStarts(it, n, 2).last() } ?: ((src.sourceDurationUs - n) * 0.55).toLong()
+                    val start = scan?.let { Moments.bestStarts(it, n, 2, calm = !style.shorterOnEnergy).last() } ?: ((src.sourceDurationUs - n) * 0.55).toLong()
                     src.copy(trimStartUs = start.coerceIn(0, (src.sourceDurationUs - n).coerceAtLeast(0)), trimEndUs = start.coerceIn(0, (src.sourceDurationUs - n).coerceAtLeast(0)) + n,
                         speed = ClipSpeed.NORMAL, keyframes = emptyList())
                 }
@@ -555,12 +618,14 @@ object AutoEdit {
         for (src in sources) {
             if (pass > 0 && t >= o.targetUs) break
             val e = energyAt(t)
-            val bps = when {
+            var bps = when {
                 e == null -> style.beatsPerSlot
-                e >= 0.72f -> (style.beatsPerSlot / 2).coerceAtLeast(1)
+                e >= 0.72f && style.shorterOnEnergy -> (style.beatsPerSlot / 2).coerceAtLeast(1)
                 e <= 0.3f -> style.beatsPerSlot * 2
                 else -> style.beatsPerSlot
             }
+            // Mai più corta del minimo del tema (con brani veloci si prendono più battiti).
+            if (style.minSceneUs > 0 && period > 0) while (period * bps < style.minSceneUs && bps < 32) bps++
             val slot = (period * bps).takeIf { it in 350_000L..6_000_000L } ?: beatSlot
             val base = if (slot in 350_000L..6_000_000L) slot else if (src.isPhoto) style.photoUs else style.videoUs
             val ideal = if (src.isPhoto) base else minOf(base, src.sourceDurationUs)
@@ -621,7 +686,7 @@ object AutoEdit {
                 val scan = scans[src.uri]?.takeIf { o.smart && it.samples.size >= 2 }
                 val start = if (scan != null) {
                     // Il tratto migliore (dalle proposte successive, il secondo o il terzo).
-                    val best = Moments.bestStarts(scan, need, 3)
+                    val best = Moments.bestStarts(scan, need, 3, calm = !style.shorterOnEnergy)
                     best[(o.variant + pass) % best.size].coerceIn(0, (src.sourceDurationUs - need).coerceAtLeast(0))
                 } else {
                     val pos = if (o.variant == 0) 0.4 else 0.2 + rnd.nextDouble() * 0.45

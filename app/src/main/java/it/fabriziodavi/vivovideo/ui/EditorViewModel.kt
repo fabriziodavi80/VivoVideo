@@ -773,7 +773,8 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             val o = music?.let { m -> if (fitMusic) options.copy(targetUs = m.sourceDurationUs) else null } ?: options
             // Le fonti si ricordano (al massimo 1500, distribuite nel tempo) per poter fare altre proposte.
             val all = if (items.size <= 1500) items else (0 until 1500).map { items[(it.toLong() * (items.size - 1) / 1499).toInt()] }
-            val sources = all.map { AutoSource(it.uri.toString(), it.isVideo, it.durationMs * 1000, it.dateMs) }
+            val raw = all.map { AutoSource(it.uri.toString(), it.isVideo, it.durationMs * 1000, it.dateMs, it.width, it.height) }
+            val sources = chooseSources(ctx, raw, o, music)
             val picked = AutoEdit.pick(sources.map { it.item() }, o.style, o.targetUs, slotUs = AutoEdit.beatSlotUs(o.style, music)).map { sources[it] }
             if (picked.isEmpty()) { busy = null; message = "Negli album scelti non ci sono foto o video."; return@launch }
             val imported = importSources(ctx, picked, emptyMap())
@@ -801,6 +802,29 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                 (if (clips.size < picked.size) " ${picked.size - clips.size} file non leggibili saltati." else "") +
                 " Guardalo in anteprima, ritocca quello che vuoi ed esporta."
         }
+    }
+
+    /**
+     * Fonti del video automatico: delle raffiche si tiene la foto migliore, e si preferiscono foto e video
+     * nello stesso verso del video finale.
+     */
+    private suspend fun chooseSources(ctx: Application, raw: List<AutoSource>, o: AutoOptions, music: MusicTrack?): List<AutoSource> {
+        val photos = raw.filter { !it.isVideo }.sortedBy { it.dateMs }
+        // Solo le foto che hanno una vicina a pochi secondi (le raffiche) vanno valutate.
+        val inBurst = photos.filterIndexed { i, s ->
+            (i > 0 && s.dateMs - photos[i - 1].dateMs <= 4_000) || (i < photos.size - 1 && photos[i + 1].dateMs - s.dateMs <= 4_000)
+        }.take(240)
+        val scores = HashMap<String, Float>()
+        if (o.smart) inBurst.forEachIndexed { i, s ->
+            busy = "Scelgo le foto migliori… ${i + 1} di ${inBurst.size}"
+            runCatching { SmartAnalyzer.scan(ctx, s.uri, true, 0L) }
+                .onFailure { if (it is kotlinx.coroutines.CancellationException) throw it }
+                .getOrNull()?.samples?.firstOrNull()?.let { scores[s.uri] = Moments.photoScore(it) }
+        }
+        val deduped = AutoEdit.dedupeBursts(raw, { scores[it.uri] })
+        val slot = AutoEdit.beatSlotUs(o.style, music) ?: o.style.photoUs
+        val wanted = (o.targetUs / slot.coerceAtLeast(500_000L)).toInt().coerceAtLeast(4)
+        return AutoEdit.preferOrientation(deduped, o.format, wanted)
     }
 
     /** Regia intelligente: analisi di foto e video (momenti migliori, volti); quelle già fatte sono immediate. */

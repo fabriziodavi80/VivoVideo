@@ -3,14 +3,12 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
-- **Romantico e nostalgico, in chiave moderna**: temi **Romantico**, **Matrimonio**, **Super 8** e **Anni '90**.
-- **Vacanze, viaggi, natura**: temi **Natura** (verdi ricchi, foschia, raggi di sole), **Mare** (turchesi, riflessi d'acqua), **Montagna** (cielo drammatico, bagliori, momento eroe) e **Diario di viaggio** (vlog con la data di ogni tappa). In tutto 20 temi.
-- **Effetti natura**: Foschia, Riflessi d'acqua, Cielo drammatico (il filtro sfumato dei paesaggisti), Neve, Foglie d'autunno.
-- **Effetti**: Luce soffusa (il filtro "Pro-Mist" dei videomaker), Petali, Cuori di luce, Super 8, Bordo pellicola (con i fori), Proiettore; e **Bagliore a ritmo** (scheda A ritmo): un alone morbido che si accende su ogni colpo, per i temi delicati.
-- **Transizioni**: Cuore, Dissolvenza bokeh, Salto di pellicola, Riavvolgimento VHS; per l'azione **Schiacciata**.
-- **Sempre a tempo di musica**: nei temi delicati i tagli cadono sulle battute e le foto "respirano" con un piccolo zoom ogni battuta; nei temi vintage compare la **data arancione della videocamera**, presa dalla data vera di ogni foto e video.
-- Stile di testo **Amore** (corsivo che va a fuoco) e **Data videocamera**.
-- Prima: temi Blockbuster, Neon notte, Estate pop, Azione, Estremo; intro a raffica, momento eroe, finale.
+- **Natura rifatto**: niente più foglie che cadono; luce soffusa, foschia leggera e raggi di sole, passaggi morbidi (anche sui colpi del brano).
+- **Ritmo giusto per i temi calmi**: Natura, Romantico, Matrimonio, Sogno, Ricordi, Elegante, Super 8 e Cinema hanno una durata minima delle scene (Natura circa 3 secondi). Con un brano veloce si usano più battiti per scena, così i tagli restano a tempo ma senza fretta.
+- **Niente mix di orizzontali e verticali**: il video automatico sceglie le foto e i video nello stesso verso del video finale; quelli nell'altro verso entrano solo se non ce ne sono abbastanza.
+- **Raffiche**: tra le foto scattate a pochi secondi l'una dall'altra resta solo la migliore (nitida, ben esposta, con i sorrisi).
+- **Momento migliore più furbo**: evita i primi e gli ultimi istanti dei video (il telefono che si alza o si abbassa) e, nei temi calmi, i tratti che sbandano.
+- Prima: temi Romantico, Matrimonio, Super 8, Anni '90, Mare, Montagna, Diario di viaggio; effetti natura e romantici; data della videocamera.
 
 ## Primi passi
 - Dalla schermata dei progetti tocca **Nuovo progetto**: **Scegli foto e video** (fino a 100) oppure **Album interi** (uno o più album, tutto in ordine di data). Lo stesso vale per **+** e **Aggiungi** dentro l'editor.
@@ -52,8 +50,10 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - Home → **Video automatico**: album, stile, musica, regia, formato, durata, titolo.
 - **Durata**: "Come il brano" (con la musica) fa durare il video esattamente quanto il brano, che finisce col suo finale; le altre durate (30 s, 1 min, …) sono rispettate al decimo di secondo; "Tutto" usa tutto quello che c'è negli album.
 - Con la musica ogni taglio cade su un battito; se le foto e i video sono pochi per la durata, le scene si allungano di battiti interi.
+- **Temi calmi** (Natura, Romantico, Matrimonio, Sogno, Ricordi, Elegante, Super 8, Cinema): le scene non scendono sotto una durata minima, anche con un brano veloce (si prendono più battiti per scena) e anche dove il brano spinge.
+- **Scelta delle foto**: delle raffiche resta solo la foto migliore; si preferiscono foto e video nello stesso verso del video finale.
 - **Energia del brano**: l'app sente dove la musica è calma (scene più lunghe, passaggi morbidi, rallenty) e dove spinge (un taglio a ogni colpo, zoom e scosse a ritmo, accelerazioni); sul drop mette un taglio esatto con una transizione d'impatto.
-- **Orientamento**: il formato segue le foto e i video più numerosi; quelli girati nell'altro verso seguono le persone (regia intelligente) o, se sono foto, si attraversano con una panoramica; lo sfondo sfocato resta solo se non c'è un soggetto chiaro.
+- **Orientamento**: il formato segue le foto e i video più numerosi, e si usano di preferenza quelli nello stesso verso; quelli girati nell'altro verso (se servono) seguono le persone (regia intelligente) o, se sono foto, si attraversano con una panoramica; lo sfondo sfocato resta solo se non c'è un soggetto chiaro.
 - **Temi**: Cinema, Energico, Reel virale, Ricordi, Sogno, Elegante, Viaggio, Blockbuster, Neon notte, Estate pop, Azione, Estremo, Romantico, Matrimonio, Super 8, Anni '90, Natura, Mare, Montagna, Diario di viaggio. Ognuno ha il suo look colore, le sue transizioni (morbide nelle parti calme, d'impatto sui colpi) e il suo titolo.
 - **Struttura**: con la musica, i temi più dinamici aprono con un'**intro a raffica** e il titolo sul colpo; sul drop c'è il **momento eroe**; il **finale** rallenta e chiude con una scritta (il periodo indicato sotto il titolo, o il titolo).
 - **Altra proposta** rifà il montaggio con altre scene e altri tratti, **Stile** lo cambia: tutto resta ritoccabile a mano.
@@ -61,7 +61,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 ## Funzioni intelligenti
 - Tutto sul telefono, senza internet: riconoscimento dei volti (con sorrisi e occhi aperti) e della persona.
 - **Video automatico → Regia intelligente**: per ogni video si guardano i fotogrammi chiave (nitidezza, luce, movimento, volti) e si sceglie il tratto migliore. Nell'orientamento opposto, se ci sono persone, il quadro si riempie seguendole invece dello sfondo sfocato. La prima volta ci vuole un po' (scritta "Cerco i momenti migliori…"); i risultati restano, e le proposte successive sono subito pronte.
-- **Momento migliore**: tieni premuta una clip video più corta del suo file. Il taglio si sposta sul tratto migliore della stessa durata; di nuovo = secondo e terzo tratto.
+- **Momento migliore**: tieni premuta una clip video più corta del suo file. Il taglio si sposta sul tratto migliore della stessa durata (evitando i primi e gli ultimi istanti del video); di nuovo = secondo e terzo tratto.
 - **Segui il soggetto**: Inquadra → Segui il soggetto. Mette "Riempi" e muove l'inquadratura con calma, seguendo i volti (o, senza volti, la zona con più dettagli). Segno SEGUE nella timeline. "Smetti di seguire" per toglierlo; con "Adatta" o "Sfocato" non ha effetto.
 - **Persona** (Effetti → Persona): Scontorna la persona (circa il tempo della clip), poi scegli lo sfondo: **sfocato**, **a colore** o **in bianco e nero** (colore solo sulla persona). Segno PERSONA. Se cambi molto il taglio, "Rifai lo scontorno".
 - **Solo la persona** nei video sovrapposti: Livelli → Forma → Scontorna la persona. Lo sfondo diventa trasparente: la persona sta sopra al video principale. In anteprima si vede quando il tratto è pronto.

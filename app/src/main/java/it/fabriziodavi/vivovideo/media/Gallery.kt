@@ -14,7 +14,11 @@ import android.util.Size
 data class Album(val id: String, val name: String, val count: Int, val videos: Int, val coverUri: Uri, val latestMs: Long)
 
 /** Una foto o un video della galleria. */
-data class GalleryItem(val uri: Uri, val isVideo: Boolean, val durationMs: Long, val dateMs: Long, val albumId: String)
+data class GalleryItem(
+    val uri: Uri, val isVideo: Boolean, val durationMs: Long, val dateMs: Long, val albumId: String,
+    /** Misure come le vede chi guarda (0 se non note). */
+    val width: Int = 0, val height: Int = 0,
+)
 
 /** Lettura di album e contenuti dalla galleria del telefono (MediaStore). */
 object Gallery {
@@ -37,6 +41,7 @@ object Gallery {
             MediaStore.Files.FileColumns._ID, MediaStore.Files.FileColumns.MEDIA_TYPE,
             MediaStore.MediaColumns.BUCKET_ID, MediaStore.MediaColumns.DATE_TAKEN,
             MediaStore.MediaColumns.DATE_ADDED, MediaStore.MediaColumns.DURATION,
+            MediaStore.MediaColumns.WIDTH, MediaStore.MediaColumns.HEIGHT, MediaStore.MediaColumns.ORIENTATION,
         )
         val sel = "(${MediaStore.Files.FileColumns.MEDIA_TYPE}=? OR ${MediaStore.Files.FileColumns.MEDIA_TYPE}=?)"
         val args = arrayOf(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString(), MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString())
@@ -45,6 +50,7 @@ object Gallery {
             val iId = c.getColumnIndexOrThrow(proj[0]); val iType = c.getColumnIndexOrThrow(proj[1])
             val iBucket = c.getColumnIndexOrThrow(proj[2]); val iTaken = c.getColumnIndexOrThrow(proj[3])
             val iAdded = c.getColumnIndexOrThrow(proj[4]); val iDur = c.getColumnIndexOrThrow(proj[5])
+            val iW = c.getColumnIndex(proj[6]); val iH = c.getColumnIndex(proj[7]); val iRot = c.getColumnIndex(proj[8])
             while (c.moveToNext()) {
                 val bucket = c.getString(iBucket) ?: continue
                 if (albumIds != null && bucket !in albumIds) continue
@@ -54,7 +60,11 @@ object Gallery {
                 val taken = c.getLong(iTaken).takeIf { it > 0 } ?: (c.getLong(iAdded) * 1000)
                 val dur = if (video) c.getLong(iDur) else 0L
                 if (video && dur < 500) continue // video vuoti o rovinati
-                out += GalleryItem(ContentUris.withAppendedId(base, id), video, dur, taken, bucket)
+                var w = if (iW >= 0) c.getInt(iW) else 0
+                var h = if (iH >= 0) c.getInt(iH) else 0
+                val rot = if (iRot >= 0) c.getInt(iRot) else 0
+                if (rot % 180 != 0) { val t = w; w = h; h = t }
+                out += GalleryItem(ContentUris.withAppendedId(base, id), video, dur, taken, bucket, w, h)
             }
         }
         return out.sortedBy { it.dateMs }
