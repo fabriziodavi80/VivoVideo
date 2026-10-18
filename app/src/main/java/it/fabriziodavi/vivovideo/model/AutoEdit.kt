@@ -191,9 +191,11 @@ object AutoEdit {
             }
         }
         // Il resto (meno di un battito per scena) lo prende l'ultima, che finisce sul bersaglio: i tagli prima restano a tempo.
+        // Se all'ultima resterebbe un pezzetto, la si toglie e il tempo va alla precedente.
+        if (clips.size > 1 && targetUs - clips.dropLast(1).sumOf { it.outputUs } < minSlot) clips.removeAt(clips.lastIndex)
         val before = clips.dropLast(1).sumOf { it.outputUs }
         val lastLen = (targetUs - before).coerceAtMost(maxLen(clips.last()))
-        if (lastLen >= minSlot) clips[clips.lastIndex] = withLen(clips.last(), lastLen)
+        if (lastLen >= minOf(minSlot, maxLen(clips.last()))) clips[clips.lastIndex] = withLen(clips.last(), lastLen)
     }
 
     fun build(name: String, sources: List<Clip>, music: MusicTrack?, o: AutoOptions, scans: Map<String, MomentScan> = emptyMap()): Project {
