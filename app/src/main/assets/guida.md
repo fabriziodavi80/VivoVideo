@@ -3,10 +3,10 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
-- **Pacchetto premium 2026**:
-  - **8 transizioni nuove** (in cima alla lista): Zoom punch, Vortice, Liquido, Pellicola bruciata, Cubo 3D, Luce che dissolve, Schiaffo RGB, Scorrimento verticale.
-  - **Effetti nuovi**: Sogno, Pellicola 35 mm, Duotono pop, Lampo di luce, Tre schermi, Olografico; e la scheda **A ritmo**: Zoom, Scossa e RGB sui battiti.
-  - **Testi animati**: Rimbalzo, Ribalta 3D, Vortice, Esplosione (lettera per lettera), Messa a fuoco, Neon tremolante; stili pronti **Cinema 2026, Sogno, Titolo 3D, Festa, Insegna, Esplosione**.
+- **Pacchetto premium 2026**, tutto in cima alle liste:
+- **8 transizioni nuove** (in cima alla lista): Zoom punch, Vortice, Liquido, Pellicola bruciata, Cubo 3D, Luce che dissolve, Schiaffo RGB, Scorrimento verticale.
+- **Effetti nuovi**: Sogno, Pellicola 35 mm, Duotono pop, Lampo di luce, Tre schermi, Olografico; e la scheda **A ritmo**: Zoom, Scossa e RGB sui battiti.
+- **Testi animati**: Rimbalzo, Ribalta 3D, Vortice, Esplosione (lettera per lettera), Messa a fuoco, Neon tremolante; stili pronti **Cinema 2026, Sogno, Titolo 3D, Festa, Insegna, Esplosione**.
 - **Video automatico più "regista"**: legge l'energia del brano. Dove la musica è calma le scene durano di più e i passaggi sono morbidi; dove spinge si taglia su ogni colpo, con effetti a ritmo; sul **drop** (l'attacco del ritornello) un taglio esatto con Zoom punch. Rallenty nei momenti calmi con i video a 120 fps, accelerazioni a tempo nelle parti cariche. Le foto orizzontali in un video verticale (e viceversa) riempiono il quadro con una panoramica lenta invece delle bande.
 - Nuovi stili del video automatico: **Reel virale** e **Sogno**.
 - Collaudo e Segnala un problema; schermo sempre acceso durante l'anteprima.
