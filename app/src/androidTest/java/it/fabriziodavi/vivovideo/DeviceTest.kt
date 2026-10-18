@@ -349,7 +349,15 @@ class DeviceTest {
             beatsUs = (1 until 60).map { it * 500_000L }, bpm = 120f)
         listOf(AutoStyle.CINEMA, AutoStyle.ENERGICO).forEach { s ->
             // Senza compositore a più ingressi: l'emulatore regge pochi decodificatori insieme (il telefono sì).
-            exportAndCheck(AutoEdit.build("auto ${s.label}", srcs, m, AutoOptions(style = s, title = "Prova", subtitle = "Ottobre 2026", targetUs = m.sourceDurationUs)), multi = false)
+            val p = AutoEdit.build("auto ${s.label}", srcs, m, AutoOptions(style = s, title = "Prova", subtitle = "Ottobre 2026", targetUs = m.sourceDurationUs))
+            // Se fallisce, il messaggio dice quale tema e com'è fatta ogni scena (per capire la causa dal registro).
+            val scenes = p.clips.joinToString("\n") { c ->
+                "  ${c.uri.substringAfterLast('/')} ${c.trimStartUs / 1000}-${c.trimEndUs / 1000} ms di ${c.sourceDurationUs / 1000}, " +
+                    "esce ${c.outputUs / 1000} ms, ${c.speed}${if (c.speedPoints.isNotEmpty()) " curva" else ""}, " +
+                    "passaggio ${c.transitionOut?.type ?: "-"} ${c.transitionOut?.durationUs?.div(1000) ?: 0} ms, fx ${c.fx.map { it.type }}"
+            }
+            try { exportAndCheck(p, multi = false) }
+            catch (e: AssertionError) { throw AssertionError("${s.label}: ${e.message}\nScene:\n$scenes", e) }
         }
     }
 
