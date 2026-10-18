@@ -384,6 +384,12 @@ class DeviceTest {
             if (s is ExportState.Done || s is ExportState.Failed) done.countDown()
         }
         main.post { exporter.start(project, options) }
+        // Diagnosi: se dopo 30 s non è nemmeno partita, il thread principale è occupato: si scrive da cosa.
+        if (!done.await(30, TimeUnit.SECONDS) && state.get() is ExportState.Idle) {
+            val stack = Looper.getMainLooper().thread.stackTrace.take(25).joinToString("\n  ")
+            android.util.Log.e("VivoTest", "Esportazione ferma, thread principale:\n  $stack")
+            fail("esportazione non partita: thread principale occupato da\n  $stack")
+        }
         assertTrue("esportazione bloccata (${state.get()})", done.await(600, TimeUnit.SECONDS))
         val s = state.get()
         if (s is ExportState.Failed) fail("esportazione fallita: ${s.message}")
@@ -706,6 +712,10 @@ class DeviceTest {
         val q = p ?: run { fail("il fermo immagine non è comparso: ${vmRef.get().message}"); return }
         assertTrue(q.clips[1].freeze && q.clips[1].isPhoto)
         assertTrue(abs(q.durationUs - 14_000_000) < 50_000)
+        // L'editor si chiude (anteprima e preparazioni ferme) prima di esportare.
+        val closed = CountDownLatch(1)
+        main.post { vmRef.get().closeProject(); closed.countDown() }
+        closed.await(10, TimeUnit.SECONDS)
         exportAndCheck(q)
     }
 

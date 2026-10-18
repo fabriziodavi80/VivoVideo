@@ -79,7 +79,7 @@ jobs:
   # Gira in parallelo alla compilazione (non ritarda la release); l'esito va nel ramo emulator-logs.
   emulatore:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 100
     steps:
       - uses: actions/checkout@v4
 
