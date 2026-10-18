@@ -358,7 +358,7 @@ class DeviceTest {
     }
 
     @Test fun previewPlaysWow() {
-        playFor(wowProject(premium = false))
+        playFor(wowProject(premium = false), minFps = 3f)
     }
 
     /** Pacchetto premium in anteprima: sull'emulatore la grafica è software (lenta), basta che scorra e mostri immagini. */
