@@ -67,7 +67,10 @@ class AutoEditTest {
             val p = AutoEdit.build("Ritmo", sources(), m, AutoOptions(targetUs = 0, style = s, intro = false))
             val starts = p.clipStartsUs() + p.durationUs
             starts.drop(1).forEach { t -> assertTrue("$s taglio a $t fuori battito", t % 500_000L == 0L) }
-            p.clips.forEach { c -> assertEquals("$s battiti per scena", s.beatsPerSlot * 500_000L, c.outputUs); assertTrue(c.muted) }
+            // Battiti per scena dello stile, di più se la scena sarebbe sotto la durata minima del tema.
+            var bps = s.beatsPerSlot
+            while (500_000L * bps < s.minSceneUs) bps++
+            p.clips.forEach { c -> assertEquals("$s battiti per scena", bps * 500_000L, c.outputUs); assertTrue(c.muted) }
             val track = p.music.single()
             assertEquals(0L, track.startUs)
             assertEquals(p.durationUs, track.lengthUs)
