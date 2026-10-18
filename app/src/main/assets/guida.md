@@ -3,7 +3,9 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
-- **Romantico e nostalgico, in chiave moderna**: temi **Romantico**, **Matrimonio**, **Super 8** e **Anni '90** (in tutto 16 temi).
+- **Romantico e nostalgico, in chiave moderna**: temi **Romantico**, **Matrimonio**, **Super 8** e **Anni '90**.
+- **Vacanze, viaggi, natura**: temi **Natura** (verdi ricchi, foschia, raggi di sole), **Mare** (turchesi, riflessi d'acqua), **Montagna** (cielo drammatico, bagliori, momento eroe) e **Diario di viaggio** (vlog con la data di ogni tappa). In tutto 20 temi.
+- **Effetti natura**: Foschia, Riflessi d'acqua, Cielo drammatico (il filtro sfumato dei paesaggisti), Neve, Foglie d'autunno.
 - **Effetti**: Luce soffusa (il filtro "Pro-Mist" dei videomaker), Petali, Cuori di luce, Super 8, Bordo pellicola (con i fori), Proiettore; e **Bagliore a ritmo** (scheda A ritmo): un alone morbido che si accende su ogni colpo, per i temi delicati.
 - **Transizioni**: Cuore, Dissolvenza bokeh, Salto di pellicola, Riavvolgimento VHS; per l'azione **Schiacciata**.
 - **Sempre a tempo di musica**: nei temi delicati i tagli cadono sulle battute e le foto "respirano" con un piccolo zoom ogni battuta; nei temi vintage compare la **data arancione della videocamera**, presa dalla data vera di ogni foto e video.
@@ -52,7 +54,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - Con la musica ogni taglio cade su un battito; se le foto e i video sono pochi per la durata, le scene si allungano di battiti interi.
 - **Energia del brano**: l'app sente dove la musica è calma (scene più lunghe, passaggi morbidi, rallenty) e dove spinge (un taglio a ogni colpo, zoom e scosse a ritmo, accelerazioni); sul drop mette un taglio esatto con una transizione d'impatto.
 - **Orientamento**: il formato segue le foto e i video più numerosi; quelli girati nell'altro verso seguono le persone (regia intelligente) o, se sono foto, si attraversano con una panoramica; lo sfondo sfocato resta solo se non c'è un soggetto chiaro.
-- **Temi**: Cinema, Energico, Reel virale, Ricordi, Sogno, Elegante, Viaggio, Blockbuster, Neon notte, Estate pop, Azione, Estremo, Romantico, Matrimonio, Super 8, Anni '90. Ognuno ha il suo look colore, le sue transizioni (morbide nelle parti calme, d'impatto sui colpi) e il suo titolo.
+- **Temi**: Cinema, Energico, Reel virale, Ricordi, Sogno, Elegante, Viaggio, Blockbuster, Neon notte, Estate pop, Azione, Estremo, Romantico, Matrimonio, Super 8, Anni '90, Natura, Mare, Montagna, Diario di viaggio. Ognuno ha il suo look colore, le sue transizioni (morbide nelle parti calme, d'impatto sui colpi) e il suo titolo.
 - **Struttura**: con la musica, i temi più dinamici aprono con un'**intro a raffica** e il titolo sul colpo; sul drop c'è il **momento eroe**; il **finale** rallenta e chiude con una scritta (il periodo indicato sotto il titolo, o il titolo).
 - **Altra proposta** rifà il montaggio con altre scene e altri tratti, **Stile** lo cambia: tutto resta ritoccabile a mano.
 

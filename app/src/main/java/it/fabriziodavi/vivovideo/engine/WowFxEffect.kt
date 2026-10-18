@@ -51,6 +51,7 @@ class WowFxEffect(
             FxType.RGBBEAT to "uRgbBeat", FxType.FLARE to "uFlare", FxType.DUST to "uDust", FxType.LETTERBOX to "uLetterbox", FxType.IMPACT to "uImpact",
             FxType.PROMIST to "uProMist", FxType.PETALS to "uPetals", FxType.HEARTS to "uHearts", FxType.SUPER8 to "uSuper8",
             FxType.FILMFRAME to "uFilmFrame", FxType.PROJECTOR to "uProjector", FxType.GLOWBEAT to "uGlowBeat",
+            FxType.HAZE to "uHaze", FxType.WATER to "uWater", FxType.SKYGRAD to "uSkyGrad", FxType.SNOW to "uSnow", FxType.LEAVES to "uLeaves",
         )
 
         fun needed(fx: List<ClipFx>) = fx.any { it.type.wow2 && it.amount > 0f }
@@ -64,6 +65,7 @@ uniform float uSeed;
 uniform float uDreamy, uFilm35, uDuoPop, uSweep, uSplit3, uHolo, uZoomBeat, uShakeBeat, uRgbBeat;
 uniform float uFlare, uDust, uLetterbox, uImpact;
 uniform float uProMist, uPetals, uHearts, uSuper8, uFilmFrame, uProjector, uGlowBeat;
+uniform float uHaze, uWater, uSkyGrad, uSnow, uLeaves;
 uniform float uLocal;
 varying vec2 vUv;
 
@@ -95,6 +97,10 @@ void main() {
   if (uSuper8 > 0.0) {
     float fr = floor(uTime * 18.0);
     uv += (vec2(hash(vec2(fr, 1.0)), hash(vec2(fr, 2.0))) - 0.5) * vec2(0.004, 0.007) * uSuper8;
+  }
+  // Riflessi d'acqua: l'immagine ondeggia appena, come vista attraverso l'acqua.
+  if (uWater > 0.0) {
+    uv += vec2(sin(uv.y * 40.0 + uTime * 2.2), cos(uv.x * 35.0 + uTime * 1.7)) * 0.0025 * uWater;
   }
   // Zoom a ritmo: spinta in avanti sul colpo, con scia radiale (l'Impatto ne fa una più forte).
   vec2 c = uv - 0.5;
@@ -268,6 +274,57 @@ void main() {
       float hole = step(0.25, fract(along * 7.0 + uTime * 0.0)) * step(fract(along * 7.0), 0.75);
       float inHole = step(strip * 0.3, side) * step(side, strip * 0.75) * hole;
       col = mix(vec3(0.05, 0.04, 0.03), vec3(0.92, 0.9, 0.82), inHole);
+    }
+  }
+  // Cielo drammatico: filtro sfumato che scurisce e satura il cielo (in alto), come i paesaggisti.
+  if (uSkyGrad > 0.0) {
+    float g = smoothstep(0.45, 1.0, vUv.y);
+    vec3 deep = mix(col, col * vec3(0.72, 0.8, 0.95), 0.9);
+    deep = mix(vec3(lum(deep)), deep, 1.25);
+    col = mix(col, deep, g * uSkyGrad);
+  }
+  // Foschia: veli di nebbia chiara che scorrono piano, più densi in basso.
+  if (uHaze > 0.0) {
+    vec2 p = vUv * vec2(3.0 * aspect, 3.0) + vec2(uTime * 0.05, 0.0);
+    float n = 0.0; float a = 0.5;
+    for (int i = 0; i < 4; i++) { vec2 ip = floor(p); vec2 fp = fract(p); fp = fp * fp * (3.0 - 2.0 * fp);
+      n += a * mix(mix(hash(ip), hash(ip + vec2(1.0, 0.0)), fp.x), mix(hash(ip + vec2(0.0, 1.0)), hash(ip + vec2(1.0, 1.0)), fp.x), fp.y);
+      p *= 2.03; a *= 0.5; }
+    float dens = smoothstep(0.2, 0.9, n) * (0.45 + 0.55 * (1.0 - vUv.y));
+    col = mix(col, vec3(0.86, 0.88, 0.9), dens * 0.5 * uHaze);
+    col = mix(col, col * 0.9 + 0.08, uHaze * 0.3);
+  }
+  // Riflessi d'acqua: luci che tremolano sulle zone chiare.
+  if (uWater > 0.0) {
+    vec2 p = vUv * vec2(14.0 * aspect, 14.0);
+    float c1 = sin(p.x + uTime * 1.3 + sin(p.y * 0.7 + uTime)) * sin(p.y * 1.1 - uTime * 0.9 + sin(p.x * 0.5));
+    float caus = pow(abs(c1), 6.0);
+    col += vec3(0.75, 0.95, 1.0) * caus * 0.35 * uWater * smoothstep(0.25, 0.8, lum(col));
+  }
+  // Neve: fiocchi su tre piani, che cadono ondeggiando.
+  if (uSnow > 0.0) {
+    for (int layer = 0; layer < 3; layer++) {
+      float sc = 8.0 + float(layer) * 7.0;
+      vec2 p = vUv * vec2(sc * aspect, sc) + vec2(sin(uTime * 0.7 + float(layer) * 2.0) * 0.5, uTime * (1.2 - float(layer) * 0.3));
+      vec2 id = floor(p); vec2 f = fract(p) - 0.5;
+      vec2 off = (vec2(hash(id + float(layer)), hash(id + 9.0)) - 0.5) * 0.6;
+      float r = 0.07 - float(layer) * 0.015;
+      float m = smoothstep(r, r * 0.3, length(f - off)) * step(0.45, hash(id + 31.0));
+      col = mix(col, vec3(1.0), m * uSnow * (1.0 - float(layer) * 0.25));
+    }
+  }
+  // Foglie d'autunno: come i petali, arancio, rosso e giallo, più grandi e lente.
+  if (uLeaves > 0.0) {
+    vec2 p = vUv * vec2(5.0 * aspect, 5.0) + vec2(sin(uTime * 0.4) * 0.8, uTime * 0.55);
+    vec2 id = floor(p); vec2 f = fract(p) - 0.5;
+    if (hash(id + 41.0) > 0.6) {
+      float a = uTime * 1.1 + hash(id) * 6.28;
+      vec2 q = vec2(cos(a) * f.x - sin(a) * f.y, sin(a) * f.x + cos(a) * f.y);
+      q += (vec2(hash(id + 1.0), hash(id + 2.0)) - 0.5) * 0.35;
+      float d = (q.x * q.x) / 0.03 + (q.y * q.y) / 0.008;
+      float m = smoothstep(1.0, 0.75, d);
+      vec3 lc = mix(vec3(0.95, 0.45, 0.1), mix(vec3(0.8, 0.15, 0.08), vec3(0.95, 0.75, 0.15), hash(id + 6.0)), hash(id + 5.0));
+      col = mix(col, lc, m * 0.9 * uLeaves);
     }
   }
   // Impatto: lampo e contrasto sul colpo.

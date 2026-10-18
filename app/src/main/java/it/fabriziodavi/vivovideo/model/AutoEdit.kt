@@ -43,6 +43,8 @@ enum class AutoStyle(
     val gentlePops: Boolean = false,
     val popEvery: Int = 1,
     val popScale: Float = 0.07f,
+    /** Stile della data sulle scene (videocamera arancione o tappa di viaggio). */
+    val stamp: TextPreset = TextPreset.DATA,
 ) {
     CINEMA(
         "Cinema", "Solenne: look da film, messa a fuoco del titolo, dissolvenze di luce e pellicola, rallenty sui momenti calmi.",
@@ -264,6 +266,65 @@ enum class AutoStyle(
         ramps = true,
         grade = Grade(contrast = 0.1f, saturation = 0.18f, temperature = 0.1f, tint = 0.08f),
         intro = true, dateStamp = true,
+    ),
+    NATURA(
+        "Natura", "Verdi e terre ricche, foschia che scorre, raggi di sole, passaggi lenti e rallenty; le foto respirano sulle battute.",
+        photoUs = 3_400_000, videoUs = 3_600_000, beatsPerSlot = 4,
+        transitions = listOf(TransitionType.CROSSFADE, TransitionType.CROSSFADE, TransitionType.LUMA, TransitionType.LIQUID, TransitionType.LEAK),
+        transitionUs = 1_100_000,
+        fx = listOf(ClipFx(FxType.SKYGRAD, 0.35f)),
+        accents = listOf(ClipFx(FxType.HAZE, 0.45f), ClipFx(FxType.RAYS, 0.4f), ClipFx(FxType.LEAVES, 0.35f)),
+        title = TextPreset.ELEGANTE,
+        impact = listOf(TransitionType.LUMA, TransitionType.FLASH, TransitionType.CUBE),
+        beatFx = listOf(ClipFx(FxType.GLOWBEAT, 0.35f)),
+        slowmo = true,
+        grade = Grade(contrast = 0.08f, shadows = 0.1f, vibrance = 0.3f, temperature = 0.08f,
+            hsl = List(8) { if (it == HslBand.GREEN.ordinal) Hsl(hue = -0.15f, sat = 0.15f, lum = -0.1f) else if (it == HslBand.BLUE.ordinal) Hsl(sat = 0.2f, lum = -0.1f) else Hsl() }),
+        gentlePops = true, popEvery = 4, popScale = 0.03f,
+    ),
+    MARE(
+        "Mare", "Turchesi e luce calda d'estate: riflessi d'acqua, scorrimenti, transizioni liquide e lampi di sole a tempo.",
+        photoUs = 2_400_000, videoUs = 2_600_000, beatsPerSlot = 2,
+        transitions = listOf(TransitionType.LIQUID, TransitionType.SLIDE_UP, TransitionType.WHIP, TransitionType.CROSSFADE, TransitionType.BOKEHFADE),
+        transitionUs = 600_000,
+        fx = listOf(ClipFx(FxType.VIVID, 0.25f)),
+        accents = listOf(ClipFx(FxType.WATER, 0.5f), ClipFx(FxType.SWEEP, 0.5f), ClipFx(FxType.FLARE, 0.4f)),
+        title = TextPreset.FESTA,
+        impact = listOf(TransitionType.PUNCH, TransitionType.FLASH, TransitionType.SWIRL),
+        beatFx = listOf(ClipFx(FxType.ZOOMBEAT, 0.4f)),
+        ramps = true, slowmo = true,
+        grade = Grade(exposure = 0.08f, contrast = 0.1f, vibrance = 0.3f, temperature = 0.15f,
+            hsl = List(8) { if (it == HslBand.AQUA.ordinal) Hsl(sat = 0.35f, lum = 0.05f) else if (it == HslBand.BLUE.ordinal) Hsl(hue = -0.2f, sat = 0.25f) else Hsl() }),
+        intro = true,
+    ),
+    MONTAGNA(
+        "Montagna", "Aria tersa e cielo drammatico, bagliori sulle vette, cubi 3D e lenti, accelerazioni sui panorami e momento eroe sul drop.",
+        photoUs = 2_600_000, videoUs = 2_900_000, beatsPerSlot = 2,
+        transitions = listOf(TransitionType.CROSSFADE, TransitionType.CUBE, TransitionType.LENS, TransitionType.WHIP, TransitionType.LUMA),
+        transitionUs = 700_000,
+        fx = listOf(ClipFx(FxType.SKYGRAD, 0.55f)),
+        accents = listOf(ClipFx(FxType.FLARE, 0.45f), ClipFx(FxType.HAZE, 0.35f), ClipFx(FxType.RAYS, 0.35f)),
+        title = TextPreset.CINEMA26,
+        impact = listOf(TransitionType.PUNCH, TransitionType.SPEEDZOOM, TransitionType.BURST),
+        beatFx = listOf(ClipFx(FxType.ZOOMBEAT, 0.4f)),
+        ramps = true, slowmo = true,
+        grade = Grade(contrast = 0.18f, highlights = -0.2f, shadows = 0.08f, vibrance = 0.25f, temperature = -0.08f, shadowWheel = Wheel(210f, 0.2f)),
+        intro = true, hero = true,
+    ),
+    DIARIO(
+        "Diario di viaggio", "Vlog moderno: la data di ogni tappa, scorrimenti e zoom puliti, colori vivaci ma naturali, foto che respirano a tempo.",
+        photoUs = 2_200_000, videoUs = 2_500_000, beatsPerSlot = 2,
+        transitions = listOf(TransitionType.WHIP, TransitionType.SLIDE_UP, TransitionType.ZOOM, TransitionType.CROSSFADE, TransitionType.CUBE),
+        transitionUs = 450_000,
+        fx = listOf(ClipFx(FxType.VIVID, 0.2f)),
+        accents = listOf(ClipFx(FxType.SWEEP, 0.45f), ClipFx(FxType.FLARE, 0.35f)),
+        title = TextPreset.TITOLO3D,
+        impact = listOf(TransitionType.PUNCH, TransitionType.FLASH, TransitionType.SPEEDZOOM),
+        beatFx = listOf(ClipFx(FxType.ZOOMBEAT, 0.35f)),
+        ramps = true,
+        grade = Grade(contrast = 0.1f, vibrance = 0.25f, temperature = 0.06f),
+        intro = true, dateStamp = true, gentlePops = true, popEvery = 2, popScale = 0.035f,
+        stamp = TextPreset.TAPPA,
     );
 
     /** Durata media di una scena, per scegliere quanti elementi usare. */
@@ -672,8 +733,10 @@ object AutoEdit {
                 val d = dates[c.uri] ?: return@forEachIndexed
                 if (i < introCount || c.outputUs < TextItem.MIN_US) return@forEachIndexed
                 val label = fmt.format(java.util.Date(d)).replace(".", "").uppercase(java.util.Locale.ITALY)
-                texts += TextPreset.DATA.applyTo(TextItem(text = label, startUs = st[i], durationUs = c.outputUs))
-                    .let { if (p.outputOrientation() == Orientation.PORTRAIT) it.copy(x = 0.22f, y = 0.42f) else it }
+                // La data cambia solo quando cambia il giorno (come in un diario), la videocamera la mostra sempre.
+                if (style.stamp == TextPreset.TAPPA && i > introCount && dates[p.clips[i - 1].uri]?.let { fmt.format(java.util.Date(it)) } == fmt.format(java.util.Date(d))) return@forEachIndexed
+                texts += style.stamp.applyTo(TextItem(text = label, startUs = st[i], durationUs = if (style.stamp == TextPreset.TAPPA) minOf(2_500_000L, c.outputUs) else c.outputUs))
+                    .let { if (p.outputOrientation() == Orientation.PORTRAIT) it.copy(x = if (style.stamp == TextPreset.TAPPA) -0.2f else 0.22f, y = 0.42f) else it }
             }
         }
         // Chiusura: una scritta negli ultimi secondi (il periodo, o il titolo), mentre l'immagine sfuma.
