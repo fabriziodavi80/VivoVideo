@@ -27,6 +27,12 @@ enum class AutoStyle(
     val ramps: Boolean = false,
     /** Rallenty nei video a 100+ fps (parti calme). */
     val slowmo: Boolean = false,
+    /** Look colore del tema (come un colorista), uguale su tutte le scene. */
+    val grade: Grade = Grade(),
+    /** Intro a raffica: lampi di scene su mezzi battiti, poi il titolo sul colpo. */
+    val intro: Boolean = false,
+    /** Momento eroe sul drop: rallenty al centro della scena, zoom e colpo. */
+    val hero: Boolean = false,
 ) {
     CINEMA(
         "Cinema", "Solenne: look da film, messa a fuoco del titolo, dissolvenze di luce e pellicola, rallenty sui momenti calmi.",
@@ -39,6 +45,8 @@ enum class AutoStyle(
         impact = listOf(TransitionType.PUNCH, TransitionType.FLASH, TransitionType.CUBE),
         beatFx = listOf(ClipFx(FxType.ZOOMBEAT, 0.35f)),
         slowmo = true,
+        grade = Grade(contrast = 0.12f, saturation = -0.05f, shadowWheel = Wheel(195f, 0.35f), highWheel = Wheel(32f, 0.3f)),
+        intro = true,
     ),
     ENERGICO(
         "Energico", "Ritmo serrato: tagli su ogni colpo nelle parti cariche, zoom punch, schiaffi RGB, scosse e accelerazioni.",
@@ -51,6 +59,8 @@ enum class AutoStyle(
         impact = listOf(TransitionType.PUNCH, TransitionType.RGB, TransitionType.GLITCH, TransitionType.FLASH, TransitionType.SHAKE),
         beatFx = listOf(ClipFx(FxType.ZOOMBEAT, 0.6f), ClipFx(FxType.SHAKEBEAT, 0.45f)),
         ramps = true,
+        grade = Grade(contrast = 0.22f, vibrance = 0.3f, shadows = -0.1f),
+        intro = true, hero = true,
     ),
     VIRALE(
         "Reel virale", "Da social: intro che sale, sul drop un taglio a ogni battito, velocità a scatti, duotono e lampi di luce.",
@@ -63,6 +73,8 @@ enum class AutoStyle(
         impact = listOf(TransitionType.PUNCH, TransitionType.RGB, TransitionType.FLASH, TransitionType.SWIRL),
         beatFx = listOf(ClipFx(FxType.ZOOMBEAT, 0.7f), ClipFx(FxType.RGBBEAT, 0.4f)),
         ramps = true,
+        grade = Grade(contrast = 0.18f, saturation = 0.12f, vibrance = 0.35f, exposure = 0.05f),
+        intro = true, hero = true,
     ),
     RICORDI(
         "Ricordi", "Nostalgico: pellicola 35 mm, luce calda, bruciature di pellicola, passaggi morbidi.",
@@ -74,6 +86,7 @@ enum class AutoStyle(
         title = TextPreset.CASCATA,
         impact = listOf(TransitionType.FLASH, TransitionType.BURN),
         slowmo = true,
+        grade = Grade(contrast = -0.12f, shadows = 0.25f, saturation = -0.12f, temperature = 0.35f, midWheel = Wheel(35f, 0.2f)),
     ),
     SOGNO(
         "Sogno", "Morbido e luminoso: alone di luce, riflessi iridescenti, dissolvenze di luce, titolo che va a fuoco.",
@@ -86,6 +99,7 @@ enum class AutoStyle(
         impact = listOf(TransitionType.LUMA, TransitionType.SWIRL, TransitionType.FLASH),
         beatFx = listOf(ClipFx(FxType.ZOOMBEAT, 0.25f)),
         slowmo = true,
+        grade = Grade(exposure = 0.12f, contrast = -0.15f, highlights = -0.2f, saturation = -0.08f, tint = 0.12f, highWheel = Wheel(330f, 0.15f)),
     ),
     ELEGANTE(
         "Elegante", "Luminoso e raffinato: colori puliti, luci bokeh e polvere d'oro, cubo 3D, titolo dorato.",
@@ -98,6 +112,7 @@ enum class AutoStyle(
         impact = listOf(TransitionType.PUNCH, TransitionType.FLASH, TransitionType.LUMA),
         beatFx = listOf(ClipFx(FxType.ZOOMBEAT, 0.3f)),
         slowmo = true,
+        grade = Grade(exposure = 0.06f, contrast = 0.06f, highlights = -0.15f, vibrance = 0.15f, highWheel = Wheel(45f, 0.12f)),
     ),
     VIAGGIO(
         "Viaggio", "Dinamico: scorrimenti con scia, vortici e cubi 3D, colori vivaci, raggi di luce, accelerazioni a tempo.",
@@ -110,6 +125,64 @@ enum class AutoStyle(
         impact = listOf(TransitionType.PUNCH, TransitionType.SWIRL, TransitionType.SPIN, TransitionType.FLASH),
         beatFx = listOf(ClipFx(FxType.ZOOMBEAT, 0.45f)),
         ramps = true,
+        grade = Grade(contrast = 0.1f, vibrance = 0.3f, temperature = 0.12f),
+        intro = true,
+    ),
+    BLOCKBUSTER(
+        "Blockbuster", "Trailer da cinema: intro a raffica, teal & orange, bande cinema, bagliori anamorfici, esplosioni di luce e momento eroe sul drop.",
+        photoUs = 2_000_000, videoUs = 2_400_000, beatsPerSlot = 2,
+        transitions = listOf(TransitionType.CROSSFADE, TransitionType.LENS, TransitionType.LUMA, TransitionType.ZOOM),
+        transitionUs = 600_000,
+        fx = listOf(ClipFx(FxType.LETTERBOX, 1f), ClipFx(FxType.FILM35, 0.3f)),
+        accents = listOf(ClipFx(FxType.FLARE, 0.6f), ClipFx(FxType.RAYS, 0.4f)),
+        title = TextPreset.CINEMA26,
+        impact = listOf(TransitionType.PUNCH, TransitionType.BURST, TransitionType.SHUTTER, TransitionType.TEAR),
+        beatFx = listOf(ClipFx(FxType.ZOOMBEAT, 0.5f), ClipFx(FxType.SHAKEBEAT, 0.3f)),
+        ramps = true, slowmo = true,
+        grade = Grade(contrast = 0.22f, saturation = 0.05f, shadows = -0.1f, shadowWheel = Wheel(190f, 0.5f), highWheel = Wheel(30f, 0.45f)),
+        intro = true, hero = true,
+    ),
+    NEON(
+        "Neon notte", "Notturno elettrico: magenta e ciano, glitch, schiaffi RGB, strisce e riflessi olografici a tempo.",
+        photoUs = 1_600_000, videoUs = 1_900_000, beatsPerSlot = 2,
+        transitions = listOf(TransitionType.STRIPES, TransitionType.SLIDE_UP, TransitionType.PIXELATE, TransitionType.GLITCH),
+        transitionUs = 350_000,
+        fx = listOf(ClipFx(FxType.GLOW, 0.35f)),
+        accents = listOf(ClipFx(FxType.HOLO, 0.5f), ClipFx(FxType.NEON, 0.5f), ClipFx(FxType.RGBBEAT, 0.6f)),
+        title = TextPreset.INSEGNA,
+        impact = listOf(TransitionType.RGB, TransitionType.GLITCH, TransitionType.BURST, TransitionType.SHUTTER),
+        beatFx = listOf(ClipFx(FxType.RGBBEAT, 0.6f), ClipFx(FxType.ZOOMBEAT, 0.4f)),
+        ramps = true,
+        grade = Grade(contrast = 0.25f, saturation = 0.2f, temperature = -0.45f, tint = 0.35f, shadowWheel = Wheel(260f, 0.4f), highWheel = Wheel(310f, 0.3f)),
+        intro = true, hero = true,
+    ),
+    ESTATE(
+        "Estate pop", "Solare e colorato: luce piena, duotono pop, lampi di luce, scorrimenti e titoli che rimbalzano.",
+        photoUs = 1_800_000, videoUs = 2_000_000, beatsPerSlot = 2,
+        transitions = listOf(TransitionType.SLIDE_UP, TransitionType.WHIP, TransitionType.CUBE, TransitionType.STRIPES),
+        transitionUs = 400_000,
+        fx = listOf(ClipFx(FxType.VIVID, 0.35f)),
+        accents = listOf(ClipFx(FxType.DUOPOP, 0.4f), ClipFx(FxType.SWEEP, 0.55f), ClipFx(FxType.SPLIT3, 1f)),
+        title = TextPreset.FESTA,
+        impact = listOf(TransitionType.PUNCH, TransitionType.FLASH, TransitionType.SWIRL, TransitionType.BURST),
+        beatFx = listOf(ClipFx(FxType.ZOOMBEAT, 0.5f)),
+        ramps = true,
+        grade = Grade(exposure = 0.12f, contrast = 0.08f, saturation = 0.2f, vibrance = 0.35f, temperature = 0.25f),
+        intro = true,
+    ),
+    AZIONE(
+        "Azione", "Sport e avventura: tagli secchi, scosse sui colpi, linee di velocità, accelerazioni e rallenty da eroe.",
+        photoUs = 1_400_000, videoUs = 1_700_000, beatsPerSlot = 2,
+        transitions = listOf(TransitionType.WHIP, TransitionType.ZOOM, TransitionType.LENS, TransitionType.SLIDE_UP),
+        transitionUs = 300_000,
+        fx = listOf(ClipFx(FxType.VIVID, 0.25f)),
+        accents = listOf(ClipFx(FxType.SPEEDLINES, 0.55f), ClipFx(FxType.SHAKEBEAT, 0.5f)),
+        title = TextPreset.ESPLOSIONE,
+        impact = listOf(TransitionType.PUNCH, TransitionType.SHAKE, TransitionType.TEAR, TransitionType.BURST),
+        beatFx = listOf(ClipFx(FxType.SHAKEBEAT, 0.5f), ClipFx(FxType.ZOOMBEAT, 0.5f)),
+        ramps = true,
+        grade = Grade(contrast = 0.3f, saturation = 0.1f, highlights = -0.15f, shadowWheel = Wheel(200f, 0.3f)),
+        intro = true, hero = true,
     );
 
     /** Durata media di una scena, per scegliere quanti elementi usare. */
@@ -133,6 +206,8 @@ data class AutoOptions(
     val format: VideoFormat = VideoFormat.AUTO,
     /** Regia intelligente: momenti migliori dei video e, nell'orientamento opposto, inquadratura che segue i volti. */
     val smart: Boolean = true,
+    /** Intro a raffica (se lo stile la prevede e c'è la musica). */
+    val intro: Boolean = true,
 )
 
 /** Un elemento della galleria da cui è nato il video automatico. */
@@ -284,6 +359,49 @@ object AutoEdit {
         var prevMotion: MotionStyle? = null
         var videoN = 0
         val rampPresets = listOf(SpeedPreset.MONTAGE, SpeedPreset.BULLET, SpeedPreset.FLASH_IN, SpeedPreset.HERO)
+
+        /** Velocità a curva con la durata finale [out]: quanto materiale serve (null se il video è troppo corto). */
+        fun rampNeed(src: Clip, preset: SpeedPreset, out: Long): Long? {
+            val r = SpeedCurve.forClip(ClipSpeed.RAMP, 1_000_000L, preset.points).outputDurationUs() / 1e6
+            if (r <= 0) return null
+            var n = (out / r).toLong()
+            repeat(3) {
+                val o2 = SpeedCurve.forClip(ClipSpeed.RAMP, n, preset.points).outputDurationUs()
+                if (o2 > 0) n = (n.toDouble() * out / o2).toLong()
+            }
+            return n.takeIf { it in 1..src.sourceDurationUs }
+        }
+
+        // 0. Intro a raffica: 8 lampi di scene diverse su mezzi battiti, poi si parte sul battito.
+        var introCount = 0
+        if (style.intro && o.intro && beats.size > 24 && sources.size >= 6 && period in 300_000L..1_000_000L) {
+            val half = period / 2
+            val ends = (1..8).map { beats.first() + it * half }
+            var prev = 0L
+            ends.forEachIndexed { k, end ->
+                val src = sources[(k.toLong() * (sources.size - 1) / 7).toInt()]
+                val len = end - prev
+                val shot = if (src.isPhoto) {
+                    src.copy(trimStartUs = 0, trimEndUs = len, keyframes = listOf(Keyframe(0, Transform(scale = 1.18f)), Keyframe(len, Transform(scale = 1.0f))))
+                } else {
+                    val n = minOf(len, src.sourceDurationUs)
+                    val scan = scans[src.uri]?.takeIf { o.smart && it.samples.size >= 2 }
+                    val start = scan?.let { Moments.bestStarts(it, n, 2).last() } ?: ((src.sourceDurationUs - n) * 0.55).toLong()
+                    src.copy(trimStartUs = start.coerceIn(0, (src.sourceDurationUs - n).coerceAtLeast(0)), trimEndUs = start.coerceIn(0, (src.sourceDurationUs - n).coerceAtLeast(0)) + n,
+                        speed = ClipSpeed.NORMAL, keyframes = emptyList())
+                }
+                clips += shot.copy(
+                    id = java.util.UUID.randomUUID().toString(), muted = true, grade = style.grade,
+                    fx = style.fx + ClipFx(FxType.RGBBEAT, 0.5f), fadeInUs = 0, fadeOutUs = 0,
+                    transitionOut = if (k < 7) TransitionSpec(TransitionType.FLASH, 140_000) else TransitionSpec(style.impact.firstOrNull() ?: TransitionType.FLASH, 300_000),
+                )
+                prev = end
+            }
+            introCount = clips.size
+            t = prev
+        }
+        val introUs = t
+
         sources.forEach { src ->
             val e = energyAt(t)
             val bps = when {
@@ -304,17 +422,34 @@ object AutoEdit {
                 if (end != null) len = end - t
             }
             len = len.coerceIn(minOf(minSlot, maxLen), maxLen)
+            val dropStart = drops.any { kotlin.math.abs(it - t) < 40_000 }
             var c = if (src.isPhoto) {
-                val m = MotionStyle.varied.filter { it != prevMotion }.random(rnd)
-                prevMotion = m
-                src.copy(trimStartUs = 0, trimEndUs = len, keyframes = m.keyframes(len))
+                val inside = beats.filter { it > t + 60_000 && it < t + len - 60_000 }
+                if (e != null && e >= 0.6f && inside.size >= 1) {
+                    // Parte carica: la foto fa un piccolo scatto di zoom su ogni colpo.
+                    val keys = mutableListOf(Keyframe(0, Transform(scale = 1.0f)))
+                    inside.forEachIndexed { k, b ->
+                        val local = b - t
+                        keys += Keyframe(local - 10_000, Transform(scale = 1.0f + 0.07f * k))
+                        keys += Keyframe(local + 90_000, Transform(scale = 1.0f + 0.07f * (k + 1)))
+                    }
+                    src.copy(trimStartUs = 0, trimEndUs = len, keyframes = keys)
+                } else {
+                    val m = MotionStyle.varied.filter { it != prevMotion }.random(rnd)
+                    prevMotion = m
+                    src.copy(trimStartUs = 0, trimEndUs = len, keyframes = m.keyframes(len))
+                }
             } else {
                 videoN++
                 // Velocità a tempo: rallenty nei momenti calmi (video a 100+ fps), accelerazioni nelle parti cariche.
                 var speed = ClipSpeed.NORMAL
                 var points = emptyList<SpeedPoint>()
                 var need = len
-                if (style.slowmo && src.fps >= 90f && (e == null || e < 0.55f) && rnd.nextFloat() < 0.65f && len * 0.5 <= src.sourceDurationUs) {
+                val heroNeed = if (style.hero && dropStart && src.fps >= 50f) rampNeed(src, SpeedPreset.HERO, len) else null
+                if (heroNeed != null) {
+                    // Momento eroe: sul drop la scena rallenta al centro.
+                    speed = ClipSpeed.RAMP; points = SpeedPreset.HERO.points; need = heroNeed
+                } else if (style.slowmo && src.fps >= 90f && (e == null || e < 0.55f) && rnd.nextFloat() < 0.65f && len * 0.5 <= src.sourceDurationUs) {
                     speed = ClipSpeed.SLOW; need = len / 2
                 } else if (style.ramps && e != null && e >= 0.6f && videoN % 2 == 0 && src.fps >= 50f) {
                     val preset = rampPresets[(videoN / 2 + o.variant) % rampPresets.size]
@@ -338,18 +473,32 @@ object AutoEdit {
                 }
                 src.copy(trimStartUs = start, trimEndUs = start + need, speed = speed, speedPoints = points, keyframes = emptyList())
             }
-            c = c.copy(muted = music != null || c.muted, fx = style.fx, fadeInUs = 0, fadeOutUs = 0, transitionOut = null)
+            c = c.copy(muted = music != null || c.muted, fx = style.fx, fadeInUs = 0, fadeOutUs = 0, transitionOut = null, grade = style.grade)
+            if (dropStart) c = c.copy(fx = c.fx + ClipFx(FxType.ZOOMBEAT, 0.8f))
             clips += c
             t += c.outputUs
         }
         if (clips.isEmpty()) return Project(name = name)
-        // Durata richiesta (per esempio "come il brano"): si arriva esattamente lì.
-        fit(clips, o.targetUs, period, minSlot)
+        // Durata richiesta (per esempio "come il brano"): si arriva esattamente lì (l'intro resta com'è).
+        if (introCount > 0 && o.targetUs > introUs) {
+            val main = clips.subList(introCount, clips.size).toMutableList()
+            fit(main, o.targetUs - introUs, period, minSlot)
+            while (clips.size > introCount) clips.removeAt(clips.lastIndex)
+            clips += main
+        } else fit(clips, o.targetUs, period, minSlot)
+        // Finale: l'ultima scena, se è un video fluido, rallenta verso la fine (stessa durata).
+        clips.lastOrNull()?.takeIf { !it.isPhoto && it.fps >= 50f && it.speed == ClipSpeed.NORMAL && clips.size > introCount + 1 }?.let { last ->
+            rampNeed(last, SpeedPreset.SLOW_END, last.outputUs)?.let { n ->
+                val start = last.trimStartUs.coerceAtMost((last.sourceDurationUs - n).coerceAtLeast(0))
+                clips[clips.lastIndex] = last.copy(trimStartUs = start, trimEndUs = start + n, speed = ClipSpeed.RAMP, speedPoints = SpeedPreset.SLOW_END.points)
+            }
+        }
 
         // 2. Transizioni: d'impatto sui colpi forti e sui drop, morbide dove il brano è calmo (mai due uguali di fila).
         var prevT: TransitionType? = null
         val starts = run { var acc = 0L; clips.map { c -> acc.also { acc += c.outputUs } } }
         for (i in clips.indices) {
+            if (i < introCount) continue
             var c = clips[i]
             val cutAt = starts[i] + c.outputUs
             val eCut = energyAt(cutAt)
@@ -406,13 +555,21 @@ object AutoEdit {
 
         // 4. Titolo (e sottotitolo) all'inizio, nello stile della regia.
         val texts = mutableListOf<TextItem>()
-        if (o.title.isNotBlank()) {
-            val dur = minOf(3_500_000L, total - 200_000).coerceAtLeast(TextItem.MIN_US)
-            texts += style.title.applyTo(TextItem(text = o.title.trim(), startUs = 200_000, durationUs = dur))
+        // Con l'intro a raffica il titolo arriva sul colpo che la chiude.
+        val titleAt = if (introCount > 0) introUs else 200_000L
+        if (o.title.isNotBlank() && total > titleAt + TextItem.MIN_US) {
+            val dur = minOf(3_500_000L, total - titleAt).coerceAtLeast(TextItem.MIN_US)
+            texts += style.title.applyTo(TextItem(text = o.title.trim(), startUs = titleAt, durationUs = dur))
             if (o.subtitle.isNotBlank()) {
-                texts += TextPreset.ELEGANTE.applyTo(TextItem(text = o.subtitle.trim(), startUs = 700_000, durationUs = (dur - 500_000).coerceAtLeast(TextItem.MIN_US)))
+                texts += TextPreset.ELEGANTE.applyTo(TextItem(text = o.subtitle.trim(), startUs = titleAt + 500_000, durationUs = (dur - 500_000).coerceAtLeast(TextItem.MIN_US)))
                     .copy(size = 0.04f, y = 0.12f, endPose = null, upper = false)
             }
+        }
+        // Chiusura: una scritta negli ultimi secondi (il periodo, o il titolo), mentre l'immagine sfuma.
+        val closing = o.subtitle.ifBlank { o.title }.trim()
+        if (closing.isNotEmpty() && total > 9_000_000) {
+            texts += style.title.applyTo(TextItem(text = closing, startUs = total - 3_000_000, durationUs = 2_800_000))
+                .let { it.copy(size = it.size * 0.6f, endPose = null) }
         }
         // 5. Musica dall'inizio, sfumata in chiusura.
         val tracks = music?.let {

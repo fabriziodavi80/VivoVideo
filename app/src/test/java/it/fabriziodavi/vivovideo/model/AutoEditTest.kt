@@ -63,7 +63,7 @@ class AutoEditTest {
         val beats = (1 until 400).map { it * 500_000L } // 120 BPM
         val m = MusicTrack(id = "m", uri = "content://m", name = "M", sourceDurationUs = 200_000_000, lengthUs = 200_000_000, beatsUs = beats, bpm = 120f)
         AutoStyle.entries.forEach { s ->
-            val p = AutoEdit.build("Ritmo", sources(), m, AutoOptions(targetUs = 0, style = s))
+            val p = AutoEdit.build("Ritmo", sources(), m, AutoOptions(targetUs = 0, style = s, intro = false))
             val starts = p.clipStartsUs() + p.durationUs
             starts.drop(1).forEach { t -> assertTrue("$s taglio a $t fuori battito", t % 500_000L == 0L) }
             p.clips.forEach { c -> assertEquals("$s battiti per scena", s.beatsPerSlot * 500_000L, c.outputUs); assertTrue(c.muted) }
@@ -145,7 +145,7 @@ class AutoEditTest {
         val m = MusicTrack(id = "m", uri = "content://m", name = "M", sourceDurationUs = song, lengthUs = song, beatsUs = beats.filter { it < song }, bpm = 120f)
         AutoStyle.entries.forEach { s ->
             // Poche scene rispetto al brano: si allungano (a battiti interi).
-            val p = AutoEdit.build("Brano", sources(), m, AutoOptions(style = s, targetUs = song))
+            val p = AutoEdit.build("Brano", sources(), m, AutoOptions(style = s, targetUs = song, intro = false))
             assertEquals("$s durata", song, p.durationUs)
             val track = p.music.single()
             assertEquals("$s musica intera", song, track.lengthUs)

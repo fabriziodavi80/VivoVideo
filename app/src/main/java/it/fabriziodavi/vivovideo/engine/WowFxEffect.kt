@@ -22,6 +22,7 @@ class WowFxEffect(
     private val beatsUs: List<Long>,
     private val clipStartUs: Long = 0,
 ) : GlEffect {
+    internal val startUs: Long get() = clipStartUs
     override fun toGlShaderProgram(context: Context, useHdr: Boolean): GlShaderProgram = WowProgram(this, useHdr)
 
     internal fun amount(t: FxType): Float = fx.firstOrNull { it.type == t }?.amount ?: 0f
@@ -47,7 +48,7 @@ class WowFxEffect(
         val UNIFORMS: Map<FxType, String> = mapOf(
             FxType.DREAMY to "uDreamy", FxType.FILM35 to "uFilm35", FxType.DUOPOP to "uDuoPop", FxType.SWEEP to "uSweep",
             FxType.SPLIT3 to "uSplit3", FxType.HOLO to "uHolo", FxType.ZOOMBEAT to "uZoomBeat", FxType.SHAKEBEAT to "uShakeBeat",
-            FxType.RGBBEAT to "uRgbBeat",
+            FxType.RGBBEAT to "uRgbBeat", FxType.FLARE to "uFlare", FxType.DUST to "uDust", FxType.LETTERBOX to "uLetterbox",
         )
 
         fun needed(fx: List<ClipFx>) = fx.any { it.type.wow2 && it.amount > 0f }
@@ -59,6 +60,8 @@ uniform vec2 uRes;
 uniform float uTime;
 uniform float uSeed;
 uniform float uDreamy, uFilm35, uDuoPop, uSweep, uSplit3, uHolo, uZoomBeat, uShakeBeat, uRgbBeat;
+uniform float uFlare, uDust, uLetterbox;
+uniform float uLocal;
 varying vec2 vUv;
 
 float hash(vec2 p) {
@@ -155,6 +158,39 @@ void main() {
     vec3 iri = 0.5 + 0.5 * cos(6.2831 * (vec3(0.0, 0.33, 0.67) + vUv.x * 1.5 + vUv.y * 0.8 + uTime * 0.3 + l * 1.2));
     col = mix(col, col * 0.6 + iri * 0.55, uHolo * smoothstep(0.2, 0.9, l) * 0.8);
   }
+  // Bagliore anamorfico: strisce orizzontali azzurre dalle luci forti, più un riflesso che scorre.
+  if (uFlare > 0.0) {
+    vec3 streak = vec3(0.0);
+    for (int i = -6; i <= 6; i++) {
+      float k = float(i) / 6.0;
+      vec3 s = tex(vec2(uv.x + k * 0.12, uv.y));
+      streak += max(s - 0.75, 0.0) * (1.0 - abs(k));
+    }
+    col += streak * vec3(0.35, 0.65, 1.0) * 0.9 * uFlare;
+    float fx = fract(uTime * 0.07) * 1.6 - 0.3;
+    vec2 fp = vec2(fx, 0.35 + 0.1 * sin(uTime * 0.5));
+    vec2 dd = vUv - fp; dd.x *= aspect;
+    col += vec3(0.4, 0.7, 1.0) * exp(-dd.y * dd.y * 2500.0) * exp(-abs(dd.x) * 1.5) * 0.5 * uFlare;
+    col += vec3(1.0, 0.85, 0.6) * exp(-dot(dd, dd) * 300.0) * 0.4 * uFlare;
+  }
+  // Polvere di pellicola: granelli e graffi che cambiano a ogni fotogramma (24 al secondo).
+  if (uDust > 0.0) {
+    float fr = floor(uTime * 24.0);
+    vec2 cell = floor(vUv * vec2(90.0 * aspect, 90.0));
+    float h = hash(cell + fr * 7.13);
+    float speck = step(0.9985, h);
+    float lineX = hash(vec2(fr, 1.0));
+    float scratch = step(0.6, hash(vec2(fr, 2.0))) * exp(-abs(vUv.x - lineX) * uRes.x * 0.8);
+    col = mix(col, vec3(0.08), speck * 0.8 * uDust);
+    col += vec3(0.6) * scratch * 0.5 * uDust;
+    col *= 1.0 - 0.12 * uDust * smoothstep(0.4, 0.95, length((vUv - 0.5) * vec2(aspect, 1.0)));
+  }
+  // Bande cinema: entrano nel primo mezzo secondo della clip (formato 2,39:1 in orizzontale).
+  if (uLetterbox > 0.5) {
+    float target = aspect >= 1.0 ? max(0.0, (1.0 - aspect / 2.39) * 0.5) : 0.1;
+    float h = target * smoothstep(0.0, 0.5, uLocal);
+    col *= step(h, vUv.y) * step(h, 1.0 - vUv.y);
+  }
   col *= sep;
   gl_FragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
 }
@@ -184,6 +220,7 @@ private class WowProgram(private val effect: WowFxEffect, useHdr: Boolean) : Bas
             program.setFloatsUniform("uRes", floatArrayOf(w, h))
             program.setFloatsUniform("uTime", floatArrayOf(((presentationTimeUs / 1000) % 100_000) / 1000f))
             program.setFloatsUniform("uSeed", floatArrayOf(effect.beatSeed(presentationTimeUs)))
+            program.setFloatsUniform("uLocal", floatArrayOf(localTimeUs(presentationTimeUs, effect.startUs) / 1e6f))
             for ((type, name) in WowFxEffect.UNIFORMS) {
                 val a = amounts.getValue(type) * when (type) {
                     FxType.ZOOMBEAT -> effect.beatAt(presentationTimeUs, 0.14f)

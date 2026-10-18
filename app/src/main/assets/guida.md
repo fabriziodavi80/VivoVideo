@@ -3,13 +3,12 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
-- **Pacchetto premium 2026**, tutto in cima alle liste:
-- **8 transizioni nuove** (in cima alla lista): Zoom punch, Vortice, Liquido, Pellicola bruciata, Cubo 3D, Luce che dissolve, Schiaffo RGB, Scorrimento verticale.
-- **Effetti nuovi**: Sogno, Pellicola 35 mm, Duotono pop, Lampo di luce, Tre schermi, Olografico; e la scheda **A ritmo**: Zoom, Scossa e RGB sui battiti.
-- **Testi animati**: Rimbalzo, Ribalta 3D, Vortice, Esplosione (lettera per lettera), Messa a fuoco, Neon tremolante; stili pronti **Cinema 2026, Sogno, Titolo 3D, Festa, Insegna, Esplosione**.
-- **Video automatico più "regista"**: legge l'energia del brano. Dove la musica è calma le scene durano di più e i passaggi sono morbidi; dove spinge si taglia su ogni colpo, con effetti a ritmo; sul **drop** (l'attacco del ritornello) un taglio esatto con Zoom punch. Rallenty nei momenti calmi con i video a 120 fps, accelerazioni a tempo nelle parti cariche. Le foto orizzontali in un video verticale (e viceversa) riempiono il quadro con una panoramica lenta invece delle bande.
-- Nuovi stili del video automatico: **Reel virale** e **Sogno**.
-- Collaudo e Segnala un problema; schermo sempre acceso durante l'anteprima.
+- **Video automatico da trailer**: **intro a raffica** (8 lampi di scene su mezzi battiti, poi il titolo sul colpo), **momento eroe** sul drop (la scena rallenta al centro, con zoom e colpo), **finale** con rallenty, sfumatura e scritta di chiusura (il periodo o il titolo). Le foto nelle parti cariche fanno uno scatto di zoom su ogni colpo.
+- **Look colore per ogni tema**, uguale su tutte le scene: teal & orange da cinema, vintage caldo, pastello da sogno, neon notturno, colori estivi pieni…
+- **4 temi nuovi**: **Blockbuster** (trailer da cinema), **Neon notte**, **Estate pop**, **Azione** (sport e avventura). In tutto 11 temi.
+- **5 transizioni d'impatto**: Strappo, Esplosione di luce, Lente, Strisce, Otturatore.
+- **3 effetti**: Bagliore anamorfico, Polvere di pellicola, Bande cinema (entrano a inizio scena).
+- Prima: pacchetto premium (transizioni, effetti a ritmo, testi animati), energia del brano, collaudo e segnalazioni.
 
 ## Primi passi
 - Dalla schermata dei progetti tocca **Nuovo progetto**: **Scegli foto e video** (fino a 100) oppure **Album interi** (uno o più album, tutto in ordine di data). Lo stesso vale per **+** e **Aggiungi** dentro l'editor.
@@ -53,7 +52,8 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - Con la musica ogni taglio cade su un battito; se le foto e i video sono pochi per la durata, le scene si allungano di battiti interi.
 - **Energia del brano**: l'app sente dove la musica è calma (scene più lunghe, passaggi morbidi, rallenty) e dove spinge (un taglio a ogni colpo, zoom e scosse a ritmo, accelerazioni); sul drop mette un taglio esatto con una transizione d'impatto.
 - **Orientamento**: il formato segue le foto e i video più numerosi; quelli girati nell'altro verso seguono le persone (regia intelligente) o, se sono foto, si attraversano con una panoramica; lo sfondo sfocato resta solo se non c'è un soggetto chiaro.
-- **Stili**: Cinema, Energico, Reel virale, Ricordi, Sogno, Elegante, Viaggio.
+- **Temi**: Cinema, Energico, Reel virale, Ricordi, Sogno, Elegante, Viaggio, Blockbuster, Neon notte, Estate pop, Azione. Ognuno ha il suo look colore, le sue transizioni (morbide nelle parti calme, d'impatto sui colpi) e il suo titolo.
+- **Struttura**: con la musica, i temi più dinamici aprono con un'**intro a raffica** e il titolo sul colpo; sul drop c'è il **momento eroe**; il **finale** rallenta e chiude con una scritta (il periodo indicato sotto il titolo, o il titolo).
 - **Altra proposta** rifà il montaggio con altre scene e altri tratti, **Stile** lo cambia: tutto resta ritoccabile a mano.
 
 ## Funzioni intelligenti

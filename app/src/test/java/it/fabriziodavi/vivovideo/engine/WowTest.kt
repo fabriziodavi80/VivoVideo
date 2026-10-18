@@ -88,7 +88,7 @@ class WowTest {
 
     @Test fun autoEditFollowsTheSongEnergy() {
         val vids = (0 until 60).map { Clip(id = "v$it", uri = "content://v/$it", sourceDurationUs = 20_000_000, trimEndUs = 20_000_000, width = 1080, height = 1920, fps = 120f) }
-        val p = AutoEdit.build("Drop", vids, music(), AutoOptions(style = AutoStyle.ENERGICO, targetUs = 60_000_000))
+        val p = AutoEdit.build("Drop", vids, music(), AutoOptions(style = AutoStyle.ENERGICO, targetUs = 60_000_000, intro = false))
         val starts = p.clipStartsUs()
         val calm = p.clips.filterIndexed { i, _ -> starts[i] + p.clips[i].outputUs <= 30_000_000 }
         val hot = p.clips.filterIndexed { i, _ -> starts[i] >= 31_000_000 && i < p.clips.lastIndex }
@@ -116,5 +116,40 @@ class WowTest {
         val ph = q.clips.first { it.isPhoto }
         assertNotNull(ph.reframe); assertTrue(ph.fill)
         assertTrue(abs(ph.reframe!!.xs.first() - ph.reframe!!.xs.last()) > 0.4f)
+    }
+
+    @Test fun trailerStructureIntroHeroEnding() {
+        val vids = (0 until 40).map { Clip(id = "v$it", uri = "content://v/$it", sourceDurationUs = 20_000_000, trimEndUs = 20_000_000, width = 1920, height = 1080, fps = 120f) }
+        val p = AutoEdit.build("Trailer", vids, music(), AutoOptions(style = AutoStyle.BLOCKBUSTER, targetUs = 60_000_000, title = "Estate", subtitle = "Agosto 2026"))
+        // Intro: 8 lampi su mezzi battiti (0,25 s), poi il titolo sul colpo.
+        val intro = p.clips.take(8)
+        assertTrue(intro.drop(1).all { abs(it.outputUs - 250_000) < 5_000 })
+        assertTrue(intro.dropLast(1).all { it.transitionOut?.type == TransitionType.FLASH })
+        val introEnd = intro.sumOf { it.outputUs }
+        val title = p.texts.first { it.text == "Estate" }
+        assertEquals(introEnd, title.startUs)
+        // Look colore del tema su tutte le scene, e bande cinema.
+        assertTrue(p.clips.all { it.grade == AutoStyle.BLOCKBUSTER.grade })
+        assertTrue(p.clips.drop(8).all { c -> c.fx.any { it.type == FxType.LETTERBOX } })
+        // Momento eroe sul drop (30 s): rallenty al centro.
+        val starts = p.clipStartsUs()
+        val d = starts.indexOfFirst { abs(it - 30_000_000) < 40_000 }
+        assertTrue("nessuna scena sul drop", d > 0)
+        assertEquals(ClipSpeed.RAMP, p.clips[d].speed)
+        // Finale: l'ultima rallenta, e c'è la scritta di chiusura.
+        assertEquals(ClipSpeed.RAMP, p.clips.last().speed)
+        assertTrue(p.texts.any { it.text == "Agosto 2026" && it.startUs > p.durationUs - 3_500_000 })
+        assertTrue("durata ${p.durationUs}", abs(p.durationUs - 60_000_000) <= 25_000)
+    }
+
+    @Test fun everyThemeBuilds() {
+        val srcs = (0 until 30).map { if (it % 3 == 0) Clip(id = "p$it", uri = "file:///p$it.jpg", sourceDurationUs = Clip.PHOTO_MAX_US, trimEndUs = 3_000_000, isPhoto = true, width = 4000, height = 3000)
+            else Clip(id = "v$it", uri = "content://v/$it", sourceDurationUs = 15_000_000, trimEndUs = 15_000_000, width = 1920, height = 1080, fps = if (it % 2 == 0) 120f else 30f) }
+        AutoStyle.entries.forEach { st ->
+            val p = AutoEdit.build("T", srcs, music(), AutoOptions(style = st, targetUs = 45_000_000, title = "Titolo"))
+            assertTrue("$st durata ${p.durationUs}", abs(p.durationUs - 45_000_000) <= 30_000)
+            assertTrue("$st", p.clips.isNotEmpty() && p.texts.isNotEmpty())
+            p.clips.dropLast(1).forEach { c -> assertNotNull("$st transizione", c.transitionOut) }
+        }
     }
 }

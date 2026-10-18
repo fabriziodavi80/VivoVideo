@@ -45,13 +45,18 @@ enum class TransitionType(val label: String) {
     CUBE("Cubo 3D"),
     LUMA("Luce che dissolve"),
     RGB("Schiaffo RGB"),
-    SLIDE_UP("Scorrimento verticale");
+    SLIDE_UP("Scorrimento verticale"),
+    TEAR("Strappo"),
+    BURST("Esplosione di luce"),
+    LENS("Lente"),
+    STRIPES("Strisce"),
+    SHUTTER("Otturatore");
 
     /** Transizioni adatte a uno slideshow "vario" (quelle più nervose solo se scelte apposta). */
-    val soft: Boolean get() = this != GLITCH && this != PIXELATE && this != SHAKE && this != RGB && this != PUNCH
+    val soft: Boolean get() = this !in setOf(GLITCH, PIXELATE, SHAKE, RGB, PUNCH, TEAR, STRIPES, SHUTTER, BURST)
 
     /** Transizioni d'impatto, da mettere sui colpi forti della musica. */
-    val punchy: Boolean get() = this in setOf(PUNCH, FLASH, RGB, GLITCH, SHAKE, WHIP, SPIN, SLIDE_UP, ZOOM, SWIRL)
+    val punchy: Boolean get() = this in setOf(PUNCH, FLASH, RGB, GLITCH, SHAKE, WHIP, SPIN, SLIDE_UP, ZOOM, SWIRL, TEAR, BURST, STRIPES, SHUTTER)
 
     /** Premium: le novità da far vedere nel pannello in cima. */
     val premium: Boolean get() = ordinal >= PUNCH.ordinal
@@ -290,7 +295,10 @@ enum class FxType(val label: String, val category: FxCategory, val toggle: Boole
     HOLO("Olografico", FxCategory.WOW, defaultAmount = 0.6f),
     ZOOMBEAT("Zoom a ritmo", FxCategory.BEAT, defaultAmount = 0.6f),
     SHAKEBEAT("Scossa a ritmo", FxCategory.BEAT, defaultAmount = 0.6f),
-    RGBBEAT("RGB a ritmo", FxCategory.BEAT, defaultAmount = 0.6f);
+    RGBBEAT("RGB a ritmo", FxCategory.BEAT, defaultAmount = 0.6f),
+    FLARE("Bagliore anamorfico", FxCategory.WOW, defaultAmount = 0.6f),
+    DUST("Polvere di pellicola", FxCategory.WOW, defaultAmount = 0.6f),
+    LETTERBOX("Bande cinema", FxCategory.WOW, toggle = true, defaultAmount = 1f);
 
     /** Effetti che seguono i battiti della musica. */
     val onBeats: Boolean get() = this == PULSE || this == STROBE || this == HIT || category == FxCategory.BEAT

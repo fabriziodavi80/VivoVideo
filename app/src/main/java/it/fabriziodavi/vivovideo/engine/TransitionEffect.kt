@@ -48,6 +48,7 @@ class TransitionEffect(
         val seed: Float = 0f,
         val swirl: Float = 0f, val warp: Float = 0f, val burn: Float = 0f, val cube: Float = 0f, val luma: Float = 0f,
         val rgb: Float = 0f, val shiftY: Float = 0f,
+        val tear: Float = 0f, val burst: Float = 0f, val lens: Float = 0f, val stripes: Float = 0f, val shutter: Float = 0f,
     )
 
     /** Numero pseudo-casuale stabile in -0,5…0,5 dato un seme. */
@@ -85,6 +86,11 @@ class TransitionEffect(
         TransitionType.LUMA -> Params(luma = e, white = 0.9f * e * e * e * e * e)
         TransitionType.RGB -> Params(rgb = e, shift = jitter(seed, 4) * 0.05f * e, rotation = jitter(seed, 5) * 0.06f * e, zoom = 1f + 0.12f * e)
         TransitionType.SLIDE_UP -> Params(shiftY = (if (entering) 0.8f else -0.8f) * e * e, blur = 0.1f * e, blurMode = 4)
+        TransitionType.TEAR -> Params(tear = e, rotation = jitter(seed, 6) * 0.04f * e, white = 0.5f * e * e * e * e * e)
+        TransitionType.BURST -> Params(burst = e, zoom = 1f + 0.5f * e * e, blur = 0.03f * e, blurMode = 2, white = e * e * e * e)
+        TransitionType.LENS -> Params(lens = e, zoom = 1f + 0.3f * e * e, prism = 0.5f * e)
+        TransitionType.STRIPES -> Params(stripes = (if (entering) -1f else 1f) * e, white = 0.3f * e * e * e * e)
+        TransitionType.SHUTTER -> Params(shutter = e, zoom = 1f + 0.12f * e, white = if (e > 0.97f) 0.8f else 0f)
     }
 }
 
@@ -127,6 +133,11 @@ private class TransitionProgram(private val effect: TransitionEffect, useHdr: Bo
             program.setFloatsUniform("uLuma", floatArrayOf(p.luma))
             program.setFloatsUniform("uRgb", floatArrayOf(p.rgb))
             program.setFloatsUniform("uShiftY", floatArrayOf(p.shiftY))
+            program.setFloatsUniform("uTear", floatArrayOf(p.tear))
+            program.setFloatsUniform("uBurst", floatArrayOf(p.burst))
+            program.setFloatsUniform("uLens", floatArrayOf(p.lens))
+            program.setFloatsUniform("uStripes", floatArrayOf(p.stripes))
+            program.setFloatsUniform("uShutter", floatArrayOf(p.shutter))
             program.bindAttributesAndUniforms()
             GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
         } catch (e: GlUtil.GlException) {
@@ -172,6 +183,11 @@ uniform float uCube;
 uniform float uLuma;
 uniform float uRgb;
 uniform float uShiftY;
+uniform float uTear;
+uniform float uBurst;
+uniform float uLens;
+uniform float uStripes;
+uniform float uShutter;
 varying vec2 vTexSamplingCoord;
 
 float hash(vec2 p) {
@@ -214,6 +230,30 @@ void main() {
   if (uWarp > 0.0) {
     uv += vec2(sin(uv.y * 18.0 + uSeed * 0.7), cos(uv.x * 14.0 + uSeed * 0.5)) * 0.045 * uWarp * uWarp
        + vec2(fbm(uv * 4.0 + uSeed * 0.05) - 0.5) * 0.12 * uWarp;
+  }
+  // Lente: rigonfiamento verso chi guarda (distorsione a barile che cresce).
+  if (uLens > 0.0) {
+    vec2 q = uv - 0.5; q.x *= uAspect;
+    float r2 = dot(q, q);
+    q *= 1.0 - uLens * 0.9 * r2 / (1.0 + r2);
+    q /= 1.0 + 0.25 * uLens;
+    q.x /= uAspect; uv = q + 0.5;
+  }
+  // Strisce: bande orizzontali che scivolano a destra e a sinistra.
+  float gap = 0.0;
+  if (uStripes != 0.0) {
+    float band = floor(uv.y * 8.0);
+    float dirS = mod(band, 2.0) < 1.0 ? 1.0 : -1.0;
+    float k = abs(uStripes);
+    uv.x += dirS * sign(uStripes) * k * k * (0.6 + 0.4 * fract(band * 0.37));
+  }
+  // Strappo: il quadro si spacca in due lungo una linea frastagliata, le metà si allontanano.
+  if (uTear > 0.0) {
+    float jag = (hash(vec2(floor(uv.x * 40.0), 3.0)) - 0.5) * 0.06 + sin(uv.x * 9.0) * 0.02;
+    float line = 0.5 + jag;
+    float open = uTear * uTear * 0.55;
+    if (uv.y > line) { uv.y -= open; if (uv.y < line) gap = 1.0; }
+    else { uv.y += open; if (uv.y > line) gap = 1.0; }
   }
   // Cubo 3D: la faccia ruota via, con prospettiva (fuori dalla faccia è nero).
   if (uCube != 0.0) {
@@ -258,6 +298,22 @@ void main() {
     leak += vec3(1.0, 0.25, 0.35) * exp(-dot(lp2, lp2) * 4.0) * uLeak * 0.8;
     acc = 1.0 - (1.0 - clamp(acc, 0.0, 1.0)) * (1.0 - clamp(leak, 0.0, 1.0));
   }
+  // Esplosione di luce: raggi bianchi dal centro che crescono fino a coprire tutto.
+  if (uBurst > 0.0) {
+    vec2 q = uv - 0.5; q.x *= uAspect;
+    float ang = atan(q.y, q.x);
+    float rays = pow(abs(sin(ang * 9.0 + uSeed * 0.01)), 8.0) + pow(abs(sin(ang * 5.0 - 1.3)), 12.0);
+    float core = exp(-length(q) * (6.0 - 5.0 * uBurst));
+    acc += vec3(1.0, 0.95, 0.85) * (rays * uBurst * 0.9 + core * uBurst * 1.4) * uBurst;
+  }
+  // Otturatore: due lame che si chiudono dall'alto e dal basso.
+  if (uShutter > 0.0) {
+    float h = uShutter * uShutter * 0.5;
+    float m = smoothstep(h - 0.004, h, uv.y) * smoothstep(h - 0.004, h, 1.0 - uv.y);
+    acc *= m;
+  }
+  // Nella fessura dello strappo si vede il bianco.
+  acc = mix(acc, vec3(1.0, 0.98, 0.94), gap);
   // Schiaffo RGB: canali spostati di molto, con righe di scansione.
   if (uRgb > 0.0) {
     float d = 0.07 * uRgb;
