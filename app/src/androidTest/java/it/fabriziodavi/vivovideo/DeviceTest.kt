@@ -256,16 +256,16 @@ class DeviceTest {
     }
 
     /** Le transizioni e le animazioni dei testi "wow", tutte insieme. */
-    private fun wowProject(): Project {
+    private fun wowProject(premium: Boolean = true): Project {
         val wow = listOf(TransitionType.GLITCH, TransitionType.PRISM, TransitionType.LEAK, TransitionType.IRIS, TransitionType.PIXELATE, TransitionType.SHAKE) +
-            TransitionType.entries.filter { it.premium }
+            (if (premium) TransitionType.entries.filter { it.premium } else emptyList())
         val clips = (0..wow.size).map { i ->
             video("w$i", listOf(videoA, videoB, videoC)[i % 3], s = 1_000_000, e = 2_500_000)
                 .copy(transitionOut = wow.getOrNull(i)?.let { TransitionSpec(it, 600_000) },
-                    fx = FxType.entries.filter { it.wow2 }.let { w -> listOf(ClipFx(w[i % w.size])) })
+                    fx = if (premium) FxType.entries.filter { it.wow2 }.let { w -> listOf(ClipFx(w[i % w.size])) } else emptyList())
         }
-        val anims = listOf(TextAnim.DROP, TextAnim.RISE, TextAnim.WAVE, TextAnim.GLITCH, TextAnim.SHINE,
-            TextAnim.BOUNCE, TextAnim.FLIP, TextAnim.SPIN, TextAnim.SCATTER, TextAnim.BLUR, TextAnim.FLICKER)
+        val anims = listOf(TextAnim.DROP, TextAnim.RISE, TextAnim.WAVE, TextAnim.GLITCH, TextAnim.SHINE) +
+            (if (premium) listOf(TextAnim.BOUNCE, TextAnim.FLIP, TextAnim.SPIN, TextAnim.SCATTER, TextAnim.BLUR, TextAnim.FLICKER) else emptyList())
         return Project(
             name = "wow",
             clips = clips,
@@ -358,7 +358,12 @@ class DeviceTest {
     }
 
     @Test fun previewPlaysWow() {
-        playFor(wowProject())
+        playFor(wowProject(premium = false))
+    }
+
+    /** Pacchetto premium in anteprima: sull'emulatore la grafica è software (lenta), basta che scorra e mostri immagini. */
+    @Test fun previewPlaysPremium() {
+        playFor(wowProject(premium = true), minFps = 1f)
     }
 
     private var lastDetails = ""
@@ -441,7 +446,7 @@ class DeviceTest {
      * L'anteprima deve scorrere davvero: dopo l'avvio, il tempo avanza quasi come l'orologio e
      * arrivano i fotogrammi. Registra la posizione ogni mezzo secondo per capire dove si ferma.
      */
-    private fun playFor(p: Project, seconds: Int = 8) {
+    private fun playFor(p: Project, seconds: Int = 8, minFps: Float = 5f) {
         val factory = CompositionFactory(ctx)
         val (w, h) = factory.outputSize(p, 1080)
         val shown = CrossfadePreview.previewProject(ctx, p, w, h)
@@ -510,7 +515,7 @@ class DeviceTest {
         val trace = samples.joinToString(" ")
         val expected = (seconds * 2 - 1) * 500L
         assertTrue("anteprima lenta: avanzata di $advanced ms invece di ~$expected (posizioni: $trace, ripartenze: $recoveries)", advanced > expected * (if (recoveries > 0) 0.4 else 0.7))
-        assertTrue("anteprima senza immagini: ${frames.get() - f0} fotogrammi (posizioni: $trace)", frames.get() - f0 > seconds * 5)
+        assertTrue("anteprima senza immagini: ${frames.get() - f0} fotogrammi (posizioni: $trace)", frames.get() - f0 > seconds * minFps)
     }
 
     @Test fun previewPlaysEveryFeature() {
