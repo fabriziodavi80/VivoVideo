@@ -3,13 +3,12 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
-- **Video automatico da trailer**: **intro a raffica** (8 lampi di scene su mezzi battiti, poi il titolo sul colpo), **momento eroe** sul drop (la scena rallenta al centro, con zoom e colpo), **finale** con rallenty, sfumatura e scritta di chiusura (il periodo o il titolo). Le foto nelle parti cariche fanno uno scatto di zoom su ogni colpo.
-- **Look colore per ogni tema**, uguale su tutte le scene: teal & orange da cinema, vintage caldo, pastello da sogno, neon notturno, colori estivi pieni…
-- **5 temi nuovi**: **Blockbuster** (trailer da cinema), **Neon notte**, **Estate pop**, **Azione** (sport e avventura) ed **Estremo** (bike, MTB, corsa, GoPro: accelerazioni a proiettile su ogni video, impatti sui colpi). In tutto 12 temi.
-- **7 transizioni d'impatto**: Strappo, Esplosione di luce, Lente, Strisce, Otturatore, **Scatto di velocità** (zoom con linee di velocità), **Sfondamento** (il quadro si crepa e si sfonda).
-- **Impatto a ritmo** (Effetti → A ritmo): zoom, scossa, contrasto e lampo su ogni colpo, come un "fermo d'impatto".
-- **3 effetti**: Bagliore anamorfico, Polvere di pellicola, Bande cinema (entrano a inizio scena).
-- Prima: pacchetto premium (transizioni, effetti a ritmo, testi animati), energia del brano, collaudo e segnalazioni.
+- **Romantico e nostalgico, in chiave moderna**: temi **Romantico**, **Matrimonio**, **Super 8** e **Anni '90** (in tutto 16 temi).
+- **Effetti**: Luce soffusa (il filtro "Pro-Mist" dei videomaker), Petali, Cuori di luce, Super 8, Bordo pellicola (con i fori), Proiettore; e **Bagliore a ritmo** (scheda A ritmo): un alone morbido che si accende su ogni colpo, per i temi delicati.
+- **Transizioni**: Cuore, Dissolvenza bokeh, Salto di pellicola, Riavvolgimento VHS; per l'azione **Schiacciata**.
+- **Sempre a tempo di musica**: nei temi delicati i tagli cadono sulle battute e le foto "respirano" con un piccolo zoom ogni battuta; nei temi vintage compare la **data arancione della videocamera**, presa dalla data vera di ogni foto e video.
+- Stile di testo **Amore** (corsivo che va a fuoco) e **Data videocamera**.
+- Prima: temi Blockbuster, Neon notte, Estate pop, Azione, Estremo; intro a raffica, momento eroe, finale.
 
 ## Primi passi
 - Dalla schermata dei progetti tocca **Nuovo progetto**: **Scegli foto e video** (fino a 100) oppure **Album interi** (uno o più album, tutto in ordine di data). Lo stesso vale per **+** e **Aggiungi** dentro l'editor.
@@ -53,7 +52,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - Con la musica ogni taglio cade su un battito; se le foto e i video sono pochi per la durata, le scene si allungano di battiti interi.
 - **Energia del brano**: l'app sente dove la musica è calma (scene più lunghe, passaggi morbidi, rallenty) e dove spinge (un taglio a ogni colpo, zoom e scosse a ritmo, accelerazioni); sul drop mette un taglio esatto con una transizione d'impatto.
 - **Orientamento**: il formato segue le foto e i video più numerosi; quelli girati nell'altro verso seguono le persone (regia intelligente) o, se sono foto, si attraversano con una panoramica; lo sfondo sfocato resta solo se non c'è un soggetto chiaro.
-- **Temi**: Cinema, Energico, Reel virale, Ricordi, Sogno, Elegante, Viaggio, Blockbuster, Neon notte, Estate pop, Azione, Estremo. Ognuno ha il suo look colore, le sue transizioni (morbide nelle parti calme, d'impatto sui colpi) e il suo titolo.
+- **Temi**: Cinema, Energico, Reel virale, Ricordi, Sogno, Elegante, Viaggio, Blockbuster, Neon notte, Estate pop, Azione, Estremo, Romantico, Matrimonio, Super 8, Anni '90. Ognuno ha il suo look colore, le sue transizioni (morbide nelle parti calme, d'impatto sui colpi) e il suo titolo.
 - **Struttura**: con la musica, i temi più dinamici aprono con un'**intro a raffica** e il titolo sul colpo; sul drop c'è il **momento eroe**; il **finale** rallenta e chiude con una scritta (il periodo indicato sotto il titolo, o il titolo).
 - **Altra proposta** rifà il montaggio con altre scene e altri tratti, **Stile** lo cambia: tutto resta ritoccabile a mano.
 

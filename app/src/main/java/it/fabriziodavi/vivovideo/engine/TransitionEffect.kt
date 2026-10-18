@@ -50,6 +50,7 @@ class TransitionEffect(
         val rgb: Float = 0f, val shiftY: Float = 0f,
         val tear: Float = 0f, val burst: Float = 0f, val lens: Float = 0f, val stripes: Float = 0f, val shutter: Float = 0f,
         val speedLines: Float = 0f, val smash: Float = 0f,
+        val squash: Float = 0f, val heart: Float = 0f, val bokeh: Float = 0f, val slip: Float = 0f, val rewind: Float = 0f,
     )
 
     /** Numero pseudo-casuale stabile in -0,5…0,5 dato un seme. */
@@ -93,6 +94,11 @@ class TransitionEffect(
         TransitionType.STRIPES -> Params(stripes = (if (entering) -1f else 1f) * e, white = 0.3f * e * e * e * e)
         TransitionType.SPEEDZOOM -> Params(speedLines = e, zoom = 1f + 1.1f * e * e, blur = 0.08f * e, blurMode = 2, prism = 0.4f * e, white = 0.35f * e * e * e * e * e)
         TransitionType.SMASH -> Params(smash = e, zoom = 1f + 0.7f * e * e * e, shift = jitter(seed, 7) * 0.03f * e, white = 0.9f * e * e * e * e * e * e)
+        TransitionType.SQUASH -> Params(squash = e, blur = 0.05f * e, blurMode = 1, white = 0.2f * e * e * e * e)
+        TransitionType.HEART -> Params(heart = e)
+        TransitionType.BOKEHFADE -> Params(bokeh = e, blur = 0.03f * e, blurMode = 3, white = 0.75f * e * e * e * e)
+        TransitionType.FILMSLIP -> Params(slip = (if (entering) -1f else 1f) * e, black = 0.2f * e * e)
+        TransitionType.REWIND -> Params(rewind = e, shift = jitter(seed, 8) * 0.02f * e)
         TransitionType.SHUTTER -> Params(shutter = e, zoom = 1f + 0.12f * e, white = if (e > 0.97f) 0.8f else 0f)
     }
 }
@@ -143,6 +149,11 @@ private class TransitionProgram(private val effect: TransitionEffect, useHdr: Bo
             program.setFloatsUniform("uShutter", floatArrayOf(p.shutter))
             program.setFloatsUniform("uSpeedLines", floatArrayOf(p.speedLines))
             program.setFloatsUniform("uSmash", floatArrayOf(p.smash))
+            program.setFloatsUniform("uSquash", floatArrayOf(p.squash))
+            program.setFloatsUniform("uHeart", floatArrayOf(p.heart))
+            program.setFloatsUniform("uBokehT", floatArrayOf(p.bokeh))
+            program.setFloatsUniform("uSlip", floatArrayOf(p.slip))
+            program.setFloatsUniform("uRewind", floatArrayOf(p.rewind))
             program.bindAttributesAndUniforms()
             GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
         } catch (e: GlUtil.GlException) {
@@ -195,6 +206,11 @@ uniform float uStripes;
 uniform float uShutter;
 uniform float uSpeedLines;
 uniform float uSmash;
+uniform float uSquash;
+uniform float uHeart;
+uniform float uBokehT;
+uniform float uSlip;
+uniform float uRewind;
 varying vec2 vTexSamplingCoord;
 
 float hash(vec2 p) {
@@ -261,6 +277,31 @@ void main() {
     float open = uTear * uTear * 0.55;
     if (uv.y > line) { uv.y -= open; if (uv.y < line) gap = 1.0; }
     else { uv.y += open; if (uv.y > line) gap = 1.0; }
+  }
+  // Schiacciata: l'immagine si strizza in orizzontale e si allunga in verticale (fuori è nero).
+  if (uSquash > 0.0) {
+    float sx = 1.0 - 0.85 * uSquash * uSquash;
+    float sy = 1.0 + 0.25 * uSquash;
+    vec2 q = (uv - 0.5) / vec2(sx, sy) + 0.5;
+    edge *= step(0.0, q.x) * step(q.x, 1.0);
+    uv = q;
+  }
+  // Salto di pellicola: il fotogramma scivola in verticale, con la riga nera fra un fotogramma e l'altro.
+  float slipBar = 0.0;
+  if (uSlip != 0.0) {
+    float k = abs(uSlip);
+    uv.y += sign(uSlip) * k * k * 0.6;
+    float f = fract(uv.y);
+    slipBar = 1.0 - smoothstep(0.0, 0.03, f) * smoothstep(0.0, 0.03, 1.0 - f);
+    uv.y = fract(uv.y);
+  }
+  // Riavvolgimento VHS: banda di disturbo che scorre, righe spostate, immagine che rotola.
+  if (uRewind > 0.0) {
+    float band = fract(uSeed * 0.037);
+    float d = abs(uv.y - band);
+    float hit = exp(-d * d * 400.0) * uRewind;
+    uv.x += (hash(vec2(floor(uv.y * 120.0), uSeed)) - 0.5) * 0.08 * uRewind * uRewind + hit * 0.08;
+    uv.y = fract(uv.y + uRewind * uRewind * 0.3);
   }
   // Sfondamento: crepe che partono dal centro, i pezzi si spostano verso l'esterno.
   float crack = 0.0;
@@ -346,6 +387,31 @@ void main() {
     acc = mix(acc, vec3(1.0), lines * fall * uSpeedLines * 0.85);
   }
   acc = mix(acc, vec3(1.0), crack * 0.85);
+  acc *= 1.0 - slipBar;
+  if (uRewind > 0.0) {
+    acc.r = mix(acc.r, texture2D(uTexSampler, xf(uv + vec2(0.012 * uRewind, 0.0))).r, uRewind);
+    acc += (hash(uv * 400.0 + uSeed) - 0.5) * 0.25 * uRewind;
+    acc = mix(acc, vec3(dot(acc, vec3(0.3, 0.59, 0.11))), 0.3 * uRewind);
+  }
+  // Dissolvenza bokeh: cerchi di luce morbidi che crescono mentre l'immagine sfuma.
+  if (uBokehT > 0.0) {
+    vec2 g = vTexSamplingCoord * vec2(uAspect * 5.0, 5.0);
+    vec2 id = floor(g); vec2 f = fract(g) - 0.5;
+    vec2 off = vec2(hash(id), hash(id + 7.0)) - 0.5;
+    float r = 0.18 + 0.25 * hash(id + 3.0);
+    float disc = smoothstep(r * uBokehT + 0.02, r * uBokehT - 0.02, length(f - off * 0.4));
+    vec3 tint = mix(vec3(1.0, 0.8, 0.85), vec3(1.0, 0.92, 0.7), hash(id + 11.0));
+    acc = mix(acc, acc + tint * 0.6, disc * uBokehT);
+  }
+  // Cuore: il quadro si chiude a forma di cuore.
+  if (uHeart > 0.0) {
+    vec2 q = (vTexSamplingCoord - vec2(0.5, 0.47)); q.x *= uAspect;
+    float s = max(0.001, (1.0 - uHeart) * 1.15);
+    vec2 h = q / s * 1.25;
+    h.y = h.y * 1.1 + abs(h.x) * 0.15;
+    float f = pow(h.x * h.x + h.y * h.y - 0.25, 3.0) - h.x * h.x * h.y * h.y * h.y * 0.5;
+    acc *= 1.0 - smoothstep(-0.0005, 0.0005, f);
+  }
   // Nella fessura dello strappo si vede il bianco.
   acc = mix(acc, vec3(1.0, 0.98, 0.94), gap);
   // Schiaffo RGB: canali spostati di molto, con righe di scansione.

@@ -49,6 +49,8 @@ class WowFxEffect(
             FxType.DREAMY to "uDreamy", FxType.FILM35 to "uFilm35", FxType.DUOPOP to "uDuoPop", FxType.SWEEP to "uSweep",
             FxType.SPLIT3 to "uSplit3", FxType.HOLO to "uHolo", FxType.ZOOMBEAT to "uZoomBeat", FxType.SHAKEBEAT to "uShakeBeat",
             FxType.RGBBEAT to "uRgbBeat", FxType.FLARE to "uFlare", FxType.DUST to "uDust", FxType.LETTERBOX to "uLetterbox", FxType.IMPACT to "uImpact",
+            FxType.PROMIST to "uProMist", FxType.PETALS to "uPetals", FxType.HEARTS to "uHearts", FxType.SUPER8 to "uSuper8",
+            FxType.FILMFRAME to "uFilmFrame", FxType.PROJECTOR to "uProjector", FxType.GLOWBEAT to "uGlowBeat",
         )
 
         fun needed(fx: List<ClipFx>) = fx.any { it.type.wow2 && it.amount > 0f }
@@ -61,6 +63,7 @@ uniform float uTime;
 uniform float uSeed;
 uniform float uDreamy, uFilm35, uDuoPop, uSweep, uSplit3, uHolo, uZoomBeat, uShakeBeat, uRgbBeat;
 uniform float uFlare, uDust, uLetterbox, uImpact;
+uniform float uProMist, uPetals, uHearts, uSuper8, uFilmFrame, uProjector, uGlowBeat;
 uniform float uLocal;
 varying vec2 vUv;
 
@@ -87,6 +90,11 @@ void main() {
     if (vert) uv.y = q; else uv.x = q;
     sep = smoothstep(0.0, 0.012, f) * smoothstep(0.0, 0.012, 1.0 - f);
     if (cell != 1.0) sep *= 0.82;
+  }
+  // Super 8: il fotogramma "balla" un poco a ogni scatto (24 al secondo).
+  if (uSuper8 > 0.0) {
+    float fr = floor(uTime * 18.0);
+    uv += (vec2(hash(vec2(fr, 1.0)), hash(vec2(fr, 2.0))) - 0.5) * vec2(0.004, 0.007) * uSuper8;
   }
   // Zoom a ritmo: spinta in avanti sul colpo, con scia radiale (l'Impatto ne fa una più forte).
   vec2 c = uv - 0.5;
@@ -191,6 +199,77 @@ void main() {
     float h = target * smoothstep(0.0, 0.5, uLocal);
     col *= step(h, vUv.y) * step(h, 1.0 - vUv.y);
   }
+  // Luce soffusa (filtro "Pro-Mist"): le luci si allargano in un alone morbido e caldo, il contrasto si addolcisce.
+  if (uProMist > 0.0 || uGlowBeat > 0.0) {
+    vec3 g = vec3(0.0);
+    for (int i = 0; i < 12; i++) { float a = float(i) * 0.5236; g += tex(uv + vec2(cos(a), sin(a) * aspect) * 0.025); }
+    g /= 12.0;
+    // Bagliore a ritmo: lo stesso alone, che si accende morbido su ogni colpo.
+    float amt = uProMist + uGlowBeat * 0.9;
+    col += max(g - 0.45, 0.0) * vec3(1.0, 0.93, 0.85) * 1.1 * amt;
+    col = mix(col, col * 0.88 + 0.07, uProMist * 0.5);
+    col += vec3(0.06, 0.045, 0.03) * uGlowBeat;
+  }
+  // Super 8: colori caldi sbiaditi, grana forte, luce che pulsa, angoli scuri e arrotondati.
+  if (uSuper8 > 0.0) {
+    float fr = floor(uTime * 18.0);
+    col = mix(col, vec3(lum(col)) * vec3(1.1, 0.98, 0.78) * 0.85 + col * 0.25 + vec3(0.06, 0.03, 0.0), uSuper8 * 0.65);
+    col += (hash(floor(vUv * uRes / 2.0) + fr) - 0.5) * 0.14 * uSuper8;
+    col *= 1.0 + (hash(vec2(fr, 9.0)) - 0.5) * 0.12 * uSuper8;
+    vec2 cq = abs(vUv - 0.5) * 2.0;
+    float corner = smoothstep(0.75, 1.02, length(pow(cq, vec2(3.0))));
+    col *= 1.0 - 0.8 * corner * uSuper8;
+  }
+  // Proiettore: luce che sfarfalla, cono più chiaro al centro, granelli di polvere.
+  if (uProjector > 0.0) {
+    float fr = floor(uTime * 24.0);
+    col *= 1.0 + (hash(vec2(fr, 4.0)) - 0.5) * 0.18 * uProjector;
+    float cone = 1.0 - smoothstep(0.2, 0.85, length((vUv - 0.5) * vec2(aspect * 0.8, 1.0)));
+    col = mix(col, col * (0.55 + 0.6 * cone) + vec3(0.04, 0.03, 0.01), uProjector);
+    float sp = step(0.9992, hash(floor(vUv * vec2(120.0 * aspect, 120.0)) + fr * 3.1));
+    col = mix(col, vec3(0.9, 0.85, 0.7), sp * uProjector);
+  }
+  // Petali che cadono girando, rosa e bianchi.
+  if (uPetals > 0.0) {
+    for (int layer = 0; layer < 2; layer++) {
+      float sc = layer == 0 ? 6.0 : 10.0;
+      vec2 p = vUv * vec2(sc * aspect, sc) + vec2(sin(uTime * 0.5 + float(layer)) * 0.6, uTime * (layer == 0 ? 0.9 : 0.6));
+      vec2 id = floor(p); vec2 f = fract(p) - 0.5;
+      if (hash(id + float(layer) * 13.0) > 0.55) {
+        float a = uTime * 1.5 + hash(id) * 6.28;
+        vec2 q = vec2(cos(a) * f.x - sin(a) * f.y, sin(a) * f.x + cos(a) * f.y);
+        q += (vec2(hash(id + 1.0), hash(id + 2.0)) - 0.5) * 0.4;
+        float d = (q.x * q.x) / 0.014 + (q.y * q.y) / 0.005;
+        float m = smoothstep(1.0, 0.7, d);
+        vec3 pc = mix(vec3(1.0, 0.72, 0.8), vec3(1.0, 0.93, 0.95), hash(id + 5.0));
+        col = mix(col, pc, m * 0.85 * uPetals * (layer == 0 ? 1.0 : 0.7));
+      }
+    }
+  }
+  // Cuori di luce: forme morbide che salgono piano.
+  if (uHearts > 0.0) {
+    vec2 p = vUv * vec2(4.0 * aspect, 4.0) + vec2(0.0, -uTime * 0.25);
+    vec2 id = floor(p); vec2 f = fract(p) - 0.5;
+    if (hash(id + 21.0) > 0.6) {
+      vec2 h = (f - (vec2(hash(id + 3.0), hash(id + 4.0)) - 0.5) * 0.3) * 3.2;
+      h.y = -h.y * 1.1 + abs(h.x) * 0.15;
+      float v = pow(h.x * h.x + h.y * h.y - 0.25, 3.0) - h.x * h.x * h.y * h.y * h.y * 0.5;
+      float m = 1.0 - smoothstep(-0.02, 0.02, v);
+      col += vec3(1.0, 0.55, 0.65) * m * 0.45 * uHearts * (0.6 + 0.4 * sin(uTime * 2.0 + hash(id) * 6.0));
+    }
+  }
+  // Bordo pellicola: la striscia scura con i fori ai lati (in alto e in basso nei video verticali).
+  if (uFilmFrame > 0.5) {
+    bool vert = aspect < 1.0;
+    float side = vert ? min(vUv.y, 1.0 - vUv.y) : min(vUv.x, 1.0 - vUv.x);
+    float along = vert ? vUv.x * aspect : vUv.y / aspect;
+    float strip = 0.075;
+    if (side < strip) {
+      float hole = step(0.25, fract(along * 7.0 + uTime * 0.0)) * step(fract(along * 7.0), 0.75);
+      float inHole = step(strip * 0.3, side) * step(side, strip * 0.75) * hole;
+      col = mix(vec3(0.05, 0.04, 0.03), vec3(0.92, 0.9, 0.82), inHole);
+    }
+  }
   // Impatto: lampo e contrasto sul colpo.
   if (uImpact > 0.0) {
     col = mix(col, (col - 0.5) * 1.35 + 0.5, uImpact);
@@ -232,6 +311,7 @@ private class WowProgram(private val effect: WowFxEffect, useHdr: Boolean) : Bas
                     FxType.SHAKEBEAT -> effect.beatAt(presentationTimeUs, 0.09f)
                     FxType.RGBBEAT -> effect.beatAt(presentationTimeUs, 0.1f)
                     FxType.IMPACT -> effect.beatAt(presentationTimeUs, 0.11f)
+                    FxType.GLOWBEAT -> effect.beatAt(presentationTimeUs, 0.3f)
                     else -> 1f
                 }
                 program.setFloatsUniform(name, floatArrayOf(a))

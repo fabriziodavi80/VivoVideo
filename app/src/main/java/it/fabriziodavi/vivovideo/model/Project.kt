@@ -53,13 +53,19 @@ enum class TransitionType(val label: String) {
     SHUTTER("Otturatore"),
     // Sport e momenti dinamici
     SPEEDZOOM("Scatto di velocità"),
-    SMASH("Sfondamento");
+    SMASH("Sfondamento"),
+    SQUASH("Schiacciata"),
+    // Romantico e nostalgico
+    HEART("Cuore"),
+    BOKEHFADE("Dissolvenza bokeh"),
+    FILMSLIP("Salto di pellicola"),
+    REWIND("Riavvolgimento VHS");
 
     /** Transizioni adatte a uno slideshow "vario" (quelle più nervose solo se scelte apposta). */
-    val soft: Boolean get() = this !in setOf(GLITCH, PIXELATE, SHAKE, RGB, PUNCH, TEAR, STRIPES, SHUTTER, BURST, SPEEDZOOM, SMASH)
+    val soft: Boolean get() = this !in setOf(GLITCH, PIXELATE, SHAKE, RGB, PUNCH, TEAR, STRIPES, SHUTTER, BURST, SPEEDZOOM, SMASH, SQUASH, REWIND)
 
     /** Transizioni d'impatto, da mettere sui colpi forti della musica. */
-    val punchy: Boolean get() = this in setOf(PUNCH, FLASH, RGB, GLITCH, SHAKE, WHIP, SPIN, SLIDE_UP, ZOOM, SWIRL, TEAR, BURST, STRIPES, SHUTTER, SPEEDZOOM, SMASH)
+    val punchy: Boolean get() = this in setOf(PUNCH, FLASH, RGB, GLITCH, SHAKE, WHIP, SPIN, SLIDE_UP, ZOOM, SWIRL, TEAR, BURST, STRIPES, SHUTTER, SPEEDZOOM, SMASH, SQUASH, REWIND)
 
     /** Premium: le novità da far vedere nel pannello in cima. */
     val premium: Boolean get() = ordinal >= PUNCH.ordinal
@@ -302,7 +308,14 @@ enum class FxType(val label: String, val category: FxCategory, val toggle: Boole
     FLARE("Bagliore anamorfico", FxCategory.WOW, defaultAmount = 0.6f),
     DUST("Polvere di pellicola", FxCategory.WOW, defaultAmount = 0.6f),
     LETTERBOX("Bande cinema", FxCategory.WOW, toggle = true, defaultAmount = 1f),
-    IMPACT("Impatto a ritmo", FxCategory.BEAT, defaultAmount = 0.7f);
+    IMPACT("Impatto a ritmo", FxCategory.BEAT, defaultAmount = 0.7f),
+    PROMIST("Luce soffusa", FxCategory.WOW, defaultAmount = 0.6f),
+    PETALS("Petali", FxCategory.WOW, defaultAmount = 0.6f),
+    HEARTS("Cuori di luce", FxCategory.WOW, defaultAmount = 0.5f),
+    SUPER8("Super 8", FxCategory.WOW, defaultAmount = 0.8f),
+    FILMFRAME("Bordo pellicola", FxCategory.WOW, toggle = true, defaultAmount = 1f),
+    PROJECTOR("Proiettore", FxCategory.WOW, defaultAmount = 0.6f),
+    GLOWBEAT("Bagliore a ritmo", FxCategory.BEAT, defaultAmount = 0.6f);
 
     /** Effetti che seguono i battiti della musica. */
     val onBeats: Boolean get() = this == PULSE || this == STROBE || this == HIT || category == FxCategory.BEAT
@@ -500,7 +513,8 @@ enum class TextPreset(val label: String) {
     CINEMA("Cinema"), DIDASCALIA("Didascalia"), POP("Pop"), ELEGANTE("Elegante"), NEON("Neon"),
     IMPATTO("Impatto"), FIRMA("Firma"), DIARIO("Diario"),
     GLITCH("Glitch"), ONDA("Onda"), ORO("Oro"), CASCATA("Cascata"),
-    CINEMA26("Cinema 2026"), SOGNO("Sogno"), TITOLO3D("Titolo 3D"), FESTA("Festa"), INSEGNA("Insegna"), ESPLOSIONE("Esplosione");
+    CINEMA26("Cinema 2026"), SOGNO("Sogno"), TITOLO3D("Titolo 3D"), FESTA("Festa"), INSEGNA("Insegna"), ESPLOSIONE("Esplosione"),
+    AMORE("Amore"), DATA("Data videocamera");
 
     fun applyTo(t: TextItem): TextItem = when (this) {
         CINEMA -> t.copy(font = TextFont.TITOLO, color = WHITE, gradientTo = 0xFFF2B33D.toInt(), spacing = 0.12f, upper = true, look = TextLook.OMBRA,
@@ -537,6 +551,10 @@ enum class TextPreset(val label: String) {
             size = 0.1f, x = 0f, y = 0f, rotation = -3f, animIn = TextAnim.BOUNCE, animOut = TextAnim.SCATTER, endPose = null)
         INSEGNA -> t.copy(font = TextFont.CORSIVO, color = 0xFF5BF0FF.toInt(), gradientTo = null, spacing = 0f, upper = false, look = TextLook.NEON,
             size = 0.1f, x = 0f, y = 0f, rotation = -4f, animIn = TextAnim.FLICKER, animOut = TextAnim.FADE, endPose = null)
+        AMORE -> t.copy(font = TextFont.CORSIVO, color = 0xFFFFF6EE.toInt(), gradientTo = 0xFFF7B2C4.toInt(), spacing = 0.02f, upper = false, look = TextLook.OMBRA,
+            size = 0.1f, x = 0f, y = 0f, rotation = -3f, animIn = TextAnim.BLUR, animOut = TextAnim.RISE, endPose = Transform(x = 0f, y = -0.01f, scale = 1.06f))
+        DATA -> t.copy(font = TextFont.MACCHINA, color = 0xFFFF9F1C.toInt(), gradientTo = null, spacing = 0.06f, upper = true, look = TextLook.OMBRA,
+            size = 0.042f, x = 0.3f, y = 0.4f, rotation = 0f, animIn = TextAnim.NONE, animOut = TextAnim.NONE, endPose = null)
         ESPLOSIONE -> t.copy(font = TextFont.IMPATTO, color = WHITE, gradientTo = 0xFFFF7A3D.toInt(), spacing = 0.03f, upper = true, look = TextLook.CONTORNO,
             size = 0.12f, x = 0f, y = 0f, rotation = 0f, animIn = TextAnim.SPIN, animOut = TextAnim.SCATTER, endPose = null)
     }

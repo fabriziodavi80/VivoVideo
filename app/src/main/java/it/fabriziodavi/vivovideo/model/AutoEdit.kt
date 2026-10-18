@@ -37,6 +37,12 @@ enum class AutoStyle(
     val rampEvery: Int = 2,
     /** Curve di velocità preferite per le accelerazioni. */
     val rampStyles: List<SpeedPreset> = listOf(SpeedPreset.MONTAGE, SpeedPreset.BULLET, SpeedPreset.FLASH_IN, SpeedPreset.HERO),
+    /** Data della videocamera (arancione, in basso a destra) dalla data vera di foto e video. */
+    val dateStamp: Boolean = false,
+    /** Le foto "respirano" a tempo anche nelle parti calme: un piccolo zoom ogni [popEvery] battiti. */
+    val gentlePops: Boolean = false,
+    val popEvery: Int = 1,
+    val popScale: Float = 0.07f,
 ) {
     CINEMA(
         "Cinema", "Solenne: look da film, messa a fuoco del titolo, dissolvenze di luce e pellicola, rallenty sui momenti calmi.",
@@ -203,6 +209,61 @@ enum class AutoStyle(
         intro = true, hero = true,
         rampEvery = 1,
         rampStyles = listOf(SpeedPreset.BULLET, SpeedPreset.FLASH_IN, SpeedPreset.MONTAGE),
+    ),
+    ROMANTICO(
+        "Romantico", "Luce soffusa e calda, petali e cuori di luce, chiusure a cuore e dissolvenze bokeh, rallenty, titolo in corsivo che va a fuoco.",
+        photoUs = 3_200_000, videoUs = 3_400_000, beatsPerSlot = 4,
+        transitions = listOf(TransitionType.CROSSFADE, TransitionType.BOKEHFADE, TransitionType.LUMA, TransitionType.CROSSFADE, TransitionType.HEART),
+        transitionUs = 1_000_000,
+        fx = listOf(ClipFx(FxType.PROMIST, 0.55f)),
+        accents = listOf(ClipFx(FxType.PETALS, 0.5f), ClipFx(FxType.HEARTS, 0.45f), ClipFx(FxType.SWEEP, 0.35f)),
+        title = TextPreset.AMORE,
+        impact = listOf(TransitionType.BOKEHFADE, TransitionType.FLASH, TransitionType.HEART),
+        beatFx = listOf(ClipFx(FxType.GLOWBEAT, 0.5f)),
+        slowmo = true,
+        grade = Grade(exposure = 0.08f, contrast = -0.1f, highlights = -0.15f, saturation = -0.05f, temperature = 0.25f, tint = 0.1f, highWheel = Wheel(20f, 0.15f), shadowWheel = Wheel(330f, 0.12f)),
+        gentlePops = true, popEvery = 4, popScale = 0.03f,
+    ),
+    MATRIMONIO(
+        "Matrimonio", "Elegante e luminoso: bianchi puliti e oro, luce soffusa, lampi di luce e polvere d'oro, passaggi lenti e solenni.",
+        photoUs = 3_500_000, videoUs = 3_800_000, beatsPerSlot = 4,
+        transitions = listOf(TransitionType.CROSSFADE, TransitionType.CROSSFADE, TransitionType.LUMA, TransitionType.BOKEHFADE, TransitionType.CUBE),
+        transitionUs = 1_100_000,
+        fx = listOf(ClipFx(FxType.PROMIST, 0.45f), ClipFx(FxType.LETTERBOX, 1f)),
+        accents = listOf(ClipFx(FxType.SPARKLE, 0.45f), ClipFx(FxType.SWEEP, 0.45f), ClipFx(FxType.HEARTS, 0.3f)),
+        title = TextPreset.ORO,
+        impact = listOf(TransitionType.FLASH, TransitionType.LUMA, TransitionType.BOKEHFADE),
+        beatFx = listOf(ClipFx(FxType.GLOWBEAT, 0.4f)),
+        slowmo = true,
+        grade = Grade(exposure = 0.1f, contrast = 0.04f, highlights = -0.2f, saturation = -0.08f, temperature = 0.12f, highWheel = Wheel(42f, 0.15f)),
+        gentlePops = true, popEvery = 4, popScale = 0.025f,
+    ),
+    SUPER8(
+        "Super 8", "Le pellicole di una volta, ma moderne: immagine che balla, colori caldi sbiaditi, bordo con i fori, proiettore, salti di pellicola e data della videocamera.",
+        photoUs = 2_600_000, videoUs = 2_800_000, beatsPerSlot = 4,
+        transitions = listOf(TransitionType.FILMSLIP, TransitionType.BURN, TransitionType.CROSSFADE, TransitionType.LEAK),
+        transitionUs = 600_000,
+        fx = listOf(ClipFx(FxType.SUPER8, 0.8f), ClipFx(FxType.FILMFRAME, 1f)),
+        accents = listOf(ClipFx(FxType.PROJECTOR, 0.5f), ClipFx(FxType.LIGHTLEAK, 0.45f), ClipFx(FxType.DUST, 0.5f)),
+        title = TextPreset.DIARIO,
+        impact = listOf(TransitionType.FILMSLIP, TransitionType.BURN, TransitionType.FLASH),
+        beatFx = listOf(ClipFx(FxType.GLOWBEAT, 0.35f)),
+        grade = Grade(contrast = -0.05f, shadows = 0.15f, saturation = -0.1f, temperature = 0.3f),
+        dateStamp = true, gentlePops = true, popEvery = 2, popScale = 0.04f,
+    ),
+    ANNI90(
+        "Anni '90", "Videocamera di famiglia anni '90: VHS, riavvolgimenti, disturbi a tempo, colori saturi un po' sbavati e la data arancione.",
+        photoUs = 2_200_000, videoUs = 2_400_000, beatsPerSlot = 2,
+        transitions = listOf(TransitionType.REWIND, TransitionType.GLITCH, TransitionType.SLIDE_UP, TransitionType.STRIPES),
+        transitionUs = 450_000,
+        fx = listOf(ClipFx(FxType.VHS, 0.6f)),
+        accents = listOf(ClipFx(FxType.RGBBEAT, 0.5f), ClipFx(FxType.CHROMA, 0.35f)),
+        title = TextPreset.DIARIO,
+        impact = listOf(TransitionType.REWIND, TransitionType.GLITCH, TransitionType.RGB),
+        beatFx = listOf(ClipFx(FxType.RGBBEAT, 0.45f), ClipFx(FxType.ZOOMBEAT, 0.3f)),
+        ramps = true,
+        grade = Grade(contrast = 0.1f, saturation = 0.18f, temperature = 0.1f, tint = 0.08f),
+        intro = true, dateStamp = true,
     );
 
     /** Durata media di una scena, per scegliere quanti elementi usare. */
@@ -349,7 +410,11 @@ object AutoEdit {
         }
     }
 
-    fun build(name: String, sources: List<Clip>, music: MusicTrack?, o: AutoOptions, scans: Map<String, MomentScan> = emptyMap()): Project {
+    fun build(
+        name: String, sources: List<Clip>, music: MusicTrack?, o: AutoOptions, scans: Map<String, MomentScan> = emptyMap(),
+        /** Data (ms) di ogni foto e video, per la data della videocamera. */
+        dates: Map<String, Long> = emptyMap(),
+    ): Project {
         val style = o.style
         val rnd = Random(o.seed)
         // Battiti con la loro energia (0 calma … 1 carica), se il brano è stato analizzato.
@@ -449,14 +514,19 @@ object AutoEdit {
             len = len.coerceIn(minOf(minSlot, maxLen), maxLen)
             val dropStart = drops.any { kotlin.math.abs(it - t) < 40_000 }
             var c = if (src.isPhoto) {
-                val inside = beats.filter { it > t + 60_000 && it < t + len - 60_000 }
-                if (e != null && e >= 0.6f && inside.size >= 1) {
+                val loud = e != null && e >= 0.6f
+                // Nelle parti cariche uno scatto su ogni colpo; nei temi delicati un respiro ogni [popEvery] battiti.
+                val every = if (loud) 1 else style.popEvery.coerceAtLeast(1)
+                val inside = beats.filter { it > t + 60_000 && it < t + len - 60_000 }.filterIndexed { k, _ -> (k + 1) % every == 0 }
+                val popScale = if (loud && !style.gentlePops) 0.07f else style.popScale
+                if ((loud || style.gentlePops) && inside.size >= 1) {
                     // Parte carica: la foto fa un piccolo scatto di zoom su ogni colpo.
                     val keys = mutableListOf(Keyframe(0, Transform(scale = 1.0f)))
                     inside.forEachIndexed { k, b ->
                         val local = b - t
-                        keys += Keyframe(local - 10_000, Transform(scale = 1.0f + 0.07f * k))
-                        keys += Keyframe(local + 90_000, Transform(scale = 1.0f + 0.07f * (k + 1)))
+                        val soft = if (loud && !style.gentlePops) 90_000L else 350_000L
+                        keys += Keyframe(local - 10_000, Transform(scale = 1.0f + popScale * k))
+                        keys += Keyframe((local + soft).coerceAtMost(len), Transform(scale = 1.0f + popScale * (k + 1)))
                     }
                     src.copy(trimStartUs = 0, trimEndUs = len, keyframes = keys)
                 } else {
@@ -592,6 +662,18 @@ object AutoEdit {
             if (o.subtitle.isNotBlank()) {
                 texts += TextPreset.ELEGANTE.applyTo(TextItem(text = o.subtitle.trim(), startUs = titleAt + 500_000, durationUs = (dur - 500_000).coerceAtLeast(TextItem.MIN_US)))
                     .copy(size = 0.04f, y = 0.12f, endPose = null, upper = false)
+            }
+        }
+        // Data della videocamera su ogni scena (temi vintage), dalla data vera dello scatto.
+        if (style.dateStamp && dates.isNotEmpty()) {
+            val fmt = java.text.SimpleDateFormat("d MMM yyyy", java.util.Locale.ITALY)
+            val st = p.clipStartsUs()
+            p.clips.forEachIndexed { i, c ->
+                val d = dates[c.uri] ?: return@forEachIndexed
+                if (i < introCount || c.outputUs < TextItem.MIN_US) return@forEachIndexed
+                val label = fmt.format(java.util.Date(d)).replace(".", "").uppercase(java.util.Locale.ITALY)
+                texts += TextPreset.DATA.applyTo(TextItem(text = label, startUs = st[i], durationUs = c.outputUs))
+                    .let { if (p.outputOrientation() == Orientation.PORTRAIT) it.copy(x = 0.22f, y = 0.42f) else it }
             }
         }
         // Chiusura: una scritta negli ultimi secondi (il periodo, o il titolo), mentre l'immagine sfuma.

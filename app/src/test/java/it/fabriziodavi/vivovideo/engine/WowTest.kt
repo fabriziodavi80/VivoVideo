@@ -152,4 +152,21 @@ class WowTest {
             p.clips.dropLast(1).forEach { c -> assertNotNull("$st transizione", c.transitionOut) }
         }
     }
+
+    @Test fun vintageThemesStampTheRealDateAndRomanticPhotosBreathe() {
+        val photos = (0 until 12).map { Clip(id = "p$it", uri = "file:///p$it.jpg", sourceDurationUs = Clip.PHOTO_MAX_US, trimEndUs = 3_000_000, isPhoto = true, width = 4000, height = 3000) }
+        val day = 1_754_000_000_000L // agosto 2025
+        val dates = photos.associate { it.uri to day }
+        val p = AutoEdit.build("Vacanze", photos, music(), AutoOptions(style = AutoStyle.SUPER8, targetUs = 30_000_000), dates = dates)
+        val stamps = p.texts.filter { it.text.endsWith("2025") }
+        assertEquals(p.clips.size, stamps.size)
+        assertTrue(stamps.all { it.font == it.font && it.color == 0xFFFF9F1C.toInt() && it.text.contains("AGO") })
+        assertTrue(p.clips.all { c -> c.fx.any { it.type == FxType.SUPER8 } && c.fx.any { it.type == FxType.FILMFRAME } })
+        // Romantico: anche nella parte calma le foto fanno un piccolo respiro sulle battute.
+        val r = AutoEdit.build("Noi", photos, music(), AutoOptions(style = AutoStyle.ROMANTICO, targetUs = 25_000_000))
+        val calm = r.clips.first()
+        assertTrue(calm.keyframes.size >= 3)
+        assertTrue(calm.keyframes.maxOf { it.value.scale } < 1.2f)
+        assertTrue(r.clips.any { c -> c.fx.any { it.type == FxType.PROMIST } })
+    }
 }

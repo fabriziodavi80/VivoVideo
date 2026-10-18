@@ -788,7 +788,9 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             val scans = smartScans(ctx, clips, o.smart)
             busy = "Montaggio…"
             val name = options.title.ifBlank { "Video automatico" }.take(40)
-            val built = withContext(Dispatchers.Default) { AutoEdit.build(name, clips, music, o, scans) }
+            // Data vera di ogni elemento (per i temi con la data della videocamera), per indirizzo della clip.
+            val dates = picked.mapNotNull { s -> imported[s.uri]?.let { it.uri to s.dateMs } }.toMap()
+            val built = withContext(Dispatchers.Default) { AutoEdit.build(name, clips, music, o, scans, dates) }
             var p = built.copy(auto = AutoRecipe(sources, o, music, round = 1, imported = imported))
             if (clips.any { it.log }) p = p.copy(color = p.color.copy(denoise = 40))
             busy = null
@@ -842,7 +844,8 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             val clips = picked.mapNotNull { imported[it.uri] }
             val scans = smartScans(ctx, clips, o.smart)
             busy = "Nuova proposta…"
-            val built = withContext(Dispatchers.Default) { AutoEdit.build(p.name, clips, r.music, o, scans) }
+            val dates = picked.mapNotNull { s -> imported[s.uri]?.let { it.uri to s.dateMs } }.toMap()
+            val built = withContext(Dispatchers.Default) { AutoEdit.build(p.name, clips, r.music, o, scans, dates) }
             busy = null
             if (built.clips.isEmpty()) { message = "Non sono riuscito a leggere le foto e i video degli album."; return@launch }
             pause()
