@@ -115,12 +115,14 @@ object AutoEdit {
      * Quali elementi usare per stare nella durata: indici in ordine di data, presi a intervalli regolari
      * (così il video racconta tutto il periodo, non solo l'inizio).
      */
-    fun pick(items: List<AutoItem>, style: AutoStyle, targetUs: Long, variant: Int = 0): List<Int> {
+    fun pick(items: List<AutoItem>, style: AutoStyle, targetUs: Long, variant: Int = 0, slotUs: Long? = null): List<Int> {
         if (items.isEmpty()) return emptyList()
         val order = items.indices.sortedBy { items[it].dateMs }
         val videoShare = items.count { it.isVideo }.toFloat() / items.size
+        // Con la musica la scena dura quanto i battiti scelti dallo stile: si conta con quella.
+        val slot = slotUs?.takeIf { it > 0 } ?: style.averageSlotUs(videoShare)
         val wanted = if (targetUs <= 0) MAX_ITEMS
-            else (targetUs / style.averageSlotUs(videoShare).coerceAtLeast(1)).toInt().coerceAtLeast(2)
+            else (targetUs / slot.coerceAtLeast(1)).toInt().coerceAtLeast(2)
         val n = minOf(wanted, order.size, MAX_ITEMS)
         if (n >= order.size) return order
         if (variant == 0 || n < 3) return (0 until n).map { k -> order[(k.toLong() * (order.size - 1) / (n - 1).coerceAtLeast(1)).toInt()] }.distinct()
@@ -144,6 +146,56 @@ object AutoEdit {
      * Monta il video: [sources] sono le clip importate in ordine di data, [music] il brano (facoltativo,
      * con i battiti già trovati). Restituisce il progetto pronto, tutto ritoccabile nell'editor.
      */
+    /** Durata di una scena con la musica (in battiti dello stile), o null se senza musica o con battiti strani. */
+    fun beatSlotUs(style: AutoStyle, music: MusicTrack?): Long? {
+        val beats = music?.beatsUs.orEmpty().filter { it > 0 }
+        val period = beats.zipWithNext { a, b -> b - a }.sorted().let { if (it.isEmpty()) 0L else it[it.size / 2] }
+        return (period * style.beatsPerSlot).takeIf { it in 500_000L..6_000_000L }
+    }
+
+    /**
+     * Porta la durata totale a [targetUs]: toglie le scene in più, oppure allunga quelle che possono
+     * (di battiti interi se c'è il ritmo [periodUs]), e l'ultima finisce esattamente sul bersaglio.
+     */
+    internal fun fit(clips: MutableList<Clip>, targetUs: Long, periodUs: Long, minSlot: Long) {
+        if (clips.isEmpty() || targetUs <= 0) return
+        fun maxLen(c: Clip) = if (c.isPhoto) Clip.PHOTO_MAX_US else c.sourceDurationUs
+        fun withLen(c: Clip, len: Long): Clip {
+            if (c.isPhoto) {
+                val k = len.toDouble() / c.trimmedUs.coerceAtLeast(1)
+                return c.copy(trimStartUs = 0, trimEndUs = len, keyframes = c.keyframes.map { it.copy(timeUs = (it.timeUs * k).toLong()) })
+            }
+            val start = c.trimStartUs.coerceAtMost((c.sourceDurationUs - len).coerceAtLeast(0))
+            return c.copy(trimStartUs = start, trimEndUs = start + len)
+        }
+        var total = clips.sumOf { it.outputUs }
+        // Troppo lungo: via le scene oltre il bersaglio, l'ultima si accorcia.
+        while (clips.size > 1 && total - clips.last().outputUs >= targetUs) { total -= clips.last().outputUs; clips.removeAt(clips.lastIndex) }
+        // Troppo corto: si allunga in proporzione, a battiti interi.
+        var deficit = targetUs - total
+        if (deficit > 0) {
+            repeat(3) {
+                if (deficit <= 0) return@repeat
+                val room = clips.map { (maxLen(it) - it.trimmedUs).coerceAtLeast(0) }
+                val roomSum = room.sum()
+                if (roomSum <= 0) return@repeat
+                for (i in clips.indices) {
+                    if (deficit <= 0) break
+                    var add = minOf(room[i], deficit * room[i] / roomSum + 1)
+                    if (periodUs > 0) add = add / periodUs * periodUs
+                    add = if (periodUs > 0) minOf(add, deficit / periodUs * periodUs) else minOf(add, deficit, room[i])
+                    if (add <= 0) continue
+                    clips[i] = withLen(clips[i], clips[i].trimmedUs + add)
+                    deficit -= add
+                }
+            }
+        }
+        // Il resto (meno di un battito per scena) lo prende l'ultima, che finisce sul bersaglio: i tagli prima restano a tempo.
+        val before = clips.dropLast(1).sumOf { it.outputUs }
+        val lastLen = (targetUs - before).coerceAtMost(maxLen(clips.last()))
+        if (lastLen >= minSlot) clips[clips.lastIndex] = withLen(clips.last(), lastLen)
+    }
+
     fun build(name: String, sources: List<Clip>, music: MusicTrack?, o: AutoOptions, scans: Map<String, MomentScan> = emptyMap()): Project {
         val style = o.style
         val rnd = Random(o.seed)
@@ -189,6 +241,8 @@ object AutoEdit {
             t += len
         }
         if (clips.isEmpty()) return Project(name = name)
+        // Durata richiesta (per esempio "come il brano"): si arriva esattamente lì.
+        fit(clips, o.targetUs, period, minSlot)
 
         // 2. Transizioni (mai due uguali di fila, tranne l'incrociata che è la "normale") ed effetti d'accento.
         var prevT: TransitionType? = null
@@ -237,7 +291,10 @@ object AutoEdit {
         }
         // 5. Musica dall'inizio, sfumata in chiusura.
         val tracks = music?.let {
-            listOf(it.copy(startUs = 0, offsetUs = 0, lengthUs = minOf(it.sourceDurationUs, total), fadeInUs = 300_000, fadeOutUs = minOf(2_500_000L, total / 3)))
+            // Se il video copre tutto il brano, il finale è quello del brano: basta una sfumatura breve.
+            val whole = total >= it.sourceDurationUs - 300_000
+            listOf(it.copy(startUs = 0, offsetUs = 0, lengthUs = minOf(it.sourceDurationUs, total), fadeInUs = 300_000,
+                fadeOutUs = if (whole) minOf(600_000L, total / 3) else minOf(2_500_000L, total / 3)))
         }.orEmpty()
         p = p.copy(texts = texts, music = tracks)
         return p

@@ -3,11 +3,9 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
-- **Copie di sicurezza** (in alto nell'editor → **Progetto**): un file .vivo da tenere dove vuoi (Drive, PC, scheda). **Leggera** (il progetto e i file creati dall'app) o **con tutti i video** (si apre anche su un altro telefono). Si riapre da Home → **Apri una copia**.
-- **File spariti**: se sposti o rinomini un video, in anteprima compare "N file non trovati · Ricollega". L'app li cerca per nome nel telefono, oppure li scegli tu: tagli ed effetti restano.
-- **Modelli di montaggio**: Progetto → **Salva come modello**; poi Home → **Da un modello**, scegli i video e il montaggio è già fatto (durate, velocità, transizioni, effetti, colori, testi, musica).
-- **Font tuoi**: Testo → Stile → **+ Aggiungi font** (.ttf o .otf).
-- Prima: regia intelligente, momento migliore, segui il soggetto, scontorno della persona; fermo immagine, al contrario, stabilizzazione; HDR a 10 bit.
+- **Video automatico, durata "Come il brano"**: ora il video dura esattamente quanto la musica, fino all'ultima nota (prima poteva finire prima e il brano si troncava). Le scene si contano col ritmo del brano e, se servono, si allungano di battiti interi: i tagli restano a tempo. Per un video già fatto basta **Altra proposta**.
+- Anche con una durata fissa (30 s, 1 min…) il video ora arriva esattamente lì.
+- Prima: copie di sicurezza .vivo, ricollegamento dei file spariti, modelli di montaggio, font tuoi; regia intelligente; HDR a 10 bit.
 
 ## Primi passi
 - Dalla schermata dei progetti tocca **Nuovo progetto**: **Scegli foto e video** (fino a 100) oppure **Album interi** (uno o più album, tutto in ordine di data). Lo stesso vale per **+** e **Aggiungi** dentro l'editor.
@@ -44,6 +42,12 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - **Apri una copia** (Home): il progetto torna nella lista; se ce n'è già uno uguale, si chiama "(copia)".
 - **Ricollega**: se un file non si trova più compare l'avviso rosso sull'anteprima. "Cerca nel telefono per nome" li ritrova se li hai spostati di cartella; altrimenti "Scegli" per ciascuno. Funziona anche per i brani e i video sovrapposti.
 - **Modelli**: Salva come modello tiene la struttura del progetto (ogni clip diventa uno "spazio" con la sua durata, velocità, transizione, effetti, colore, inquadratura e movimento) e anche testi, musica, livelli e formato. Da un modello: scegli i video e le foto nell'ordine giusto; per ogni video si prende il momento migliore della durata giusta. Se scegli più elementi degli spazi, il modello si ripete.
+
+## Video automatico
+- Home → **Video automatico**: album, stile, musica, regia, formato, durata, titolo.
+- **Durata**: "Come il brano" (con la musica) fa durare il video esattamente quanto il brano, che finisce col suo finale; le altre durate (30 s, 1 min, …) sono rispettate al decimo di secondo; "Tutto" usa tutto quello che c'è negli album.
+- Con la musica ogni taglio cade su un battito; se le foto e i video sono pochi per la durata, le scene si allungano di battiti interi.
+- **Altra proposta** rifà il montaggio con altre scene e altri tratti, **Stile** lo cambia: tutto resta ritoccabile a mano.
 
 ## Funzioni intelligenti
 - Tutto sul telefono, senza internet: riconoscimento dei volti (con sorrisi e occhi aperti) e della persona.

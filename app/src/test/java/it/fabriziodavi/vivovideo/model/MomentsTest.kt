@@ -66,13 +66,13 @@ class MomentsTest {
         val clips = listOf(v(0, 1080, 1920), v(1, 1080, 1920), v(2, 1920, 1080))
         val good = MomentScan("", 12_000_000, (0..12).map { i -> val t = i * 1_000_000L; if (i < 8) s(t, 15f) else s(t, 500f, faces = 1, smile = 1f, x = 0.7f) })
         val scans = clips.associate { it.uri to good.copy(uri = it.uri) }
-        val p = AutoEdit.build("t", clips, null, AutoOptions(format = VideoFormat.VERTICAL), scans)
+        val p = AutoEdit.build("t", clips, null, AutoOptions(targetUs = 0, format = VideoFormat.VERTICAL), scans)
         p.clips.forEach { c -> assertTrue("inizio ${c.trimStartUs}", c.trimStartUs >= 6_000_000) }
         val wide = p.clips.first { it.width == 1920 }
         assertNotNull(wide.reframe); assertTrue(wide.fill)
         assertTrue(p.clips.filter { it.width == 1080 }.all { it.reframe == null })
         // Senza regia intelligente: come prima.
-        val plain = AutoEdit.build("t", clips, null, AutoOptions(format = VideoFormat.VERTICAL, smart = false), scans)
+        val plain = AutoEdit.build("t", clips, null, AutoOptions(targetUs = 0, format = VideoFormat.VERTICAL, smart = false), scans)
         assertTrue(plain.clips.all { it.reframe == null })
     }
 }

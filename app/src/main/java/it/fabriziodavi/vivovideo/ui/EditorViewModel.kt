@@ -752,11 +752,18 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                 music = readMusic(ctx, musicUri)
                 if (music == null) { busy = null; message = "Questo file audio non si può leggere."; return@launch }
             }
+            // Prima il ritmo: serve a sapere quante scene ci stanno nel brano.
+            val m1 = music
+            if (m1 != null && m1.beatsUs.isEmpty()) {
+                busy = "Analisi del ritmo…"
+                val r = findBeats(ctx, m1)
+                if (r != null) music = m1.copy(beatsUs = r.beatsUs, bpm = r.bpm)
+            }
             val o = music?.let { m -> if (fitMusic) options.copy(targetUs = m.sourceDurationUs) else null } ?: options
             // Le fonti si ricordano (al massimo 1500, distribuite nel tempo) per poter fare altre proposte.
             val all = if (items.size <= 1500) items else (0 until 1500).map { items[(it.toLong() * (items.size - 1) / 1499).toInt()] }
             val sources = all.map { AutoSource(it.uri.toString(), it.isVideo, it.durationMs * 1000, it.dateMs) }
-            val picked = AutoEdit.pick(sources.map { it.item() }, o.style, o.targetUs).map { sources[it] }
+            val picked = AutoEdit.pick(sources.map { it.item() }, o.style, o.targetUs, slotUs = AutoEdit.beatSlotUs(o.style, music)).map { sources[it] }
             if (picked.isEmpty()) { busy = null; message = "Negli album scelti non ci sono foto o video."; return@launch }
             val imported = importSources(ctx, picked, emptyMap())
             val clips = picked.mapNotNull { imported[it.uri] }
@@ -819,7 +826,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch {
             val round = r.round + 1
             val o = r.options.copy(style = style ?: r.options.style, seed = r.options.seed + 7919 * round, variant = round)
-            val picked = AutoEdit.pick(r.sources.map { it.item() }, o.style, o.targetUs, variant = round).map { r.sources[it] }
+            val picked = AutoEdit.pick(r.sources.map { it.item() }, o.style, o.targetUs, variant = round, slotUs = AutoEdit.beatSlotUs(o.style, r.music)).map { r.sources[it] }
             val imported = importSources(ctx, picked, r.imported)
             val clips = picked.mapNotNull { imported[it.uri] }
             val scans = smartScans(ctx, clips, o.smart)

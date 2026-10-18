@@ -32,7 +32,7 @@ class AutoEditTest {
 
     @Test fun buildsAFinishedVideoWithoutMusic() {
         AutoStyle.entries.forEach { s ->
-            val p = AutoEdit.build("Prova", sources(), null, AutoOptions(style = s, title = "Estate", subtitle = "Agosto 2026"))
+            val p = AutoEdit.build("Prova", sources(), null, AutoOptions(targetUs = 0, style = s, title = "Estate", subtitle = "Agosto 2026"))
             assertEquals(12, p.clips.size)
             p.clips.forEachIndexed { i, c ->
                 if (c.isPhoto) {
@@ -63,7 +63,7 @@ class AutoEditTest {
         val beats = (1 until 400).map { it * 500_000L } // 120 BPM
         val m = MusicTrack(id = "m", uri = "content://m", name = "M", sourceDurationUs = 200_000_000, lengthUs = 200_000_000, beatsUs = beats, bpm = 120f)
         AutoStyle.entries.forEach { s ->
-            val p = AutoEdit.build("Ritmo", sources(), m, AutoOptions(style = s))
+            val p = AutoEdit.build("Ritmo", sources(), m, AutoOptions(targetUs = 0, style = s))
             val starts = p.clipStartsUs() + p.durationUs
             starts.drop(1).forEach { t -> assertTrue("$s taglio a $t fuori battito", t % 500_000L == 0L) }
             p.clips.forEach { c -> assertEquals("$s battiti per scena", s.beatsPerSlot * 500_000L, c.outputUs); assertTrue(c.muted) }
@@ -76,11 +76,11 @@ class AutoEditTest {
     }
 
     @Test fun shortVideosAreUsedWholeAndNeverStretched() {
-        val p = AutoEdit.build("Corti", listOf(video(0, 1_000_000), photo(1), video(2, 700_000)), null, AutoOptions(style = AutoStyle.CINEMA))
+        val p = AutoEdit.build("Corti", listOf(video(0, 1_000_000), photo(1), video(2, 700_000)), null, AutoOptions(targetUs = 0, style = AutoStyle.CINEMA))
         assertEquals(1_000_000L, p.clips[0].outputUs)
         assertEquals(700_000L, p.clips[2].outputUs)
         assertTrue(p.clips.all { it.trimEndUs <= it.sourceDurationUs })
-        assertTrue(AutoEdit.build("Vuoto", emptyList(), null, AutoOptions()).clips.isEmpty())
+        assertTrue(AutoEdit.build("Vuoto", emptyList(), null, AutoOptions(targetUs = 0)).clips.isEmpty())
     }
 
     @Test fun dateRanges() {
@@ -102,8 +102,8 @@ class AutoEditTest {
             assertTrue(abs(v.size - first.size) <= 2)                    // durata simile
         }
         // Anche montaggio diverso: transizioni o punto dei video.
-        val a = AutoEdit.build("x", sources(), null, AutoOptions(seed = 7))
-        val b = AutoEdit.build("x", sources(), null, AutoOptions(seed = 7 + 7919 * 2, variant = 2))
+        val a = AutoEdit.build("x", sources(), null, AutoOptions(targetUs = 0, seed = 7))
+        val b = AutoEdit.build("x", sources(), null, AutoOptions(targetUs = 0, seed = 7 + 7919 * 2, variant = 2))
         assertTrue(a.clips.map { it.transitionOut to it.trimStartUs } != b.clips.map { it.transitionOut to it.trimStartUs })
     }
 
@@ -124,11 +124,11 @@ class AutoEditTest {
     @Test fun formatFollowsTheMajorityAndOppositeOnesGetABlurredBackground() {
         fun v(i: Int, w: Int, h: Int) = video(i).copy(width = w, height = h)
         val srcs = listOf(v(0, 1080, 1920), v(1, 1080, 1920), v(2, 1920, 1080), photo(3).copy(width = 3000, height = 4000))
-        val p = AutoEdit.build("Verticale", srcs, null, AutoOptions())
+        val p = AutoEdit.build("Verticale", srcs, null, AutoOptions(targetUs = 0))
         assertEquals(VideoFormat.VERTICAL, p.format)
         assertEquals(listOf(FrameMode.FILL, FrameMode.FILL, FrameMode.BLUR, FrameMode.FILL), p.clips.map { it.frameMode })
         // Formato scelto a mano: orizzontale.
-        val h = AutoEdit.build("Orizzontale", srcs, null, AutoOptions(format = VideoFormat.HORIZONTAL))
+        val h = AutoEdit.build("Orizzontale", srcs, null, AutoOptions(targetUs = 0, format = VideoFormat.HORIZONTAL))
         assertEquals(listOf(FrameMode.BLUR, FrameMode.BLUR, FrameMode.FILL, FrameMode.BLUR), h.clips.map { it.frameMode })
         assertTrue(h.followsPresets())
         // Preimpostazioni diverse: orientamento opposto con bande nere.
@@ -136,5 +136,30 @@ class AutoEditTest {
         assertEquals(FrameMode.FIT, q.clips[0].frameMode)
         assertEquals(VideoFormat.HORIZONTAL, VideoFormat.majority(listOf(v(0, 1920, 1080), v(1, 1080, 1920))))
         assertEquals(Orientation.SQUARE, orientationOf(1000, 1050))
+    }
+
+    /** "Come il brano": il video dura esattamente quanto la musica, con i tagli sempre a tempo. */
+    @Test fun fitsTheWholeSong() {
+        val beats = (1 until 400).map { it * 500_000L } // 120 BPM
+        val song = 95_250_000L
+        val m = MusicTrack(id = "m", uri = "content://m", name = "M", sourceDurationUs = song, lengthUs = song, beatsUs = beats.filter { it < song }, bpm = 120f)
+        AutoStyle.entries.forEach { s ->
+            // Poche scene rispetto al brano: si allungano (a battiti interi).
+            val p = AutoEdit.build("Brano", sources(), m, AutoOptions(style = s, targetUs = song))
+            assertEquals("$s durata", song, p.durationUs)
+            val track = p.music.single()
+            assertEquals("$s musica intera", song, track.lengthUs)
+            assertTrue("$s finale del brano", track.fadeOutUs <= 600_000)
+            p.clipStartsUs().drop(1).forEach { t -> assertTrue("$s taglio a $t fuori battito", t % 500_000L == 0L) }
+        }
+        // Troppe scene: quelle in più si tolgono, e si finisce comunque col brano.
+        val many = (0 until 80).map { if (it % 3 == 0) video(it) else photo(it) }
+        val p = AutoEdit.build("Brano", many, m, AutoOptions(targetUs = song))
+        assertEquals(song, p.durationUs)
+        assertTrue(p.clips.size < 80)
+        // Il numero di scene si stima con il ritmo: 95 s a 2 battiti (1 s) = circa 95 scene.
+        val items = (0 until 500).map { AutoItem(isVideo = false, durationUs = 0, dateMs = it.toLong()) }
+        val n = AutoEdit.pick(items, AutoStyle.ENERGICO, song, slotUs = AutoEdit.beatSlotUs(AutoStyle.ENERGICO, m)).size
+        assertTrue("$n scene", n in 40..200)
     }
 }
