@@ -16,6 +16,7 @@ import it.fabriziodavi.vivovideo.ui.AlbumPickerScreen
 import it.fabriziodavi.vivovideo.ui.SubtitlesScreen
 import androidx.compose.foundation.layout.fillMaxSize
 import it.fabriziodavi.vivovideo.ui.GuideScreen
+import it.fabriziodavi.vivovideo.ui.TestPlanScreen
 import it.fabriziodavi.vivovideo.ui.EditorViewModel
 import it.fabriziodavi.vivovideo.ui.HomeScreen
 import it.fabriziodavi.vivovideo.ui.VivoTheme
@@ -24,6 +25,8 @@ class MainActivity : ComponentActivity() {
     private val vm: EditorViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Diary.init(this)
+        Diary.log("Avvio, versione ${BuildConfig.VERSION_NAME}")
         Safety.install(this)
         super.onCreate(savedInstanceState)
         // Se l'app era caduta, lo si dice (con il dettaglio) e si spengono le funzioni sperimentali coinvolte.
@@ -57,6 +60,7 @@ class MainActivity : ComponentActivity() {
                 androidx.compose.foundation.layout.Box(androidx.compose.ui.Modifier.fillMaxSize()) {
                     when {
                         vm.showGuide -> GuideScreen { vm.showGuide = false }
+                        vm.showTestPlan -> TestPlanScreen(vm)
                         vm.project == null && vm.showAuto -> AutoScreen(vm)
                         vm.project == null -> HomeScreen(vm)
                         else -> EditorScreen(vm)

@@ -88,6 +88,8 @@ import it.fabriziodavi.vivovideo.importPhoto
 import it.fabriziodavi.vivovideo.Safety
 import it.fabriziodavi.vivovideo.readAudioInfo
 import it.fabriziodavi.vivovideo.readVideoInfo
+import it.fabriziodavi.vivovideo.Diary
+import it.fabriziodavi.vivovideo.Diagnostics
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -141,7 +143,11 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     var fullscreen by mutableStateOf(false)
     /** Guida aperta. */
     var showGuide by mutableStateOf(false)
-    var message by mutableStateOf<String?>(null)
+    private var messageState by mutableStateOf<String?>(null)
+    /** Messaggio in basso; finisce anche nel diario (per le segnalazioni). */
+    var message: String?
+        get() = messageState
+        set(v) { messageState = v; if (v != null) Diary.log("Messaggio: $v") }
     var busy by mutableStateOf<String?>(null)
         private set
 
@@ -1686,8 +1692,10 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         private set
     var isPlaying by mutableStateOf(false)
         private set
-    var previewError by mutableStateOf<String?>(null)
-        private set
+    private var previewErrorState by mutableStateOf<String?>(null)
+    var previewError: String?
+        get() = previewErrorState
+        private set(v) { previewErrorState = v; if (v != null) Diary.log("Anteprima: $v") }
     private val handler = Handler(Looper.getMainLooper())
 
     private val ticker = object : Runnable {
@@ -1864,7 +1872,41 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     var exportState by mutableStateOf<ExportState>(ExportState.Idle)
         private set
 
-    private val exporter = Exporter(app, viewModelScope, factory) { exportState = it }
+    private val exporter = Exporter(app, viewModelScope, factory) { s ->
+        when (s) {
+            is ExportState.Done -> Diary.log("Esportazione riuscita: ${s.details}")
+            is ExportState.Failed -> Diary.log("Esportazione fallita: ${s.message}")
+            else -> {}
+        }
+        exportState = s
+    }
+
+    // ---------------- Collaudo e segnalazioni ----------------
+
+    var showTestPlan by mutableStateOf(false)
+
+    /** Prepara il rapporto (con il progetto aperto, se [withProject]) e apre la condivisione per mandarlo. */
+    fun shareReport(note: String, withProject: Boolean = true, extra: String = "") {
+        val ctx = getApplication<Application>()
+        val p = if (withProject) project else null
+        viewModelScope.launch {
+            busy = "Preparo la segnalazione…"
+            val f = withContext(Dispatchers.IO) { runCatching { Diagnostics.write(ctx, Diagnostics.report(ctx, p, note, extra)) } }
+            busy = null
+            f.onSuccess { file ->
+                val uri = androidx.core.content.FileProvider.getUriForFile(ctx, ctx.packageName + ".files", file)
+                val send = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_STREAM, uri)
+                    putExtra(Intent.EXTRA_SUBJECT, "VivoVideo: segnalazione")
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+                runCatching {
+                    ctx.startActivity(Intent.createChooser(send, "Manda la segnalazione").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION))
+                }.onFailure { message = "Non riesco ad aprire la condivisione: ${it.message}" }
+            }.onFailure { message = "Segnalazione non riuscita: ${it.message}" }
+        }
+    }
 
     // ---------------- Dissolvenze preparate per l'anteprima ----------------
 

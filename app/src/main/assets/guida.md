@@ -3,9 +3,9 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
-- **Video automatico, durata "Come il brano"**: ora il video dura esattamente quanto la musica, fino all'ultima nota (prima poteva finire prima e il brano si troncava). Le scene si contano col ritmo del brano e, se servono, si allungano di battiti interi: i tagli restano a tempo. Per un video già fatto basta **Altra proposta**.
-- Anche con una durata fissa (30 s, 1 min…) il video ora arriva esattamente lì.
-- Prima: copie di sicurezza .vivo, ricollegamento dei file spariti, modelli di montaggio, font tuoi; regia intelligente; HDR a 10 bit.
+- **Collaudo** (Home → **Collaudo e segnalazioni**): l'elenco delle prove da fare con i tuoi video prima della versione ufficiale. Ogni prova dice come farla e cosa deve succedere; segna **Funziona** o **Problema** (con due parole).
+- **Segnala un problema** (nel Collaudo, o nell'editor → Progetto): prepara un file di testo da mandarmi, allegandolo nella chat. Dentro: versione, telefono, esito del collaudo, il progetto aperto (senza video), gli ultimi errori e il diario dell'app. Le chiavi dei servizi musicali vengono tolte.
+- Prima: video automatico che dura esattamente quanto il brano; copie di sicurezza, ricollegamento, modelli, font tuoi.
 
 ## Primi passi
 - Dalla schermata dei progetti tocca **Nuovo progetto**: **Scegli foto e video** (fino a 100) oppure **Album interi** (uno o più album, tutto in ordine di data). Lo stesso vale per **+** e **Aggiungi** dentro l'editor.
@@ -175,6 +175,12 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - **HDR 10 bit** (solo se nel progetto ci sono video HDR, HLG, HDR10 o Dolby Vision): il video esportato resta HDR, in H.265. Spento, l'HDR viene convertito in SDR, che si vede bene su ogni schermo. WhatsApp esporta sempre in SDR. Nel risultato la riga **Colore** dice com'è uscito davvero.
 - Il video finito va in galleria, cartella Movies/VivoVideo.
 - **Sperimentale**: "Nel video esportato" attiva dissolvenze incrociate vere e video sovrapposti (acceso di serie).
+
+## Collaudo e segnalazioni
+- Home → **Collaudo e segnalazioni**: le prove sono divise per area (Base, Anteprima, Esportazione, Audio, Testo, Colore, Strumenti, Intelligenti, Progetto). In alto vedi quante ne hai fatte.
+- **Funziona** la segna in arancione; **Problema** chiede cosa non va (bordo rosso). "Salva e segnala" manda subito la segnalazione su quella prova.
+- **Segnala un problema**: scrivi cosa è successo, poi "Prepara e manda" apre la condivisione: salva il file (per esempio in Download o su Drive) e allegalo nella chat con Claude. Meglio farlo subito dopo il problema, con il progetto aperto.
+- "Ricomincia il collaudo" azzera gli esiti (per rifare le prove su una versione nuova).
 
 ## Se qualcosa va storto
 - Se l'app si chiude per un errore, alla riapertura compare un messaggio con il dettaglio: mandane uno screenshot.

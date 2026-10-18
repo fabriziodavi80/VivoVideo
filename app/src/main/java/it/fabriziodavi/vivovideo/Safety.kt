@@ -25,11 +25,15 @@ object Safety {
                     "anteprima avanzata".takeIf { prefs(app).getBoolean("pending_preview", false) },
                     "esportazione avanzata".takeIf { prefs(app).getBoolean("pending_export", false) },
                 )
-                crashFile(app).writeText(
-                    "Versione ${BuildConfig.VERSION_NAME} · thread ${thread.name}" +
-                        (if (pending.isNotEmpty()) " · in corso: ${pending.joinToString()}" else "") +
-                        "\n" + sw.toString().take(6000)
-                )
+                val text = "Versione ${BuildConfig.VERSION_NAME} · thread ${thread.name}" +
+                    (if (pending.isNotEmpty()) " · in corso: ${pending.joinToString()}" else "") +
+                    "\n" + sw.toString().take(6000)
+                crashFile(app).writeText(text)
+                // Storico per le segnalazioni (gli ultimi crash, non solo l'ultimo).
+                val h = Diagnostics.crashHistory(app)
+                h.appendText("\n----- " + java.text.SimpleDateFormat("dd/MM HH:mm:ss", java.util.Locale.ITALY).format(java.util.Date()) + "\n" + text + "\n")
+                if (h.length() > 60_000) h.writeText(h.readText().takeLast(30_000))
+                Diary.log("CRASH: ${e.javaClass.simpleName}: ${e.message}")
             }
             previous?.uncaughtException(thread, e)
         }

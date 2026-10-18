@@ -257,6 +257,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
     var projectMenu by remember { mutableStateOf(false) }
     var naming by remember { mutableStateOf(false) }
     var relinkOpen by remember { mutableStateOf(false) }
+    var reportOpen by remember { mutableStateOf(false) }
     var backupWithMedia by remember { mutableStateOf(false) }
     val backupSaver = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/octet-stream")) { uri ->
         if (uri != null) vm.exportBackup(uri, backupWithMedia)
@@ -702,12 +703,15 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
                         projectMenu = false; backupWithMedia = true; backupSaver.launch(project.name.ifBlank { "progetto" } + ".vivo")
                     }
                     if (vm.missingFiles.isNotEmpty()) MenuRow(VVIcons.Movie, "Ricollega i file spariti") { projectMenu = false; relinkOpen = true }
+                    MenuRow(VVIcons.Help, "Segnala un problema") { projectMenu = false; reportOpen = true }
+                    MenuRow(VVIcons.Check, "Collaudo") { projectMenu = false; vm.showTestPlan = true }
                     Hint("Leggera: il progetto e i file creati dall'app (foto importate, voce, fermi immagine, brani scaricati); i video restano nella galleria. Con tutti i video: si apre anche su un altro telefono.")
                 }
             },
             confirmButton = { TextButton(onClick = { projectMenu = false }) { Text("Chiudi", color = VV.Dim) } },
         )
     }
+    if (reportOpen) ReportDialog(vm, onDismiss = { reportOpen = false })
     if (naming) {
         var name by remember { mutableStateOf(project.name) }
         AlertDialog(

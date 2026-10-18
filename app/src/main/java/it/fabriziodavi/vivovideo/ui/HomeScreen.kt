@@ -97,6 +97,7 @@ fun HomeScreen(vm: EditorViewModel) {
             SecondaryButton("Da un modello", Modifier.weight(1f), onClick = { askTemplate = true })
             SecondaryButton("Apri una copia", Modifier.weight(1f), onClick = { backupOpener.launch(arrayOf("application/octet-stream", "application/zip", "*/*")) })
         }
+        SecondaryButton("Collaudo e segnalazioni", Modifier.fillMaxWidth().padding(bottom = 14.dp), onClick = { vm.showTestPlan = true })
         if (vm.projects.isEmpty()) {
             Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
                 Text(

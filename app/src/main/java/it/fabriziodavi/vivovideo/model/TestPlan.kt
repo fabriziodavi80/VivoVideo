@@ -1,0 +1,135 @@
+package it.fabriziodavi.vivovideo.model
+
+import android.content.Context
+
+/**
+ * Collaudo guidato: le prove da fare sul telefono prima della versione ufficiale.
+ * Ogni prova dice come farla e cosa deve succedere; l'esito (funziona / problema + nota) resta salvato.
+ */
+object TestPlan {
+    data class Item(val id: String, val area: String, val title: String, val how: String, val expect: String)
+
+    val items: List<Item> = listOf(
+        // Base
+        Item("base_import", "Base", "Progetto con video 4K/8K e foto",
+            "Home → Nuovo progetto → scegli 5–6 video (anche 4K a 120 fps o 8K) e qualche foto.",
+            "Le clip compaiono nella timeline con le miniature; nessun errore."),
+        Item("base_edit", "Base", "Tagliare, dividere, spostare, annullare",
+            "Accorcia una clip con le maniglie, Dividi all'indicatore, tieni premuto → Sposta dopo, poi Annulla e Ripeti.",
+            "Ogni modifica si vede subito; Annulla torna indietro di un passo."),
+        Item("base_album", "Base", "Album interi",
+            "Nuovo progetto → Album interi → scegli un album.",
+            "Arrivano tutte le foto e i video dell'album, in ordine di data."),
+        // Anteprima
+        Item("prev_4k", "Anteprima", "Anteprima fluida con video pesanti",
+            "Con un video 4K a 120 fps o 8K, aspetta la scritta \"Preparo le copie leggere…\", poi fai partire l'anteprima.",
+            "Scorre senza scatti; nessun messaggio rosso."),
+        Item("prev_full", "Anteprima", "Schermo intero e barra",
+            "Tocca schermo intero, trascina la barra di avanzamento.",
+            "Il video segue il dito; si torna indietro col tasto Indietro."),
+        Item("prev_cross", "Anteprima", "Dissolvenza incrociata in anteprima",
+            "Transizione Incrociata su un taglio, aspetta qualche secondo (\"Preparo un tratto…\").",
+            "In anteprima le due clip sfumano l'una nell'altra senza salti."),
+        Item("prev_pip", "Anteprima", "Video sovrapposto che si muove",
+            "Livelli → aggiungi un video sopra, aspetta che il tratto sia pronto.",
+            "In anteprima il video sovrapposto si muove (prima è un'immagine ferma)."),
+        // Esportazione
+        Item("exp_4k", "Esportazione", "Esportazione 4K H.265",
+            "Esporta → Pronto per: YouTube 4K → Esporta.",
+            "Finisce senza errori; il video in galleria si vede bene, audio a posto e sincronizzato."),
+        Item("exp_social", "Esportazione", "Reels e WhatsApp",
+            "Esporta con Reels e TikTok, poi con WhatsApp; confronta il peso stimato con quello vero.",
+            "Il peso reale è vicino a quello stimato; il file WhatsApp è leggero."),
+        Item("exp_hdr", "Esportazione", "HDR a 10 bit",
+            "Progetto con un video HDR del telefono → Esporta → HDR 10 bit acceso.",
+            "Nel risultato la riga Colore dice HDR; in galleria il video ha luci piene come l'originale."),
+        Item("exp_long", "Esportazione", "Progetto lungo",
+            "Un progetto di 10 minuti o più (4K) con musica e testi → esporta.",
+            "Arriva in fondo senza chiudersi; durata giusta."),
+        // Audio
+        Item("aud_library", "Audio", "Musica dalla libreria online",
+            "Musica → Libreria online → cerca un genere, ascolta, usa un brano.",
+            "Risultati in pochi secondi, il brano entra nella timeline con il credito."),
+        Item("aud_voice", "Audio", "Voce fuori campo e ducking",
+            "Musica → Voce → registra 10 s parlando, con un brano sotto e il ducking acceso.",
+            "Quando parli la musica si abbassa, poi risale."),
+        Item("aud_beats", "Audio", "Tagli a ritmo",
+            "Musica → Battiti → trova i battiti, poi Ascolta e tocca a tempo.",
+            "I tagli cadono sui colpi della musica."),
+        // Testo
+        Item("txt_styles", "Testo", "Stili e animazioni WOW",
+            "Testo → aggiungi → Stili pronti, prova Glitch, Onda, Oro, Cascata.",
+            "Lo stile scelto si illumina; le animazioni sono fluide anche in anteprima."),
+        Item("txt_subs", "Testo", "Sottotitoli automatici",
+            "Su una clip in cui si parla: Testo → Sottotitoli automatici → Veloce, italiano, Karaoke.",
+            "Le parole sono giuste e a tempo; la parola detta si colora."),
+        Item("txt_font", "Testo", "Font tuoi",
+            "Testo → Stile → + Aggiungi font, scegli un .ttf scaricato.",
+            "Il testo cambia font in anteprima e nel video esportato."),
+        // Colore
+        Item("col_clip", "Colore", "Colore per clip e istogramma",
+            "Colore → Base, Ruote, HSL su una clip; Copia/Applica a tutte.",
+            "L'istogramma segue le modifiche; il video esportato ha gli stessi colori dell'anteprima."),
+        // Strumenti
+        Item("tool_speed", "Strumenti", "Velocità a curva",
+            "Velocità → Curva su un video a 120 fps, esporta.",
+            "Rallenty fluido; l'audio segue (tono naturale)."),
+        Item("tool_freeze", "Strumenti", "Fermo immagine",
+            "Tieni premuta una clip → Fermo immagine all'indicatore.",
+            "Compare una foto di 2 s nitida, uguale al fotogramma."),
+        Item("tool_reverse", "Strumenti", "Al contrario",
+            "Tieni premuta una clip di 10–20 s → Al contrario.",
+            "Il video e l'audio vanno all'indietro; Di nuovo nel verso normale riporta l'originale."),
+        Item("tool_stab", "Strumenti", "Stabilizzazione",
+            "Una clip girata camminando → Inquadra → Stabilizza la clip; prova la Forza.",
+            "L'immagine trema molto meno; lo zoom resta moderato."),
+        Item("tool_multi", "Strumenti", "Selezione multipla e incolla attributi",
+            "Copia attributi da una clip con effetti e colore → Seleziona più clip → Incolla attributi.",
+            "Le clip scelte prendono effetti e colore; un Annulla torna indietro."),
+        // Intelligenti
+        Item("ai_auto", "Intelligenti", "Video automatico con regia intelligente",
+            "Video automatico → 2 album → stile → brano online → durata Come il brano.",
+            "Il video dura quanto il brano, i tagli sono a tempo, le scene sono le parti migliori; Altra proposta ne fa un'altra."),
+        Item("ai_best", "Intelligenti", "Momento migliore",
+            "Accorcia una clip lunga a 3 s → tieni premuto → Momento migliore (anche 2–3 volte).",
+            "Sceglie tratti nitidi e con persone, non quelli mossi."),
+        Item("ai_follow", "Intelligenti", "Segui il soggetto",
+            "Progetto verticale con un video orizzontale di una persona che si muove → Inquadra → Segui il soggetto.",
+            "La persona resta al centro, il movimento dell'inquadratura è morbido."),
+        Item("ai_person", "Intelligenti", "Scontorno della persona",
+            "Clip con una persona → Effetti → Persona → Scontorna, poi Sfoca lo sfondo / colore / bianco e nero.",
+            "Il bordo della persona è pulito (capelli compresi più o meno), lo sfondo cambia; uguale nel video esportato."),
+        // Progetto
+        Item("prj_backup", "Progetto", "Copia di sicurezza",
+            "Progetto → Copia di sicurezza (leggera), salvala; poi Home → Apri una copia.",
+            "Il progetto si riapre identico."),
+        Item("prj_relink", "Progetto", "File spostato",
+            "Sposta in un'altra cartella uno dei video di un progetto, riapri il progetto → Ricollega → Cerca nel telefono.",
+            "Il video viene ritrovato e il progetto torna a posto."),
+        Item("prj_template", "Progetto", "Modello",
+            "Progetto riuscito → Progetto → Salva come modello; Home → Da un modello → scegli altri video.",
+            "Il nuovo progetto ha lo stesso montaggio con i video nuovi."),
+    )
+
+    data class Result(val state: Boolean? = null, val note: String = "")
+
+    /** Esiti salvati sul telefono. */
+    class Store(ctx: Context) {
+        private val p = ctx.getSharedPreferences("collaudo", Context.MODE_PRIVATE)
+
+        fun get(id: String) = Result(
+            state = if (p.contains("s_$id")) p.getBoolean("s_$id", false) else null,
+            note = p.getString("n_$id", "") ?: "",
+        )
+
+        fun all(): Map<String, Result> = items.associate { it.id to get(it.id) }
+
+        fun set(id: String, state: Boolean?, note: String = get(id).note) {
+            val e = p.edit()
+            if (state == null) e.remove("s_$id") else e.putBoolean("s_$id", state)
+            e.putString("n_$id", note).apply()
+        }
+
+        fun reset() = p.edit().clear().apply()
+    }
+}
