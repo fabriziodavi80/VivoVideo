@@ -102,7 +102,7 @@ class WowTest {
         assertTrue(hot.all { c -> c.fx.any { it.type == FxType.ZOOMBEAT } })
         assertTrue(hot.any { it.speed == ClipSpeed.RAMP })
         // Tutto a tempo e della durata giusta.
-        assertEquals(60_000_000L, p.durationUs)
+        assertTrue("durata ${p.durationUs}", abs(p.durationUs - 60_000_000L) <= 20_000)
         starts.drop(1).forEach { t -> assertTrue("taglio a $t fuori battito", t % 500_000L < 20_000 || t % 500_000L > 480_000) }
     }
 

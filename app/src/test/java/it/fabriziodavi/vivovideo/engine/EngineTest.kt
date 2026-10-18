@@ -276,7 +276,7 @@ class EngineTest {
         assertTrue(fx.hitAt(1_300_000) < 0.1f)
         assertEquals(0f, fx.hitAt(900_000), 0f)
         assertTrue(FxType.HIT.onBeats && FxType.PULSE.onBeats && !FxType.BOKEH.onBeats)
-        assertEquals(8, FxType.entries.count { it.category == FxCategory.WOW })
+        assertEquals(14, FxType.entries.count { it.category == FxCategory.WOW })
     }
 
     @Test fun lettersArriveInTurnAndLeave() {

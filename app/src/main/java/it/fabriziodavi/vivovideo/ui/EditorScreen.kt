@@ -206,7 +206,9 @@ val TEXT_TABS = listOf("Stile", "Animazione", "Movimento")
 val LAYER_TABS = listOf("Aspetto", "Forma", "Animazione")
 /** Animazioni per i livelli (quelle lettera per lettera, glitch e luccichio sono solo per i testi). */
 /** Le novità premium in testa alle liste: si vedono subito. */
-val TRANSITIONS_NEW_FIRST: List<TransitionType> = TransitionType.entries.filter { it.premium } + TransitionType.entries.filter { !it.premium }
+// L'incrociata resta la prima (è la più usata), poi le novità.
+val TRANSITIONS_NEW_FIRST: List<TransitionType> = listOf(TransitionType.CROSSFADE) + TransitionType.entries.filter { it.premium } +
+    TransitionType.entries.filter { !it.premium && it != TransitionType.CROSSFADE }
 val PRESETS_NEW_FIRST: List<TextPreset> = TextPreset.entries.filter { it.ordinal >= TextPreset.CINEMA26.ordinal } + TextPreset.entries.filter { it.ordinal < TextPreset.CINEMA26.ordinal }
 val ANIMS_NEW_FIRST: List<TextAnim> = listOf(TextAnim.NONE) + TextAnim.entries.filter { it.ordinal >= TextAnim.BOUNCE.ordinal } +
     TextAnim.entries.filter { it != TextAnim.NONE && it.ordinal < TextAnim.BOUNCE.ordinal }

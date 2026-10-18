@@ -249,7 +249,7 @@ object AutoEdit {
         if (lastLen >= minOf(minSlot, maxOut(clips.last()))) {
             // La curva di velocità arrotonda a passi: si corregge finché la fine cade sul bersaglio.
             var c = withOut(clips.last(), lastLen)
-            repeat(3) { val err = targetUs - before - c.outputUs; if (kotlin.math.abs(err) > 2_000) c = withOut(c, c.outputUs + err) }
+            repeat(5) { val err = targetUs - before - c.outputUs; if (kotlin.math.abs(err) > 2_000) c = withOut(c, (c.outputUs + err).coerceAtMost(maxOut(c))) }
             clips[clips.lastIndex] = c
         }
     }

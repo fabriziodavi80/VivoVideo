@@ -124,11 +124,11 @@ class AutoEditTest {
     @Test fun formatFollowsTheMajorityAndOppositeOnesGetABlurredBackground() {
         fun v(i: Int, w: Int, h: Int) = video(i).copy(width = w, height = h)
         val srcs = listOf(v(0, 1080, 1920), v(1, 1080, 1920), v(2, 1920, 1080), photo(3).copy(width = 3000, height = 4000))
-        val p = AutoEdit.build("Verticale", srcs, null, AutoOptions(targetUs = 0))
+        val p = AutoEdit.build("Verticale", srcs, null, AutoOptions(targetUs = 0, smart = false))
         assertEquals(VideoFormat.VERTICAL, p.format)
         assertEquals(listOf(FrameMode.FILL, FrameMode.FILL, FrameMode.BLUR, FrameMode.FILL), p.clips.map { it.frameMode })
         // Formato scelto a mano: orizzontale.
-        val h = AutoEdit.build("Orizzontale", srcs, null, AutoOptions(targetUs = 0, format = VideoFormat.HORIZONTAL))
+        val h = AutoEdit.build("Orizzontale", srcs, null, AutoOptions(targetUs = 0, format = VideoFormat.HORIZONTAL, smart = false))
         assertEquals(listOf(FrameMode.BLUR, FrameMode.BLUR, FrameMode.FILL, FrameMode.BLUR), h.clips.map { it.frameMode })
         assertTrue(h.followsPresets())
         // Preimpostazioni diverse: orientamento opposto con bande nere.
