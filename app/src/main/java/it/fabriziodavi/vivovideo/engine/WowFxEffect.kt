@@ -48,7 +48,7 @@ class WowFxEffect(
         val UNIFORMS: Map<FxType, String> = mapOf(
             FxType.DREAMY to "uDreamy", FxType.FILM35 to "uFilm35", FxType.DUOPOP to "uDuoPop", FxType.SWEEP to "uSweep",
             FxType.SPLIT3 to "uSplit3", FxType.HOLO to "uHolo", FxType.ZOOMBEAT to "uZoomBeat", FxType.SHAKEBEAT to "uShakeBeat",
-            FxType.RGBBEAT to "uRgbBeat", FxType.FLARE to "uFlare", FxType.DUST to "uDust", FxType.LETTERBOX to "uLetterbox",
+            FxType.RGBBEAT to "uRgbBeat", FxType.FLARE to "uFlare", FxType.DUST to "uDust", FxType.LETTERBOX to "uLetterbox", FxType.IMPACT to "uImpact",
         )
 
         fun needed(fx: List<ClipFx>) = fx.any { it.type.wow2 && it.amount > 0f }
@@ -60,7 +60,7 @@ uniform vec2 uRes;
 uniform float uTime;
 uniform float uSeed;
 uniform float uDreamy, uFilm35, uDuoPop, uSweep, uSplit3, uHolo, uZoomBeat, uShakeBeat, uRgbBeat;
-uniform float uFlare, uDust, uLetterbox;
+uniform float uFlare, uDust, uLetterbox, uImpact;
 uniform float uLocal;
 varying vec2 vUv;
 
@@ -88,21 +88,21 @@ void main() {
     sep = smoothstep(0.0, 0.012, f) * smoothstep(0.0, 0.012, 1.0 - f);
     if (cell != 1.0) sep *= 0.82;
   }
-  // Zoom a ritmo: spinta in avanti sul colpo, con scia radiale.
+  // Zoom a ritmo: spinta in avanti sul colpo, con scia radiale (l'Impatto ne fa una più forte).
   vec2 c = uv - 0.5;
-  float z = 1.0 + 0.18 * uZoomBeat;
+  float z = 1.0 + 0.18 * uZoomBeat + 0.28 * uImpact;
   uv = c / z + 0.5;
   // Scossa a ritmo: scatto in una direzione diversa a ogni colpo.
-  if (uShakeBeat > 0.0) {
+  if (uShakeBeat > 0.0 || uImpact > 0.0) {
     float a = hash(vec2(uSeed, 3.1)) * 6.2831;
-    uv += vec2(cos(a), sin(a) * aspect) * 0.035 * uShakeBeat;
+    uv += vec2(cos(a), sin(a) * aspect) * (0.035 * uShakeBeat + 0.05 * uImpact);
   }
   vec3 col;
-  if (uZoomBeat > 0.02 || uShakeBeat > 0.02) {
+  if (uZoomBeat > 0.02 || uShakeBeat > 0.02 || uImpact > 0.02) {
     col = vec3(0.0);
     for (int i = 0; i < 8; i++) {
       float k = float(i) / 7.0;
-      col += tex(uv - (uv - 0.5) * k * 0.06 * uZoomBeat - vec2(0.012, 0.0) * k * uShakeBeat);
+      col += tex(uv - (uv - 0.5) * k * (0.06 * uZoomBeat + 0.1 * uImpact) - vec2(0.012, 0.0) * k * uShakeBeat);
     }
     col /= 8.0;
   } else col = tex(uv);
@@ -191,6 +191,11 @@ void main() {
     float h = target * smoothstep(0.0, 0.5, uLocal);
     col *= step(h, vUv.y) * step(h, 1.0 - vUv.y);
   }
+  // Impatto: lampo e contrasto sul colpo.
+  if (uImpact > 0.0) {
+    col = mix(col, (col - 0.5) * 1.35 + 0.5, uImpact);
+    col += vec3(0.35) * uImpact * uImpact;
+  }
   col *= sep;
   gl_FragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
 }
@@ -226,6 +231,7 @@ private class WowProgram(private val effect: WowFxEffect, useHdr: Boolean) : Bas
                     FxType.ZOOMBEAT -> effect.beatAt(presentationTimeUs, 0.14f)
                     FxType.SHAKEBEAT -> effect.beatAt(presentationTimeUs, 0.09f)
                     FxType.RGBBEAT -> effect.beatAt(presentationTimeUs, 0.1f)
+                    FxType.IMPACT -> effect.beatAt(presentationTimeUs, 0.11f)
                     else -> 1f
                 }
                 program.setFloatsUniform(name, floatArrayOf(a))

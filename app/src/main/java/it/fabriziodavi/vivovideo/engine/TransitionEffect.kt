@@ -49,6 +49,7 @@ class TransitionEffect(
         val swirl: Float = 0f, val warp: Float = 0f, val burn: Float = 0f, val cube: Float = 0f, val luma: Float = 0f,
         val rgb: Float = 0f, val shiftY: Float = 0f,
         val tear: Float = 0f, val burst: Float = 0f, val lens: Float = 0f, val stripes: Float = 0f, val shutter: Float = 0f,
+        val speedLines: Float = 0f, val smash: Float = 0f,
     )
 
     /** Numero pseudo-casuale stabile in -0,5…0,5 dato un seme. */
@@ -90,6 +91,8 @@ class TransitionEffect(
         TransitionType.BURST -> Params(burst = e, zoom = 1f + 0.5f * e * e, blur = 0.03f * e, blurMode = 2, white = e * e * e * e)
         TransitionType.LENS -> Params(lens = e, zoom = 1f + 0.3f * e * e, prism = 0.5f * e)
         TransitionType.STRIPES -> Params(stripes = (if (entering) -1f else 1f) * e, white = 0.3f * e * e * e * e)
+        TransitionType.SPEEDZOOM -> Params(speedLines = e, zoom = 1f + 1.1f * e * e, blur = 0.08f * e, blurMode = 2, prism = 0.4f * e, white = 0.35f * e * e * e * e * e)
+        TransitionType.SMASH -> Params(smash = e, zoom = 1f + 0.7f * e * e * e, shift = jitter(seed, 7) * 0.03f * e, white = 0.9f * e * e * e * e * e * e)
         TransitionType.SHUTTER -> Params(shutter = e, zoom = 1f + 0.12f * e, white = if (e > 0.97f) 0.8f else 0f)
     }
 }
@@ -138,6 +141,8 @@ private class TransitionProgram(private val effect: TransitionEffect, useHdr: Bo
             program.setFloatsUniform("uLens", floatArrayOf(p.lens))
             program.setFloatsUniform("uStripes", floatArrayOf(p.stripes))
             program.setFloatsUniform("uShutter", floatArrayOf(p.shutter))
+            program.setFloatsUniform("uSpeedLines", floatArrayOf(p.speedLines))
+            program.setFloatsUniform("uSmash", floatArrayOf(p.smash))
             program.bindAttributesAndUniforms()
             GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
         } catch (e: GlUtil.GlException) {
@@ -188,6 +193,8 @@ uniform float uBurst;
 uniform float uLens;
 uniform float uStripes;
 uniform float uShutter;
+uniform float uSpeedLines;
+uniform float uSmash;
 varying vec2 vTexSamplingCoord;
 
 float hash(vec2 p) {
@@ -255,6 +262,24 @@ void main() {
     if (uv.y > line) { uv.y -= open; if (uv.y < line) gap = 1.0; }
     else { uv.y += open; if (uv.y > line) gap = 1.0; }
   }
+  // Sfondamento: crepe che partono dal centro, i pezzi si spostano verso l'esterno.
+  float crack = 0.0;
+  if (uSmash > 0.0) {
+    vec2 q = uv - 0.5; q.x *= uAspect;
+    float ang = atan(q.y, q.x);
+    float sector = floor((ang + 3.1416) / 6.2832 * 11.0);
+    float rr = length(q);
+    float ring = floor(rr * 7.0 + hash(vec2(sector, 2.0)) * 0.8);
+    vec2 cellId = vec2(sector, ring);
+    vec2 push = normalize(q + 1e-4) * uSmash * uSmash * (0.04 + 0.08 * hash(cellId));
+    float a = (hash(cellId + 5.0) - 0.5) * 0.25 * uSmash * uSmash;
+    q -= push;
+    q = vec2(cos(a) * q.x - sin(a) * q.y, sin(a) * q.x + cos(a) * q.y);
+    float edgeA = abs(fract((ang + 3.1416) / 6.2832 * 11.0) - 0.5);
+    float edgeR = abs(fract(rr * 7.0 + hash(vec2(sector, 2.0)) * 0.8) - 0.5);
+    crack = (1.0 - smoothstep(0.0, 0.03, 0.5 - max(edgeA, edgeR))) * smoothstep(0.05, 0.4, uSmash);
+    q.x /= uAspect; uv = q + 0.5;
+  }
   // Cubo 3D: la faccia ruota via, con prospettiva (fuori dalla faccia è nero).
   if (uCube != 0.0) {
     float k = abs(uCube);
@@ -312,6 +337,15 @@ void main() {
     float m = smoothstep(h - 0.004, h, uv.y) * smoothstep(h - 0.004, h, 1.0 - uv.y);
     acc *= m;
   }
+  // Linee di velocità: strisce radiali bianche che scorrono verso l'esterno.
+  if (uSpeedLines > 0.0) {
+    vec2 q = vTexSamplingCoord - 0.5; q.x *= uAspect;
+    float ang = atan(q.y, q.x);
+    float lines = step(0.82, hash(vec2(floor(ang * 60.0), floor(uSeed * 0.5))));
+    float fall = smoothstep(0.15, 0.7, length(q));
+    acc = mix(acc, vec3(1.0), lines * fall * uSpeedLines * 0.85);
+  }
+  acc = mix(acc, vec3(1.0), crack * 0.85);
   // Nella fessura dello strappo si vede il bianco.
   acc = mix(acc, vec3(1.0, 0.98, 0.94), gap);
   // Schiaffo RGB: canali spostati di molto, con righe di scansione.

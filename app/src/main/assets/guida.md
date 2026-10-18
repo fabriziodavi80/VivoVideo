@@ -5,8 +5,9 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 ## Novità di questa versione
 - **Video automatico da trailer**: **intro a raffica** (8 lampi di scene su mezzi battiti, poi il titolo sul colpo), **momento eroe** sul drop (la scena rallenta al centro, con zoom e colpo), **finale** con rallenty, sfumatura e scritta di chiusura (il periodo o il titolo). Le foto nelle parti cariche fanno uno scatto di zoom su ogni colpo.
 - **Look colore per ogni tema**, uguale su tutte le scene: teal & orange da cinema, vintage caldo, pastello da sogno, neon notturno, colori estivi pieni…
-- **4 temi nuovi**: **Blockbuster** (trailer da cinema), **Neon notte**, **Estate pop**, **Azione** (sport e avventura). In tutto 11 temi.
-- **5 transizioni d'impatto**: Strappo, Esplosione di luce, Lente, Strisce, Otturatore.
+- **5 temi nuovi**: **Blockbuster** (trailer da cinema), **Neon notte**, **Estate pop**, **Azione** (sport e avventura) ed **Estremo** (bike, MTB, corsa, GoPro: accelerazioni a proiettile su ogni video, impatti sui colpi). In tutto 12 temi.
+- **7 transizioni d'impatto**: Strappo, Esplosione di luce, Lente, Strisce, Otturatore, **Scatto di velocità** (zoom con linee di velocità), **Sfondamento** (il quadro si crepa e si sfonda).
+- **Impatto a ritmo** (Effetti → A ritmo): zoom, scossa, contrasto e lampo su ogni colpo, come un "fermo d'impatto".
 - **3 effetti**: Bagliore anamorfico, Polvere di pellicola, Bande cinema (entrano a inizio scena).
 - Prima: pacchetto premium (transizioni, effetti a ritmo, testi animati), energia del brano, collaudo e segnalazioni.
 
@@ -52,7 +53,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - Con la musica ogni taglio cade su un battito; se le foto e i video sono pochi per la durata, le scene si allungano di battiti interi.
 - **Energia del brano**: l'app sente dove la musica è calma (scene più lunghe, passaggi morbidi, rallenty) e dove spinge (un taglio a ogni colpo, zoom e scosse a ritmo, accelerazioni); sul drop mette un taglio esatto con una transizione d'impatto.
 - **Orientamento**: il formato segue le foto e i video più numerosi; quelli girati nell'altro verso seguono le persone (regia intelligente) o, se sono foto, si attraversano con una panoramica; lo sfondo sfocato resta solo se non c'è un soggetto chiaro.
-- **Temi**: Cinema, Energico, Reel virale, Ricordi, Sogno, Elegante, Viaggio, Blockbuster, Neon notte, Estate pop, Azione. Ognuno ha il suo look colore, le sue transizioni (morbide nelle parti calme, d'impatto sui colpi) e il suo titolo.
+- **Temi**: Cinema, Energico, Reel virale, Ricordi, Sogno, Elegante, Viaggio, Blockbuster, Neon notte, Estate pop, Azione, Estremo. Ognuno ha il suo look colore, le sue transizioni (morbide nelle parti calme, d'impatto sui colpi) e il suo titolo.
 - **Struttura**: con la musica, i temi più dinamici aprono con un'**intro a raffica** e il titolo sul colpo; sul drop c'è il **momento eroe**; il **finale** rallenta e chiude con una scritta (il periodo indicato sotto il titolo, o il titolo).
 - **Altra proposta** rifà il montaggio con altre scene e altri tratti, **Stile** lo cambia: tutto resta ritoccabile a mano.
 

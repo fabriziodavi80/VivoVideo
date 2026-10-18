@@ -33,6 +33,10 @@ enum class AutoStyle(
     val intro: Boolean = false,
     /** Momento eroe sul drop: rallenty al centro della scena, zoom e colpo. */
     val hero: Boolean = false,
+    /** Ogni quanti video (nelle parti cariche) c'è un'accelerazione a tempo. */
+    val rampEvery: Int = 2,
+    /** Curve di velocità preferite per le accelerazioni. */
+    val rampStyles: List<SpeedPreset> = listOf(SpeedPreset.MONTAGE, SpeedPreset.BULLET, SpeedPreset.FLASH_IN, SpeedPreset.HERO),
 ) {
     CINEMA(
         "Cinema", "Solenne: look da film, messa a fuoco del titolo, dissolvenze di luce e pellicola, rallenty sui momenti calmi.",
@@ -178,11 +182,27 @@ enum class AutoStyle(
         fx = listOf(ClipFx(FxType.VIVID, 0.25f)),
         accents = listOf(ClipFx(FxType.SPEEDLINES, 0.55f), ClipFx(FxType.SHAKEBEAT, 0.5f)),
         title = TextPreset.ESPLOSIONE,
-        impact = listOf(TransitionType.PUNCH, TransitionType.SHAKE, TransitionType.TEAR, TransitionType.BURST),
+        impact = listOf(TransitionType.SPEEDZOOM, TransitionType.PUNCH, TransitionType.SHAKE, TransitionType.TEAR, TransitionType.SMASH),
         beatFx = listOf(ClipFx(FxType.SHAKEBEAT, 0.5f), ClipFx(FxType.ZOOMBEAT, 0.5f)),
         ramps = true,
         grade = Grade(contrast = 0.3f, saturation = 0.1f, highlights = -0.15f, shadowWheel = Wheel(200f, 0.3f)),
         intro = true, hero = true,
+    ),
+    ESTREMO(
+        "Estremo", "Bike, MTB, corsa, GoPro: accelerazioni a proiettile su ogni video, impatti sui colpi, scatti di velocità e sfondamenti sul drop.",
+        photoUs = 1_200_000, videoUs = 1_500_000, beatsPerSlot = 2,
+        transitions = listOf(TransitionType.WHIP, TransitionType.SPEEDZOOM, TransitionType.LENS, TransitionType.SLIDE_UP, TransitionType.ZOOM),
+        transitionUs = 280_000,
+        fx = listOf(ClipFx(FxType.VIVID, 0.3f)),
+        accents = listOf(ClipFx(FxType.SPEEDLINES, 0.6f), ClipFx(FxType.FISHEYE, 0.25f), ClipFx(FxType.RGBBEAT, 0.5f)),
+        title = TextPreset.ESPLOSIONE,
+        impact = listOf(TransitionType.SMASH, TransitionType.SPEEDZOOM, TransitionType.PUNCH, TransitionType.TEAR, TransitionType.SHAKE),
+        beatFx = listOf(ClipFx(FxType.IMPACT, 0.6f)),
+        ramps = true, slowmo = true,
+        grade = Grade(contrast = 0.35f, saturation = 0.12f, vibrance = 0.2f, highlights = -0.2f, shadows = -0.08f, shadowWheel = Wheel(205f, 0.35f), highWheel = Wheel(40f, 0.2f)),
+        intro = true, hero = true,
+        rampEvery = 1,
+        rampStyles = listOf(SpeedPreset.BULLET, SpeedPreset.FLASH_IN, SpeedPreset.MONTAGE),
     );
 
     /** Durata media di una scena, per scegliere quanti elementi usare. */
@@ -358,7 +378,7 @@ object AutoEdit {
         var t = 0L
         var prevMotion: MotionStyle? = null
         var videoN = 0
-        val rampPresets = listOf(SpeedPreset.MONTAGE, SpeedPreset.BULLET, SpeedPreset.FLASH_IN, SpeedPreset.HERO)
+        val rampPresets = style.rampStyles
 
         /** Velocità a curva con la durata finale [out]: quanto materiale serve (null se il video è troppo corto). */
         fun rampNeed(src: Clip, preset: SpeedPreset, out: Long): Long? {
@@ -402,7 +422,12 @@ object AutoEdit {
         }
         val introUs = t
 
-        sources.forEach { src ->
+        // Con la musica, se le scene non bastano per la durata, si riprendono le stesse (con altri tratti) seguendo il brano:
+        // così intro, drop e ritmo restano dove devono, invece di allungare tutto.
+        var pass = 0
+        while (true) {
+        for (src in sources) {
+            if (pass > 0 && t >= o.targetUs) break
             val e = energyAt(t)
             val bps = when {
                 e == null -> style.beatsPerSlot
@@ -451,8 +476,8 @@ object AutoEdit {
                     speed = ClipSpeed.RAMP; points = SpeedPreset.HERO.points; need = heroNeed
                 } else if (style.slowmo && src.fps >= 90f && (e == null || e < 0.55f) && rnd.nextFloat() < 0.65f && len * 0.5 <= src.sourceDurationUs) {
                     speed = ClipSpeed.SLOW; need = len / 2
-                } else if (style.ramps && e != null && e >= 0.6f && videoN % 2 == 0 && src.fps >= 50f) {
-                    val preset = rampPresets[(videoN / 2 + o.variant) % rampPresets.size]
+                } else if (style.ramps && e != null && e >= 0.6f && videoN % style.rampEvery.coerceAtLeast(1) == 0 && src.fps >= 50f) {
+                    val preset = rampPresets[(videoN / style.rampEvery.coerceAtLeast(1) + o.variant) % rampPresets.size]
                     val r = SpeedCurve.forClip(ClipSpeed.RAMP, 1_000_000L, preset.points).outputDurationUs() / 1e6
                     var n = (len / r).toLong()
                     // La curva lavora a passi: si corregge il materiale finché la durata torna col battito.
@@ -466,7 +491,7 @@ object AutoEdit {
                 val start = if (scan != null) {
                     // Il tratto migliore (dalle proposte successive, il secondo o il terzo).
                     val best = Moments.bestStarts(scan, need, 3)
-                    best[o.variant % best.size].coerceIn(0, (src.sourceDurationUs - need).coerceAtLeast(0))
+                    best[(o.variant + pass) % best.size].coerceIn(0, (src.sourceDurationUs - need).coerceAtLeast(0))
                 } else {
                     val pos = if (o.variant == 0) 0.4 else 0.2 + rnd.nextDouble() * 0.45
                     ((src.sourceDurationUs - need) * pos).toLong().coerceAtLeast(0)
@@ -475,8 +500,12 @@ object AutoEdit {
             }
             c = c.copy(muted = music != null || c.muted, fx = style.fx, fadeInUs = 0, fadeOutUs = 0, transitionOut = null, grade = style.grade)
             if (dropStart) c = c.copy(fx = c.fx + ClipFx(FxType.ZOOMBEAT, 0.8f))
+            if (pass > 0) c = c.copy(id = java.util.UUID.randomUUID().toString())
             clips += c
             t += c.outputUs
+        }
+        pass++
+        if (music == null || beats.isEmpty() || o.targetUs <= 0 || t >= o.targetUs - minSlot || pass >= 6 || sources.isEmpty()) break
         }
         if (clips.isEmpty()) return Project(name = name)
         // Durata richiesta (per esempio "come il brano"): si arriva esattamente lì (l'intro resta com'è).

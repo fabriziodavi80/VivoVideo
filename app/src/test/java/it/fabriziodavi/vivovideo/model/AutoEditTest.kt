@@ -50,8 +50,9 @@ class AutoEditTest {
             }
             if (s.accents.isNotEmpty()) assertTrue("$s accenti", p.clips[1].fx.size > s.fx.size)
             assertTrue(p.clips.first().fadeInUs > 0 && p.clips.last().fadeOutUs > 0)
-            assertEquals(2, p.texts.size)
+            assertEquals(3, p.texts.size) // titolo, sottotitolo e chiusura
             assertEquals("Estate", p.texts[0].text)
+            assertEquals("Agosto 2026", p.texts.last().text)
             assertEquals(s.title, TextPreset.matching(p.texts[0]))
             assertTrue(p.music.isEmpty())
             // Le dissolvenze incrociate hanno sempre fotogrammi oltre il taglio (foto o video presi dal mezzo).
