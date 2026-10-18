@@ -281,19 +281,23 @@ enum class AutoStyle(
         intro = true, dateStamp = true,
     ),
     NATURA(
-        "Natura", "Verdi e azzurri ricchi, foschia leggera, raggi di sole, scene lunghe e passaggi morbidi; rallenty e foto che respirano.",
+        "Natura", "Verdi e azzurri ricchi, foschia leggera, scene lunghe, passaggi morbidi senza lampi; rallenty e foto che scorrono piano.",
         photoUs = 3_400_000, videoUs = 3_600_000, beatsPerSlot = 4,
-        transitions = listOf(TransitionType.CROSSFADE, TransitionType.CROSSFADE, TransitionType.LUMA, TransitionType.LIQUID, TransitionType.LEAK),
+        // Niente passaggi con il lampo bianco (Luce, Luce che dissolve, Bokeh): solo dissolvenze, sfocature e liquido.
+        transitions = listOf(TransitionType.CROSSFADE, TransitionType.CROSSFADE, TransitionType.BLUR, TransitionType.LIQUID),
         transitionUs = 1_100_000,
         fx = listOf(ClipFx(FxType.SKYGRAD, 0.35f)),
-        accents = listOf(ClipFx(FxType.HAZE, 0.4f), ClipFx(FxType.RAYS, 0.35f), ClipFx(FxType.DREAMY, 0.25f)),
+        // Niente aloni né raggi: solo foschia e una vignettatura leggera.
+        accents = listOf(ClipFx(FxType.HAZE, 0.3f), ClipFx(FxType.VIGNETTE, 0.3f)),
         title = TextPreset.ELEGANTE,
-        impact = listOf(TransitionType.LUMA, TransitionType.BOKEHFADE, TransitionType.LIQUID),
-        beatFx = listOf(ClipFx(FxType.GLOWBEAT, 0.25f)),
+        impact = listOf(TransitionType.CROSSFADE, TransitionType.BLUR, TransitionType.LIQUID),
+        // Niente effetti a ritmo: nessun bagliore che pulsa.
+        beatFx = emptyList(),
         slowmo = true,
         grade = Grade(contrast = 0.08f, shadows = 0.1f, vibrance = 0.3f, temperature = 0.08f,
             hsl = List(8) { if (it == HslBand.GREEN.ordinal) Hsl(hue = -0.15f, sat = 0.15f, lum = -0.1f) else if (it == HslBand.BLUE.ordinal) Hsl(sat = 0.2f, lum = -0.1f) else Hsl() }),
-        gentlePops = true, popEvery = 4, popScale = 0.03f,
+        // Foto con panoramiche e zoom lenti e continui, non piccoli zoom a scatti sui battiti.
+        gentlePops = false,
         minSceneUs = 3_200_000, shorterOnEnergy = false,
     ),
     MARE(
@@ -346,6 +350,9 @@ enum class AutoStyle(
 
     /** Durata media di una scena, per scegliere quanti elementi usare. */
     fun averageSlotUs(videoShare: Float): Long = (photoUs * (1 - videoShare) + videoUs * videoShare).toLong()
+
+    /** Tema calmo (restano distesi anche dove il brano spinge): niente colpi di zoom e lampi sui drop, niente scatti sulle foto. */
+    val calm: Boolean get() = !shorterOnEnergy
 }
 
 /** Un elemento della galleria candidato al video automatico. */
@@ -640,7 +647,8 @@ object AutoEdit {
             len = len.coerceIn(minOf(minSlot, maxLen), maxLen)
             val dropStart = drops.any { kotlin.math.abs(it - t) < 40_000 }
             var c = if (src.isPhoto) {
-                val loud = e != null && e >= 0.6f
+                // I temi calmi non fanno scatti sulle foto nemmeno dove il brano spinge.
+                val loud = e != null && e >= 0.6f && !style.calm
                 // Nelle parti cariche uno scatto su ogni colpo; nei temi delicati un respiro ogni [popEvery] battiti.
                 val every = if (loud) 1 else style.popEvery.coerceAtLeast(1)
                 val inside = beats.filter { it > t + 60_000 && it < t + len - 60_000 }.filterIndexed { k, _ -> (k + 1) % every == 0 }
@@ -695,7 +703,7 @@ object AutoEdit {
                 src.copy(trimStartUs = start, trimEndUs = start + need, speed = speed, speedPoints = points, keyframes = emptyList())
             }
             c = c.copy(muted = music != null || c.muted, fx = style.fx, fadeInUs = 0, fadeOutUs = 0, transitionOut = null, grade = style.grade)
-            if (dropStart) c = c.copy(fx = c.fx + ClipFx(FxType.ZOOMBEAT, 0.8f))
+            if (dropStart && !style.calm) c = c.copy(fx = c.fx + ClipFx(FxType.ZOOMBEAT, 0.8f))
             if (pass > 0) c = c.copy(id = java.util.UUID.randomUUID().toString())
             clips += c
             t += c.outputUs
@@ -734,13 +742,14 @@ object AutoEdit {
                 val choices = list.filter { it != prevT || it == TransitionType.CROSSFADE }.ifEmpty { list }
                 val type = if (isDrop) style.impact.first() else choices.random(rnd)
                 prevT = type
-                val dur = if (strong) minOf(style.transitionUs, 400_000L) else style.transitionUs
+                // Nei temi calmi anche i passaggi sui colpi restano lenti.
+                val dur = if (strong && !style.calm) minOf(style.transitionUs, 400_000L) else style.transitionUs
                 c = c.copy(transitionOut = TransitionSpec(type, minOf(dur, c.outputUs / 2, clips[i + 1].outputUs / 2)))
             }
             // Effetti a ritmo nelle parti cariche; sul drop un colpo in più.
             val eMid = energyAt(starts[i] + c.outputUs / 2)
             if (eMid != null && eMid >= 0.6f && style.beatFx.isNotEmpty()) c = c.copy(fx = c.fx.filter { f -> style.beatFx.none { it.type == f.type } } + style.beatFx)
-            if (drops.any { kotlin.math.abs(it - starts[i]) < 40_000 }) c = c.copy(fx = c.fx.filter { it.type != FxType.HIT } + ClipFx(FxType.HIT, 0.8f))
+            if (!style.calm && drops.any { kotlin.math.abs(it - starts[i]) < 40_000 }) c = c.copy(fx = c.fx.filter { it.type != FxType.HIT } + ClipFx(FxType.HIT, 0.8f))
             if (style.accents.isNotEmpty() && i % 3 == 1 + (o.variant % 2)) {
                 val a = style.accents[(i / 3) % style.accents.size]
                 c = c.copy(fx = c.fx.filter { it.type != a.type } + a)

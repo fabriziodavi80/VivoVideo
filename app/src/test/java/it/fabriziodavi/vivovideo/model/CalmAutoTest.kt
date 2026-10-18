@@ -32,6 +32,43 @@ class CalmAutoTest {
         assertFalse(all.any { it.type == FxType.LEAVES })
     }
 
+    @Test fun naturaHasNoFlashesOrPulsingGlow() {
+        val st = AutoStyle.NATURA
+        val flashy = setOf(TransitionType.LUMA, TransitionType.LEAK, TransitionType.BOKEHFADE, TransitionType.FLASH,
+            TransitionType.BURST, TransitionType.PUNCH, TransitionType.SMASH, TransitionType.TEAR, TransitionType.SPEEDZOOM)
+        assertTrue((st.transitions + st.impact).none { it in flashy })
+        val glow = setOf(FxType.DREAMY, FxType.RAYS, FxType.GLOW, FxType.GLOWBEAT, FxType.FLARE, FxType.SPARKLE, FxType.ZOOMBEAT, FxType.HIT)
+        assertTrue((st.fx + st.accents + st.beatFx).none { it.type in glow })
+        assertTrue(st.beatFx.isEmpty())
+        assertFalse(st.gentlePops)
+        assertTrue(st.impact.isNotEmpty()) // serve per i drop
+    }
+
+    /** Brano veloce con un ritornello che attacca (drop) a metà. */
+    private fun songWithDrop(): MusicTrack {
+        val beats = (1 until 250).map { it * 400_000L }
+        return MusicTrack(id = "d", uri = "content://d", name = "D", sourceDurationUs = 100_000_000, lengthUs = 100_000_000,
+            beatsUs = beats, bpm = 150f, energy = beats.mapIndexed { i, _ -> if (i in 60..120) 0.95f else 0.2f })
+    }
+
+    @Test fun calmThemesNeverPunchOnDropsOrSnapPhotos() {
+        val photos = (0 until 30).map { Clip(id = "p$it", uri = "file:///p$it.jpg", sourceDurationUs = Clip.PHOTO_MAX_US, trimEndUs = 3_000_000, isPhoto = true, width = 4000, height = 3000) }
+        val vids = (0 until 10).map { Clip(id = "v$it", uri = "content://v/$it", sourceDurationUs = 20_000_000, trimEndUs = 20_000_000, width = 1920, height = 1080, fps = 30f) }
+        val beatTypes = setOf(FxType.HIT, FxType.ZOOMBEAT, FxType.GLOWBEAT, FxType.SHAKEBEAT, FxType.RGBBEAT, FxType.IMPACT)
+        val p = AutoEdit.build("Natura", photos + vids, songWithDrop(), AutoOptions(style = AutoStyle.NATURA, targetUs = 60_000_000, intro = false))
+        assertTrue(p.clips.size > 5)
+        p.clips.forEachIndexed { i, c ->
+            assertTrue("effetto a ritmo in ${c.id}: ${c.fx}", c.fx.none { it.type in beatTypes })
+            // Foto: un solo movimento lento dall'inizio alla fine (due keyframe), nessuno scatto sui battiti.
+            if (c.isPhoto) assertTrue("scatti in ${c.id}: ${c.keyframes.size}", c.keyframes.size <= 2)
+            // Passaggi lenti anche dove il brano spinge (le ultime due scene possono essere accorciate).
+            if (i < p.clips.size - 2) c.transitionOut?.let { assertTrue("passaggio corto ${it.durationUs}", it.durationUs >= 1_000_000) }
+        }
+        // Un tema energico invece i colpi sul drop li tiene.
+        val e = AutoEdit.build("Estremo", photos + vids, songWithDrop(), AutoOptions(style = AutoStyle.ESTREMO, targetUs = 60_000_000, intro = false))
+        assertTrue(e.clips.any { c -> c.fx.any { it.type in beatTypes } })
+    }
+
     private fun src(i: Int, w: Int, h: Int, date: Long = i * 60_000L, video: Boolean = false) =
         AutoSource("content://s/$i", video, if (video) 10_000_000 else 0, date, w, h)
 

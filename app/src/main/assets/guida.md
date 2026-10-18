@@ -3,12 +3,9 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
-- **Natura rifatto**: niente più foglie che cadono; luce soffusa, foschia leggera e raggi di sole, passaggi morbidi (anche sui colpi del brano).
-- **Ritmo giusto per i temi calmi**: Natura, Romantico, Matrimonio, Sogno, Ricordi, Elegante, Super 8 e Cinema hanno una durata minima delle scene (Natura circa 3 secondi). Con un brano veloce si usano più battiti per scena, così i tagli restano a tempo ma senza fretta.
-- **Niente mix di orizzontali e verticali**: il video automatico sceglie le foto e i video nello stesso verso del video finale; quelli nell'altro verso entrano solo se non ce ne sono abbastanza.
-- **Raffiche**: tra le foto scattate a pochi secondi l'una dall'altra resta solo la migliore (nitida, ben esposta, con i sorrisi).
-- **Momento migliore più furbo**: evita i primi e gli ultimi istanti dei video (il telefono che si alza o si abbassa) e, nei temi calmi, i tratti che sbandano.
-- Prima: temi Romantico, Matrimonio, Super 8, Anni '90, Mare, Montagna, Diario di viaggio; effetti natura e romantici; data della videocamera.
+- **Natura più tranquillo**: niente più bagliori né lampi bianchi nei passaggi (solo dissolvenze, sfocature e passaggi liquidi), niente alone luminoso e raggi di luce, niente bagliore che pulsa a ritmo. Le foto scorrono con panoramiche e zoom lenti invece di fare piccoli zoom sui battiti.
+- **Temi calmi senza colpi**: in Natura, Romantico, Matrimonio, Sogno, Ricordi, Elegante e Super 8 la scena del drop non pulsa più a ogni battito (zoom e colpo di luce), le foto non fanno scatti dove la musica spinge e i passaggi restano lenti anche sui colpi. Il taglio cade comunque a tempo.
+- Prima: Natura senza foglie che cadono; durata minima delle scene nei temi calmi; foto e video nello stesso verso; raffiche ridotte alla foto migliore; momento migliore che evita i tratti mossi.
 
 ## Primi passi
 - Dalla schermata dei progetti tocca **Nuovo progetto**: **Scegli foto e video** (fino a 100) oppure **Album interi** (uno o più album, tutto in ordine di data). Lo stesso vale per **+** e **Aggiungi** dentro l'editor.
@@ -51,6 +48,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - **Durata**: "Come il brano" (con la musica) fa durare il video esattamente quanto il brano, che finisce col suo finale; le altre durate (30 s, 1 min, …) sono rispettate al decimo di secondo; "Tutto" usa tutto quello che c'è negli album.
 - Con la musica ogni taglio cade su un battito; se le foto e i video sono pochi per la durata, le scene si allungano di battiti interi.
 - **Temi calmi** (Natura, Romantico, Matrimonio, Sogno, Ricordi, Elegante, Super 8, Cinema): le scene non scendono sotto una durata minima, anche con un brano veloce (si prendono più battiti per scena) e anche dove il brano spinge.
+- Nei temi calmi (tranne Cinema) dove il brano spinge e sul drop la scena non pulsa a ritmo e le foto non fanno scatti: il taglio cade a tempo e il passaggio resta morbido. Natura non usa passaggi con il lampo di luce né effetti che pulsano.
 - **Scelta delle foto**: delle raffiche resta solo la foto migliore; si preferiscono foto e video nello stesso verso del video finale.
 - **Energia del brano**: l'app sente dove la musica è calma (scene più lunghe, passaggi morbidi, rallenty) e dove spinge (un taglio a ogni colpo, zoom e scosse a ritmo, accelerazioni); sul drop mette un taglio esatto con una transizione d'impatto.
 - **Orientamento**: il formato segue le foto e i video più numerosi, e si usano di preferenza quelli nello stesso verso; quelli girati nell'altro verso (se servono) seguono le persone (regia intelligente) o, se sono foto, si attraversano con una panoramica; lo sfondo sfocato resta solo se non c'è un soggetto chiaro.
