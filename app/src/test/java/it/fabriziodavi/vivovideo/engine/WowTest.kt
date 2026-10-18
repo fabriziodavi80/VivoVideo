@@ -110,7 +110,7 @@ class WowTest {
         val vids = (0 until 20).map { Clip(id = "v$it", uri = "content://v/$it", sourceDurationUs = 20_000_000, trimEndUs = 20_000_000, width = 1080, height = 1920, fps = 120f) }
         val p = AutoEdit.build("Lento", vids, null, AutoOptions(style = AutoStyle.CINEMA, targetUs = 0))
         assertTrue(p.clips.any { it.speed == ClipSpeed.SLOW })
-        p.clips.filter { it.speed == ClipSpeed.SLOW }.forEach { assertEquals(it.trimmedUs * 2, it.outputUs, 10_000) }
+        p.clips.filter { it.speed == ClipSpeed.SLOW }.forEach { assertTrue(abs(it.trimmedUs * 2 - it.outputUs) <= 10_000) }
         val photo = Clip(id = "p", uri = "file:///p.jpg", sourceDurationUs = Clip.PHOTO_MAX_US, trimEndUs = 3_000_000, isPhoto = true, width = 4000, height = 3000)
         val q = AutoEdit.build("Foto", vids.take(4) + photo, null, AutoOptions(style = AutoStyle.SOGNO, targetUs = 0, format = VideoFormat.VERTICAL))
         val ph = q.clips.first { it.isPhoto }
