@@ -354,7 +354,8 @@ class DeviceTest {
             .map { it.copy(trimStartUs = 0, trimEndUs = it.sourceDurationUs.coerceAtMost(Clip.PHOTO_MAX_US)) }
         val m = MusicTrack(uri = music.toString(), name = "musica", sourceDurationUs = 30_000_000, lengthUs = 30_000_000,
             beatsUs = (1 until 60).map { it * 500_000L }, bpm = 120f)
-        val p = AutoEdit.build("auto ${s.label}", srcs, m, AutoOptions(style = s, title = "Prova", subtitle = "Ottobre 2026", targetUs = m.sourceDurationUs))
+        // 12 s bastano per intro, tagli, stacchi netti e transizioni del tema; l'emulatore regge pochi video lunghi di fila.
+        val p = AutoEdit.build("auto ${s.label}", srcs, m, AutoOptions(style = s, title = "Prova", subtitle = "Ottobre 2026", targetUs = 12_000_000))
         // Com'è fatta ogni scena: scritto nel registro prima di esportare (resta anche se l'emulatore va in crash).
         val scenes = p.clips.joinToString("\n") { c ->
             "  ${c.uri.substringAfterLast('/')} ${c.trimStartUs / 1000}-${c.trimEndUs / 1000} ms di ${c.sourceDurationUs / 1000}, " +
