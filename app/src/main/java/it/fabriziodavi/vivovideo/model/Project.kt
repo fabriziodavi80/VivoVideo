@@ -59,13 +59,23 @@ enum class TransitionType(val label: String) {
     HEART("Cuore"),
     BOKEHFADE("Dissolvenza bokeh"),
     FILMSLIP("Salto di pellicola"),
-    REWIND("Riavvolgimento VHS");
+    REWIND("Riavvolgimento VHS"),
+    // Tendenze 2026: stacchi secchi da velocity edit, niente forme 3D.
+    BLACKOUT("Blackout"),
+    EXPOSE("Flash esposizione"),
+    CAMSHAKE("Scossa camera"),
+    SNAPZOOM("Zoom secco");
 
     /** Transizioni adatte a uno slideshow "vario" (quelle più nervose solo se scelte apposta). */
-    val soft: Boolean get() = this !in setOf(GLITCH, PIXELATE, SHAKE, RGB, PUNCH, TEAR, STRIPES, SHUTTER, BURST, SPEEDZOOM, SMASH, SQUASH, REWIND)
+    val soft: Boolean get() = this !in setOf(GLITCH, PIXELATE, SHAKE, RGB, PUNCH, TEAR, STRIPES, SHUTTER, BURST, SPEEDZOOM, SMASH, SQUASH, REWIND,
+        BLACKOUT, EXPOSE, CAMSHAKE, SNAPZOOM)
 
     /** Transizioni d'impatto, da mettere sui colpi forti della musica. */
-    val punchy: Boolean get() = this in setOf(PUNCH, FLASH, RGB, GLITCH, SHAKE, WHIP, SPIN, SLIDE_UP, ZOOM, SWIRL, TEAR, BURST, STRIPES, SHUTTER, SPEEDZOOM, SMASH, SQUASH, REWIND)
+    val punchy: Boolean get() = this in setOf(PUNCH, FLASH, RGB, GLITCH, SHAKE, WHIP, SPIN, SLIDE_UP, ZOOM, SWIRL, TEAR, BURST, STRIPES, SHUTTER, SPEEDZOOM, SMASH, SQUASH, REWIND,
+        BLACKOUT, EXPOSE, CAMSHAKE, SNAPZOOM)
+
+    /** Di tendenza (2026): da mostrare per prime nel pannello. */
+    val trend: Boolean get() = ordinal >= BLACKOUT.ordinal
 
     /** Premium: le novità da far vedere nel pannello in cima. */
     val premium: Boolean get() = ordinal >= PUNCH.ordinal
@@ -248,7 +258,7 @@ data class ColorSettings(
 )
 
 /** Categorie degli effetti (per il pannello). */
-enum class FxCategory(val label: String) { WOW("Wow"), BEAT("A ritmo"), COLOR("Colore"), STYLE("Stile"), OPTICS("Ottica"), SHAPE("Forma"), MOTION("Movimento") }
+enum class FxCategory(val label: String) { TREND("Di tendenza"), WOW("Wow"), BEAT("A ritmo"), COLOR("Colore"), STYLE("Stile"), OPTICS("Ottica"), SHAPE("Forma"), MOTION("Movimento") }
 
 /** Effetti video per clip; [toggle] = acceso/spento senza intensità. L'ordine non conta (salvati per nome). */
 enum class FxType(val label: String, val category: FxCategory, val toggle: Boolean = false, val defaultAmount: Float = 0.6f) {
@@ -321,10 +331,25 @@ enum class FxType(val label: String, val category: FxCategory, val toggle: Boole
     WATER("Riflessi d'acqua", FxCategory.WOW, defaultAmount = 0.5f),
     SKYGRAD("Cielo drammatico", FxCategory.WOW, defaultAmount = 0.6f),
     SNOW("Neve", FxCategory.WOW, defaultAmount = 0.6f),
-    LEAVES("Foglie d'autunno", FxCategory.WOW, defaultAmount = 0.6f);
+    LEAVES("Foglie d'autunno", FxCategory.WOW, defaultAmount = 0.6f),
+    // Tendenze 2026 (velocity edit, look da social): lampi brevi, scatti puliti, pellicola moderna, fotocamera digitale.
+    FLASHBEAT("Flash a ritmo", FxCategory.BEAT, defaultAmount = 0.7f),
+    BWBEAT("B/N a ritmo", FxCategory.BEAT, defaultAmount = 1f),
+    BOUNCE("Rimbalzo a ritmo", FxCategory.BEAT, defaultAmount = 0.6f),
+    HALATION("Pellicola moderna", FxCategory.TREND, defaultAmount = 0.6f),
+    DIGICAM("Fotocamera digitale", FxCategory.TREND, defaultAmount = 0.7f),
+    GRAIN("Grana fine", FxCategory.TREND, defaultAmount = 0.5f),
+    MUTED("Toni smorzati", FxCategory.TREND, defaultAmount = 0.7f);
 
     /** Effetti che seguono i battiti della musica. */
     val onBeats: Boolean get() = this == PULSE || this == STROBE || this == HIT || category == FxCategory.BEAT
+
+    /**
+     * Nella scheda "Di tendenza": i look del 2026 più gli effetti a ritmo e ottici che si usano oggi nelle velocity edit
+     * (così si trovano tutti in un posto, anche se appartengono a un'altra categoria).
+     */
+    val trendy: Boolean get() = category == FxCategory.TREND ||
+        this in setOf(FLASHBEAT, BWBEAT, BOUNCE, SHAKEBEAT, RGBBEAT, ZOOMBLUR, CHROMA, LETTERBOX)
 
     /** Effetti del secondo shader (premium). */
     val wow2: Boolean get() = ordinal >= DREAMY.ordinal
@@ -520,7 +545,12 @@ enum class TextPreset(val label: String) {
     IMPATTO("Impatto"), FIRMA("Firma"), DIARIO("Diario"),
     GLITCH("Glitch"), ONDA("Onda"), ORO("Oro"), CASCATA("Cascata"),
     CINEMA26("Cinema 2026"), SOGNO("Sogno"), TITOLO3D("Titolo 3D"), FESTA("Festa"), INSEGNA("Insegna"), ESPLOSIONE("Esplosione"),
-    AMORE("Amore"), DATA("Data videocamera"), TAPPA("Tappa di viaggio");
+    AMORE("Amore"), DATA("Data videocamera"), TAPPA("Tappa di viaggio"),
+    // Tendenze 2026: bold senza grazie, bianco, niente sfumature né scritte storte, animazioni sobrie.
+    PULITO("Pulito"), ETICHETTA("Etichetta"), TITOLONE("Titolone"), MINIMAL("Minimal"), SOCIAL("Social");
+
+    /** Stili di tendenza (2026): in testa alla lista. */
+    val trend: Boolean get() = ordinal >= PULITO.ordinal
 
     fun applyTo(t: TextItem): TextItem = when (this) {
         CINEMA -> t.copy(font = TextFont.TITOLO, color = WHITE, gradientTo = 0xFFF2B33D.toInt(), spacing = 0.12f, upper = true, look = TextLook.OMBRA,
@@ -565,6 +595,21 @@ enum class TextPreset(val label: String) {
             size = 0.032f, x = -0.28f, y = 0.4f, rotation = 0f, animIn = TextAnim.BLUR, animOut = TextAnim.FADE, endPose = null)
         ESPLOSIONE -> t.copy(font = TextFont.IMPATTO, color = WHITE, gradientTo = 0xFFFF7A3D.toInt(), spacing = 0.03f, upper = true, look = TextLook.CONTORNO,
             size = 0.12f, x = 0f, y = 0f, rotation = 0f, animIn = TextAnim.SPIN, animOut = TextAnim.SCATTER, endPose = null)
+        // Pulito: bold senza grazie, lettere strette, entra a fuoco e si avvicina appena.
+        PULITO -> t.copy(font = TextFont.POSTER, color = WHITE, gradientTo = null, spacing = -0.02f, upper = false, look = TextLook.OMBRA,
+            size = 0.075f, x = 0f, y = 0f, rotation = 0f, animIn = TextAnim.BLUR, animOut = TextAnim.FADE, endPose = Transform(x = 0f, y = 0f, scale = 1.03f))
+        // Etichetta: testo scuro su pillola bianca (il riquadro diventa chiaro con il testo scuro).
+        ETICHETTA -> t.copy(font = TextFont.MODERNO, color = 0xFF111111.toInt(), gradientTo = null, spacing = 0f, upper = false, look = TextLook.RIQUADRO,
+            size = 0.045f, x = 0f, y = 0.3f, rotation = 0f, animIn = TextAnim.POP, animOut = TextAnim.FADE, endPose = null)
+        // Titolone: enorme, condensato, a tutto schermo; entra a fuoco e spinge piano in avanti.
+        TITOLONE -> t.copy(font = TextFont.IMPATTO, color = WHITE, gradientTo = null, spacing = -0.01f, upper = true, look = TextLook.OMBRA,
+            size = 0.13f, x = 0f, y = 0f, rotation = 0f, animIn = TextAnim.BLUR, animOut = TextAnim.FADE, endPose = Transform(x = 0f, y = 0f, scale = 1.06f))
+        // Minimal: piccolo, maiuscolo spaziato, senza effetti.
+        MINIMAL -> t.copy(font = TextFont.MODERNO, color = WHITE, gradientTo = null, spacing = 0.3f, upper = true, look = TextLook.OMBRA,
+            size = 0.03f, x = 0f, y = 0f, rotation = 0f, animIn = TextAnim.FADE, animOut = TextAnim.FADE, endPose = null)
+        // Social: come le didascalie dei reel, bianco con contorno nero, parola per parola.
+        SOCIAL -> t.copy(font = TextFont.POSTER, color = WHITE, gradientTo = null, spacing = 0f, upper = false, look = TextLook.CONTORNO,
+            size = 0.065f, x = 0f, y = 0.25f, rotation = 0f, animIn = TextAnim.WORDS, animOut = TextAnim.FADE, endPose = null)
     }
 
     companion object {

@@ -47,7 +47,7 @@ fun SubtitlesScreen(vm: EditorViewModel) {
     BackHandler { if (busy != null) vm.cancelSubtitles() else vm.showSubtitles = false }
     var model by remember { mutableStateOf(if (Whisper.isDownloaded(ctx, Whisper.Model.FAST) && !Whisper.isDownloaded(ctx, Whisper.Model.ACCURATE)) Whisper.Model.FAST else Whisper.Model.ACCURATE) }
     var lang by remember { mutableStateOf("it") }
-    var style by remember { mutableStateOf(SubStyle.KARAOKE) }
+    var style by remember { mutableStateOf(SubStyle.SOCIAL) }
     var pos by remember { mutableStateOf(SubPosition.BOTTOM) }
     val existing = vm.project?.texts?.count { it.subtitle } ?: 0
 
@@ -82,11 +82,13 @@ fun SubtitlesScreen(vm: EditorViewModel) {
             Box(Modifier.fillMaxWidth().height(64.dp).clip(RoundedCornerShape(10.dp)).background(Color(0xFF2A2F38)), contentAlignment = Alignment.Center) {
                 val sample = when (style) {
                     SubStyle.KARAOKE -> buildAnnotatedString {
-                        append("CHE BELLA ")
-                        withStyle(SpanStyle(color = Color(Subtitles.HIGHLIGHT))) { append("GIORNATA") }
-                        append(" OGGI")
+                        append("Che bella ")
+                        withStyle(SpanStyle(color = Color(Subtitles.HIGHLIGHT))) { append("giornata") }
+                        append(" oggi")
                     }
-                    SubStyle.REVEAL -> buildAnnotatedString { append("CHE BELLA GIORNATA…") }
+                    SubStyle.REVEAL -> buildAnnotatedString { append("Che bella giornata…") }
+                    SubStyle.SOCIAL -> buildAnnotatedString { append("Che bella giornata") }
+                    SubStyle.MINIMAL -> buildAnnotatedString { append("che bella giornata oggi") }
                     else -> buildAnnotatedString { append("Che bella giornata oggi") }
                 }
                 Text(

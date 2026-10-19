@@ -282,7 +282,7 @@ class EditorOpsTest {
         assertEquals(AutoStyle.ENERGICO, p.auto!!.options.style)
         assertEquals(before.id, p.id)                      // stesso progetto
         assertTrue(p.clips.map { it.uri } != before.clips.map { it.uri } || p.clips.map { it.outputUs } != before.clips.map { it.outputUs })
-        assertTrue(p.clips.all { c -> c.fx.any { it.type == FxType.HIT } })   // regia Energico
+        assertTrue(p.clips.all { c -> c.fx.any { it.type == FxType.GRAIN } })   // regia Energico (grana fine su tutte le scene)
         assertEquals("Estate", p.texts.first().text)
         // A mano si può sempre intervenire, e Annulla torna alla proposta di prima.
         vm.selectedClipId = p.clips[0].id

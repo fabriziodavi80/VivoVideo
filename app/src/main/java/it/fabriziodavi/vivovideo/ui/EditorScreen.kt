@@ -207,9 +207,11 @@ val LAYER_TABS = listOf("Aspetto", "Forma", "Animazione")
 /** Animazioni per i livelli (quelle lettera per lettera, glitch e luccichio sono solo per i testi). */
 /** Le novità premium in testa alle liste: si vedono subito. */
 // L'incrociata resta la prima (è la più usata), poi le novità.
-val TRANSITIONS_NEW_FIRST: List<TransitionType> = listOf(TransitionType.CROSSFADE) + TransitionType.entries.filter { it.premium } +
-    TransitionType.entries.filter { !it.premium && it != TransitionType.CROSSFADE }
-val PRESETS_NEW_FIRST: List<TextPreset> = TextPreset.entries.filter { it.ordinal >= TextPreset.CINEMA26.ordinal } + TextPreset.entries.filter { it.ordinal < TextPreset.CINEMA26.ordinal }
+// Prima le transizioni di tendenza (stacchi da velocity edit), poi le altre novità e le classiche.
+val TRANSITIONS_NEW_FIRST: List<TransitionType> = listOf(TransitionType.CROSSFADE) + TransitionType.entries.filter { it.trend } +
+    TransitionType.entries.filter { it.premium && !it.trend } + TransitionType.entries.filter { !it.premium && it != TransitionType.CROSSFADE }
+val PRESETS_NEW_FIRST: List<TextPreset> = TextPreset.entries.filter { it.trend } +
+    TextPreset.entries.filter { !it.trend && it.ordinal >= TextPreset.CINEMA26.ordinal } + TextPreset.entries.filter { it.ordinal < TextPreset.CINEMA26.ordinal }
 val ANIMS_NEW_FIRST: List<TextAnim> = listOf(TextAnim.NONE) + TextAnim.entries.filter { it.ordinal >= TextAnim.BOUNCE.ordinal } +
     TextAnim.entries.filter { it != TextAnim.NONE && it.ordinal < TextAnim.BOUNCE.ordinal }
 val LAYER_ANIMS = TextAnim.entries.filter { !it.inOnly && !it.letters && it != TextAnim.GLITCH }
@@ -1823,11 +1825,11 @@ private fun EffectsPanel(vm: EditorViewModel, running: Boolean, tab: Int) {
 
 @Composable
 private fun FxTab(vm: EditorViewModel, clip: it.fabriziodavi.vivovideo.model.Clip, p: it.fabriziodavi.vivovideo.model.Project, enabled: Boolean) {
-    var category by remember { mutableStateOf(FxCategory.WOW) }
+    var category by remember { mutableStateOf(FxCategory.TREND) }
     Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         FxCategory.entries.forEach { cat ->
             val on = cat == category
-            val count = clip.fx.count { it.type.category == cat }
+            val count = clip.fx.count { if (cat == FxCategory.TREND) it.type.trendy else it.type.category == cat }
             Box(
                 Modifier.clip(RoundedCornerShape(10.dp)).background(if (on) VV.Raised2 else VV.Canvas)
                     .border(1.dp, if (on) VV.Tally else VV.Line, RoundedCornerShape(10.dp))
@@ -1838,7 +1840,7 @@ private fun FxTab(vm: EditorViewModel, clip: it.fabriziodavi.vivovideo.model.Cli
         }
     }
     Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        FxType.entries.filter { it.category == category }.forEach { t ->
+        FxType.entries.filter { if (category == FxCategory.TREND) it.trendy else it.category == category }.forEach { t ->
             val on = clip.fx.any { it.type == t }
             Box(
                 Modifier.clip(RoundedCornerShape(18.dp)).background(if (on) VV.Tally else VV.Raised)

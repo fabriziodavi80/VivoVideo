@@ -100,6 +100,17 @@ class TransitionEffect(
         TransitionType.FILMSLIP -> Params(slip = (if (entering) -1f else 1f) * e, black = 0.2f * e * e)
         TransitionType.REWIND -> Params(rewind = e, shift = jitter(seed, 8) * 0.02f * e)
         TransitionType.SHUTTER -> Params(shutter = e, zoom = 1f + 0.12f * e, white = if (e > 0.97f) 0.8f else 0f)
+        // Tendenze 2026. Blackout: pochi fotogrammi neri secchi attorno al taglio (niente dissolvenza).
+        TransitionType.BLACKOUT -> Params(black = if (e > 0.6f) 1f else 0f)
+        // Flash esposizione: l'immagine si "brucia" di luce sul taglio, con un filo di sfocatura (non un bianco pieno).
+        TransitionType.EXPOSE -> Params(white = 0.7f * e * e * e, zoom = 1f + 0.03f * e, blur = 0.012f * e * e, blurMode = 3)
+        // Scossa camera: come una ripresa a mano che sobbalza, piccola e con scia di movimento.
+        TransitionType.CAMSHAKE -> Params(
+            shift = jitter(seed, 9) * 0.05f * e, shiftY = jitter(seed, 10) * 0.04f * e, rotation = jitter(seed, 11) * 0.035f * e,
+            zoom = 1f + 0.06f * e, blur = 0.03f * e, blurMode = 1,
+        )
+        // Zoom secco: spinta in avanti rapida con scia radiale, senza prisma né lampo.
+        TransitionType.SNAPZOOM -> Params(zoom = 1f + 0.35f * e * e, blur = 0.03f * e * e, blurMode = 2)
     }
 }
 

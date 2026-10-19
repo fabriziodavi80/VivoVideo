@@ -40,7 +40,7 @@ class SubtitlesTest {
             val t = Subtitles.build(ws, st, SubPosition.BOTTOM, 10_000_000)
             assertEquals(2, t.size)
             assertTrue(t.all { it.subtitle })
-            assertEquals("Che bella giornata.", t[0].text)
+            assertEquals("Che bella giornata.".let { if (st == SubStyle.MINIMAL) it.lowercase() else it }, t[0].text)
             assertEquals(1_000_000L, t[0].startUs)
             assertEquals(listOf(0L, 300_000L, 600_000L), t[0].wordsUs)
             assertTrue("non si accavalla col successivo", t[0].endUs <= t[1].startUs)
@@ -48,6 +48,11 @@ class SubtitlesTest {
         }
         assertEquals(1, Subtitles.build(ws, SubStyle.KARAOKE, SubPosition.TOP, 10_000_000)[0].wordMode)
         assertEquals(2, Subtitles.build(ws, SubStyle.REVEAL, SubPosition.TOP, 10_000_000)[0].wordMode)
+        // Stili 2026: niente tutto maiuscolo; Social a poche parole, Minimal in minuscolo.
+        assertTrue(SubStyle.entries.none { st -> Subtitles.build(ws, st, SubPosition.TOP, 10_000_000)[0].upper })
+        val long = (0 until 9).map { w(it * 0.3, it * 0.3 + 0.25, "parola$it") }
+        assertTrue(Subtitles.build(long, SubStyle.SOCIAL, SubPosition.BOTTOM, 10_000_000).all { it.text.split(" ").size <= 3 })
+        assertEquals(2, Subtitles.build(ws, SubStyle.SOCIAL, SubPosition.TOP, 10_000_000)[0].wordMode)
         assertEquals(-1, Subtitles.wordAt(listOf(100L, 400L), 50))
         assertEquals(1, Subtitles.wordAt(listOf(100L, 400L), 450))
     }

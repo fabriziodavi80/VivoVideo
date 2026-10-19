@@ -84,6 +84,7 @@ import it.fabriziodavi.vivovideo.model.AutoOptions
 import it.fabriziodavi.vivovideo.model.AutoStyle
 import it.fabriziodavi.vivovideo.model.TextItem
 import it.fabriziodavi.vivovideo.model.TextLook
+import it.fabriziodavi.vivovideo.model.TextPreset
 import it.fabriziodavi.vivovideo.model.Transform
 import it.fabriziodavi.vivovideo.model.TransitionSpec
 import it.fabriziodavi.vivovideo.model.TransitionType
@@ -560,6 +561,27 @@ class DeviceTest {
         }
         // L'anteprima con le dissolvenze pronte scorre.
         playFor(p, seconds = 8)
+    }
+
+    /** Tendenze 2026: le nuove transizioni, gli effetti combinati nella stessa scena (con i battiti) e i nuovi testi. */
+    @Test fun exportTrendKit() {
+        val cuts = TransitionType.entries.filter { it.trend }
+        val looks = listOf(
+            listOf(FxType.FLASHBEAT, FxType.BWBEAT, FxType.BOUNCE, FxType.GRAIN),
+            listOf(FxType.HALATION, FxType.MUTED),
+            listOf(FxType.DIGICAM, FxType.SHAKEBEAT),
+            listOf(FxType.HALATION, FxType.DIGICAM, FxType.GRAIN, FxType.MUTED, FxType.FLASHBEAT),
+        )
+        val clips = (0..cuts.size).map { i ->
+            video("t$i", listOf(videoA, videoB, videoC)[i % 3], s = 1_000_000, e = 2_500_000)
+                .copy(transitionOut = cuts.getOrNull(i)?.let { TransitionSpec(it, 300_000) }, fx = looks[i % looks.size].map { ClipFx(it) })
+        }
+        val texts = TextPreset.entries.filter { it.trend }.mapIndexed { i, pr ->
+            pr.applyTo(TextItem(text = if (pr == TextPreset.TITOLONE) "Supercalifragilistico" else "Tendenza ${pr.label}", startUs = i * 1_400_000L, durationUs = 1_800_000))
+        }
+        val m = MusicTrack(uri = music.toString(), name = "musica", sourceDurationUs = 30_000_000, lengthUs = 8_000_000,
+            beatsUs = (1 until 60).map { it * 500_000L }, bpm = 120f)
+        exportAndCheck(Project(name = "tendenze", clips = clips, texts = texts, music = listOf(m)))
     }
 
     /** Il ripiego dell'app quando il decodificatore hardware si guasta: con quello software si esporta lo stesso. */

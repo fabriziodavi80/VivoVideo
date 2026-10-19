@@ -15,7 +15,8 @@ import kotlin.math.exp
 
 /**
  * Effetti premium (2026): sogno, pellicola 35 mm, duotono pop, lampo di luce, tre schermi, olografico,
- * e quelli che seguono i battiti (zoom, scossa, RGB). Shader separato dagli effetti classici.
+ * quelli che seguono i battiti (zoom, scossa, RGB, flash, B/N, rimbalzo) e le tendenze (pellicola moderna,
+ * fotocamera digitale, grana fine, toni smorzati). Shader separato dagli effetti classici.
  */
 class WowFxEffect(
     private val fx: List<ClipFx>,
@@ -40,6 +41,15 @@ class WowFxEffect(
         return if (dt > decayS * 6) 0f else exp(-dt / decayS)
     }
 
+    /** 1 per [holdS] secondi dopo ogni colpo, poi 0 (scatto netto, senza dissolvenza). */
+    internal fun heldAfterBeat(timeUs: Long, holdS: Float): Float = if (sinceBeat(timeUs) < holdS) 1f else 0f
+
+    /** Rimbalzo sul colpo: sale, scende un poco sotto lo zero e si assesta (molla smorzata). */
+    internal fun bounceAt(timeUs: Long): Float {
+        val dt = sinceBeat(timeUs)
+        return if (dt > 0.6f) 0f else exp(-dt / 0.13f) * kotlin.math.cos(dt * 24f)
+    }
+
     /** Numero pseudo-casuale stabile per il battito in corso (direzione della scossa). */
     internal fun beatSeed(timeUs: Long): Float = ((timeUs - (sinceBeat(timeUs) * 1e6f).toLong()) / 1000 % 997).toFloat()
 
@@ -52,6 +62,8 @@ class WowFxEffect(
             FxType.PROMIST to "uProMist", FxType.PETALS to "uPetals", FxType.HEARTS to "uHearts", FxType.SUPER8 to "uSuper8",
             FxType.FILMFRAME to "uFilmFrame", FxType.PROJECTOR to "uProjector", FxType.GLOWBEAT to "uGlowBeat",
             FxType.HAZE to "uHaze", FxType.WATER to "uWater", FxType.SKYGRAD to "uSkyGrad", FxType.SNOW to "uSnow", FxType.LEAVES to "uLeaves",
+            FxType.FLASHBEAT to "uFlashBeat", FxType.BWBEAT to "uBwBeat", FxType.BOUNCE to "uBounce",
+            FxType.HALATION to "uHalation", FxType.DIGICAM to "uDigicam", FxType.GRAIN to "uGrain", FxType.MUTED to "uMuted",
         )
 
         fun needed(fx: List<ClipFx>) = fx.any { it.type.wow2 && it.amount > 0f }
@@ -66,6 +78,7 @@ uniform float uDreamy, uFilm35, uDuoPop, uSweep, uSplit3, uHolo, uZoomBeat, uSha
 uniform float uFlare, uDust, uLetterbox, uImpact;
 uniform float uProMist, uPetals, uHearts, uSuper8, uFilmFrame, uProjector, uGlowBeat;
 uniform float uHaze, uWater, uSkyGrad, uSnow, uLeaves;
+uniform float uFlashBeat, uBwBeat, uBounce, uHalation, uDigicam, uGrain, uMuted;
 uniform float uLocal;
 varying vec2 vUv;
 
@@ -110,7 +123,8 @@ void main() {
 #endif
   // Zoom a ritmo: spinta in avanti sul colpo, con scia radiale (l'Impatto ne fa una più forte).
   vec2 c = uv - 0.5;
-  float z = 1.0 + 0.18 * uZoomBeat + 0.28 * uImpact;
+  // Rimbalzo a ritmo: piccolo scatto di scala che oscilla e si assesta (uBounce va sopra e sotto lo zero), senza scia.
+  float z = 1.0 + 0.18 * uZoomBeat + 0.28 * uImpact + 0.07 * uBounce;
   uv = c / z + 0.5;
   // Scossa a ritmo: scatto in una direzione diversa a ogni colpo.
 #if defined(FX_SHAKEBEAT) || defined(FX_IMPACT)
@@ -375,6 +389,61 @@ void main() {
     }
   }
 #endif
+  // Toni smorzati: colori meno saturi, neri un po' schiacciati, ombre fredde e luci calde (il look "aesthetic").
+#if defined(FX_MUTED)
+  if (uMuted > 0.0) {
+    vec3 m = mix(vec3(lum(col)), col, 0.72);
+    m = max((m - 0.5) * 1.12 + 0.5 - 0.02, 0.0);
+    m *= mix(vec3(0.94, 1.0, 1.05), vec3(1.04, 1.0, 0.95), smoothstep(0.15, 0.7, lum(m)));
+    col = mix(col, m, uMuted);
+  }
+#endif
+  // Pellicola moderna: alone rosso-arancio attorno alle luci (halation), neri appena sollevati, luci calde. Niente tremolio.
+#if defined(FX_HALATION)
+  if (uHalation > 0.0) {
+    vec3 h = vec3(0.0);
+    for (int i = 0; i < 12; i++) { float a = float(i) * 0.5236; h += tex(uv + vec2(cos(a), sin(a) * aspect) * 0.011); }
+    h /= 12.0;
+    float hl = smoothstep(0.55, 1.0, lum(h));
+    col += vec3(1.0, 0.3, 0.1) * hl * 0.5 * uHalation;
+    col = mix(col, col * vec3(1.03, 1.0, 0.95) * 0.95 + 0.03, uHalation * 0.6);
+  }
+#endif
+  // Fotocamera digitale (anni 2000): nitidezza digitale, luce da flash, ombre fredde, rumore di colore, angoli più scuri.
+#if defined(FX_DIGICAM)
+  if (uDigicam > 0.0) {
+    vec2 px = 1.5 / uRes;
+    vec3 soft = (tex(uv + vec2(px.x, 0.0)) + tex(uv - vec2(px.x, 0.0)) + tex(uv + vec2(0.0, px.y)) + tex(uv - vec2(0.0, px.y))) * 0.25;
+    vec3 d = col + (col - soft) * 1.2;
+    d = d * 1.12 + 0.03;
+    d = mix(vec3(lum(d)), d, 1.15);
+    d *= mix(vec3(0.92, 1.0, 1.07), vec3(1.04, 1.0, 0.95), smoothstep(0.2, 0.8, lum(d)));
+    float fr = floor(uTime * 15.0);
+    vec2 cell = floor(vUv * uRes / 2.0);
+    d += (vec3(hash(cell + fr), hash(cell + fr + 5.0), hash(cell + fr + 9.0)) - 0.5) * 0.05;
+    d *= 1.0 - 0.18 * smoothstep(0.5, 1.0, length((vUv - 0.5) * vec2(aspect, 1.0)));
+    col = mix(col, d, uDigicam);
+  }
+#endif
+  // Grana fine: rumore minuto che cambia a ogni fotogramma, più visibile nei mezzitoni.
+#if defined(FX_GRAIN)
+  if (uGrain > 0.0) {
+    float g = hash(floor(vUv * uRes / 1.2) + floor(uTime * 24.0) * 13.7) - 0.5;
+    col += g * 0.07 * uGrain * (1.0 - abs(lum(col) - 0.5));
+  }
+#endif
+  // B/N a ritmo: per un istante dopo ogni colpo il quadro diventa bianco e nero contrastato.
+#if defined(FX_BWBEAT)
+  if (uBwBeat > 0.0) {
+    col = mix(col, vec3(smoothstep(0.06, 0.94, lum(col))), uBwBeat);
+  }
+#endif
+  // Flash a ritmo: l'esposizione salta sul colpo e torna subito (non un velo bianco).
+#if defined(FX_FLASHBEAT)
+  if (uFlashBeat > 0.0) {
+    col = col * (1.0 + 1.1 * uFlashBeat) + 0.06 * uFlashBeat;
+  }
+#endif
   // Impatto: lampo e contrasto sul colpo.
 #if defined(FX_IMPACT)
   if (uImpact > 0.0) {
@@ -426,6 +495,9 @@ private class WowProgram(private val effect: WowFxEffect, useHdr: Boolean) : Bas
                     FxType.RGBBEAT -> effect.beatAt(presentationTimeUs, 0.1f)
                     FxType.IMPACT -> effect.beatAt(presentationTimeUs, 0.11f)
                     FxType.GLOWBEAT -> effect.beatAt(presentationTimeUs, 0.3f)
+                    FxType.FLASHBEAT -> effect.beatAt(presentationTimeUs, 0.06f)
+                    FxType.BWBEAT -> effect.heldAfterBeat(presentationTimeUs, 0.18f)
+                    FxType.BOUNCE -> effect.bounceAt(presentationTimeUs)
                     else -> 1f
                 }
                 program.setFloatsUniform(name, floatArrayOf(a))

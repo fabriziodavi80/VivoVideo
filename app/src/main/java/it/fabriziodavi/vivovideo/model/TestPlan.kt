@@ -33,6 +33,9 @@ object TestPlan {
         Item("prev_pip", "Anteprima", "Video sovrapposto che si muove",
             "Livelli → aggiungi un video sopra, aspetta che il tratto sia pronto.",
             "In anteprima il video sovrapposto si muove (prima è un'immagine ferma)."),
+        Item("prev_trend", "Anteprima", "Look 2026: velocity edit",
+            "Video automatico con tema Energico o Estremo e un brano con un ritornello forte; poi Effetti → Di tendenza su una clip.",
+            "Molti tagli netti sul battito, blackout e flash brevi sui colpi, titolo bianco pulito; anteprima fluida, niente cubi o vortici."),
         // Esportazione
         Item("exp_4k", "Esportazione", "Esportazione 4K H.265",
             "Esporta → Pronto per: YouTube 4K → Esporta.",

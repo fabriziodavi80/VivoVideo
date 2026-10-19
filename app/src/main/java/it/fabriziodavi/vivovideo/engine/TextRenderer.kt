@@ -83,6 +83,10 @@ object TextRenderer {
         val text = displayText(item).ifEmpty { " " }
         // Larghezza massima: 90% del quadro; poi si stringe alla riga più lunga.
         val maxW = (frameW * 0.9f).toInt().coerceAtLeast(16)
+        // Titoli molto grandi (o video verticali): se una parola non entra in larghezza si rimpicciolisce il carattere,
+        // invece di spezzarla a metà.
+        val widest = text.split(' ', '\n').maxOfOrNull { paint.measureText(it) } ?: 0f
+        if (widest > maxW) paint.textSize = (paint.textSize * maxW / widest * 0.98f).coerceAtLeast(4f)
         val content: CharSequence = if (visible >= text.length && highlight == null) text else SpannableString(text).apply {
             if (visible < text.length) setSpan(ForegroundColorSpan(Color.TRANSPARENT), visible.coerceAtLeast(0), text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             // Karaoke: la parola detta in questo momento ha il colore di risalto.

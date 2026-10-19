@@ -3,10 +3,13 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
-- **Natura più tranquillo**: niente più bagliori né lampi bianchi nei passaggi (solo dissolvenze, sfocature e passaggi liquidi), niente alone luminoso e raggi di luce, niente bagliore che pulsa a ritmo. Le foto scorrono con panoramiche e zoom lenti invece di fare piccoli zoom sui battiti.
-- **Temi calmi senza colpi**: in Natura, Romantico, Matrimonio, Sogno, Ricordi, Elegante e Super 8 la scena del drop non pulsa più a ogni battito (zoom e colpo di luce), le foto non fanno scatti dove la musica spinge e i passaggi restano lenti anche sui colpi. Il taglio cade comunque a tempo.
-- **Esportazione più robusta**: se il decodificatore video del telefono si guasta a metà (può capitare con progetti lunghi o con tanti video), l'app non si ferma più con un errore ma riprova da sola con il decodificatore software, più lento ma più sicuro. Lo stesso vale per la preparazione delle dissolvenze dell'anteprima.
-- Prima: Natura senza foglie che cadono; durata minima delle scene nei temi calmi; foto e video nello stesso verso; raffiche ridotte alla foto migliore; momento migliore che evita i tratti mossi.
+- **Look 2026 nei temi d'azione**: Energico, Reel virale, Azione, Estremo, Neon notte, Estate pop, Blockbuster, Viaggio, Mare, Montagna e Diario di viaggio sono rifatti come le velocity edit di oggi. Ci sono tagli netti sul battito, blackout e flash di esposizione sui colpi, zoom secchi, swipe e scosse di camera, B/N a scatti e rimbalzi a ritmo, grana fine, pellicola moderna e fotocamera digitale. Via cubi 3D, vortici, prismi, strisce, linee da fumetto e lampi bianchi pieni.
+- **Titoli puliti**: i temi d'azione usano scritte bold bianche senza sfumature né inclinazioni (Titolone, Pulito, Social), con il sottotitolo piccolo e spaziato.
+- **Nuova scheda "Di tendenza"** negli effetti (si apre per prima): Pellicola moderna, Fotocamera digitale, Grana fine, Toni smorzati, più Flash, B/N e Rimbalzo a ritmo.
+- **Nuove transizioni**: Blackout, Flash esposizione, Scossa camera, Zoom secco (in testa all'elenco).
+- **Nuovi stili di testo**: Pulito, Etichetta, Titolone, Minimal, Social (in testa all'elenco). Le parole troppo lunghe per lo schermo ora rimpiccioliscono invece di spezzarsi a metà.
+- **Sottotitoli**: nuovi stili **Social** (due o tre parole alla volta, bianco con contorno) e **Minimal** (minuscolo, quieto); Karaoke e Parola per parola non sono più tutto maiuscolo.
+- Prima: Natura più tranquillo; temi calmi senza colpi sul drop; esportazione che riprova con il decodificatore software.
 
 ## Primi passi
 - Dalla schermata dei progetti tocca **Nuovo progetto**: **Scegli foto e video** (fino a 100) oppure **Album interi** (uno o più album, tutto in ordine di data). Lo stesso vale per **+** e **Aggiungi** dentro l'editor.
@@ -53,7 +56,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - **Scelta delle foto**: delle raffiche resta solo la foto migliore; si preferiscono foto e video nello stesso verso del video finale.
 - **Energia del brano**: l'app sente dove la musica è calma (scene più lunghe, passaggi morbidi, rallenty) e dove spinge (un taglio a ogni colpo, zoom e scosse a ritmo, accelerazioni); sul drop mette un taglio esatto con una transizione d'impatto.
 - **Orientamento**: il formato segue le foto e i video più numerosi, e si usano di preferenza quelli nello stesso verso; quelli girati nell'altro verso (se servono) seguono le persone (regia intelligente) o, se sono foto, si attraversano con una panoramica; lo sfondo sfocato resta solo se non c'è un soggetto chiaro.
-- **Temi**: Cinema, Energico, Reel virale, Ricordi, Sogno, Elegante, Viaggio, Blockbuster, Neon notte, Estate pop, Azione, Estremo, Romantico, Matrimonio, Super 8, Anni '90, Natura, Mare, Montagna, Diario di viaggio. Ognuno ha il suo look colore, le sue transizioni (morbide nelle parti calme, d'impatto sui colpi) e il suo titolo.
+- **Temi**: Cinema, Energico, Reel virale, Ricordi, Sogno, Elegante, Viaggio, Blockbuster, Neon notte, Estate pop, Azione, Estremo, Romantico, Matrimonio, Super 8, Anni '90, Natura, Mare, Montagna, Diario di viaggio. Ognuno ha il suo look colore, le sue transizioni (morbide nelle parti calme, d'impatto sui colpi) e il suo titolo. I temi d'azione seguono lo stile delle velocity edit: molti tagli sono stacchi netti sul battito, sui colpi ci sono blackout, flash di esposizione, zoom secchi e scosse di camera, e sul drop un blackout seguito da flash e rimbalzo. Anni '90 e Super 8 restano volutamente rétro.
 - **Struttura**: con la musica, i temi più dinamici aprono con un'**intro a raffica** e il titolo sul colpo; sul drop c'è il **momento eroe**; il **finale** rallenta e chiude con una scritta (il periodo indicato sotto il titolo, o il titolo).
 - **Altra proposta** rifà il montaggio con altre scene e altri tratti, **Stile** lo cambia: tutto resta ritoccabile a mano.
 
@@ -94,6 +97,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 ## Transizioni
 - Tocca il **cerchietto sul taglio** fra due clip nella timeline (oppure Modifica → Transizione con la clip prima del taglio). Il cerchietto diventa arancione quando c'è una transizione; ai lati della clip selezionata è nascosto per lasciare posto alle maniglie.
 - **Incrociata**: le due clip si sovrappongono (vera dissolvenza). Usa i fotogrammi oltre il taglio: se una clip non ne ha, la dissolvenza si accorcia (il pannello lo indica). Fra foto è sempre piena.
+- **Di tendenza** (in cima all'elenco): **Blackout** (pochi fotogrammi neri secchi sul taglio), **Flash esposizione** (l'immagine si brucia di luce per un istante, senza diventare bianca), **Scossa camera** (sobbalzo da ripresa a mano), **Zoom secco** (spinta in avanti rapida). Sono gli stacchi delle velocity edit: brevi, da 0,2–0,3 s.
 - Altre: Nero, Flash, Zoom, Sfocatura, Scorrimento, Rotazione (metà alla fine di una clip, metà all'inizio della successiva).
 - **Wow**: **Glitch** (strisce e colori sfasati), **Prisma** (zoom con i colori divisi), **Luce** (bagliore caldo che brucia nel bianco), **Cerchio** (si chiude al nero e si riapre), **Pixel** (si scompone in quadretti), **Scossa** (scatto mosso).
 - Lo slideshow "Varie" usa solo le transizioni morbide; Glitch, Pixel e Scossa vanno scelte apposta.
@@ -105,6 +109,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - **Effetti** nella barra principale, due schede. **Dissolvenze**: in entrata e in uscita (fino a metà clip), dal/al nero o bianco, anche sull'audio (l'audio sfuma nel video esportato).
 - **Apri e chiudi il video**: dissolvenza dal nero sulla prima clip e al nero sull'ultima, in un tocco (acceso è in ambra; ritoccalo per toglierle). **A tutte le clip** copia le dissolvenze.
 - Scheda **Effetti**, per categoria (tocca la categoria, poi l'effetto; il numero indica quanti ne hai accesi):
+- **Di tendenza** (si apre per prima): **Pellicola moderna** (alone caldo attorno alle luci, neri morbidi, senza tremolio), **Fotocamera digitale** (look anni 2000: nitida, luce da flash, ombre fredde, un filo di rumore), **Grana fine**, **Toni smorzati** (colori meno saturi, neri schiacciati). Qui trovi anche gli effetti a ritmo di oggi: **Flash a ritmo** (l'esposizione salta sul colpo), **B/N a ritmo** (un istante in bianco e nero a ogni colpo), **Rimbalzo a ritmo** (piccolo scatto di scala che si assesta), oltre a Scossa e RGB a ritmo, Sfocatura zoom, Aberrazione e Bande cinema.
 - **Wow**: **Colpo a ritmo** (scatto di zoom con colori sfasati sul battito), **Cinematografico** (contrasto da film e bande nere), **Contorni neon** (i bordi si accendono di colori che cambiano), **Raggi di luce**, **Luci bokeh**, **Polvere d'oro** (scintille), **Prisma** (colori che ruotano), **Linee di velocità** (da fumetto).
 - **Colore**: Bianco e nero, Seppia, Colori vivaci, Bicromia, Arcobaleno, Poster, Negativo.
 - **Stile**: Pellicola, Vecchio film, VHS, Glitch, Fumetto, Retino, Pixel, Luce calda, Bagliore.
@@ -150,7 +155,8 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Testo
 - **Testo** nella barra principale: parte dall'indicatore, 3 secondi. Schede **Stile**, **Animazione**, **Movimento**.
-- **Stili pronti**: Cinema, Didascalia, Pop, Elegante, Neon, Impatto, Firma, Diario e i nuovi **Glitch, Onda, Oro, Cascata**.
+- **Stili pronti**: in testa quelli di tendenza: **Pulito** (bold bianco, lettere strette), **Etichetta** (testo scuro su pillola bianca), **Titolone** (enorme e condensato), **Minimal** (piccolo, maiuscolo spaziato), **Social** (bianco con contorno, parola per parola). Poi Cinema, Didascalia, Pop, Elegante, Neon, Impatto, Firma, Diario, Glitch, Onda, Oro, Cascata e gli altri.
+- Se una parola non entra in larghezza (titoli molto grandi o video verticali) il carattere si rimpicciolisce quanto basta, invece di spezzarla a metà.
 - Carattere, colore, **sfumatura** a due colori, stile (Ombra, Contorno, Riquadro, Neon), spaziatura, maiuscolo.
 - Posizione: trascina, pizzica e ruota il riquadro tratteggiato sull'anteprima.
 - Animazioni di entrata/uscita (anche **Macchina da scrivere** e **Parola per parola**).
@@ -165,7 +171,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - **Testo → Sottotitoli automatici**. L'app ascolta l'audio delle clip, la voce fuori campo e l'audio staccato (la musica no) e crea i sottotitoli, divisi in righe brevi da leggere, con i tempi di ogni parola.
 - **Riconoscimento**: **Preciso** (consigliato per l'italiano, 190 MB) o **Veloce** (60 MB). Il modello si scarica una volta sola, poi funziona anche senza internet: l'audio non esce mai dal telefono.
 - **Lingua**: Italiano, Inglese o Automatica. **Posizione**: in basso, al centro, in alto.
-- **Stili**: **Classico** (bianco con ombra), **Karaoke** (la parola detta si colora d'arancio), **Parola per parola** (le parole compaiono mentre sono dette), **Riquadro** (fondo scuro).
+- **Stili**: **Social** (di serie: due o tre parole alla volta, bold bianco con contorno nero, le parole compaiono mentre sono dette), **Minimal** (minuscolo, piccolo, senza animazioni), **Classico** (bianco con ombra), **Karaoke** (la parola detta si accende di giallo burro), **Parola per parola**, **Riquadro** (fondo scuro).
 - I sottotitoli sono testi normali nella timeline: toccane uno per correggere una parola, spostarlo o cambiarne lo stile. Rifacendo i sottotitoli, quelli automatici di prima vengono sostituiti; **Togli i sottotitoli automatici** li elimina tutti; Annulla torna indietro.
 - Su un video lungo l'ascolto richiede un po' (con "Preciso" circa un terzo della durata del video, a seconda del telefono): si può annullare.
 

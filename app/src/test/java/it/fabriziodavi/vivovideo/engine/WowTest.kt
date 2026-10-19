@@ -99,7 +99,7 @@ class WowTest {
         assertTrue("nessun taglio sul drop: $starts", i > 0)
         assertEquals(AutoStyle.ENERGICO.impact.first(), p.clips[i - 1].transitionOut?.type)
         // Effetti a ritmo nelle parti cariche, e accelerazioni a tempo nei video.
-        assertTrue(hot.all { c -> c.fx.any { it.type == FxType.ZOOMBEAT } })
+        assertTrue(hot.all { c -> c.fx.any { it.type == FxType.FLASHBEAT } })
         assertTrue(hot.any { it.speed == ClipSpeed.RAMP })
         // Tutto a tempo e della durata giusta.
         assertTrue("durata ${p.durationUs}", abs(p.durationUs - 60_000_000L) <= 20_000)
@@ -124,7 +124,7 @@ class WowTest {
         // Intro: 8 lampi su mezzi battiti (0,25 s), poi il titolo sul colpo.
         val intro = p.clips.take(8)
         assertTrue(intro.drop(1).all { abs(it.outputUs - 250_000) < 5_000 })
-        assertTrue(intro.dropLast(1).all { it.transitionOut?.type == TransitionType.FLASH })
+        assertTrue(intro.dropLast(1).all { it.transitionOut?.type == TransitionType.EXPOSE })
         val introEnd = intro.sumOf { it.outputUs }
         val title = p.texts.first { it.text == "Estate" }
         assertEquals(introEnd, title.startUs)
@@ -149,7 +149,9 @@ class WowTest {
             val p = AutoEdit.build("T", srcs, music(), AutoOptions(style = st, targetUs = 45_000_000, title = "Titolo"))
             assertTrue("$st durata ${p.durationUs}", abs(p.durationUs - 45_000_000) <= 30_000)
             assertTrue("$st", p.clips.isNotEmpty() && p.texts.isNotEmpty())
-            p.clips.dropLast(1).forEach { c -> assertNotNull("$st transizione", c.transitionOut) }
+            // Tutte le scene hanno la loro transizione, tranne gli stacchi netti dei temi da velocity edit.
+            if (st.cutShare == 0f) p.clips.dropLast(1).forEach { c -> assertNotNull("$st transizione", c.transitionOut) }
+            else assertTrue("$st senza transizioni", p.clips.dropLast(1).any { it.transitionOut != null })
         }
     }
 
