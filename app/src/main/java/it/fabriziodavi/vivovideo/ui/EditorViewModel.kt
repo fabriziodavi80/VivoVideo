@@ -8,6 +8,7 @@ import it.fabriziodavi.vivovideo.model.SubPosition
 import it.fabriziodavi.vivovideo.model.Subtitles
 import it.fabriziodavi.vivovideo.engine.Whisper
 import it.fabriziodavi.vivovideo.engine.Proxies
+import it.fabriziodavi.vivovideo.engine.Decoders
 import it.fabriziodavi.vivovideo.model.ClipAttr
 import it.fabriziodavi.vivovideo.model.ClipStyle
 import it.fabriziodavi.vivovideo.model.ClipTools
@@ -2061,6 +2062,8 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             // Un pezzo dura un secondo: se per 20 s non esce nulla si è inceppato e si riprova.
             .setMaxDelayBetweenMuxerSamplesMs(20_000)
             .setVideoMimeType(androidx.media3.common.MimeTypes.VIDEO_H264)
+            // Al secondo tentativo con il decodificatore software: non si guasta se quelli hardware sono esauriti.
+            .setAssetLoaderFactory(Decoders.assetLoader(ctx, softwareOnly = retry))
             .addListener(object : Transformer.Listener {
                 override fun onCompleted(composition: androidx.media3.transformer.Composition, exportResult: androidx.media3.transformer.ExportResult) {
                     tmp.renameTo(CrossfadePreview.file(ctx, job.key))

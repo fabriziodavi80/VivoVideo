@@ -9,11 +9,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import android.provider.MediaStore
-import androidx.media3.common.util.Clock
-import androidx.media3.exoplayer.mediacodec.MediaCodecUtil
 import androidx.media3.transformer.Composition
-import androidx.media3.transformer.DefaultAssetLoaderFactory
-import androidx.media3.transformer.DefaultDecoderFactory
 import androidx.media3.transformer.DefaultEncoderFactory
 import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
@@ -122,13 +118,6 @@ class Exporter(
                 "decoder software (lento)"
             }
         }
-        val decoders = DefaultDecoderFactory.Builder(context)
-        if (softwareDecoder) {
-            decoders.setMediaCodecSelector { mime, secure, tunneling ->
-                val all = MediaCodecUtil.getDecoderInfos(mime, secure, tunneling)
-                all.filter { it.softwareOnly }.ifEmpty { all }
-            }
-        }
         val outFile = File(context.cacheDir, "export_${System.currentTimeMillis()}.mp4")
 
         val listener = object : Transformer.Listener {
@@ -181,6 +170,13 @@ class Exporter(
                     handler.post { attempt(project, options.copy(hdr = false), audio, 0, log, allowMulti) }
                     return
                 }
+                if (exportException.errorCode == ExportException.ERROR_CODE_DECODING_FAILED && !softwareDecoder && !cancelled) {
+                    // Il decodificatore video si è guastato a metà (capita con progetti lunghi o molti video):
+                    // cambiare l'encoder non serve, si riprova subito con il decodificatore software.
+                    onState(ExportState.Running(null, "Nuovo tentativo con il decodificatore software…"))
+                    handler.post { attempt(project, options, audio, if (heavy) 2 else 3, log, allowMulti) }
+                    return
+                }
                 if (retryable && step < 3 && !cancelled) {
                     onState(ExportState.Running(null, "Nuovo tentativo con impostazioni più prudenti…"))
                     handler.post { attempt(project, options, audio, attempt + 1, log, allowMulti) }
@@ -212,7 +208,7 @@ class Exporter(
             .setEncoderFactory(
                 DefaultEncoderFactory.Builder(context).setRequestedVideoEncoderSettings(settings.build()).build()
             )
-            .setAssetLoaderFactory(DefaultAssetLoaderFactory(context, decoders.build(), Clock.DEFAULT, null))
+            .setAssetLoaderFactory(Decoders.assetLoader(context, softwareDecoder))
             .addListener(listener)
             .build()
         transformer = t

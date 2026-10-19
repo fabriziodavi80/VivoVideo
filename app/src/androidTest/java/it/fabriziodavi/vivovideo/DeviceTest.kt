@@ -11,6 +11,7 @@ import android.media.MediaMetadataRetriever
 import android.net.Uri
 import it.fabriziodavi.vivovideo.online.Library
 import it.fabriziodavi.vivovideo.engine.AudioDsp
+import it.fabriziodavi.vivovideo.engine.Decoders
 import it.fabriziodavi.vivovideo.engine.Whisper
 import it.fabriziodavi.vivovideo.model.Subtitles
 import it.fabriziodavi.vivovideo.model.SubStyle
@@ -187,11 +188,12 @@ class DeviceTest {
         }
 
         /** Esegue Transformer sul thread principale e aspetta la fine. */
-        fun transform(c: Composition, out: File, timeoutS: Long = 240) {
+        fun transform(c: Composition, out: File, timeoutS: Long = 240, softwareDecoder: Boolean = false) {
             val done = CountDownLatch(1)
             val error = AtomicReference<String?>(null)
             main.post {
                 Transformer.Builder(ctx).setMaxDelayBetweenMuxerSamplesMs(30_000).setVideoMimeType(MimeTypes.VIDEO_H264)
+                    .setAssetLoaderFactory(Decoders.assetLoader(ctx, softwareDecoder))
                     .addListener(object : Transformer.Listener {
                         override fun onCompleted(composition: Composition, exportResult: ExportResult) { done.countDown() }
                         override fun onError(composition: Composition, exportResult: ExportResult, exportException: ExportException) {
@@ -552,12 +554,21 @@ class DeviceTest {
             val out = CrossfadePreview.file(ctx, job.key)
             val c = factory.build(job.sub, ExportOptions(), forPreview = true, nativeAudio = null, allowMulti = true,
                 sizeOverride = w to h, crossfadesOverride = job.cf?.let { listOf(it) })
-            // Come nell'app: se si inceppa si riprova una volta.
-            try { transform(c, out, timeoutS = 120) } catch (e: Throwable) { out.delete(); transform(c, out, timeoutS = 120) }
+            // Come nell'app: se si inceppa si riprova una volta, con il decodificatore software.
+            try { transform(c, out, timeoutS = 120) } catch (e: Throwable) { out.delete(); transform(c, out, timeoutS = 180, softwareDecoder = true) }
             assertTrue(out.length() > 1000)
         }
         // L'anteprima con le dissolvenze pronte scorre.
         playFor(p, seconds = 8)
+    }
+
+    /** Il ripiego dell'app quando il decodificatore hardware si guasta: con quello software si esporta lo stesso. */
+    @Test fun softwareDecoderExports() {
+        val seq = EditedMediaItemSequence.Builder(setOf(C.TRACK_TYPE_VIDEO))
+            .addItem(EditedMediaItem.Builder(MediaItem.fromUri(videoA)).setRemoveAudio(true).build()).build()
+        val out = File(dir(), "software.mp4").apply { delete() }
+        transform(Composition.Builder(listOf(seq)).build(), out, timeoutS = 180, softwareDecoder = true)
+        assertTrue(out.length() > 1000)
     }
 
     /** Video sovrapposto: il tratto si prepara (con il video vero dentro) e l'anteprima lo riproduce al posto dell'immagine ferma. */
