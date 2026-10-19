@@ -757,11 +757,14 @@ object AutoEdit {
             val eCut = energyAt(cutAt)
             val isDrop = drops.any { kotlin.math.abs(it - cutAt) < 40_000 }
             if (i < clips.lastIndex) {
-                val strong = style.impact.isNotEmpty() && (isDrop || (eCut != null && eCut >= 0.65f && rnd.nextFloat() < 0.6f))
+                // Nei temi da velocity edit i colpi d'impatto sono più rari: dove il brano spinge la maggior parte dei tagli è netta
+                // (blackout e flash a ogni mezzo secondo sarebbero troppo).
+                val strong = style.impact.isNotEmpty() && (isDrop || (eCut != null && eCut >= 0.65f && rnd.nextFloat() < 0.6f * (1f - style.cutShare)))
                 val list = if (strong) style.impact else style.transitions
                 val choices = list.filter { it != prevT || it == TransitionType.CROSSFADE }.ifEmpty { list }
                 // Velocity edit: buona parte dei tagli normali è uno stacco netto sul battito, senza transizione.
-                val hardCut = !strong && !isDrop && style.cutShare > 0f && rnd.nextFloat() < style.cutShare
+                // Solo con la musica: lo stacco netto ha senso sul battito.
+                val hardCut = beats.isNotEmpty() && !strong && !isDrop && style.cutShare > 0f && rnd.nextFloat() < style.cutShare
                 if (hardCut) {
                     prevT = null
                     c = c.copy(transitionOut = null)
