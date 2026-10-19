@@ -1,6 +1,6 @@
 # VivoVideo · note per riprendere il lavoro
 
-Aggiornate al 18/10/2026, ultima versione **v0.3.136**. Da leggere insieme a `CLAUDE.md`.
+Aggiornate al 19/10/2026, ultima versione **v0.3.140**. Da leggere insieme a `CLAUDE.md`.
 
 ## 1. Stato attuale dell'app
 
@@ -57,7 +57,13 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, minSdk 33, solo arm64-v8a 
 - Data della videocamera nei temi vintage.
 - "Altra proposta" e cambio di stile.
 
-### Ultime modifiche (v0.3.136), dopo il commento negativo su Natura
+### Ultime modifiche (v0.3.137–v0.3.140)
+- Natura dopo il secondo parere (ritmo ok, ma bagliori e pulsare fastidiosi): niente passaggi con lampo bianco (LUMA, LEAK, BOKEHFADE), niente DREAMY, RAYS, GLOWBEAT; foto con movimenti lenti (`gentlePops = false`).
+- `AutoStyle.calm` (= `!shorterOnEnergy`): nei temi calmi niente ZOOMBEAT/HIT sulla scena del drop (HIT pulsa a ogni battito per tutta la scena), niente scatti delle foto nelle parti cariche, passaggi lenti anche sui colpi.
+- Esportazione: `ERROR_CODE_DECODING_FAILED` ora si riprova con il decodificatore software (`engine/Decoders.kt`); anche il secondo tentativo delle dissolvenze dell'anteprima.
+- Prove sull'emulatore: video automatico diviso in `exportAutoVideoCinema`/`Energico` con le scene nel registro (tag AutoScene); nuova `softwareDecoderExports`; il ramo `emulator-logs` ora ha `logcat-errori.txt` e i registri di ogni prova in `tests/`.
+
+### Modifiche precedenti (v0.3.136), dopo il commento negativo su Natura
 - Natura senza foglie che cadono. Passaggi morbidi anche sui colpi: LUMA, BOKEHFADE, LIQUID.
 - `AutoStyle.minSceneUs` e `shorterOnEnergy`: i temi calmi hanno una durata minima delle scene (Natura 3,2 s) e non si accorciano dove il brano spinge.
 - Verso coerente:
@@ -67,9 +73,9 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, minSdk 33, solo arm64-v8a 
 - `Moments.bestStarts` evita i primi e gli ultimi 0,6 s e, con `calm`, i tratti molto mossi.
 
 ### Prove
-- La compilazione e le prove unitarie della v0.3.136 sono riuscite.
-- Le prove sull'emulatore erano ancora in corso quando ho scritto queste note: l'esito è nel ramo `emulator-logs`.
-- L'ultimo giro completo sull'emulatore (run 134) è passato 28 su 28.
+- v0.3.140: compilazione e prove unitarie riuscite; emulatore 29 su 30. Fallita solo `previewPlaysWow` (anteprima lenta dopo 3 s: grafica software dell'emulatore, era passata nel giro prima).
+- I fallimenti dei giri 136–139 erano il decodificatore h264 dell'emulatore (`c2.goldfish`, errore -14) che si esaurisce verso l'ottava prova pesante, non il video automatico.
+- Per leggere i rami dei log serve `git fetch origin +emulator-logs:...` (con il +): vengono riscritti a ogni giro.
 - Mai provati sul telefono vero:
   - il risultato in HDR;
   - la qualità della stabilizzazione e dello scontorno;
@@ -109,8 +115,8 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, minSdk 33, solo arm64-v8a 
 - I temi calmi devono restare distesi, mai frenetici.
 
 ## 3. Prossimi passi
-1. Controllare l'esito delle prove sull'emulatore della v0.3.136 e correggere eventuali errori.
-2. Raccogliere il parere dell'utente sul nuovo Natura (ritmo, passaggi, verso) e regolare `minSceneUs` e gli accenti.
+1. Se `previewPlaysWow` fallisce di nuovo, capire quale effetto WOW rallenta l'anteprima (dopo 3 s).
+2. Raccogliere il parere dell'utente sul Natura della v0.3.137 (senza bagliori né pulsare).
 3. Valutare un dittico (due foto affiancate) per le foto nell'altro verso, invece di scartarle o fare una panoramica.
 4. Migliorare la forma dell'effetto Foglie d'autunno, oppure toglierlo dai temi.
 5. Collaudo sul telefono vero (schermata Collaudo), in particolare HDR, stabilizzazione, scontorno, anteprima con effetti premium e progetti lunghi. Correggere a partire dai rapporti "Segnala un problema".
