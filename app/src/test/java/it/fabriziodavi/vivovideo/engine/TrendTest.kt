@@ -111,8 +111,8 @@ class TrendTest {
         assertEquals(TransitionType.BLACKOUT, p.clips[d - 1].transitionOut?.type)
         assertTrue(p.clips[d].fx.any { it.type == FxType.FLASHBEAT } && p.clips[d].fx.any { it.type == FxType.BOUNCE })
         assertTrue(p.clips.none { c -> c.fx.any { it.type == FxType.HIT || it.type == FxType.ZOOMBEAT } })
-        // Tutto sul battito e della durata giusta.
-        starts.drop(1).forEach { t -> assertTrue("taglio a $t fuori battito", t % 500_000L < 20_000 || t % 500_000L > 480_000) }
+        // Dopo l'intro a raffica (8 lampi su mezzi battiti) tutto sul battito, e della durata giusta.
+        starts.drop(9).forEach { t -> assertTrue("taglio a $t fuori battito", t % 500_000L < 20_000 || t % 500_000L > 480_000) }
         assertTrue(abs(p.durationUs - 60_000_000L) <= 20_000)
         // Titolo grande e pulito, sottotitolo minimal.
         val title = p.texts.first { it.text == "Estate" }
