@@ -1,6 +1,6 @@
 # VivoVideo · note per riprendere il lavoro
 
-Aggiornate al 19/10/2026, ultima versione **v0.3.140**. Da leggere insieme a `CLAUDE.md`.
+Aggiornate al 19/10/2026, ultima versione **v0.3.144**. Da leggere insieme a `CLAUDE.md`.
 
 ## 1. Stato attuale dell'app
 
@@ -57,7 +57,20 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, minSdk 33, solo arm64-v8a 
 - Data della videocamera nei temi vintage.
 - "Altra proposta" e cambio di stile.
 
-### Ultime modifiche (v0.3.137–v0.3.140)
+### Ultime modifiche (v0.3.141–v0.3.144): look 2026
+- Parere ricevuto dall'utente: i temi d'azione avevano un "look da boomer". Ricerca su CapCut, Edits di Meta, tendenze 2026 (velocity edit).
+- Temi d'azione (Energico, Virale, Azione, Estremo, Neon, Estate, Blockbuster, Viaggio, Mare, Montagna, Diario) rifatti:
+  - `AutoStyle.cutShare`: stacchi netti sul battito (solo con musica); colpi d'impatto più rari dove il brano spinge;
+  - `dropFx` (FLASHBEAT + BOUNCE), `introCut` (EXPOSE), `introFx`; Anni '90 tiene i suoi colpi VHS;
+  - via CUBE, SWIRL, SPIN, PRISM, STRIPES, PUNCH, BURST, SPEEDLINES, DUOPOP, HOLO, NEON, HIT, ZOOMBEAT; titoli TITOLONE/PULITO/SOCIAL, sottotitolo MINIMAL.
+- Effetti nuovi (WowFxEffect): HALATION, DIGICAM, GRAIN, MUTED (categoria `FxCategory.TREND`, prima scheda) e FLASHBEAT, BWBEAT, BOUNCE (a ritmo). `FxType.trendy` raccoglie la scheda.
+- Transizioni nuove: BLACKOUT, EXPOSE, CAMSHAKE, SNAPZOOM (solo parametri esistenti dello shader); `TransitionType.trend` in testa al pannello.
+- Testi: PULITO, ETICHETTA, TITOLONE, MINIMAL, SOCIAL; `TextRenderer` rimpicciolisce le parole troppo larghe.
+- Sottotitoli: stili SOCIAL (di serie, 3 parole) e MINIMAL (minuscolo); Karaoke e Parola per parola senza maiuscolo, giallo burro.
+- Prove: `TrendTest`, `exportTrendKit` sull'emulatore; video automatico sull'emulatore ridotto a 12 s (oltre l'ottava prova pesante l'emulatore si esauriva).
+- Da raccogliere: parere dell'utente e di chi ha criticato i temi sul nuovo look.
+
+### Modifiche v0.3.137–v0.3.140
 - Natura dopo il secondo parere (ritmo ok, ma bagliori e pulsare fastidiosi): niente passaggi con lampo bianco (LUMA, LEAK, BOKEHFADE), niente DREAMY, RAYS, GLOWBEAT; foto con movimenti lenti (`gentlePops = false`).
 - `AutoStyle.calm` (= `!shorterOnEnergy`): nei temi calmi niente ZOOMBEAT/HIT sulla scena del drop (HIT pulsa a ogni battito per tutta la scena), niente scatti delle foto nelle parti cariche, passaggi lenti anche sui colpi.
 - Esportazione: `ERROR_CODE_DECODING_FAILED` ora si riprova con il decodificatore software (`engine/Decoders.kt`); anche il secondo tentativo delle dissolvenze dell'anteprima.
@@ -73,6 +86,7 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, minSdk 33, solo arm64-v8a 
 - `Moments.bestStarts` evita i primi e gli ultimi 0,6 s e, con `calm`, i tratti molto mossi.
 
 ### Prove
+- v0.3.144: compilazione, prove unitarie ed emulatore (31 prove) tutti riusciti.
 - v0.3.140: compilazione e prove unitarie riuscite; emulatore 29 su 30. Fallita solo `previewPlaysWow` (anteprima lenta dopo 3 s: grafica software dell'emulatore, era passata nel giro prima).
 - I fallimenti dei giri 136–139 erano il decodificatore h264 dell'emulatore (`c2.goldfish`, errore -14) che si esaurisce verso l'ottava prova pesante, non il video automatico.
 - Per leggere i rami dei log serve `git fetch origin +emulator-logs:...` (con il +): vengono riscritti a ogni giro.
