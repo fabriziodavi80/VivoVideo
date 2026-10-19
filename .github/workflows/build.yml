@@ -133,7 +133,7 @@ jobs:
           done
           grep -E "VivoVideo|AndroidRuntime|FATAL|Media3|ExoPlayer|Transformer|TestRunner" logcat.txt | tail -400 > /tmp/elogs/logcat.txt 2>/dev/null || true
           # Errori di tutto il giro, dall'inizio (il registro sopra tiene solo la fine).
-          grep -E "TestRunner|CodecException|Caused by|ExportException| E/(Transformer|ExoPlayer|MediaCodec|CCodec|DefaultCodec)" logcat.txt | head -600 > /tmp/elogs/logcat-errori.txt 2>/dev/null || true
+          grep -E "TestRunner|AutoScene|CodecException|Caused by|ExportException| E/(Transformer|ExoPlayer|MediaCodec|CCodec|DefaultCodec)" logcat.txt | head -600 > /tmp/elogs/logcat-errori.txt 2>/dev/null || true
           grep -E "FAILED|AssertionError|Exception|tests completed|BUILD" -A25 /tmp/elogs/device.log > /tmp/elogs/errors.txt || true
           echo "run=${GITHUB_RUN_NUMBER} sha=${GITHUB_SHA} outcome=${OUTCOME}" > /tmp/elogs/status.txt
           cd /tmp/elogs

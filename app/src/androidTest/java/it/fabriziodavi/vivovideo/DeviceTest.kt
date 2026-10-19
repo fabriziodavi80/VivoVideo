@@ -342,23 +342,26 @@ class DeviceTest {
     }
 
     /** Video automatico con musica e battiti: tutte le regie si esportano. */
-    @Test fun exportAutoVideo() {
+    @Test fun exportAutoVideoCinema() = exportAuto(AutoStyle.CINEMA)
+
+    @Test fun exportAutoVideoEnergico() = exportAuto(AutoStyle.ENERGICO)
+
+    private fun exportAuto(s: AutoStyle) {
         val srcs = listOf(video("a", videoA), photoClip("p1"), video("b", videoB), photoClip("p2"), video("c", videoC))
             .map { it.copy(trimStartUs = 0, trimEndUs = it.sourceDurationUs.coerceAtMost(Clip.PHOTO_MAX_US)) }
         val m = MusicTrack(uri = music.toString(), name = "musica", sourceDurationUs = 30_000_000, lengthUs = 30_000_000,
             beatsUs = (1 until 60).map { it * 500_000L }, bpm = 120f)
-        listOf(AutoStyle.CINEMA, AutoStyle.ENERGICO).forEach { s ->
-            // Senza compositore a più ingressi: l'emulatore regge pochi decodificatori insieme (il telefono sì).
-            val p = AutoEdit.build("auto ${s.label}", srcs, m, AutoOptions(style = s, title = "Prova", subtitle = "Ottobre 2026", targetUs = m.sourceDurationUs))
-            // Se fallisce, il messaggio dice quale tema e com'è fatta ogni scena (per capire la causa dal registro).
-            val scenes = p.clips.joinToString("\n") { c ->
-                "  ${c.uri.substringAfterLast('/')} ${c.trimStartUs / 1000}-${c.trimEndUs / 1000} ms di ${c.sourceDurationUs / 1000}, " +
-                    "esce ${c.outputUs / 1000} ms, ${c.speed}${if (c.speedPoints.isNotEmpty()) " curva" else ""}, " +
-                    "passaggio ${c.transitionOut?.type ?: "-"} ${c.transitionOut?.durationUs?.div(1000) ?: 0} ms, fx ${c.fx.map { it.type }}"
-            }
-            try { exportAndCheck(p, multi = false) }
-            catch (e: AssertionError) { throw AssertionError("${s.label}: ${e.message}\nScene:\n$scenes", e) }
+        val p = AutoEdit.build("auto ${s.label}", srcs, m, AutoOptions(style = s, title = "Prova", subtitle = "Ottobre 2026", targetUs = m.sourceDurationUs))
+        // Com'è fatta ogni scena: scritto nel registro prima di esportare (resta anche se l'emulatore va in crash).
+        val scenes = p.clips.joinToString("\n") { c ->
+            "  ${c.uri.substringAfterLast('/')} ${c.trimStartUs / 1000}-${c.trimEndUs / 1000} ms di ${c.sourceDurationUs / 1000}, " +
+                "esce ${c.outputUs / 1000} ms, ${c.speed}${if (c.speedPoints.isNotEmpty()) " curva" else ""}, " +
+                "passaggio ${c.transitionOut?.type ?: "-"} ${c.transitionOut?.durationUs?.div(1000) ?: 0} ms, fx ${c.fx.map { it.type }}"
         }
+        scenes.lines().forEach { android.util.Log.i("AutoScene", "${s.label}: $it") }
+        // Senza compositore a più ingressi: l'emulatore regge pochi decodificatori insieme (il telefono sì).
+        try { exportAndCheck(p, multi = false) }
+        catch (e: AssertionError) { throw AssertionError("${s.label}: ${e.message}\nScene:\n$scenes", e) }
     }
 
     @Test fun exportWowTransitionsAndTexts() {
