@@ -30,7 +30,7 @@ object Whisper {
 
     private external fun nativeInit(path: String): Long
     private external fun nativeFree(ctx: Long)
-    private external fun nativeTranscribe(ctx: Long, pcm: FloatArray, lang: String, threads: Int): ByteArray
+    private external fun nativeTranscribe(ctx: Long, pcm: FloatArray, lang: String, threads: Int, prompt: String): ByteArray
     private external fun nativeProgress(): Int
     private external fun nativeAbort()
 
@@ -71,14 +71,17 @@ object Whisper {
         f
     }
 
-    /** Trascrive: [pcm] mono 16 kHz, [lang] "it", "en" o "auto". */
-    suspend fun transcribe(model: File, pcm: FloatArray, lang: String): List<SpokenWord> = withContext(Dispatchers.Default) {
+    /** Suggerimento che fa scrivere anche le parole di riempimento ("ehm", "eh"…). */
+    const val FILLER_PROMPT = "Allora, ehm, eh, cioè... uhm, sì, ehm, mmm, ecco."
+
+    /** Trascrive: [pcm] mono 16 kHz, [lang] "it", "en" o "auto"; [prompt] = testo d'esempio che orienta lo stile. */
+    suspend fun transcribe(model: File, pcm: FloatArray, lang: String, prompt: String = ""): List<SpokenWord> = withContext(Dispatchers.Default) {
         if (!loaded) error("Il riconoscimento vocale non è disponibile su questo telefono.")
         val ctx = nativeInit(model.absolutePath)
         if (ctx == 0L) error("Modello non leggibile: prova a scaricarlo di nuovo.")
         try {
             val threads = Runtime.getRuntime().availableProcessors().coerceIn(2, 6)
-            parseWords(nativeTranscribe(ctx, pcm, lang, threads))
+            parseWords(nativeTranscribe(ctx, pcm, lang, threads, prompt))
         } finally { nativeFree(ctx) }
     }
 

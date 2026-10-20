@@ -39,7 +39,7 @@ static jbyteArray bytes(JNIEnv *env, const std::string &s) {
 }
 
 extern "C" JNIEXPORT jbyteArray JNICALL
-Java_it_fabriziodavi_vivovideo_engine_Whisper_nativeTranscribe(JNIEnv *env, jobject, jlong ctxPtr, jfloatArray pcm, jstring lang, jint threads) {
+Java_it_fabriziodavi_vivovideo_engine_Whisper_nativeTranscribe(JNIEnv *env, jobject, jlong ctxPtr, jfloatArray pcm, jstring lang, jint threads, jstring prompt) {
     auto *ctx = reinterpret_cast<whisper_context *>(ctxPtr);
     if (ctx == nullptr) return bytes(env, "");
     g_progress.store(0);
@@ -47,6 +47,9 @@ Java_it_fabriziodavi_vivovideo_engine_Whisper_nativeTranscribe(JNIEnv *env, jobj
     const char *l = env->GetStringUTFChars(lang, nullptr);
     std::string language(l);
     env->ReleaseStringUTFChars(lang, l);
+    const char *pr = env->GetStringUTFChars(prompt, nullptr);
+    std::string initialPrompt(pr);
+    env->ReleaseStringUTFChars(prompt, pr);
 
     whisper_full_params wp = whisper_full_default_params(WHISPER_SAMPLING_GREEDY);
     wp.n_threads = threads > 0 ? threads : 4;
@@ -62,6 +65,8 @@ Java_it_fabriziodavi_vivovideo_engine_Whisper_nativeTranscribe(JNIEnv *env, jobj
     wp.max_len = 1;
     wp.split_on_word = true;
     wp.suppress_nst = true;
+    // Un esempio di parlato "con gli ehm" convince il modello a scriverli (di solito li tralascia).
+    wp.initial_prompt = initialPrompt.empty() ? nullptr : initialPrompt.c_str();
     wp.progress_callback = [](whisper_context *, whisper_state *, int progress, void *) { g_progress.store(progress); };
     wp.abort_callback = [](void *) { return g_abort.load(); };
 

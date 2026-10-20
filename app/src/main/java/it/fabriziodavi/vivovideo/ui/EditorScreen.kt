@@ -1348,6 +1348,8 @@ private fun ClipAudioTab(vm: EditorViewModel, running: Boolean) {
     }
     val clip = vm.selectedClip
     if (clip == null) { Hint("Nessuna clip nel progetto."); return }
+    // Per i video parlati: toglie silenzi e "ehm" da tutto il progetto.
+    SecondaryButton("Taglia pause e ehm", Modifier.fillMaxWidth(), onClick = { if (!running) { vm.pause(); vm.speechPlan = null; vm.showSpeechCut = true } })
     if (clip.isPhoto) { Hint("Le foto non hanno audio."); return }
     ToggleRow("Disattiva l'audio della clip", clip.muted, !running) { v -> vm.updateSelected { it.copy(muted = v) } }
     LabeledSlider(

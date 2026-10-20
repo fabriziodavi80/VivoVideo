@@ -6,6 +6,7 @@ import it.fabriziodavi.vivovideo.model.Clip
 import it.fabriziodavi.vivovideo.model.SubStyle
 import it.fabriziodavi.vivovideo.model.SubPosition
 import it.fabriziodavi.vivovideo.model.Subtitles
+import it.fabriziodavi.vivovideo.model.cutTimeline
 import it.fabriziodavi.vivovideo.engine.Whisper
 import it.fabriziodavi.vivovideo.engine.Proxies
 import it.fabriziodavi.vivovideo.engine.Decoders
@@ -1537,6 +1538,68 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
 
     /** Toglie tutti i sottotitoli automatici. */
     fun removeSubtitles() = update { it.copy(texts = it.texts.filterNot { t -> t.subtitle }) }
+
+    // ---------------- Pulizia del parlato: pause ed "ehm" ----------------
+
+    var showSpeechCut by mutableStateOf(false)
+    /** Ciò che l'analisi propone di togliere (null finché non si analizza). */
+    var speechPlan by mutableStateOf<it.fabriziodavi.vivovideo.model.SpeechCuts.Result?>(null)
+
+    /**
+     * Ascolta l'audio delle clip: pause più lunghe di [minPauseUs] (0 = non cercarle) e, con [fillers],
+     * le parole di riempimento (serve il riconoscimento vocale). Non cambia nulla finché non si conferma.
+     */
+    fun analyzeSpeech(model: Whisper.Model, lang: String, minPauseUs: Long, fillers: Boolean) {
+        val ctx = getApplication<Application>()
+        val p = project ?: return
+        if (p.clips.isEmpty() || busy != null) return
+        pause()
+        speechPlan = null
+        subtitleJob = viewModelScope.launch {
+            try {
+                busy = "Preparo l'audio…"
+                // Solo l'audio delle clip: voci fuori campo e musica non si tagliano.
+                val pcm = withContext(Dispatchers.Default) {
+                    val wav = renderTimelineAudio(ctx, p.copy(music = emptyList()), loudness = false)
+                    try { Whisper.wavTo16kMono(wav) } finally { wav.delete() }
+                }
+                var words = emptyList<it.fabriziodavi.vivovideo.model.SpokenWord>()
+                if (fillers) {
+                    if (!Whisper.isDownloaded(ctx, model)) {
+                        busy = "Scarico il modello ${model.label} (${model.sizeMb} MB, solo la prima volta)…"
+                        Whisper.download(ctx, model) { f -> handler.post { busy = "Scarico il modello ${model.label}… ${(f * 100).toInt()}%" } }
+                    }
+                    busy = "Ascolto il parlato… 0%"
+                    val poll = launch { while (true) { kotlinx.coroutines.delay(400); busy = "Ascolto il parlato… ${Whisper.progress()}%" } }
+                    words = try { Whisper.transcribe(Whisper.modelFile(ctx, model), pcm, lang, Whisper.FILLER_PROMPT) } finally { poll.cancel() }
+                }
+                busy = "Cerco le pause…"
+                val plan = withContext(Dispatchers.Default) { it.fabriziodavi.vivovideo.model.SpeechCuts.plan(p, pcm, words, minPauseUs) }
+                busy = null
+                speechPlan = plan
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                busy = null; throw e
+            } catch (e: Exception) {
+                busy = null
+                message = "Analisi non riuscita: ${e.message ?: e.javaClass.simpleName}"
+            }
+        }
+    }
+
+    /** Taglia quello che l'analisi ha trovato (un solo Annulla torna indietro). */
+    fun applySpeechCuts() {
+        val plan = speechPlan ?: return
+        if (plan.isEmpty) return
+        val before = project?.durationUs ?: return
+        update { it.cutTimeline(plan.spans) }
+        val after = project?.durationUs ?: before
+        speechPlan = null
+        showSpeechCut = false
+        selectedClipId = null
+        message = "Tolti ${formatSeconds(before - after)} di pause e parole di riempimento. Annulla per tornare indietro."
+    }
+
+    private fun formatSeconds(us: Long): String = String.format(java.util.Locale.ITALIAN, "%.1f s", us / 1e6)
 
     // ---------------- Voce fuori campo, audio staccato, ducking ----------------
 

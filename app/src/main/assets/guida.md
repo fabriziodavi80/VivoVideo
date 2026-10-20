@@ -3,6 +3,7 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **Taglia pause e ehm** (Audio → Clip): per i video parlati, l'app toglie i silenzi lunghi (soglia 0,4, 0,7 o 1 s) lasciando un attimo di respiro fra le frasi e, se vuoi, anche "ehm", "eh", "uhm", "mmm". Prima ti dice quanto toglie e quanto dura il video dopo; un solo Annulla torna indietro.
 - **Home più chiara**: due strade grandi per creare un video, **Video automatico** e **Monta tu**, con **Da un modello** accanto. I progetti stanno sotto, "Apri una copia" e "Collaudo" in fondo.
 - **Video automatico in tre passi**: Cosa usare → Stile → Musica e dettagli, con i pulsanti Avanti e la barra dei passi in alto. I 20 temi sono divisi in gruppi; formato e regia stanno in "Altre opzioni".
 - **Foto singole nel video automatico**: oltre agli album interi puoi scegliere foto e video uno per uno da una griglia, anche filtrando per album.
@@ -149,6 +150,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - **Volume uniformato** (Esporta, acceso di serie): il video finito ha il volume standard di YouTube e Instagram (–14 LUFS), con i picchi sotto –1 dB.
 
 ## Audio delle clip
+- **Taglia pause e ehm** (Audio → Clip, in alto): l'app ascolta l'audio delle clip e propone di togliere i silenzi più lunghi della soglia scelta (**0,4 s** ritmo serrato, **0,7 s** naturale, **1 s** solo i silenzi lunghi), lasciando 0,15 s di respiro per lato. Con **Togli anche ehm, eh, uhm, mmm** usa il riconoscimento vocale (lo stesso dei sottotitoli) per trovare le parole di riempimento. **Analizza** mostra quante pause e quanti "ehm" ha trovato e la nuova durata; **Taglia** li toglie con stacchi netti. Foto, clip mute, musica e voci fuori campo non si toccano; testi e sottotitoli dopo i tagli si spostano con il video (i sottotitoli di un "ehm" tolto spariscono).
 - **Audio → scheda Clip**: volume (0–200%) o audio disattivato della clip selezionata (o sotto l'indicatore).
 
 ## Musica
