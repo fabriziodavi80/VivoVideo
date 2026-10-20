@@ -148,6 +148,8 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     var fullscreen by mutableStateOf(false)
     /** Guida aperta. */
     var showGuide by mutableStateOf(false)
+    /** Argomento su cui aprire la guida (null = indice). */
+    var guideTopic by mutableStateOf<String?>(null)
     private var messageState by mutableStateOf<String?>(null)
     /** Messaggio in basso; finisce anche nel diario (per le segnalazioni). */
     var message: String?

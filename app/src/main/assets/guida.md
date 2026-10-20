@@ -3,6 +3,7 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **Guida più comoda**: si apre su un indice diviso per argomenti, con la **ricerca** in alto (scrivi una parola: trovi gli argomenti che la contengono, evidenziata); ogni argomento ha la sua pagina con **precedente** e **successivo**. Dal punto di domanda nell'editor la guida si apre sull'argomento dello strumento che stai usando.
 - **Privacy: oscura volti, targhe e oggetti** (Effetti → Privacy): l'app trova cosa coprire in ogni fotogramma, sul telefono e senza internet, e lo segue mentre si muove; pixel, sfocato o nero.
 - **Strumenti per i tutorial**: **Zoom su un punto** (Modifica → Inquadra: l'immagine si avvicina morbida alla zona scelta, resta e torna), **evidenziazioni** pronte (Livelli: freccia, cerchio, riquadro, numero) e **passi numerati** (Testo → Passo numerato).
 - **Nuovo tema Grunge** (gruppo Rétro): crudo ma moderno, con toni smorzati e neri profondi, grana e graffi leggeri, tanti tagli secchi, B/N a scatti e sobbalzi di camera sui colpi, titolo da macchina da scrivere (nuovo stile di testo **Stampa**).
@@ -32,6 +33,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - **Modifica** mostra sopra una seconda riga con gli strumenti della clip; le altre voci aprono subito il loro pannello, diviso in schede.
 - La timeline scorre sotto l'indicatore arancione fisso: trascinala per scegliere il punto. Con **–** e **+** cambi lo zoom.
 - **Annulla/Ripeti** sono in alto. Il progetto si salva da solo.
+- **Guida** (punto di domanda): indice per argomenti con la ricerca in alto. Nell'editor si apre direttamente sull'argomento dello strumento aperto; la freccia in alto torna all'indice.
 - Ruotando il telefono l'editor passa in orizzontale; il tasto in alto a destra nell'anteprima la porta a schermo intero, con la barra di avanzamento da trascinare.
 
 ## Selezionare

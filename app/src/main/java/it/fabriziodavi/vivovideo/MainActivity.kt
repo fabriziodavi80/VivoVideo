@@ -69,7 +69,7 @@ class MainActivity : ComponentActivity() {
                 // La libreria si apre sopra alla schermata da cui la si chiama (che resta com'era).
                 androidx.compose.foundation.layout.Box(androidx.compose.ui.Modifier.fillMaxSize()) {
                     when {
-                        vm.showGuide -> GuideScreen { vm.showGuide = false }
+                        vm.showGuide -> GuideScreen(vm.guideTopic) { vm.showGuide = false; vm.guideTopic = null }
                         vm.showTestPlan -> TestPlanScreen(vm)
                         vm.project == null && vm.showAuto -> AutoScreen(vm)
                         vm.project == null -> HomeScreen(vm)
