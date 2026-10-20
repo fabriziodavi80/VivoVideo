@@ -1359,6 +1359,90 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    // ---------------- Privacy: oscura volti, targhe, oggetti ----------------
+
+    var redactFaces by mutableStateOf(true)
+    var redactPlates by mutableStateOf(true)
+    var redactStyle by mutableStateOf(it.fabriziodavi.vivovideo.model.RedactStyle.PIXEL)
+    /** Oggetto scelto toccandolo nel fotogramma (null = nessuno) e tempo del file in cui è stato scelto. */
+    var redactSeed by mutableStateOf<it.fabriziodavi.vivovideo.model.RBox?>(null)
+    private var redactSeedSrcUs = 0L
+    private var redactSeedClipId: String? = null
+    /** Scelta dell'oggetto: fotogramma all'indicatore e oggetti trovati dentro. */
+    var objectPick by mutableStateOf<android.graphics.Bitmap?>(null)
+        private set
+    var objectPickBoxes by mutableStateOf(listOf<it.fabriziodavi.vivovideo.model.RBox>())
+        private set
+
+    /** Apre la scelta dell'oggetto: prende il fotogramma all'indicatore e cerca gli oggetti. */
+    fun openObjectPick() {
+        val p = project ?: return
+        val (i, off) = p.locate(playheadUs) ?: return
+        val c = p.clips[i]
+        val ctx = getApplication<Application>()
+        pause()
+        viewModelScope.launch {
+            busy = "Cerco gli oggetti nel fotogramma…"
+            val bmp = withContext(Dispatchers.IO) {
+                runCatching {
+                    if (c.isPhoto) it.fabriziodavi.vivovideo.decodePhotoThumb(Uri.parse(c.uri).path ?: "", 1080)
+                    else {
+                        val r = android.media.MediaMetadataRetriever()
+                        try {
+                            r.setDataSource(ctx, Uri.parse(c.uri))
+                            val k = minOf(1f, 1080f / maxOf(c.width, c.height).coerceAtLeast(1))
+                            r.getScaledFrameAtTime(c.trimStartUs + c.speedCurve().sourceTimeAt(off), android.media.MediaMetadataRetriever.OPTION_CLOSEST,
+                                (c.width * k).toInt().coerceAtLeast(2), (c.height * k).toInt().coerceAtLeast(2))
+                        } finally { r.release() }
+                    }
+                }.getOrNull()
+            }
+            if (bmp == null) { busy = null; message = "Non riesco a leggere il fotogramma."; return@launch }
+            objectPickBoxes = runCatching { it.fabriziodavi.vivovideo.engine.Redactor.objectsIn(bmp) }.getOrDefault(emptyList())
+            busy = null
+            redactSeedSrcUs = if (c.isPhoto) 0L else c.trimStartUs + c.speedCurve().sourceTimeAt(off)
+            redactSeedClipId = c.id
+            selectedClipId = c.id
+            objectPick = bmp
+        }
+    }
+
+    /** Tocco sul fotogramma ([x], [y] fra 0 e 1): l'oggetto trovato lì, oppure un riquadro attorno al dito. */
+    fun pickObjectAt(x: Float, y: Float) {
+        val hit = objectPickBoxes.filter { it.contains(x, y) }.minByOrNull { it.w * it.h }
+        redactSeed = hit ?: it.fabriziodavi.vivovideo.model.RBox((x - 0.1f).coerceIn(0f, 0.8f), (y - 0.1f).coerceIn(0f, 0.8f), 0.2f, 0.2f)
+    }
+
+    fun closeObjectPick() { objectPick = null }
+
+    fun clearObject() { redactSeed = null }
+
+    /** Analizza la clip e oscura ciò che è stato scelto (volti, targhe, oggetto). */
+    fun redactClip() {
+        val c = workClip() ?: return
+        val seed = redactSeed?.takeIf { redactSeedClipId == c.id }
+        if (!redactFaces && !redactPlates && seed == null) { message = "Scegli almeno cosa oscurare."; return }
+        val ctx = getApplication<Application>()
+        val want = it.fabriziodavi.vivovideo.model.Redaction(faces = redactFaces, plates = redactPlates, objectSeed = seed, style = redactStyle)
+        runClipWork(if (c.isPhoto) "Cerco cosa oscurare…" else "Cerco cosa oscurare in ogni fotogramma…") { prog ->
+            val r = it.fabriziodavi.vivovideo.engine.Redactor.analyze(ctx, c, want, redactSeedSrcUs, prog)
+            val now = project?.clips?.firstOrNull { it.id == c.id } ?: return@runClipWork
+            update { it.replaceClip(now.copy(redact = r)) }
+            message = when {
+                r.found == 0 -> "Non ho trovato volti, targhe o l'oggetto in questa clip."
+                c.isPhoto -> "Oscurati ${r.found} elementi. Cambia lo stile qui sotto; Annulla per togliere."
+                else -> "Fatto: qualcosa da oscurare in ${r.found} fotogrammi su ${r.count}. Guarda l'anteprima; Annulla per togliere."
+            }
+        }
+    }
+
+    fun setRedactStyle(s: it.fabriziodavi.vivovideo.model.RedactStyle) {
+        redactStyle = s
+        updateSelected { c -> c.redact?.let { c.copy(redact = it.copy(style = s)) } ?: c }
+    }
+
+    fun removeRedact() = updateSelected { it.copy(redact = null) }
+
     fun setPersonMode(m: PersonMode) = updateSelected { c -> c.person?.let { c.copy(person = it.copy(mode = m)) } ?: c }
     fun setPersonColor(color: Int) = updateSelected { c -> c.person?.let { c.copy(person = it.copy(color = color)) } ?: c }
     fun removePerson() = updateSelected { it.copy(person = null) }

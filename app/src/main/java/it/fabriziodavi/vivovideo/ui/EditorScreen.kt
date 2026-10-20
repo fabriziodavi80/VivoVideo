@@ -216,7 +216,7 @@ val PRESETS_NEW_FIRST: List<TextPreset> = TextPreset.entries.filter { it.trend }
 val ANIMS_NEW_FIRST: List<TextAnim> = listOf(TextAnim.NONE) + TextAnim.entries.filter { it.ordinal >= TextAnim.BOUNCE.ordinal } +
     TextAnim.entries.filter { it != TextAnim.NONE && it.ordinal < TextAnim.BOUNCE.ordinal }
 val LAYER_ANIMS = TextAnim.entries.filter { !it.inOnly && !it.letters && it != TextAnim.GLITCH }
-val EFFECT_TABS = listOf("Effetti", "Dissolvenze", "Persona")
+val EFFECT_TABS = listOf("Effetti", "Dissolvenze", "Persona", "Privacy")
 val COLOR_TABS = listOf("Base", "Ruote", "HSL", "Progetto")
 
 @Composable
@@ -1844,6 +1844,7 @@ private fun EffectsPanel(vm: EditorViewModel, running: Boolean, tab: Int) {
     val enabled = !running
     if (tab == 0) { FxTab(vm, clip, p, enabled); return }
     if (tab == 2) { PersonTab(vm, clip, enabled); return }
+    if (tab == 3) { PrivacyTab(vm, clip, enabled); return }
     val secs = { v: Int -> if (v == 0) "No" else String.format(java.util.Locale.ITALIAN, "%.1f s", v / 10f) }
     val maxTenths = (clip.outputUs / 2 / 100_000).toInt().coerceIn(1, 50)
     PanelLabel("Dissolvenze della clip")
@@ -2214,6 +2215,39 @@ private fun PasteStyleDialog(src: Clip, targets: Int, onPaste: (Set<ClipAttr>) -
 private val PERSON_COLORS = listOf(0xFF101418, 0xFFFFFFFF, 0xFF1F6FEB, 0xFF2DA44E, 0xFFF2B33D, 0xFFE5484D, 0xFF8E4EC6).map { it.toInt() }
 
 /** Scontorno della persona: cosa fare dello sfondo. */
+/** Privacy: oscura volti, targhe e un oggetto scelto, in tutta la clip (riconosciuti sul telefono). */
+@Composable
+private fun PrivacyTab(vm: EditorViewModel, clip: Clip, enabled: Boolean) {
+    val r = clip.redact
+    val busy = vm.clipWork != null
+    if (r != null) {
+        PanelLabel("Oscurato")
+        val what = listOfNotNull(if (r.faces) "volti" else null, if (r.plates) "targhe" else null, if (r.objectSeed != null) "un oggetto" else null).joinToString(", ")
+        Hint("In questa clip: $what. " + if (clip.isPhoto) "${r.found} elementi coperti." else "Coperti in ${r.found} fotogrammi su ${r.count}.")
+        PillRow(it.fabriziodavi.vivovideo.model.RedactStyle.entries, r.style, { it.label }, enabled) { vm.setRedactStyle(it) }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            SecondaryButton("Rifai", onClick = { if (enabled && !busy) vm.redactClip() })
+            SecondaryButton("Togli", onClick = { if (enabled) vm.removeRedact() })
+        }
+        Hint("Se accorci o allunghi molto la clip, o cambi cosa oscurare qui sotto, tocca Rifai.")
+    } else {
+        PanelLabel("Oscura volti, targhe e oggetti")
+        Hint("L'app trova cosa coprire in ogni fotogramma della clip, sul telefono e senza internet, e lo segue mentre si muove.")
+    }
+    ToggleRow("Volti", vm.redactFaces, enabled) { vm.redactFaces = it }
+    ToggleRow("Targhe", vm.redactPlates, enabled) { vm.redactPlates = it }
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(if (vm.redactSeed != null) "Oggetto scelto" else "Un oggetto", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+        SecondaryButton(if (vm.redactSeed != null) "Cambia" else "Toccalo nell'immagine", onClick = { if (enabled && !busy) vm.openObjectPick() })
+        if (vm.redactSeed != null) IconBtn(VVIcons.Close, "Nessun oggetto") { vm.clearObject() }
+    }
+    if (r == null) {
+        PillRow(it.fabriziodavi.vivovideo.model.RedactStyle.entries, vm.redactStyle, { it.label }, enabled) { vm.redactStyle = it }
+        PrimaryButton(if (clip.isPhoto) "Oscura" else "Analizza e oscura", Modifier.fillMaxWidth(), enabled = enabled && !busy) { vm.redactClip() }
+        if (!clip.isPhoto) Hint("Ci vuole circa il tempo della clip. Per l'oggetto: porta l'indicatore dove si vede bene, poi toccalo.")
+    }
+}
+
 @Composable
 private fun PersonTab(vm: EditorViewModel, clip: Clip, enabled: Boolean) {
     if (clip.isPhoto) { Hint("Lo scontorno della persona funziona sui video."); return }

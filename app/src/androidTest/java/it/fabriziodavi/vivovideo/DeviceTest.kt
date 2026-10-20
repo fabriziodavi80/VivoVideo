@@ -85,6 +85,9 @@ import it.fabriziodavi.vivovideo.model.AutoStyle
 import it.fabriziodavi.vivovideo.model.TextItem
 import it.fabriziodavi.vivovideo.model.TextLook
 import it.fabriziodavi.vivovideo.model.TextPreset
+import it.fabriziodavi.vivovideo.model.RBox
+import it.fabriziodavi.vivovideo.model.RedactStyle
+import it.fabriziodavi.vivovideo.model.Redaction
 import it.fabriziodavi.vivovideo.model.Credits
 import it.fabriziodavi.vivovideo.model.withCredits
 import it.fabriziodavi.vivovideo.model.Transform
@@ -595,6 +598,24 @@ class DeviceTest {
         val text = Credits.text("Grazie per la visione", rows, listOf("\"Brano\" di Autore (CC BY 4.0)"))
         val p = base.withCredits(text, 6_000_000, onBlack = true, black = photoClip("nero"))
         assertEquals(12_000_000L, p.durationUs)
+        exportAndCheck(p)
+    }
+
+    /** Privacy: i modelli (volti, scritte, oggetti) si caricano e l'analisi gira; i riquadri si oscurano nel video esportato. */
+    @Test fun redactAnalyzesAndExports() {
+        val clip = video("r", videoA, s = 0, e = 3_000_000)
+        val found = kotlinx.coroutines.runBlocking {
+            it.fabriziodavi.vivovideo.engine.Redactor.analyze(ctx, clip,
+                Redaction(faces = true, plates = true, objectSeed = RBox(0.4f, 0.4f, 0.2f, 0.2f)), 1_000_000) {}
+        }
+        assertTrue("nessun fotogramma analizzato", found.count > 0 && found.file.isNotEmpty())
+        val box = RBox(0.3f, 0.3f, 0.4f, 0.3f)
+        val p = Project(name = "privacy", clips = listOf(
+            clip.copy(redact = found),
+            photoClip("p1").copy(redact = Redaction(boxes = listOf(box, box.copy(x = 0.1f, round = true)), style = RedactStyle.PIXEL)),
+            photoClip("p2").copy(redact = Redaction(boxes = listOf(box), style = RedactStyle.BLUR)),
+            photoClip("p3").copy(redact = Redaction(boxes = listOf(box), style = RedactStyle.BLACK)),
+        ))
         exportAndCheck(p)
     }
 

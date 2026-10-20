@@ -223,6 +223,8 @@ data class Clip(
     val reframe: Reframe? = null,
     /** Persona scontornata: cosa fare dello sfondo. */
     val person: PersonFx? = null,
+    /** Oscuramento automatico di volti, targhe e oggetti (privacy). */
+    val redact: Redaction? = null,
     /** Nome e dimensione del file originale: servono a ritrovarlo se viene spostato. */
     val fileName: String = "",
     val fileSize: Long = 0,

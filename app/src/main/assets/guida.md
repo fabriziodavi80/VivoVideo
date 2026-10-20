@@ -3,6 +3,7 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **Privacy: oscura volti, targhe e oggetti** (Effetti → Privacy): l'app trova cosa coprire in ogni fotogramma, sul telefono e senza internet, e lo segue mentre si muove; pixel, sfocato o nero.
 - **Strumenti per i tutorial**: **Zoom su un punto** (Modifica → Inquadra: l'immagine si avvicina morbida alla zona scelta, resta e torna), **evidenziazioni** pronte (Livelli: freccia, cerchio, riquadro, numero) e **passi numerati** (Testo → Passo numerato).
 - **Nuovo tema Grunge** (gruppo Rétro): crudo ma moderno, con toni smorzati e neri profondi, grana e graffi leggeri, tanti tagli secchi, B/N a scatti e sobbalzi di camera sui colpi, titolo da macchina da scrivere (nuovo stile di testo **Stampa**).
 - **Titoli di coda** (Testo → Titoli di coda): un rullo che sale piano alla fine del video, con titolo, righe "ruolo e nomi" e i crediti dei brani della libreria aggiunti da soli; su nero dopo il video o sopra le ultime scene.
@@ -179,6 +180,13 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - Animazioni di entrata/uscita (anche **Macchina da scrivere** e **Parola per parola**).
 - **Animazioni Wow**: **Lettere cadono** (rimbalzano al loro posto; in uscita cadono), **Lettere sfumate**, **Onda** (le lettere saltano una dopo l'altra), **Glitch** (con qualche sussulto anche mentre il testo resta), **Luccichio** (una striscia di luce attraversa il testo ogni 3 secondi; solo in entrata).
 - **Movimento**: posizione iniziale → finale (scegli quale modificare, sistemala con le dita).
+
+## Privacy: oscurare volti, targhe e oggetti
+- **Effetti → Privacy** sulla clip selezionata: scegli **Volti**, **Targhe** e, se serve, **Un oggetto** (porta l'indicatore dove l'oggetto si vede bene, tocca "Toccalo nell'immagine" e poi l'oggetto: i riquadri bianchi sono quelli che l'app sa seguire; altrove copre un riquadro attorno al dito).
+- Stile: **Pixel** (quadretti), **Sfocato** o **Nero**; si cambia anche dopo, senza rifare l'analisi.
+- **Analizza e oscura**: l'app guarda la clip 10 volte al secondo (circa il tempo della clip) e copre volti (ovali), targhe (scritte con la forma di una targa) e l'oggetto scelto mentre si muove. Le foto sono immediate.
+- Si vede subito in anteprima ed è nel video esportato. **Rifai** dopo aver accorciato o allungato molto la clip; **Togli** lo elimina; anche Annulla funziona.
+- Controlla sempre il risultato prima di pubblicare: un volto molto piccolo, di profilo o al buio, o una targa sporca o storta, possono sfuggire.
 
 ## Fare un tutorial
 - **Zoom su un punto** (Modifica → Inquadra, in fondo): porta l'indicatore dove serve, scegli quanto ingrandire (1,5×, 2×, 2,5×) e per quanto (1,5, 2,5 o 4 s), poi tocca la zona del quadro nella griglia 3×3. L'immagine ci arriva in mezzo secondo, resta e torna, senza mai mostrare i bordi. Sono keyframe normali: li ritocchi dallo strumento Keyframe.

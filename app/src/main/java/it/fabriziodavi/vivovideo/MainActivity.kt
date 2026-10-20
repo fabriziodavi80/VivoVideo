@@ -19,6 +19,9 @@ import it.fabriziodavi.vivovideo.ui.GuideScreen
 import it.fabriziodavi.vivovideo.ui.TestPlanScreen
 import it.fabriziodavi.vivovideo.ui.EditorViewModel
 import it.fabriziodavi.vivovideo.ui.HomeScreen
+import it.fabriziodavi.vivovideo.ui.ObjectPickScreen
+import it.fabriziodavi.vivovideo.ui.CreditsScreen
+import it.fabriziodavi.vivovideo.ui.SpeechCutScreen
 import it.fabriziodavi.vivovideo.ui.VivoTheme
 
 class MainActivity : ComponentActivity() {
@@ -75,8 +78,9 @@ class MainActivity : ComponentActivity() {
                     if (vm.library != null) LibraryScreen(vm)
                     if (vm.albumPick != null) AlbumPickerScreen(vm)
                     if (vm.showSubtitles && vm.project != null) SubtitlesScreen(vm)
-                    if (vm.showSpeechCut && vm.project != null) it.fabriziodavi.vivovideo.ui.SpeechCutScreen(vm)
-                    if (vm.showCredits && vm.project != null) it.fabriziodavi.vivovideo.ui.CreditsScreen(vm)
+                    if (vm.showSpeechCut && vm.project != null) SpeechCutScreen(vm)
+                    if (vm.showCredits && vm.project != null) CreditsScreen(vm)
+                    if (vm.objectPick != null && vm.project != null) ObjectPickScreen(vm)
                 }
             }
         }

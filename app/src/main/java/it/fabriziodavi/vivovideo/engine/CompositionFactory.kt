@@ -142,6 +142,10 @@ class CompositionFactory(private val context: Context) {
 
     /** Persona scontornata, stabilizzazione e "segui il soggetto": sulla sorgente, prima dell'inquadratura. */
     private fun smartEffects(clip: Clip, startUs: Long, outW: Int, outH: Int): List<Effect> = if (clip.baked) emptyList() else buildList {
+        // Oscuramento per primo: i riquadri sono misurati sul fotogramma originale.
+        clip.redact?.takeIf { it.boxes.isNotEmpty() || it.file.isNotEmpty() }?.let { r ->
+            add(RedactEffect(r, clip.isPhoto) { t -> clip.trimStartUs + clip.speedCurve().sourceTimeAt(localTimeUs(t, startUs)) })
+        }
         clip.person?.takeIf { it.maskFile.isNotEmpty() && !clip.isPhoto }?.let { fx ->
             add(PersonEffect(fx) { t -> clip.trimStartUs + clip.speedCurve().sourceTimeAt(localTimeUs(t, startUs)) })
         }
