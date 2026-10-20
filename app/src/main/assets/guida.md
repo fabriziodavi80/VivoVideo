@@ -193,7 +193,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - **Copie leggere per i video 4K, 8K e 120 fps** (acceso di serie): solo per un'anteprima fluida; la prima volta si preparano in sottofondo ("Preparo le copie leggere…").
 - **HDR 10 bit** (solo se nel progetto ci sono video HDR, HLG, HDR10 o Dolby Vision): il video esportato resta HDR, in H.265. Spento, l'HDR viene convertito in SDR, che si vede bene su ogni schermo. WhatsApp esporta sempre in SDR. Nel risultato la riga **Colore** dice com'è uscito davvero.
 - Il video finito va in galleria, cartella Movies/VivoVideo.
-- Se qualcosa va storto l'app riprova da sola con impostazioni più prudenti; se si guasta il decodificatore video riprova con quello software (più lento). Nel risultato, "Tentativi falliti prima" elenca cosa non è andato.
+- Se qualcosa va storto l'app riprova da sola con impostazioni più prudenti; se si guasta il decodificatore video riprova con quello software (più lento); se si ferma il codificatore riprova con un ritmo più tranquillo. Nel risultato, "Tentativi falliti prima" elenca cosa non è andato.
 - **Sperimentale**: "Nel video esportato" attiva dissolvenze incrociate vere e video sovrapposti (acceso di serie).
 
 ## Collaudo e segnalazioni

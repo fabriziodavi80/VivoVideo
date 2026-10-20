@@ -160,7 +160,9 @@ class Exporter(
                 log += "• $mode, ${bitrate / 1_000_000} Mbps: ${exportException.errorCodeName}$codecInfo"
                 val retryable = exportException.errorCode == ExportException.ERROR_CODE_ENCODER_INIT_FAILED ||
                     exportException.errorCode == ExportException.ERROR_CODE_DECODER_INIT_FAILED ||
-                    exportException.errorCode == ExportException.ERROR_CODE_MUXING_TIMEOUT
+                    exportException.errorCode == ExportException.ERROR_CODE_MUXING_TIMEOUT ||
+                    // Il codificatore si è fermato a metà (capita con progetti lunghi): si riprova con impostazioni più prudenti.
+                    exportException.errorCode == ExportException.ERROR_CODE_ENCODING_FAILED
                 if (options.hdr && !cancelled) {
                     // L'HDR non è riuscito (encoder o un filtro che non lo regge): di nuovo, in SDR.
                     val why = generateSequence(exportException as Throwable) { it.cause }.take(3)
