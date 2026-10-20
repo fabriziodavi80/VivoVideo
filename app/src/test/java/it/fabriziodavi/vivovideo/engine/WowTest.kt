@@ -6,7 +6,9 @@ import it.fabriziodavi.vivovideo.model.AutoStyle
 import it.fabriziodavi.vivovideo.model.Clip
 import it.fabriziodavi.vivovideo.model.ClipFx
 import it.fabriziodavi.vivovideo.model.ClipSpeed
+import it.fabriziodavi.vivovideo.model.FrameMode
 import it.fabriziodavi.vivovideo.model.FxType
+import it.fabriziodavi.vivovideo.model.frameMode
 import it.fabriziodavi.vivovideo.model.MusicTrack
 import it.fabriziodavi.vivovideo.model.TextAnim
 import it.fabriziodavi.vivovideo.model.TextPreset
@@ -15,6 +17,7 @@ import it.fabriziodavi.vivovideo.model.TransitionType
 import it.fabriziodavi.vivovideo.model.VideoFormat
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import kotlin.math.abs
@@ -114,8 +117,10 @@ class WowTest {
         val photo = Clip(id = "p", uri = "file:///p.jpg", sourceDurationUs = Clip.PHOTO_MAX_US, trimEndUs = 3_000_000, isPhoto = true, width = 4000, height = 3000)
         val q = AutoEdit.build("Foto", vids.take(4) + photo, null, AutoOptions(style = AutoStyle.SOGNO, targetUs = 0, format = VideoFormat.VERTICAL))
         val ph = q.clips.first { it.isPhoto }
-        assertNotNull(ph.reframe); assertTrue(ph.fill)
-        assertTrue(abs(ph.reframe!!.xs.first() - ph.reframe!!.xs.last()) > 0.4f)
+        // Foto orizzontale in un video verticale: resta intera sullo sfondo sfocato (niente panoramica che ne taglia metà).
+        assertEquals(FrameMode.BLUR, ph.frameMode)
+        assertNull(ph.reframe)
+        assertTrue(ph.keyframes.all { it.value.scale <= 1.05f })
     }
 
     @Test fun trailerStructureIntroHeroEnding() {

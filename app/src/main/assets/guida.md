@@ -3,6 +3,8 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **Foto meno ingrandite**: nel video automatico (e nei movimenti pronti) le foto si muovono con zoom e panoramiche leggeri, al massimo +10% invece del +20–30% di prima; gli zoom a ritmo non si sommano più all'infinito (tetto +10%, +6% nei temi delicati). Così si vedono anche i bordi della foto.
+- **Foto nell'altro verso intere**: una foto verticale in un video orizzontale (o viceversa, o una foto quadrata) non viene più riempita con una panoramica che ne mostrava meno della metà: si vede tutta, sullo sfondo sfocato.
 - **Natura senza onde**: via il passaggio Liquido (l'immagine che ondeggia). Ora usa dissolvenze incrociate, i nuovi **Zoom morbido** e **Scivolata** e una sfocatura leggera; ogni tanto un taglio netto a tempo, come nei montaggi di viaggio di oggi. Le scene restano lunghe e distese.
 - **Nuove transizioni morbide**: **Zoom morbido** (lenta spinta in avanti con una sfocatura che nasconde il taglio) e **Scivolata** (l'immagine scorre appena di lato e la successiva continua il movimento). Sono in testa all'elenco, insieme agli stacchi di tendenza.
 - Anche Sogno e Mare non usano più il passaggio Liquido.
@@ -58,7 +60,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - Nei temi calmi (tranne Cinema) dove il brano spinge e sul drop la scena non pulsa a ritmo e le foto non fanno scatti: il taglio cade a tempo e il passaggio resta morbido. Natura non usa passaggi con il lampo di luce né effetti che pulsano.
 - **Scelta delle foto**: delle raffiche resta solo la foto migliore; si preferiscono foto e video nello stesso verso del video finale.
 - **Energia del brano**: l'app sente dove la musica è calma (scene più lunghe, passaggi morbidi, rallenty) e dove spinge (un taglio a ogni colpo, zoom e scosse a ritmo, accelerazioni); sul drop mette un taglio esatto con una transizione d'impatto.
-- **Orientamento**: il formato segue le foto e i video più numerosi, e si usano di preferenza quelli nello stesso verso; quelli girati nell'altro verso (se servono) seguono le persone (regia intelligente) o, se sono foto, si attraversano con una panoramica; lo sfondo sfocato resta solo se non c'è un soggetto chiaro.
+- **Orientamento**: il formato segue le foto e i video più numerosi, e si usano di preferenza quelli nello stesso verso; i video girati nell'altro verso (se servono) seguono le persone (regia intelligente); le **foto** nell'altro verso (o quadrate, o panoramiche) si vedono **intere** sullo sfondo sfocato, perché riempiendo il quadro se ne perderebbe più di un terzo.
 - **Temi**: Cinema, Energico, Reel virale, Ricordi, Sogno, Elegante, Viaggio, Blockbuster, Neon notte, Estate pop, Azione, Estremo, Romantico, Matrimonio, Super 8, Anni '90, Natura, Mare, Montagna, Diario di viaggio. Ognuno ha il suo look colore, le sue transizioni (morbide nelle parti calme, d'impatto sui colpi) e il suo titolo. I temi d'azione seguono lo stile delle velocity edit: molti tagli sono stacchi netti sul battito, sui colpi ci sono blackout, flash di esposizione, zoom secchi e scosse di camera, e sul drop un blackout seguito da flash e rimbalzo. Anni '90 e Super 8 restano volutamente rétro.
 - **Struttura**: con la musica, i temi più dinamici aprono con un'**intro a raffica** e il titolo sul colpo; sul drop c'è il **momento eroe**; il **finale** rallenta e chiude con una scritta (il periodo indicato sotto il titolo, o il titolo).
 - **Altra proposta** rifà il montaggio con altre scene e altri tratti, **Stile** lo cambia: tutto resta ritoccabile a mano.
@@ -89,7 +91,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Foto
 - Le foto si aggiungono come i video. Strumento **Durata**: da 0,2 a 15 secondi.
-- **Movimento** pronto: zoom avanti/indietro, panoramiche, diagonale, inclinazione (anche su tutte le foto).
+- **Movimento** pronto: zoom avanti/indietro, panoramiche, diagonale, inclinazione (anche su tutte le foto). Sono movimenti leggeri (al massimo +10%), così si vede quasi tutta la foto.
 - Le foto vengono raddrizzate e ridotte a 4096 pixel: abbastanza per il 4K.
 
 ## Slideshow automatico

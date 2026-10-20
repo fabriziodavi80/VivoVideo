@@ -377,14 +377,15 @@ enum class MotionStyle(val label: String) {
     fun keyframes(durationUs: Long): List<Keyframe> {
         val (a, b) = when (this) {
             NONE -> return emptyList()
-            ZOOM_IN -> Transform() to Transform(scale = 1.2f)
-            ZOOM_OUT -> Transform(scale = 1.2f) to Transform()
-            PAN_RIGHT -> Transform(x = -0.08f, scale = 1.22f) to Transform(x = 0.08f, scale = 1.22f)
-            PAN_LEFT -> Transform(x = 0.08f, scale = 1.22f) to Transform(x = -0.08f, scale = 1.22f)
-            PAN_DOWN -> Transform(y = -0.07f, scale = 1.22f) to Transform(y = 0.07f, scale = 1.22f)
-            PAN_UP -> Transform(y = 0.07f, scale = 1.22f) to Transform(y = -0.07f, scale = 1.22f)
-            DIAGONAL -> Transform(x = -0.06f, y = -0.05f, scale = 1.12f) to Transform(x = 0.05f, y = 0.05f, scale = 1.3f)
-            TILT -> Transform(scale = 1.18f, rotation = -2.5f) to Transform(scale = 1.25f, rotation = 2.5f)
+            // Movimenti leggeri, come nelle app professionali: si vede quasi tutta la foto (al massimo +10%).
+            ZOOM_IN -> Transform() to Transform(scale = 1.08f)
+            ZOOM_OUT -> Transform(scale = 1.08f) to Transform()
+            PAN_RIGHT -> Transform(x = -0.035f, scale = 1.08f) to Transform(x = 0.035f, scale = 1.08f)
+            PAN_LEFT -> Transform(x = 0.035f, scale = 1.08f) to Transform(x = -0.035f, scale = 1.08f)
+            PAN_DOWN -> Transform(y = -0.035f, scale = 1.08f) to Transform(y = 0.035f, scale = 1.08f)
+            PAN_UP -> Transform(y = 0.035f, scale = 1.08f) to Transform(y = -0.035f, scale = 1.08f)
+            DIAGONAL -> Transform(x = -0.02f, y = -0.02f, scale = 1.05f) to Transform(x = 0.02f, y = 0.02f, scale = 1.1f)
+            TILT -> Transform(scale = 1.06f, rotation = -1f) to Transform(scale = 1.08f, rotation = 1f)
         }
         return listOf(Keyframe(0, a, Easing.LINEAR), Keyframe(durationUs, b, Easing.LINEAR))
     }

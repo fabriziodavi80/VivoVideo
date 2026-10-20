@@ -423,6 +423,12 @@ data class AutoRecipe(
 )
 
 object AutoEdit {
+    /** Una foto riempie il quadro solo se così se ne vede almeno questa parte (sennò sfondo sfocato). */
+    const val MIN_FILL_KEEP = 0.7f
+
+    /** Quanta parte della foto resta visibile riempiendo un quadro con proporzioni [frame] (1 = tutta). */
+    fun fillKeeps(photo: Float, frame: Float): Float = if (photo <= 0f || frame <= 0f) 1f else minOf(photo, frame) / maxOf(photo, frame)
+
     /** Al massimo tanti elementi, per non importare intere gallerie. */
     const val MAX_ITEMS = 300
 
@@ -621,7 +627,7 @@ object AutoEdit {
                 val src = sources[(k.toLong() * (sources.size - 1) / 7).toInt()]
                 val len = end - prev
                 val shot = if (src.isPhoto) {
-                    src.copy(trimStartUs = 0, trimEndUs = len, keyframes = listOf(Keyframe(0, Transform(scale = 1.18f)), Keyframe(len, Transform(scale = 1.0f))))
+                    src.copy(trimStartUs = 0, trimEndUs = len, keyframes = listOf(Keyframe(0, Transform(scale = 1.06f)), Keyframe(len, Transform(scale = 1.0f))))
                 } else {
                     val n = minOf(len, src.sourceDurationUs)
                     val scan = scans[src.uri]?.takeIf { o.smart && it.samples.size >= 2 }
@@ -679,11 +685,14 @@ object AutoEdit {
                 if ((loud || style.gentlePops) && inside.size >= 1) {
                     // Parte carica: la foto fa un piccolo scatto di zoom su ogni colpo.
                     val keys = mutableListOf(Keyframe(0, Transform(scale = 1.0f)))
+                    // Gli scatti si sommano a gradini, ma la foto non va mai oltre +10% (+6% nei temi delicati):
+                    // altrimenti con tanti battiti si perdono i bordi.
+                    val step = minOf(popScale, (if (style.gentlePops) 0.06f else 0.10f) / inside.size)
                     inside.forEachIndexed { k, b ->
                         val local = b - t
                         val soft = if (loud && !style.gentlePops) 90_000L else 350_000L
-                        keys += Keyframe(local - 10_000, Transform(scale = 1.0f + popScale * k))
-                        keys += Keyframe((local + soft).coerceAtMost(len), Transform(scale = 1.0f + popScale * (k + 1)))
+                        keys += Keyframe(local - 10_000, Transform(scale = 1.0f + step * k))
+                        keys += Keyframe((local + soft).coerceAtMost(len), Transform(scale = 1.0f + step * (k + 1)))
                     }
                     src.copy(trimStartUs = 0, trimEndUs = len, keyframes = keys)
                 } else {
@@ -795,11 +804,20 @@ object AutoEdit {
         // Formato e inquadratura: stesso orientamento = riempi, orientamento opposto = sfondo sfocato.
         val format = if (o.format == VideoFormat.AUTO) VideoFormat.majority(sources) else o.format
         var p = Project(name = name, clips = clips, format = format).applyFramePresets()
+        // Foto che riempiendo il quadro perderebbero troppo (nell'altro verso, quadrate in un video verticale, panoramiche):
+        // si mostrano intere sullo sfondo sfocato, con un movimento ancora più leggero.
+        val frameAspect = format.aspect ?: p.clips.firstOrNull { !it.isPhoto }?.let { it.width.toFloat() / it.height.coerceAtLeast(1) }
+            ?: p.clips.firstOrNull()?.let { it.width.toFloat() / it.height.coerceAtLeast(1) } ?: (16f / 9f)
+        p = p.copy(clips = p.clips.map { c ->
+            if (!c.isPhoto || c.width <= 0 || c.height <= 0) return@map c
+            if (fillKeeps(c.width.toFloat() / c.height, frameAspect) >= MIN_FILL_KEEP) c.withMode(FrameMode.FILL)
+            else c.withMode(FrameMode.BLUR).copy(reframe = null, keyframes = c.keyframes.map { k ->
+                k.copy(value = k.value.copy(scale = 1f + (k.value.scale - 1f) * 0.5f, x = k.value.x * 0.5f, y = k.value.y * 0.5f))
+            })
+        })
         if (o.smart) {
-            // Orientamento opposto: si riempie il quadro seguendo i volti (o un soggetto chiaro) invece delle bande;
-            // le foto senza volti si attraversano con una panoramica lenta.
+            // Video nell'orientamento opposto: si riempie il quadro seguendo i volti (o un soggetto chiaro) invece delle bande.
             val out = p.outputOrientation()
-            var dir = false
             p = p.copy(clips = p.clips.map { c ->
                 if (c.orientation == out || out == Orientation.SQUARE) return@map c
                 val scan = scans[c.uri]
@@ -807,12 +825,7 @@ object AutoEdit {
                 val path = if (clear) Moments.subjectPath(scan!!) else null
                 when {
                     path != null && !c.isPhoto -> c.withMode(FrameMode.FILL).copy(reframe = path)
-                    c.isPhoto && path != null && scan?.hasFaces == true -> c.withMode(FrameMode.FILL).copy(reframe = path)
-                    c.isPhoto -> {
-                        dir = !dir
-                        val (a, b) = if (dir) 0.22f to 0.78f else 0.78f to 0.22f
-                        c.withMode(FrameMode.FILL).copy(reframe = Reframe(listOf(0L, c.trimmedUs), listOf(a, b), listOf(0.5f, 0.5f)))
-                    }
+                    // Le foto nell'altro verso restano intere (sfondo sfocato, sopra): niente panoramiche che ne tagliano metà.
                     else -> c
                 }
             })
