@@ -8,13 +8,13 @@ on:
 permissions:
   contents: write
 
-concurrency:
-  group: build
-  cancel-in-progress: false
-
 jobs:
+  # Le release si fanno una alla volta, in ordine (nessuna si perde).
   build:
     runs-on: ubuntu-latest
+    concurrency:
+      group: build
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
 
@@ -80,6 +80,10 @@ jobs:
   emulatore:
     runs-on: ubuntu-latest
     timeout-minutes: 100
+    # Un giro sull'emulatore alla volta; se arriva una versione più nuova, quello vecchio si ferma (conta l'ultima).
+    concurrency:
+      group: emulatore
+      cancel-in-progress: true
     steps:
       - uses: actions/checkout@v4
 
