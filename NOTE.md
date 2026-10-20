@@ -1,6 +1,6 @@
 # VivoVideo · note per riprendere il lavoro
 
-Aggiornate al 19/10/2026, ultima versione **v0.3.145**. Da leggere insieme a `CLAUDE.md`.
+Aggiornate al 19/10/2026, ultima versione **v0.3.147**. Da leggere insieme a `CLAUDE.md`.
 
 ## 1. Stato attuale dell'app
 
@@ -57,7 +57,14 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, minSdk 33, solo arm64-v8a 
 - Data della videocamera nei temi vintage.
 - "Altra proposta" e cambio di stile.
 
-### Ultime modifiche (v0.3.145)
+### Ultime modifiche (v0.3.146–v0.3.147)
+- Natura con zoom morbido e scivolata approvato ("abbastanza delicato, ci sta").
+- Foto troppo ingrandite in tutti i temi: MotionStyle ora al massimo +10%; scatti a ritmo a gradini con tetto (10%, 6% temi delicati);
+  foto che riempiendo perderebbero oltre il 30% (`AutoEdit.fillKeeps` < `MIN_FILL_KEEP`) vanno su sfondo sfocato, intere; niente più panoramica sulle foto nell'altro verso.
+- Exporter: anche `ERROR_CODE_ENCODING_FAILED` si riprova con impostazioni più prudenti.
+- Emulatore v0.3.147: 30 su 31; fallisce a volte `previewPlaysWow` (anteprima che rallenta dopo 3 s, grafica software dell'emulatore). Da verificare sul telefono la fluidità dell'anteprima con transizioni WOW.
+
+### Modifiche v0.3.145
 - Energico 2026 approvato dall'utente ("bene così").
 - Natura: le "onde" (transizione LIQUID) non piacevano. Ora CROSSFADE, SOFTZOOM, DRIFT, BLUR e `cutShare = 0.2`. Tolto LIQUID anche da Sogno e Mare.
 - Nuove transizioni SOFTZOOM e DRIFT (`TransitionType.gentleTrend`: di tendenza ma morbide).
