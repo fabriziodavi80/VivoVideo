@@ -511,6 +511,21 @@ internal fun motionU(local: Long, duration: Long): Float {
     return u * u * (3 - 2 * u)
 }
 
+/**
+ * Titoli di coda: all'inizio il bordo alto del testo tocca il fondo del quadro, alla fine il bordo basso ne tocca la cima;
+ * in mezzo sale a velocità costante (anche se il testo è più alto del quadro).
+ */
+internal fun rollSettings(local: Long, duration: Long): OverlaySettings {
+    val u = rollU(local, duration)
+    return StaticOverlaySettings.Builder()
+        .setOverlayFrameAnchor(0f, 1f - 2f * u)
+        .setBackgroundFrameAnchor(0f, -1f + 2f * u)
+        .build()
+}
+
+/** Avanzamento lineare del rullo (0 all'inizio, 1 alla fine). */
+internal fun rollU(local: Long, duration: Long): Float = (local.toFloat() / duration.coerceAtLeast(1)).coerceIn(0f, 1f)
+
 internal fun overlaySettings(alpha: Float, scale: Float, rotation: Float, x: Float, y: Float): OverlaySettings =
     StaticOverlaySettings.Builder()
         .setAlphaScale(alpha.coerceIn(0f, 1f))
@@ -612,6 +627,7 @@ class TimedTextOverlay(
 
     override fun getOverlaySettings(presentationTimeUs: Long): OverlaySettings {
         val local = presentationTimeUs - item.startUs
+        if (item.roll) return rollSettings(local, item.durationUs)
         val f = animFactors(item.animIn, item.animOut, local, item.durationUs)
         var x = item.x; var y = item.y; var scale = 1f; var rot = item.rotation; var alpha = 1f
         item.endPose?.let { e ->

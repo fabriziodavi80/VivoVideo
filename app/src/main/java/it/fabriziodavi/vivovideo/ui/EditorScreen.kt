@@ -1,5 +1,6 @@
 package it.fabriziodavi.vivovideo.ui
 
+import it.fabriziodavi.vivovideo.model.creditsRoll
 import it.fabriziodavi.vivovideo.model.FadeColor
 import it.fabriziodavi.vivovideo.model.AutoStyle
 import it.fabriziodavi.vivovideo.model.Grade
@@ -1439,6 +1440,7 @@ private fun TextPanel(vm: EditorViewModel, running: Boolean, tab: Int, onPickFon
         }
         PrimaryButton("Aggiungi testo", Modifier.fillMaxWidth(), enabled = enabled, onClick = vm::addText)
         SecondaryButton("Sottotitoli automatici", Modifier.fillMaxWidth(), onClick = { if (enabled) { vm.pause(); vm.showSubtitles = true } })
+        SecondaryButton(if (p.creditsRoll != null) "Titoli di coda · modifica" else "Titoli di coda", Modifier.fillMaxWidth(), onClick = { if (enabled) { vm.pause(); vm.showCredits = true } })
         Hint("Il testo parte dall'indicatore. Nella timeline lo sposti trascinandolo e ne cambi la durata con le maniglie.")
         return
     }
@@ -1528,6 +1530,7 @@ private fun TextPanel(vm: EditorViewModel, running: Boolean, tab: Int, onPickFon
     }
     SecondaryButton("Stile a tutti i testi", selected = p.textStyleOnAll(t), onClick = { if (enabled) vm.applyTextStyleToAll() })
     SecondaryButton("Sottotitoli automatici", Modifier.fillMaxWidth(), onClick = { if (enabled) { vm.pause(); vm.showSubtitles = true } })
+    SecondaryButton(if (p.creditsRoll != null) "Titoli di coda · modifica" else "Titoli di coda", Modifier.fillMaxWidth(), onClick = { if (enabled) { vm.pause(); vm.showCredits = true } })
 }
 
 /**

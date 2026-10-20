@@ -3,6 +3,7 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **Titoli di coda** (Testo → Titoli di coda): un rullo che sale piano alla fine del video, con titolo, righe "ruolo e nomi" e i crediti dei brani della libreria aggiunti da soli; su nero dopo il video o sopra le ultime scene.
 - **Taglia pause e ehm** (Audio → Clip): per i video parlati, l'app toglie i silenzi lunghi (soglia 0,4, 0,7 o 1 s) lasciando un attimo di respiro fra le frasi e, se vuoi, anche "ehm", "eh", "uhm", "mmm". Prima ti dice quanto toglie e quanto dura il video dopo; un solo Annulla torna indietro.
 - **Home più chiara**: due strade grandi per creare un video, **Video automatico** e **Monta tu**, con **Da un modello** accanto. I progetti stanno sotto, "Apri una copia" e "Collaudo" in fondo.
 - **Video automatico in tre passi**: Cosa usare → Stile → Musica e dettagli, con i pulsanti Avanti e la barra dei passi in alto. I 20 temi sono divisi in gruppi; formato e regia stanno in "Altre opzioni".
@@ -176,6 +177,12 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - Animazioni di entrata/uscita (anche **Macchina da scrivere** e **Parola per parola**).
 - **Animazioni Wow**: **Lettere cadono** (rimbalzano al loro posto; in uscita cadono), **Lettere sfumate**, **Onda** (le lettere saltano una dopo l'altra), **Glitch** (con qualche sussulto anche mentre il testo resta), **Luccichio** (una striscia di luce attraversa il testo ogni 3 secondi; solo in entrata).
 - **Movimento**: posizione iniziale → finale (scegli quale modificare, sistemala con le dita).
+
+## Titoli di coda
+- **Testo → Titoli di coda**: scrivi un **titolo** (per esempio "Grazie per la visione") e le **righe** con ruolo e nomi (Riprese, Montaggio, Musica…); con i brani della libreria online, **Aggiungi i crediti dei brani** li mette in fondo da solo (le licenze chiedono di citare l'autore).
+- **Dove**: **Su nero, dopo il video** aggiunge alla fine uno sfondo nero (l'ultima scena sfuma nel nero) e il rullo ci scorre sopra; **Sopra le ultime scene** non allunga il video.
+- **Durata**: proposta in base alle righe (circa un secondo a riga, fra 6 e 30 s), regolabile.
+- Il rullo è un testo nella timeline: puoi spostarlo o allungarlo; **Rifai i titoli di coda** li sostituisce, **Togli i titoli di coda** li elimina (anche lo sfondo nero).
 
 ## Font tuoi
 - Testo → Stile → **I tuoi font** → **+ Aggiungi font**: scegli un file .ttf o .otf (per esempio scaricato da Google Fonts). Il font resta nell'app per tutti i progetti e finisce anche nelle copie di sicurezza.

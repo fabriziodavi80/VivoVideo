@@ -85,12 +85,15 @@ import it.fabriziodavi.vivovideo.model.AutoStyle
 import it.fabriziodavi.vivovideo.model.TextItem
 import it.fabriziodavi.vivovideo.model.TextLook
 import it.fabriziodavi.vivovideo.model.TextPreset
+import it.fabriziodavi.vivovideo.model.Credits
+import it.fabriziodavi.vivovideo.model.withCredits
 import it.fabriziodavi.vivovideo.model.Transform
 import it.fabriziodavi.vivovideo.model.TransitionSpec
 import it.fabriziodavi.vivovideo.model.TransitionType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.BeforeClass
@@ -583,6 +586,16 @@ class DeviceTest {
         val m = MusicTrack(uri = music.toString(), name = "musica", sourceDurationUs = 30_000_000, lengthUs = 8_000_000,
             beatsUs = (1 until 60).map { it * 500_000L }, bpm = 120f)
         exportAndCheck(Project(name = "tendenze", clips = clips, texts = texts, music = listOf(m)))
+    }
+
+    /** Titoli di coda su nero dopo il video: il rullo (più alto del quadro) scorre e si esporta. */
+    @Test fun exportCreditsRoll() {
+        val base = Project(name = "titoli", clips = listOf(video("a", videoA, s = 0, e = 3_000_000), video("b", videoB, s = 0, e = 3_000_000)))
+        val rows = (1..14).map { Credits.Row("Ruolo $it", "Nome Cognome $it") }
+        val text = Credits.text("Grazie per la visione", rows, listOf("\"Brano\" di Autore (CC BY 4.0)"))
+        val p = base.withCredits(text, 6_000_000, onBlack = true, black = photoClip("nero"))
+        assertEquals(12_000_000L, p.durationUs)
+        exportAndCheck(p)
     }
 
     /** Il ripiego dell'app quando il decodificatore hardware si guasta: con quello software si esporta lo stesso. */

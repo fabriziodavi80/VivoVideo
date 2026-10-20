@@ -7,6 +7,8 @@ import it.fabriziodavi.vivovideo.model.SubStyle
 import it.fabriziodavi.vivovideo.model.SubPosition
 import it.fabriziodavi.vivovideo.model.Subtitles
 import it.fabriziodavi.vivovideo.model.cutTimeline
+import it.fabriziodavi.vivovideo.model.withCredits
+import it.fabriziodavi.vivovideo.model.withoutCredits
 import it.fabriziodavi.vivovideo.engine.Whisper
 import it.fabriziodavi.vivovideo.engine.Proxies
 import it.fabriziodavi.vivovideo.engine.Decoders
@@ -1538,6 +1540,48 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
 
     /** Toglie tutti i sottotitoli automatici. */
     fun removeSubtitles() = update { it.copy(texts = it.texts.filterNot { t -> t.subtitle }) }
+
+    // ---------------- Titoli di coda ----------------
+
+    var showCredits by mutableStateOf(false)
+    /** Ultime scelte nella schermata dei titoli (si ritrovano riaprendola). */
+    var creditsTitle by mutableStateOf("")
+    var creditsRows by mutableStateOf(listOf(it.fabriziodavi.vivovideo.model.Credits.Row("Riprese e montaggio", "")))
+    var creditsMusic by mutableStateOf(true)
+    var creditsOnBlack by mutableStateOf(true)
+    var creditsSeconds by mutableStateOf(0)
+
+    /** Testo dei titoli con le scelte attuali. */
+    fun creditsText(): String = it.fabriziodavi.vivovideo.model.Credits.text(
+        creditsTitle, creditsRows, if (creditsMusic) project?.credits().orEmpty() else emptyList(),
+    )
+
+    /** Mette (o rifà) i titoli di coda; un Annulla li toglie. */
+    fun applyCredits() {
+        val ctx = getApplication<Application>()
+        val p = project ?: return
+        val text = creditsText()
+        if (text.isBlank()) { message = "Scrivi almeno un titolo o una riga."; return }
+        val dur = if (creditsSeconds > 0) creditsSeconds * 1_000_000L else it.fabriziodavi.vivovideo.model.Credits.suggestedUs(text)
+        val black = if (creditsOnBlack) blackClip(ctx, p) else null
+        update { it.withCredits(text, dur, creditsOnBlack, black) }
+        showCredits = false
+        message = "Titoli di coda pronti (${dur / 1_000_000} s). Nella timeline sono un testo che si può spostare; Annulla li toglie."
+    }
+
+    fun removeCredits() { update { it.withoutCredits() }; showCredits = false }
+
+    /** Una foto nera grande quanto il video (per i titoli "su nero"). */
+    private fun blackClip(ctx: Application, p: Project): Clip? = runCatching {
+        val (w, h) = factory.outputSize(p, 1080)
+        val f = File(File(ctx.filesDir, "titoli").apply { mkdirs() }, "nero_${w}x$h.jpg")
+        if (!f.exists()) {
+            val bmp = android.graphics.Bitmap.createBitmap(w, h, android.graphics.Bitmap.Config.ARGB_8888).apply { eraseColor(android.graphics.Color.BLACK) }
+            f.outputStream().use { bmp.compress(android.graphics.Bitmap.CompressFormat.JPEG, 90, it) }
+            bmp.recycle()
+        }
+        Clip(uri = android.net.Uri.fromFile(f).toString(), sourceDurationUs = Clip.PHOTO_MAX_US, trimEndUs = 5_000_000, isPhoto = true, width = w, height = h, fill = true)
+    }.getOrNull()
 
     // ---------------- Pulizia del parlato: pause ed "ehm" ----------------
 

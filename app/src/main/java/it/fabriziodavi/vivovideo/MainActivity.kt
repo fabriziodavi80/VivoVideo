@@ -76,6 +76,7 @@ class MainActivity : ComponentActivity() {
                     if (vm.albumPick != null) AlbumPickerScreen(vm)
                     if (vm.showSubtitles && vm.project != null) SubtitlesScreen(vm)
                     if (vm.showSpeechCut && vm.project != null) it.fabriziodavi.vivovideo.ui.SpeechCutScreen(vm)
+                    if (vm.showCredits && vm.project != null) it.fabriziodavi.vivovideo.ui.CreditsScreen(vm)
                 }
             }
         }

@@ -459,6 +459,8 @@ data class TextItem(
     /** 0 = testo intero; 1 = karaoke (la parola detta si colora di [highlight]); 2 = le parole compaiono mentre sono dette. */
     val wordMode: Int = 0,
     val highlight: Int = 0xFFF2B33D.toInt(),
+    /** Titoli di coda: il testo (più righe) scorre dal basso in alto a velocità costante per tutta la durata. */
+    val roll: Boolean = false,
 ) {
     val endUs: Long get() = startUs + durationUs
 
