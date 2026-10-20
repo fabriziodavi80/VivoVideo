@@ -1436,7 +1436,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun setRedactStyle(s: it.fabriziodavi.vivovideo.model.RedactStyle) {
+    fun changeRedactStyle(s: it.fabriziodavi.vivovideo.model.RedactStyle) {
         redactStyle = s
         updateSelected { c -> c.redact?.let { c.copy(redact = it.copy(style = s)) } ?: c }
     }

@@ -2224,7 +2224,7 @@ private fun PrivacyTab(vm: EditorViewModel, clip: Clip, enabled: Boolean) {
         PanelLabel("Oscurato")
         val what = listOfNotNull(if (r.faces) "volti" else null, if (r.plates) "targhe" else null, if (r.objectSeed != null) "un oggetto" else null).joinToString(", ")
         Hint("In questa clip: $what. " + if (clip.isPhoto) "${r.found} elementi coperti." else "Coperti in ${r.found} fotogrammi su ${r.count}.")
-        PillRow(it.fabriziodavi.vivovideo.model.RedactStyle.entries, r.style, { it.label }, enabled) { vm.setRedactStyle(it) }
+        PillRow(it.fabriziodavi.vivovideo.model.RedactStyle.entries, r.style, { it.label }, enabled) { vm.changeRedactStyle(it) }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             SecondaryButton("Rifai", onClick = { if (enabled && !busy) vm.redactClip() })
             SecondaryButton("Togli", onClick = { if (enabled) vm.removeRedact() })
