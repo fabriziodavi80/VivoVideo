@@ -90,7 +90,7 @@ internal val STYLE_GROUPS: List<Pair<String, List<AutoStyle>>> = listOf(
     "Dinamici" to listOf(AutoStyle.ENERGICO, AutoStyle.VIRALE, AutoStyle.AZIONE, AutoStyle.ESTREMO, AutoStyle.BLOCKBUSTER, AutoStyle.NEON, AutoStyle.ESTATE),
     "Viaggi e natura" to listOf(AutoStyle.VIAGGIO, AutoStyle.DIARIO, AutoStyle.MARE, AutoStyle.MONTAGNA, AutoStyle.NATURA),
     "Emozioni" to listOf(AutoStyle.CINEMA, AutoStyle.ELEGANTE, AutoStyle.ROMANTICO, AutoStyle.MATRIMONIO, AutoStyle.SOGNO, AutoStyle.RICORDI),
-    "Rétro" to listOf(AutoStyle.SUPER8, AutoStyle.ANNI90),
+    "Rétro" to listOf(AutoStyle.SUPER8, AutoStyle.ANNI90, AutoStyle.GRUNGE),
 )
 
 /** Da dove prendere foto e video: scelti uno per uno o album interi. */

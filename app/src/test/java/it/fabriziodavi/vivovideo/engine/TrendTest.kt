@@ -137,6 +137,17 @@ class TrendTest {
         assertTrue(sub.upper && sub.size < 0.04f && sub.gradientTo == null)
     }
 
+    @Test fun grungeIsRawButNotCheesy() {
+        val st = AutoStyle.GRUNGE
+        assertTrue((st.transitions + st.impact).none { it in datedTransitions || it == TransitionType.GLITCH || it == TransitionType.BURN })
+        assertTrue((st.fx + st.accents + st.beatFx + st.dropFx).none { it.type in datedFx || it.type == FxType.VHS })
+        assertTrue(st.cutShare >= 0.5f && st.grade.saturation < 0f)
+        val vids = (0 until 30).map { Clip(id = "v$it", uri = "content://v/$it", sourceDurationUs = 20_000_000, trimEndUs = 20_000_000, width = 1080, height = 1920, fps = 60f) }
+        val p = AutoEdit.build("Grunge", vids, song(), AutoOptions(style = st, targetUs = 40_000_000, title = "Notte"))
+        assertTrue(p.clips.all { c -> c.fx.any { it.type == FxType.GRAIN } })
+        assertEquals(TextPreset.STAMPA, TextPreset.matching(p.texts.first { it.text == "Notte" }))
+    }
+
     @Test fun retroThemeKeepsItsVhsHits() {
         val vids = (0 until 30).map { Clip(id = "v$it", uri = "content://v/$it", sourceDurationUs = 20_000_000, trimEndUs = 20_000_000, width = 1920, height = 1080, fps = 30f) }
         val p = AutoEdit.build("Anni 90", vids, song(), AutoOptions(style = AutoStyle.ANNI90, targetUs = 45_000_000))
