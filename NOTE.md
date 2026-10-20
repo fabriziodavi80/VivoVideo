@@ -1,6 +1,6 @@
 # VivoVideo · note per riprendere il lavoro
 
-Aggiornate al 19/10/2026, ultima versione **v0.3.147**. Da leggere insieme a `CLAUDE.md`.
+Aggiornate al 20/10/2026, ultima versione **v0.3.156**. Da leggere insieme a `CLAUDE.md`.
 
 ## 1. Stato attuale dell'app
 
@@ -57,7 +57,18 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, minSdk 33, solo arm64-v8a 
 - Data della videocamera nei temi vintage.
 - "Altra proposta" e cambio di stile.
 
-### Ultime modifiche (v0.3.146–v0.3.147)
+### Ultime modifiche (v0.3.148–v0.3.156)
+- Interfaccia: Home con "Video automatico" e "Monta tu" grandi, "Da un modello" accanto, servizi in fondo. Video automatico in 3 passi (`AutoScreen`: Cosa usare / Stile / Musica e dettagli, `STYLE_GROUPS`), scelta di singole foto e video (`MediaGrid`, `autoCreate(handPicked)`).
+- Taglia pause e ehm (Audio → Clip, `SpeechCutScreen`): `SpeechCuts` (silenzi con soglia adattiva, filler da Whisper con `FILLER_PROMPT`/initial_prompt), `Project.cutTimeline` + `shiftAfterCut`.
+- Titoli di coda (Testo → Titoli di coda, `CreditsScreen`): `TextItem.roll` + `rollSettings` (ancore dell'overlay), `Credits`, clip nera `Credits.BLACK_ID`.
+- Tutorial: `Tutorial.zoomKeyframes` (Inquadra, griglia 3×3), `TutorialMarks` (freccia, cerchio, riquadro, numero come livelli), stile PASSO.
+- Tema Grunge (gruppo Rétro) e stile STAMPA.
+- Privacy (Effetti → Privacy, `ObjectPickScreen`): `Redactor` (ML Kit volti, testo per le targhe, oggetti in STREAM_MODE, 10 fps, file), `RedactEffect` (12 riquadri, pixel/sfocato/nero), `Clip.redact`.
+- GitHub Actions: concorrenza separata per build ed emulatore (l'emulatore vecchio si annulla).
+- Emulatore v0.3.156: 31 su 33; falliti `onlineLibraryOpenverse` (timeout di rete) e `exportWowTransitionsAndTexts` (decodificatore dell'emulatore). Tutte le prove nuove passate.
+- Da verificare sul telefono: maschere privacy su video veri, taglio degli "ehm", zoom tutorial, titoli di coda.
+
+### Modifiche v0.3.146–v0.3.147
 - Natura con zoom morbido e scivolata approvato ("abbastanza delicato, ci sta").
 - Foto troppo ingrandite in tutti i temi: MotionStyle ora al massimo +10%; scatti a ritmo a gradini con tetto (10%, 6% temi delicati);
   foto che riempiendo perderebbero oltre il 30% (`AutoEdit.fillKeeps` < `MIN_FILL_KEEP`) vanno su sfondo sfocato, intere; niente più panoramica sulle foto nell'altro verso.
