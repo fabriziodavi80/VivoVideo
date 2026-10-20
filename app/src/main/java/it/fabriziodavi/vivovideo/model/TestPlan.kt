@@ -20,6 +20,9 @@ object TestPlan {
         Item("base_album", "Base", "Album interi",
             "Nuovo progetto → Album interi → scegli un album.",
             "Arrivano tutte le foto e i video dell'album, in ordine di data."),
+        Item("base_auto_pick", "Base", "Video automatico a passi con foto scelte",
+            "Home → Video automatico → Foto e video: scegli 8–10 foto una per una (anche qualcuna nell'altro verso) → Avanti → uno stile → Avanti → un brano → Crea il video.",
+            "Ci sono tutte le foto scelte, nell'ordine di data; quelle nell'altro verso si vedono intere sullo sfondo sfocato; nessuna troppo ingrandita."),
         // Anteprima
         Item("prev_4k", "Anteprima", "Anteprima fluida con video pesanti",
             "Con un video 4K a 120 fps o 8K, aspetta la scritta \"Preparo le copie leggere…\", poi fai partire l'anteprima.",
@@ -59,6 +62,9 @@ object TestPlan {
         Item("aud_beats", "Audio", "Tagli a ritmo",
             "Musica → Battiti → trova i battiti, poi Ascolta e tocca a tempo.",
             "I tagli cadono sui colpi della musica."),
+        Item("aud_cut", "Audio", "Taglia pause e ehm",
+            "Un video parlato di 1–2 minuti con pause e qualche \"ehm\" → Audio → Clip → Taglia pause e ehm: 0,7 s, Togli anche ehm → Analizza → Taglia.",
+            "Il riepilogo è sensato; dopo il taglio le frasi non sono mozzate, resta un attimo di respiro, gli ehm spariti; Annulla torna com'era."),
         // Testo
         Item("txt_styles", "Testo", "Stili e animazioni WOW",
             "Testo → aggiungi → Stili pronti, prova Glitch, Onda, Oro, Cascata.",
@@ -69,6 +75,9 @@ object TestPlan {
         Item("txt_font", "Testo", "Font tuoi",
             "Testo → Stile → + Aggiungi font, scegli un .ttf scaricato.",
             "Il testo cambia font in anteprima e nel video esportato."),
+        Item("txt_credits", "Testo", "Titoli di coda",
+            "Testo → Titoli di coda: un titolo e 6–8 righe, Su nero, dopo il video → Metti i titoli di coda; guarda l'anteprima, poi esporta.",
+            "Il rullo sale regolare e si legge bene, l'ultima scena sfuma nel nero; uguale nel video esportato."),
         // Colore
         Item("col_clip", "Colore", "Colore per clip e istogramma",
             "Colore → Base, Ruote, HSL su una clip; Copia/Applica a tutte.",
@@ -89,6 +98,9 @@ object TestPlan {
         Item("tool_multi", "Strumenti", "Selezione multipla e incolla attributi",
             "Copia attributi da una clip con effetti e colore → Seleziona più clip → Incolla attributi.",
             "Le clip scelte prendono effetti e colore; un Annulla torna indietro."),
+        Item("tool_tutorial", "Strumenti", "Tutorial: zoom, frecce, passi",
+            "Modifica → Inquadra → Zoom su un punto: 2× su un angolo. Livelli → Freccia e Numero. Testo → Passo numerato.",
+            "Lo zoom arriva e torna morbido senza bordi neri; freccia e numero nitidi e spostabili; i numeri vanno avanti (1, 2, 3)."),
         // Intelligenti
         Item("ai_auto", "Intelligenti", "Video automatico con regia intelligente",
             "Video automatico → 2 album → stile → brano online → durata Come il brano.",
@@ -102,6 +114,9 @@ object TestPlan {
         Item("ai_person", "Intelligenti", "Scontorno della persona",
             "Clip con una persona → Effetti → Persona → Scontorna, poi Sfoca lo sfondo / colore / bianco e nero.",
             "Il bordo della persona è pulito (capelli compresi più o meno), lo sfondo cambia; uguale nel video esportato."),
+        Item("ai_privacy", "Intelligenti", "Privacy: volti, targhe, oggetti",
+            "Un video di 10–20 s con persone e un'auto con la targa leggibile → Effetti → Privacy → Volti e Targhe → Analizza e oscura; poi Rifai aggiungendo un oggetto toccato nell'immagine. Esporta.",
+            "Volti e targhe coperti per tutta la clip anche mentre si muovono, l'oggetto seguito; nessun buco evidente; uguale nel video esportato."),
         // Progetto
         Item("prj_backup", "Progetto", "Copia di sicurezza",
             "Progetto → Copia di sicurezza (leggera), salvala; poi Home → Apri una copia.",
