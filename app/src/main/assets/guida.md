@@ -3,6 +3,7 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **Strumenti per i tutorial**: **Zoom su un punto** (Modifica → Inquadra: l'immagine si avvicina morbida alla zona scelta, resta e torna), **evidenziazioni** pronte (Livelli: freccia, cerchio, riquadro, numero) e **passi numerati** (Testo → Passo numerato).
 - **Nuovo tema Grunge** (gruppo Rétro): crudo ma moderno, con toni smorzati e neri profondi, grana e graffi leggeri, tanti tagli secchi, B/N a scatti e sobbalzi di camera sui colpi, titolo da macchina da scrivere (nuovo stile di testo **Stampa**).
 - **Titoli di coda** (Testo → Titoli di coda): un rullo che sale piano alla fine del video, con titolo, righe "ruolo e nomi" e i crediti dei brani della libreria aggiunti da soli; su nero dopo il video o sopra le ultime scene.
 - **Taglia pause e ehm** (Audio → Clip): per i video parlati, l'app toglie i silenzi lunghi (soglia 0,4, 0,7 o 1 s) lasciando un attimo di respiro fra le frasi e, se vuoi, anche "ehm", "eh", "uhm", "mmm". Prima ti dice quanto toglie e quanto dura il video dopo; un solo Annulla torna indietro.
@@ -178,6 +179,12 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - Animazioni di entrata/uscita (anche **Macchina da scrivere** e **Parola per parola**).
 - **Animazioni Wow**: **Lettere cadono** (rimbalzano al loro posto; in uscita cadono), **Lettere sfumate**, **Onda** (le lettere saltano una dopo l'altra), **Glitch** (con qualche sussulto anche mentre il testo resta), **Luccichio** (una striscia di luce attraversa il testo ogni 3 secondi; solo in entrata).
 - **Movimento**: posizione iniziale → finale (scegli quale modificare, sistemala con le dita).
+
+## Fare un tutorial
+- **Zoom su un punto** (Modifica → Inquadra, in fondo): porta l'indicatore dove serve, scegli quanto ingrandire (1,5×, 2×, 2,5×) e per quanto (1,5, 2,5 o 4 s), poi tocca la zona del quadro nella griglia 3×3. L'immagine ci arriva in mezzo secondo, resta e torna, senza mai mostrare i bordi. Sono keyframe normali: li ritocchi dallo strumento Keyframe.
+- **Evidenziazioni** (Livelli, senza nulla selezionato): **Freccia**, **Cerchio**, **Riquadro** e **Numero** compaiono al centro dall'indicatore per 3 s; trascinali sul punto da indicare, pizzica per la misura, ruota la freccia con due dita. I numeri vanno avanti da soli.
+- **Passo numerato** (Testo, senza nulla selezionato): un'etichetta chiara in alto a sinistra "1. …", poi "2. …"; scrivi il testo nel pannello.
+- Per un tutorial parlato: **Taglia pause e ehm** (Audio → Clip) e i **sottotitoli automatici** in stile Social completano il lavoro.
 
 ## Titoli di coda
 - **Testo → Titoli di coda**: scrivi un **titolo** (per esempio "Grazie per la visione") e le **righe** con ruolo e nomi (Riprese, Montaggio, Musica…); con i brani della libreria online, **Aggiungi i crediti dei brani** li mette in fondo da solo (le licenze chiedono di citare l'autore).

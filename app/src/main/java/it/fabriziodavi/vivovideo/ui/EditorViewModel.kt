@@ -1,5 +1,6 @@
 package it.fabriziodavi.vivovideo.ui
 
+import it.fabriziodavi.vivovideo.model.TextAnim
 import it.fabriziodavi.vivovideo.model.TextItem
 import it.fabriziodavi.vivovideo.model.TransitionSpec
 import it.fabriziodavi.vivovideo.model.Clip
@@ -1540,6 +1541,59 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
 
     /** Toglie tutti i sottotitoli automatici. */
     fun removeSubtitles() = update { it.copy(texts = it.texts.filterNot { t -> t.subtitle }) }
+
+    // ---------------- Tutorial: zoom su un punto, evidenziazioni, passi ----------------
+
+    /**
+     * Zoom morbido sulla zona [spot] della clip sotto l'indicatore: arriva, resta [holdUs] e torna
+     * (si vede in anteprima; i keyframe si ritoccano dallo strumento Keyframe).
+     */
+    fun zoomOnSpot(spot: it.fabriziodavi.vivovideo.model.Tutorial.Spot, scale: Float, holdUs: Long) {
+        val p = project ?: return
+        val (i, offsetOut) = p.locate(playheadUs) ?: return
+        val clip = p.clips[i]
+        val local = clip.speedCurve().sourceTimeAt(offsetOut)
+        val keys = it.fabriziodavi.vivovideo.model.Tutorial.zoomKeyframes(clip.keyframes, local, clip.trimmedUs, spot.x, spot.y, scale, holdUs)
+        update { it.replaceClip(clip.copy(keyframes = keys)) }
+        selectedClipId = clip.id
+        message = "Zoom aggiunto: guarda l'anteprima. Si ritocca dallo strumento Keyframe; Annulla lo toglie."
+    }
+
+    /** Freccia, cerchio, riquadro o numero come livello dall'indicatore (3 s), al centro: poi lo sposti con le dita. */
+    fun addTutorialMark(mark: it.fabriziodavi.vivovideo.model.Tutorial.Mark) {
+        val ctx = getApplication<Application>()
+        val p = project ?: return
+        if (p.clips.isEmpty()) { message = "Aggiungi prima un video o una foto."; return }
+        val n = it.fabriziodavi.vivovideo.model.Tutorial.nextStep(p)
+        val (f, w, h) = runCatching { it.fabriziodavi.vivovideo.engine.TutorialMarks.file(ctx, mark, n) }.getOrElse { message = "Non riesco a preparare l'immagine."; return }
+        val total = p.durationUs
+        val start = if (total - playheadUs < Layer.MIN_US) 0L else playheadUs
+        val scale = when (mark) {
+            it.fabriziodavi.vivovideo.model.Tutorial.Mark.ARROW -> 0.18f
+            it.fabriziodavi.vivovideo.model.Tutorial.Mark.CIRCLE -> 0.24f
+            it.fabriziodavi.vivovideo.model.Tutorial.Mark.BOX -> 0.38f
+            it.fabriziodavi.vivovideo.model.Tutorial.Mark.NUMBER -> 0.1f
+        }
+        val name = if (mark == it.fabriziodavi.vivovideo.model.Tutorial.Mark.NUMBER) "Numero $n" else mark.label
+        val layer = Layer(
+            uri = android.net.Uri.fromFile(f).toString(), name = name, width = w, height = h,
+            startUs = start, durationUs = minOf(3_000_000L, total - start).coerceAtLeast(Layer.MIN_US),
+            pose = Transform(scale = scale), animIn = TextAnim.POP, animOut = TextAnim.FADE,
+        )
+        update { it.copy(layers = it.layers + layer) }
+        selectedLayerId = layer.id
+    }
+
+    /** Passo numerato ("1. …") dall'indicatore, in alto a sinistra: si scrive il testo nel pannello. */
+    fun addStep() {
+        val p = project ?: return
+        if (p.clips.isEmpty()) { message = "Aggiungi prima un video o una foto."; return }
+        val total = p.durationUs
+        val start = if (total - playheadUs < TextItem.MIN_US) 0L else playheadUs
+        val t = it.fabriziodavi.vivovideo.model.Tutorial.stepText(it.fabriziodavi.vivovideo.model.Tutorial.nextStep(p), start, minOf(4_000_000L, total - start).coerceAtLeast(TextItem.MIN_US))
+        update { it.copy(texts = it.texts + t) }
+        selectedTextId = t.id
+    }
 
     // ---------------- Titoli di coda ----------------
 

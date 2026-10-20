@@ -554,7 +554,7 @@ enum class TextPreset(val label: String) {
     IMPATTO("Impatto"), FIRMA("Firma"), DIARIO("Diario"),
     GLITCH("Glitch"), ONDA("Onda"), ORO("Oro"), CASCATA("Cascata"),
     CINEMA26("Cinema 2026"), SOGNO("Sogno"), TITOLO3D("Titolo 3D"), FESTA("Festa"), INSEGNA("Insegna"), ESPLOSIONE("Esplosione"),
-    AMORE("Amore"), DATA("Data videocamera"), TAPPA("Tappa di viaggio"), STAMPA("Stampa"),
+    AMORE("Amore"), DATA("Data videocamera"), TAPPA("Tappa di viaggio"), STAMPA("Stampa"), PASSO("Passo"),
     // Tendenze 2026: bold senza grazie, bianco, niente sfumature né scritte storte, animazioni sobrie.
     PULITO("Pulito"), ETICHETTA("Etichetta"), TITOLONE("Titolone"), MINIMAL("Minimal"), SOCIAL("Social");
 
@@ -607,6 +607,9 @@ enum class TextPreset(val label: String) {
         // Stampa (grunge): macchina da scrivere, maiuscolo spaziato, entra tremolando come una pellicola.
         STAMPA -> t.copy(font = TextFont.MACCHINA, color = 0xFFF2EFE6.toInt(), gradientTo = null, spacing = 0.14f, upper = true, look = TextLook.OMBRA,
             size = 0.06f, x = 0f, y = 0f, rotation = 0f, animIn = TextAnim.FLICKER, animOut = TextAnim.FADE, endPose = Transform(x = 0f, y = 0f, scale = 1.04f))
+        // Passo (tutorial): etichetta chiara in alto a sinistra, testo scuro su pillola bianca.
+        PASSO -> t.copy(font = TextFont.MODERNO, color = 0xFF111111.toInt(), gradientTo = null, spacing = 0f, upper = false, look = TextLook.RIQUADRO,
+            size = 0.04f, x = -0.22f, y = -0.38f, rotation = 0f, animIn = TextAnim.SLIDE, animOut = TextAnim.FADE, endPose = null)
         // Pulito: bold senza grazie, lettere strette, entra a fuoco e si avvicina appena.
         PULITO -> t.copy(font = TextFont.POSTER, color = WHITE, gradientTo = null, spacing = -0.02f, upper = false, look = TextLook.OMBRA,
             size = 0.075f, x = 0f, y = 0f, rotation = 0f, animIn = TextAnim.BLUR, animOut = TextAnim.FADE, endPose = Transform(x = 0f, y = 0f, scale = 1.03f))

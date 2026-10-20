@@ -1377,6 +1377,33 @@ private fun PhotoPanel(vm: EditorViewModel, running: Boolean) {
     Hint("I movimenti usano due keyframe: li personalizzi dallo strumento Keyframe. Zoom fisso, posizione e Adatta/Riempi sono in Inquadra. Con i battiti, la maniglia destra aggancia la durata al ritmo.")
 }
 
+/** Zoom su un punto, per i tutorial: si sceglie la zona del quadro, quanto ingrandire e per quanto. */
+@Composable
+private fun TutorialZoom(vm: EditorViewModel, enabled: Boolean) {
+    var zoom by remember { mutableStateOf(2f) }
+    var hold by remember { mutableStateOf(2_500_000L) }
+    PanelLabel("Zoom su un punto (tutorial)")
+    Hint("Porta l'indicatore dove vuoi lo zoom e tocca la zona del quadro: l'immagine ci arriva morbida, resta e torna.")
+    Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            it.fabriziodavi.vivovideo.model.Tutorial.Spot.entries.chunked(3).forEach { row ->
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    row.forEach { s ->
+                        Box(
+                            Modifier.size(40.dp).clip(RoundedCornerShape(8.dp)).background(VV.Raised).clickable(enabled = enabled) { vm.zoomOnSpot(s, zoom, hold) },
+                            contentAlignment = Alignment.Center,
+                        ) { Text(s.label, color = VV.Tally, style = MaterialTheme.typography.titleSmall) }
+                    }
+                }
+            }
+        }
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            PillRow(listOf(1.5f, 2f, 2.5f), zoom, { String.format(java.util.Locale.ITALIAN, "%.1f×", it).replace(",0×", "×") }, enabled) { zoom = it }
+            PillRow(listOf(1_500_000L, 2_500_000L, 4_000_000L), hold, { String.format(java.util.Locale.ITALIAN, "%.1f s", it / 1e6).replace(",0 s", " s") }, enabled) { hold = it }
+        }
+    }
+}
+
 @Composable
 private fun FramePanel(vm: EditorViewModel, running: Boolean) {
     val clip = vm.selectedClip ?: return
@@ -1402,6 +1429,7 @@ private fun FramePanel(vm: EditorViewModel, running: Boolean) {
         SecondaryButton("Reimposta", onClick = { if (enabled) { vm.setFrame(Transform()); vm.project?.let { p -> vm.updateSelected { it.withMode(p.presetModeFor(it)) } } } })
     }
     SecondaryButton("Applica a tutte le clip", selected = vm.project?.frameOnAll(clip) == true, onClick = { if (enabled) vm.applyFrameToAll() })
+    TutorialZoom(vm, enabled)
     PanelLabel("Segui il soggetto")
     if (clip.reframe == null) {
         SecondaryButton("Segui il soggetto", Modifier.fillMaxWidth(), onClick = { if (enabled && vm.clipWork == null) vm.followSubject() })
@@ -1441,6 +1469,7 @@ private fun TextPanel(vm: EditorViewModel, running: Boolean, tab: Int, onPickFon
         PrimaryButton("Aggiungi testo", Modifier.fillMaxWidth(), enabled = enabled, onClick = vm::addText)
         SecondaryButton("Sottotitoli automatici", Modifier.fillMaxWidth(), onClick = { if (enabled) { vm.pause(); vm.showSubtitles = true } })
         SecondaryButton(if (p.creditsRoll != null) "Titoli di coda · modifica" else "Titoli di coda", Modifier.fillMaxWidth(), onClick = { if (enabled) { vm.pause(); vm.showCredits = true } })
+        SecondaryButton("Passo numerato (tutorial)", Modifier.fillMaxWidth(), onClick = { if (enabled) vm.addStep() })
         Hint("Il testo parte dall'indicatore. Nella timeline lo sposti trascinandolo e ne cambi la durata con le maniglie.")
         return
     }
@@ -1661,6 +1690,13 @@ private fun LayerPanel(vm: EditorViewModel, running: Boolean, tab: Int, onAdd: (
         }
         PrimaryButton("Aggiungi immagine o video", Modifier.fillMaxWidth(), enabled = enabled, onClick = onAdd)
         Hint("Foto, loghi, adesivi PNG con trasparenza o altri video (picture-in-picture) sopra al video, dall'indicatore. Nella timeline li sposti e ne cambi la durata con le maniglie.")
+        PanelLabel("Evidenziazioni per tutorial")
+        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            it.fabriziodavi.vivovideo.model.Tutorial.Mark.entries.forEach { m ->
+                SecondaryButton(m.label, onClick = { if (enabled) vm.addTutorialMark(m) })
+            }
+        }
+        Hint("Compaiono al centro dall'indicatore per 3 s: trascinale dove serve, pizzica per la misura, ruota la freccia con due dita. I numeri vanno avanti da soli (1, 2, 3…).")
         return
     }
     val pose = vm.editedLayerPose() ?: l.pose
