@@ -755,7 +755,8 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
      * Crea un progetto completo dagli elementi della galleria scelti: seleziona, importa, analizza il ritmo
      * del brano e monta con la regia dello stile scelto. [fitMusic] = durata come il brano.
      */
-    fun autoCreate(items: List<GalleryItem>, musicUri: Uri?, options: AutoOptions, fitMusic: Boolean) {
+    /** [handPicked] = foto e video scelti uno per uno: si usano tutti (niente scarto delle raffiche né del verso). */
+    fun autoCreate(items: List<GalleryItem>, musicUri: Uri?, options: AutoOptions, fitMusic: Boolean, handPicked: Boolean = false) {
         val ctx = getApplication<Application>()
         viewModelScope.launch {
             var music: MusicTrack? = null
@@ -775,9 +776,9 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             // Le fonti si ricordano (al massimo 1500, distribuite nel tempo) per poter fare altre proposte.
             val all = if (items.size <= 1500) items else (0 until 1500).map { items[(it.toLong() * (items.size - 1) / 1499).toInt()] }
             val raw = all.map { AutoSource(it.uri.toString(), it.isVideo, it.durationMs * 1000, it.dateMs, it.width, it.height) }
-            val sources = chooseSources(ctx, raw, o, music)
+            val sources = if (handPicked) raw.sortedBy { it.dateMs } else chooseSources(ctx, raw, o, music)
             val picked = AutoEdit.pick(sources.map { it.item() }, o.style, o.targetUs, slotUs = AutoEdit.beatSlotUs(o.style, music)).map { sources[it] }
-            if (picked.isEmpty()) { busy = null; message = "Negli album scelti non ci sono foto o video."; return@launch }
+            if (picked.isEmpty()) { busy = null; message = "Fra quelli scelti non ci sono foto o video."; return@launch }
             val imported = importSources(ctx, picked, emptyMap())
             val clips = picked.mapNotNull { imported[it.uri] }
             if (clips.isEmpty()) { busy = null; message = "Non sono riuscito a leggere le foto e i video scelti."; return@launch }

@@ -1,5 +1,6 @@
 package it.fabriziodavi.vivovideo.model
 
+import it.fabriziodavi.vivovideo.ui.STYLE_GROUPS
 import it.fabriziodavi.vivovideo.ui.dateRangeLabel
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -165,5 +166,11 @@ class AutoEditTest {
         val items = (0 until 500).map { AutoItem(isVideo = false, durationUs = 0, dateMs = it.toLong()) }
         val n = AutoEdit.pick(items, AutoStyle.ENERGICO, song, slotUs = AutoEdit.beatSlotUs(AutoStyle.ENERGICO, m)).size
         assertTrue("$n scene", n in 40..200)
+    }
+
+    @Test fun everyThemeIsInExactlyOneGroup() {
+        val all = STYLE_GROUPS.flatMap { it.second }
+        assertEquals(AutoStyle.entries.size, all.size)
+        assertEquals(AutoStyle.entries.toSet(), all.toSet())
     }
 }

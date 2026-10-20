@@ -85,16 +85,30 @@ fun dateRangeLabel(firstMs: Long, lastMs: Long): String {
     }
 }
 
+/** I temi del video automatico divisi per gruppo (nel passo "Stile"). */
+internal val STYLE_GROUPS: List<Pair<String, List<AutoStyle>>> = listOf(
+    "Dinamici" to listOf(AutoStyle.ENERGICO, AutoStyle.VIRALE, AutoStyle.AZIONE, AutoStyle.ESTREMO, AutoStyle.BLOCKBUSTER, AutoStyle.NEON, AutoStyle.ESTATE),
+    "Viaggi e natura" to listOf(AutoStyle.VIAGGIO, AutoStyle.DIARIO, AutoStyle.MARE, AutoStyle.MONTAGNA, AutoStyle.NATURA),
+    "Emozioni" to listOf(AutoStyle.CINEMA, AutoStyle.ELEGANTE, AutoStyle.ROMANTICO, AutoStyle.MATRIMONIO, AutoStyle.SOGNO, AutoStyle.RICORDI),
+    "Rétro" to listOf(AutoStyle.SUPER8, AutoStyle.ANNI90),
+)
+
+/** Da dove prendere foto e video: scelti uno per uno o album interi. */
+private enum class Source(val label: String) { ITEMS("Foto e video"), ALBUMS("Album interi") }
+
+private val STEPS = listOf("Cosa usare", "Stile", "Musica e dettagli")
+
 /**
- * Video automatico: si scelgono uno o più album, uno stile, un brano e la durata;
- * l'app sceglie le scene, le taglia a ritmo e aggiunge transizioni, effetti e titolo.
+ * Video automatico in tre passi: 1) foto e video (scelti uno per uno o album interi), 2) stile, 3) musica, durata e titolo.
+ * L'app sceglie le scene, le taglia a ritmo e aggiunge transizioni, effetti e titolo.
  */
 @Composable
 fun AutoScreen(vm: EditorViewModel) {
     val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
     val busy = vm.busy
-    BackHandler(enabled = busy == null) { vm.showAuto = false }
+    var step by remember { mutableIntStateOf(0) }
+    BackHandler(enabled = busy == null) { if (step > 0) step-- else vm.showAuto = false }
 
     var permTick by remember { mutableIntStateOf(0) }
     val permLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permTick++ }
@@ -105,11 +119,20 @@ fun AutoScreen(vm: EditorViewModel) {
     val albums by produceState<List<Album>?>(null, permTick) {
         value = if (Gallery.anyAccess(ctx)) withContext(Dispatchers.IO) { runCatching { Gallery.albums(ctx) }.getOrDefault(emptyList()) } else emptyList()
     }
+    // Tutta la galleria, dal più recente (per la scelta una per una).
+    val gallery by produceState<List<GalleryItem>?>(null, permTick) {
+        value = if (Gallery.anyAccess(ctx)) withContext(Dispatchers.IO) { runCatching { Gallery.items(ctx).asReversed() }.getOrDefault(emptyList()) } else emptyList()
+    }
+    var source by remember { mutableStateOf(Source.ITEMS) }
     var selected by remember { mutableStateOf(setOf<String>()) }
+    var picked by remember { mutableStateOf(listOf<String>()) }
+    var filterAlbum by remember { mutableStateOf<Album?>(null) }
     var style by remember { mutableStateOf(AutoStyle.CINEMA) }
+    var group by remember { mutableStateOf(STYLE_GROUPS.first { AutoStyle.CINEMA in it.second }.first) }
     var duration by remember { mutableStateOf(60_000_000L) }
     var format by remember { mutableStateOf(VideoFormat.AUTO) }
     var smart by remember { mutableStateOf(true) }
+    var more by remember { mutableStateOf(false) }
     var musicUri by remember { mutableStateOf<Uri?>(null) }
     var title by remember { mutableStateOf("") }
     var titleTouched by remember { mutableStateOf(false) }
@@ -127,159 +150,218 @@ fun AutoScreen(vm: EditorViewModel) {
         }
     }
     // Elementi degli album scelti (servono per contare e per il periodo del sottotitolo).
-    val items by produceState<List<GalleryItem>>(emptyList(), selected, permTick) {
+    val albumItems by produceState<List<GalleryItem>>(emptyList(), selected, permTick) {
         value = if (selected.isEmpty()) emptyList() else withContext(Dispatchers.IO) { runCatching { Gallery.items(ctx, selected) }.getOrDefault(emptyList()) }
     }
-    val subtitle = if (items.isEmpty()) "" else dateRangeLabel(items.first().dateMs, items.last().dateMs)
+    // Quelli che entreranno nel video, dal più vecchio.
+    val chosen: List<GalleryItem> = if (source == Source.ALBUMS) albumItems else {
+        val set = picked.toSet()
+        gallery.orEmpty().filter { it.uri.toString() in set }.sortedBy { it.dateMs }
+    }
+    val subtitle = if (chosen.isEmpty()) "" else dateRangeLabel(chosen.first().dateMs, chosen.last().dateMs)
     // Titolo proposto: i nomi degli album (finché non lo si cambia a mano).
-    LaunchedEffect(selected, albums) {
-        if (!titleTouched) title = albums.orEmpty().filter { it.id in selected }.joinToString(" · ") { it.name }.take(40)
+    LaunchedEffect(selected, albums, source) {
+        if (!titleTouched) title = if (source == Source.ALBUMS) albums.orEmpty().filter { it.id in selected }.joinToString(" · ") { it.name }.take(40) else ""
     }
 
     Column(Modifier.fillMaxSize().background(VV.Canvas).safeDrawingPadding()) {
         Row(Modifier.fillMaxWidth().height(52.dp).padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-            IconBtn(VVIcons.Back, "Indietro", enabled = busy == null) { vm.showAuto = false }
+            IconBtn(VVIcons.Back, "Indietro", enabled = busy == null) { if (step > 0) step-- else vm.showAuto = false }
             Text("Video automatico", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
         }
+        StepBar(step) { if (it < step && busy == null) step = it }
         if (busy != null) {
             Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(busy, style = MaterialTheme.typography.bodyMedium)
                 LinearProgressIndicator(Modifier.fillMaxWidth().height(4.dp).clip(RoundedCornerShape(2.dp)), color = VV.Tally, trackColor = VV.Raised2)
             }
         }
-        Column(
-            Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Hint("Scegli uno o più album: l'app prende le foto e i video migliori lungo tutto il periodo, li taglia a tempo di musica e aggiunge transizioni, effetti e titolo nello stile che preferisci. Poi puoi ritoccare tutto.")
-
-            Section("1", "Album")
-            when {
-                !any -> {
-                    Hint("Per vedere gli album serve il permesso di leggere foto e video.")
-                    PrimaryButton("Consenti l'accesso alla galleria", Modifier.fillMaxWidth()) { permLauncher.launch(Gallery.permissions) }
-                    SecondaryButton("Apri le impostazioni dell'app", Modifier.fillMaxWidth(), onClick = {
-                        runCatching { ctx.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + ctx.packageName))) }
-                    })
-                }
-                albums == null -> Hint("Lettura degli album…")
-                else -> {
-                    if (!full) {
-                        Hint("Hai dato accesso solo ad alcune foto: si vedono solo quelle. Per gli album interi scegli \"Consenti tutto\".")
-                        SecondaryButton("Consenti l'accesso a tutto", Modifier.fillMaxWidth(), onClick = { permLauncher.launch(Gallery.permissions) })
-                    }
-                    if (albums!!.isEmpty()) Hint("Nessun album con foto o video.")
-                    albums!!.chunked(3).forEach { row ->
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            row.forEach { a ->
-                                AlbumCard(a, a.id in selected, Modifier.weight(1f)) {
-                                    selected = if (a.id in selected) selected - a.id else selected + a.id
+        Box(Modifier.fillMaxWidth().weight(1f)) {
+            when (step) {
+                0 -> Column(Modifier.fillMaxSize().padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Segmented(Source.entries, source, { it.label }) { source = it }
+                    when {
+                        !any -> {
+                            Hint("Per vedere foto e album serve il permesso di leggere foto e video.")
+                            PrimaryButton("Consenti l'accesso alla galleria", Modifier.fillMaxWidth()) { permLauncher.launch(Gallery.permissions) }
+                            SecondaryButton("Apri le impostazioni dell'app", Modifier.fillMaxWidth(), onClick = {
+                                runCatching { ctx.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + ctx.packageName))) }
+                            })
+                        }
+                        source == Source.ITEMS -> {
+                            if (!full) Hint("Hai dato accesso solo ad alcune foto: si vedono solo quelle.")
+                            val list = gallery
+                            if (list == null) Hint("Lettura della galleria…") else {
+                                if (!albums.isNullOrEmpty()) PillRow(listOf<Album?>(null) + albums!!, filterAlbum, { it?.name ?: "Tutte" }) { filterAlbum = it }
+                                val shown = filterAlbum?.let { a -> list.filter { it.albumId == a.id } } ?: list
+                                if (shown.isEmpty()) Hint("Nessuna foto o video.")
+                                MediaGrid(shown, picked, { item ->
+                                    val u = item.uri.toString()
+                                    picked = if (u in picked) picked - u else picked + u
+                                }, Modifier.fillMaxWidth().weight(1f))
+                            }
+                        }
+                        else -> Column(Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            Hint("L'app prende le foto e i video migliori lungo tutto il periodo degli album scelti.")
+                            if (!full) {
+                                Hint("Hai dato accesso solo ad alcune foto: si vedono solo quelle. Per gli album interi scegli \"Consenti tutto\".")
+                                SecondaryButton("Consenti l'accesso a tutto", Modifier.fillMaxWidth(), onClick = { permLauncher.launch(Gallery.permissions) })
+                            }
+                            when {
+                                albums == null -> Hint("Lettura degli album…")
+                                albums!!.isEmpty() -> Hint("Nessun album con foto o video.")
+                                else -> albums!!.chunked(3).forEach { row ->
+                                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        row.forEach { a ->
+                                            AlbumCard(a, a.id in selected, Modifier.weight(1f)) {
+                                                selected = if (a.id in selected) selected - a.id else selected + a.id
+                                            }
+                                        }
+                                        repeat(3 - row.size) { Spacer(Modifier.weight(1f)) }
+                                    }
                                 }
                             }
-                            repeat(3 - row.size) { Spacer(Modifier.weight(1f)) }
                         }
                     }
-                    if (selected.isNotEmpty()) {
-                        val v = items.count { it.isVideo }
-                        Text(
-                            "${selected.size} album · ${items.size - v} foto, $v video" + if (subtitle.isNotEmpty()) " · $subtitle" else "",
-                            style = MaterialTheme.typography.labelLarge, color = VV.Tally,
-                        )
+                }
+                1 -> Column(Modifier.fillMaxSize().padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    PillRow(STYLE_GROUPS.map { it.first }, group, { it }) { group = it }
+                    val list = STYLE_GROUPS.first { it.first == group }.second
+                    Column(Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        list.chunked(2).forEach { row ->
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                row.forEach { s -> StyleCard(s, s == style, Modifier.weight(1f)) { style = s } }
+                                if (row.size == 1) Spacer(Modifier.weight(1f))
+                            }
+                        }
+                        Spacer(Modifier.height(4.dp))
+                        Text(style.label, style = MaterialTheme.typography.titleSmall, color = VV.Tally)
+                        Text(style.description, style = MaterialTheme.typography.bodySmall)
                     }
                 }
-            }
-
-            Section("2", "Stile")
-            AutoStyle.entries.forEach { s ->
-                val on = s == style
-                Column(
-                    Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(if (on) VV.Raised2 else VV.Raised)
-                        .border(if (on) 2.dp else 0.dp, if (on) VV.Tally else Color.Transparent, RoundedCornerShape(12.dp))
-                        .clickable { style = s }.padding(horizontal = 14.dp, vertical = 10.dp),
+                else -> Column(
+                    Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    Text(s.label, style = MaterialTheme.typography.titleSmall, color = if (on) VV.Tally else VV.Text)
-                    Text(s.description, style = MaterialTheme.typography.bodySmall)
-                }
-            }
-
-            Section("3", "Musica")
-            if (musicUri == null) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    PrimaryButton("Libreria online", Modifier.weight(1f)) { vm.openLibrary(effects = false, forAuto = true) }
-                    SecondaryButton("Dal telefono", Modifier.weight(1f), onClick = { musicPicker.launch(arrayOf("audio/*")) })
-                }
-                Hint("Con la musica i tagli cadono sui battiti e l'audio dei video si spegne. Senza, restano i suoni originali.")
-            } else {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(VVIcons.Music, null, tint = VV.Music, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(8.dp))
-                    Text(musicName ?: "", style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-                    IconBtn(VVIcons.Close, "Togli il brano") { musicUri = null; if (duration == FIT_MUSIC) duration = 60_000_000L }
-                }
-            }
-
-            Section("4", "Regia")
-            ToggleRow("Regia intelligente", smart) { smart = it }
-            Hint(
-                if (smart) "L'app guarda ogni video e sceglie il tratto migliore: nitido, ben illuminato, con volti e sorrisi. Nell'orientamento opposto segue le persone riempiendo il quadro. Ci vuole un po' di più (la seconda volta è subito pronto)."
-                else "Dai video si prende un tratto centrale, senza analizzarli: più veloce."
-            )
-
-            Section("5", "Formato")
-            PillRow(VideoFormat.entries, format, { if (it == VideoFormat.AUTO) "Automatico" else it.label }) { format = it }
-            Hint(
-                if (format == VideoFormat.AUTO) "Automatico: verticale o orizzontale secondo le foto e i video più numerosi. Quelli con l'orientamento opposto avranno lo sfondo sfocato."
-                else "Le foto e i video con l'orientamento opposto avranno lo sfondo sfocato invece delle bande nere."
-            )
-
-            Section("6", "Durata")
-            val options = (if (musicUri != null) listOf(FIT_MUSIC) else emptyList()) + DURATIONS
-            PillRow(options, duration, { d ->
-                when (d) { FIT_MUSIC -> "Come il brano"; 0L -> "Tutto"; else -> if (d < 60_000_000L) "${d / 1_000_000} s" else "${d / 60_000_000} min" }
-            }) { duration = it }
-
-            Section("7", "Titolo")
-            OutlinedTextField(
-                value = title,
-                onValueChange = { title = it; titleTouched = true },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                placeholder = { Text("Titolo del video (facoltativo)", color = VV.Faint) },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = VV.Tally, unfocusedBorderColor = VV.Line, cursorColor = VV.Tally,
-                    focusedTextColor = VV.Text, unfocusedTextColor = VV.Text,
-                ),
-            )
-            if (subtitle.isNotEmpty() && title.isNotBlank()) Hint("Sotto il titolo: $subtitle")
-            Spacer(Modifier.height(4.dp))
-        }
-        Box(Modifier.fillMaxWidth().padding(16.dp)) {
-            PrimaryButton(
-                if (selected.isEmpty()) "Scegli almeno un album" else "Crea il video",
-                Modifier.fillMaxWidth(), enabled = selected.isNotEmpty() && items.isNotEmpty() && busy == null,
-            ) {
-                scope.launch {
-                    val all = withContext(Dispatchers.IO) { Gallery.items(ctx, selected) }
-                    vm.autoCreate(
-                        all, musicUri,
-                        AutoOptions(style = style, format = format, targetUs = duration.coerceAtLeast(0), title = title, subtitle = if (title.isBlank()) "" else subtitle,
-                            seed = (System.currentTimeMillis() % 10_000).toInt(), smart = smart),
-                        fitMusic = duration == FIT_MUSIC,
+                    PanelLabel("Musica")
+                    if (musicUri == null) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            PrimaryButton("Libreria online", Modifier.weight(1f)) { vm.openLibrary(effects = false, forAuto = true) }
+                            SecondaryButton("Dal telefono", Modifier.weight(1f), onClick = { musicPicker.launch(arrayOf("audio/*")) })
+                        }
+                        Hint("Con la musica i tagli cadono sui battiti e l'audio dei video si spegne. Senza, restano i suoni originali.")
+                    } else {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(VVIcons.Music, null, tint = VV.Music, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text(musicName ?: "", style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+                            IconBtn(VVIcons.Close, "Togli il brano") { musicUri = null; if (duration == FIT_MUSIC) duration = 60_000_000L }
+                        }
+                    }
+                    PanelLabel("Durata")
+                    val options = (if (musicUri != null) listOf(FIT_MUSIC) else emptyList()) + DURATIONS
+                    PillRow(options, duration, { d ->
+                        when (d) { FIT_MUSIC -> "Come il brano"; 0L -> "Tutto"; else -> if (d < 60_000_000L) "${d / 1_000_000} s" else "${d / 60_000_000} min" }
+                    }) { duration = it }
+                    if (source == Source.ITEMS && duration != 0L) Hint("Con \"Tutto\" entrano tutte le foto e i video scelti; con una durata fissa, se sono troppi, l'app ne usa una parte lungo tutto il periodo.")
+                    PanelLabel("Titolo")
+                    OutlinedTextField(
+                        value = title,
+                        onValueChange = { title = it; titleTouched = true },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        placeholder = { Text("Titolo del video (facoltativo)", color = VV.Faint) },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = VV.Tally, unfocusedBorderColor = VV.Line, cursorColor = VV.Tally,
+                            focusedTextColor = VV.Text, unfocusedTextColor = VV.Text,
+                        ),
                     )
+                    if (subtitle.isNotEmpty() && title.isNotBlank()) Hint("Sotto il titolo: $subtitle")
+                    // Le scelte meno usate restano chiuse finché non servono.
+                    Row(
+                        Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).clickable { more = !more }.padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(if (more) "Meno opzioni" else "Altre opzioni: formato e regia", style = MaterialTheme.typography.labelLarge, color = VV.Tally, modifier = Modifier.weight(1f))
+                        Text(if (more) "▲" else "▼", color = VV.Tally)
+                    }
+                    if (more) {
+                        PanelLabel("Formato")
+                        PillRow(VideoFormat.entries, format, { if (it == VideoFormat.AUTO) "Automatico" else it.label }) { format = it }
+                        Hint(
+                            if (format == VideoFormat.AUTO) "Automatico: verticale o orizzontale secondo le foto e i video più numerosi. Le foto nell'altro verso si vedono intere sullo sfondo sfocato."
+                            else "Le foto e i video nell'altro verso avranno lo sfondo sfocato invece delle bande nere."
+                        )
+                        ToggleRow("Regia intelligente", smart) { smart = it }
+                        Hint(
+                            if (smart) "L'app guarda ogni video e sceglie il tratto migliore: nitido, ben illuminato, con volti e sorrisi. Ci vuole un po' di più (la seconda volta è subito pronto)."
+                            else "Dai video si prende un tratto centrale, senza analizzarli: più veloce."
+                        )
+                    }
+                    Spacer(Modifier.height(4.dp))
+                }
+            }
+        }
+        // Riepilogo e pulsante del passo.
+        Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (chosen.isNotEmpty()) {
+                val v = chosen.count { it.isVideo }
+                Text(
+                    "${chosen.size - v} foto, $v video" + (if (subtitle.isNotEmpty()) " · $subtitle" else "") + if (step > 0) " · ${style.label}" else "",
+                    style = MaterialTheme.typography.labelLarge, color = VV.Tally,
+                )
+            }
+            val ready = chosen.isNotEmpty() && busy == null
+            when (step) {
+                0 -> PrimaryButton(
+                    if (chosen.isEmpty()) (if (source == Source.ITEMS) "Scegli foto e video" else "Scegli almeno un album") else "Avanti: stile",
+                    Modifier.fillMaxWidth(), enabled = ready,
+                ) { step = 1 }
+                1 -> PrimaryButton("Avanti: musica e dettagli", Modifier.fillMaxWidth(), enabled = ready) { step = 2 }
+                else -> PrimaryButton("Crea il video", Modifier.fillMaxWidth(), enabled = ready) {
+                    val handPicked = source == Source.ITEMS
+                    scope.launch {
+                        val all = if (handPicked) chosen else withContext(Dispatchers.IO) { Gallery.items(ctx, selected) }
+                        vm.autoCreate(
+                            all, musicUri,
+                            AutoOptions(style = style, format = format, targetUs = duration.coerceAtLeast(0), title = title, subtitle = if (title.isBlank()) "" else subtitle,
+                                seed = (System.currentTimeMillis() % 10_000).toInt(), smart = smart),
+                            fitMusic = duration == FIT_MUSIC, handPicked = handPicked,
+                        )
+                    }
                 }
             }
         }
     }
 }
 
+/** I tre passi in alto: quello in corso in ambra; si torna indietro toccando un passo già fatto. */
 @Composable
-private fun Section(n: String, label: String) {
-    Row(Modifier.padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-        Box(Modifier.size(22.dp).clip(CircleShape).background(VV.Tally), contentAlignment = Alignment.Center) {
-            Text(n, color = VV.TallyInk, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+private fun StepBar(step: Int, onStep: (Int) -> Unit) {
+    Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        STEPS.forEachIndexed { i, label ->
+            val on = i == step
+            val done = i < step
+            Column(Modifier.weight(1f).clip(RoundedCornerShape(8.dp)).clickable(enabled = done) { onStep(i) }.padding(vertical = 4.dp)) {
+                Box(Modifier.fillMaxWidth().height(4.dp).clip(RoundedCornerShape(2.dp)).background(if (on || done) VV.Tally else VV.Raised2))
+                Text(
+                    "${i + 1}. $label", style = MaterialTheme.typography.labelMedium, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                    color = if (on) VV.Tally else if (done) VV.Text else VV.Dim, modifier = Modifier.padding(top = 4.dp),
+                )
+            }
         }
-        Spacer(Modifier.width(8.dp))
-        Text(label, style = MaterialTheme.typography.titleSmall)
+    }
+}
+
+@Composable
+private fun StyleCard(s: AutoStyle, on: Boolean, modifier: Modifier, onClick: () -> Unit) {
+    Column(
+        modifier.height(96.dp).clip(RoundedCornerShape(12.dp)).background(if (on) VV.Raised2 else VV.Raised)
+            .border(if (on) 2.dp else 0.dp, if (on) VV.Tally else Color.Transparent, RoundedCornerShape(12.dp))
+            .clickable(onClick = onClick).padding(horizontal = 12.dp, vertical = 10.dp),
+    ) {
+        Text(s.label, style = MaterialTheme.typography.titleSmall, color = if (on) VV.Tally else VV.Text)
+        Text(s.description, style = MaterialTheme.typography.bodySmall, maxLines = 3, overflow = TextOverflow.Ellipsis)
     }
 }
 

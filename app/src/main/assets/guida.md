@@ -3,6 +3,9 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **Home più chiara**: due strade grandi per creare un video, **Video automatico** e **Monta tu**, con **Da un modello** accanto. I progetti stanno sotto, "Apri una copia" e "Collaudo" in fondo.
+- **Video automatico in tre passi**: Cosa usare → Stile → Musica e dettagli, con i pulsanti Avanti e la barra dei passi in alto. I 20 temi sono divisi in gruppi; formato e regia stanno in "Altre opzioni".
+- **Foto singole nel video automatico**: oltre agli album interi puoi scegliere foto e video uno per uno da una griglia, anche filtrando per album.
 - **Foto meno ingrandite**: nel video automatico (e nei movimenti pronti) le foto si muovono con zoom e panoramiche leggeri, al massimo +10% invece del +20–30% di prima; gli zoom a ritmo non si sommano più all'infinito (tetto +10%, +6% nei temi delicati). Così si vedono anche i bordi della foto.
 - **Foto nell'altro verso intere**: una foto verticale in un video orizzontale (o viceversa, o una foto quadrata) non viene più riempita con una panoramica che ne mostrava meno della metà: si vede tutta, sullo sfondo sfocato.
 - **Natura senza onde**: via il passaggio Liquido (l'immagine che ondeggia). Ora usa dissolvenze incrociate, i nuovi **Zoom morbido** e **Scivolata** e una sfocatura leggera; ogni tanto un taglio netto a tempo, come nei montaggi di viaggio di oggi. Le scene restano lunghe e distese.
@@ -17,7 +20,8 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - Prima: Natura più tranquillo; temi calmi senza colpi sul drop; esportazione che riprova con il decodificatore software.
 
 ## Primi passi
-- Dalla schermata dei progetti tocca **Nuovo progetto**: **Scegli foto e video** (fino a 100) oppure **Album interi** (uno o più album, tutto in ordine di data). Lo stesso vale per **+** e **Aggiungi** dentro l'editor.
+- La Home ha due strade per creare un video: **Video automatico** (lo monta l'app) e **Monta tu** (lo monti tu nell'editor), più **Da un modello**. Sotto ci sono i tuoi progetti; in fondo **Apri una copia** e **Collaudo e segnalazioni**; in alto il punto di domanda apre questa guida.
+- **Monta tu**: **Scegli foto e video** (fino a 100) oppure **Album interi** (uno o più album, tutto in ordine di data). Lo stesso vale per **+** e **Aggiungi** dentro l'editor.
 - L'editor ha tre zone: **anteprima** in alto, **timeline** al centro, **strumenti** in basso.
 - In fondo c'è sempre la **barra principale**: Modifica, Audio, Testo, Livelli, Effetti, Colore. Toccando di nuovo la voce accesa si chiude.
 - **Modifica** mostra sopra una seconda riga con gli strumenti della clip; le altre voci aprono subito il loro pannello, diviso in schede.
@@ -53,8 +57,11 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - **Modelli**: Salva come modello tiene la struttura del progetto (ogni clip diventa uno "spazio" con la sua durata, velocità, transizione, effetti, colore, inquadratura e movimento) e anche testi, musica, livelli e formato. Da un modello: scegli i video e le foto nell'ordine giusto; per ogni video si prende il momento migliore della durata giusta. Se scegli più elementi degli spazi, il modello si ripete.
 
 ## Video automatico
-- Home → **Video automatico**: album, stile, musica, regia, formato, durata, titolo.
-- **Durata**: "Come il brano" (con la musica) fa durare il video esattamente quanto il brano, che finisce col suo finale; le altre durate (30 s, 1 min, …) sono rispettate al decimo di secondo; "Tutto" usa tutto quello che c'è negli album.
+- Home → **Video automatico**, in tre passi (la barra in alto mostra dove sei; tocca un passo già fatto per tornarci):
+- **1. Cosa usare**: **Foto e video** per sceglierli uno per uno dalla griglia (il numero sul riquadro è l'ordine di scelta; in alto filtri per album), oppure **Album interi**. Scelti uno per uno, entrano tutti (niente scarto delle foto simili).
+- **2. Stile**: i temi sono divisi in **Dinamici**, **Viaggi e natura**, **Emozioni**, **Rétro**; sotto c'è la descrizione del tema scelto.
+- **3. Musica e dettagli**: brano, durata e titolo; **Altre opzioni** apre formato e regia intelligente. Poi **Crea il video**.
+- **Durata**: "Come il brano" (con la musica) fa durare il video esattamente quanto il brano, che finisce col suo finale; le altre durate (30 s, 1 min, …) sono rispettate al decimo di secondo; "Tutto" usa tutto quello che c'è negli album o che hai scelto.
 - Con la musica ogni taglio cade su un battito; se le foto e i video sono pochi per la durata, le scene si allungano di battiti interi.
 - **Temi calmi** (Natura, Romantico, Matrimonio, Sogno, Ricordi, Elegante, Super 8, Cinema): le scene non scendono sotto una durata minima, anche con un brano veloce (si prendono più battiti per scena) e anche dove il brano spinge.
 - Nei temi calmi (tranne Cinema) dove il brano spinge e sul drop la scena non pulsa a ritmo e le foto non fanno scatti: il taglio cade a tempo e il passaggio resta morbido. Natura non usa passaggi con il lampo di luce né effetti che pulsano.

@@ -73,39 +73,29 @@ fun HomeScreen(vm: EditorViewModel) {
     val encoders = remember { runCatching { describeEncoders() }.getOrDefault("") }
 
     Column(Modifier.fillMaxSize().background(VV.Canvas).safeDrawingPadding().padding(horizontal = 16.dp)) {
-        Row(Modifier.fillMaxWidth().padding(top = 18.dp, bottom = 18.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.fillMaxWidth().padding(top = 18.dp, bottom = 14.dp), verticalAlignment = Alignment.CenterVertically) {
             Text("VivoVideo", style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
             IconBtn(VVIcons.Help, "Guida") { vm.showGuide = true }
-            PrimaryButton("Nuovo progetto") { askNew = true }
         }
-        // Video automatico: in evidenza, sopra ai progetti.
-        Row(
-            Modifier.fillMaxWidth().padding(bottom = 16.dp).clip(RoundedCornerShape(14.dp))
-                .background(androidx.compose.ui.graphics.Brush.horizontalGradient(listOf(VV.Raised2, VV.Raised)))
-                .clickable { vm.showAuto = true }.padding(14.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Box(Modifier.size(44.dp).clip(RoundedCornerShape(12.dp)).background(VV.Tally), contentAlignment = Alignment.Center) {
-                Icon(VVIcons.Effects, null, tint = VV.TallyInk)
-            }
-            Column(Modifier.weight(1f).padding(start = 12.dp)) {
-                Text("Video automatico", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                Text("Scegli uno o più album: musica, tagli a ritmo, transizioni ed effetti li fa l'app.", style = MaterialTheme.typography.bodySmall)
-            }
+        // Due strade chiare per creare un video: lo monta l'app, oppure lo monti tu. Il modello è la terza, più piccola.
+        Text("Crea un video", style = MaterialTheme.typography.labelLarge, color = VV.Dim, modifier = Modifier.padding(bottom = 8.dp))
+        CreateCard(
+            VVIcons.Effects, "Video automatico", "Scegli le foto o un album: musica, tagli a ritmo e transizioni li fa l'app.",
+            primary = true, modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+        ) { vm.showAuto = true }
+        Row(Modifier.fillMaxWidth().padding(bottom = 18.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            CreateCard(VVIcons.Edit, "Monta tu", "Scegli video e foto e monta come vuoi.", primary = false, modifier = Modifier.weight(1f)) { askNew = true }
+            CreateCard(VVIcons.Copy, "Da un modello", "Un montaggio salvato, con foto nuove.", primary = false, modifier = Modifier.weight(1f)) { askTemplate = true }
         }
-        Row(Modifier.fillMaxWidth().padding(bottom = 14.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            SecondaryButton("Da un modello", Modifier.weight(1f), onClick = { askTemplate = true })
-            SecondaryButton("Apri una copia", Modifier.weight(1f), onClick = { backupOpener.launch(arrayOf("application/octet-stream", "application/zip", "*/*")) })
-        }
-        SecondaryButton("Collaudo e segnalazioni", Modifier.fillMaxWidth().padding(bottom = 14.dp), onClick = { vm.showTestPlan = true })
         if (vm.projects.isEmpty()) {
             Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
                 Text(
-                    "Crea un progetto scegliendo video e foto dalla galleria.",
+                    "Qui compariranno i tuoi progetti.",
                     style = MaterialTheme.typography.bodyMedium, color = VV.Dim,
                 )
             }
         } else {
+            Text("I tuoi progetti", style = MaterialTheme.typography.labelLarge, color = VV.Dim, modifier = Modifier.padding(bottom = 8.dp))
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(160.dp),
                 modifier = Modifier.weight(1f),
@@ -115,11 +105,18 @@ fun HomeScreen(vm: EditorViewModel) {
                 items(vm.projects, key = { it.id }) { p -> ProjectCard(p, onOpen = { vm.openProject(p) }, onDelete = { toDelete = p }) }
             }
         }
+        // Strumenti di servizio: in fondo, piccoli.
+        Row(Modifier.fillMaxWidth().padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            TextButton(onClick = { backupOpener.launch(arrayOf("application/octet-stream", "application/zip", "*/*")) }) {
+                Text("Apri una copia", style = MaterialTheme.typography.labelMedium, color = VV.Dim)
+            }
+            TextButton(onClick = { vm.showTestPlan = true }) { Text("Collaudo e segnalazioni", style = MaterialTheme.typography.labelMedium, color = VV.Dim) }
+        }
         Text(
             "Versione $version   ·   " + encoders.lines().firstOrNull().orEmpty(),
             style = MaterialTheme.typography.bodySmall, color = VV.Faint,
             maxLines = 1, overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(vertical = 10.dp),
+            modifier = Modifier.padding(bottom = 10.dp, start = 12.dp),
         )
     }
 
@@ -168,6 +165,26 @@ fun HomeScreen(vm: EditorViewModel) {
             confirmButton = { TextButton(onClick = { vm.deleteProject(p.id); toDelete = null }) { Text("Elimina", color = VV.Danger) } },
             dismissButton = { TextButton(onClick = { toDelete = null }) { Text("Annulla", color = VV.Dim) } },
         )
+    }
+}
+
+/** Riquadro per creare un video: icona, titolo e una riga che spiega cosa succede. */
+@Composable
+private fun CreateCard(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String, body: String, primary: Boolean, modifier: Modifier, onClick: () -> Unit) {
+    val bg = if (primary) androidx.compose.ui.graphics.Brush.horizontalGradient(listOf(VV.Raised2, VV.Raised))
+    else androidx.compose.ui.graphics.SolidColor(VV.Raised)
+    Row(
+        modifier.clip(RoundedCornerShape(14.dp)).background(bg).clickable(onClick = onClick).padding(if (primary) 14.dp else 12.dp),
+        verticalAlignment = if (primary) Alignment.CenterVertically else Alignment.Top,
+    ) {
+        Box(
+            Modifier.size(if (primary) 44.dp else 34.dp).clip(RoundedCornerShape(10.dp)).background(if (primary) VV.Tally else VV.Raised2),
+            contentAlignment = Alignment.Center,
+        ) { Icon(icon, null, tint = if (primary) VV.TallyInk else VV.Tally, modifier = Modifier.size(if (primary) 24.dp else 18.dp)) }
+        Column(Modifier.weight(1f).padding(start = 10.dp)) {
+            Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text(body, style = MaterialTheme.typography.bodySmall)
+        }
     }
 }
 
