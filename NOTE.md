@@ -1,6 +1,6 @@
 # VivoVideo · note per riprendere il lavoro
 
-Aggiornate al 19/10/2026, ultima versione **v0.3.144**. Da leggere insieme a `CLAUDE.md`.
+Aggiornate al 19/10/2026, ultima versione **v0.3.145**. Da leggere insieme a `CLAUDE.md`.
 
 ## 1. Stato attuale dell'app
 
@@ -57,7 +57,13 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, minSdk 33, solo arm64-v8a 
 - Data della videocamera nei temi vintage.
 - "Altra proposta" e cambio di stile.
 
-### Ultime modifiche (v0.3.141–v0.3.144): look 2026
+### Ultime modifiche (v0.3.145)
+- Energico 2026 approvato dall'utente ("bene così").
+- Natura: le "onde" (transizione LIQUID) non piacevano. Ora CROSSFADE, SOFTZOOM, DRIFT, BLUR e `cutShare = 0.2`. Tolto LIQUID anche da Sogno e Mare.
+- Nuove transizioni SOFTZOOM e DRIFT (`TransitionType.gentleTrend`: di tendenza ma morbide).
+- Compilazione, prove unitarie ed emulatore tutti riusciti.
+
+### Modifiche v0.3.141–v0.3.144: look 2026
 - Parere ricevuto dall'utente: i temi d'azione avevano un "look da boomer". Ricerca su CapCut, Edits di Meta, tendenze 2026 (velocity edit).
 - Temi d'azione (Energico, Virale, Azione, Estremo, Neon, Estate, Blockbuster, Viaggio, Mare, Montagna, Diario) rifatti:
   - `AutoStyle.cutShare`: stacchi netti sul battito (solo con musica); colpi d'impatto più rari dove il brano spinge;
