@@ -3,6 +3,9 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **Natura senza onde**: via il passaggio Liquido (l'immagine che ondeggia). Ora usa dissolvenze incrociate, i nuovi **Zoom morbido** e **Scivolata** e una sfocatura leggera; ogni tanto un taglio netto a tempo, come nei montaggi di viaggio di oggi. Le scene restano lunghe e distese.
+- **Nuove transizioni morbide**: **Zoom morbido** (lenta spinta in avanti con una sfocatura che nasconde il taglio) e **Scivolata** (l'immagine scorre appena di lato e la successiva continua il movimento). Sono in testa all'elenco, insieme agli stacchi di tendenza.
+- Anche Sogno e Mare non usano più il passaggio Liquido.
 - **Look 2026 nei temi d'azione**: Energico, Reel virale, Azione, Estremo, Neon notte, Estate pop, Blockbuster, Viaggio, Mare, Montagna e Diario di viaggio sono rifatti come le velocity edit di oggi. Ci sono tagli netti sul battito, blackout e flash di esposizione sui colpi, zoom secchi, swipe e scosse di camera, B/N a scatti e rimbalzi a ritmo, grana fine, pellicola moderna e fotocamera digitale. Via cubi 3D, vortici, prismi, strisce, linee da fumetto e lampi bianchi pieni.
 - **Titoli puliti**: i temi d'azione usano scritte bold bianche senza sfumature né inclinazioni (Titolone, Pulito, Social), con il sottotitolo piccolo e spaziato.
 - **Nuova scheda "Di tendenza"** negli effetti (si apre per prima): Pellicola moderna, Fotocamera digitale, Grana fine, Toni smorzati, più Flash, B/N e Rimbalzo a ritmo.
@@ -97,7 +100,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 ## Transizioni
 - Tocca il **cerchietto sul taglio** fra due clip nella timeline (oppure Modifica → Transizione con la clip prima del taglio). Il cerchietto diventa arancione quando c'è una transizione; ai lati della clip selezionata è nascosto per lasciare posto alle maniglie.
 - **Incrociata**: le due clip si sovrappongono (vera dissolvenza). Usa i fotogrammi oltre il taglio: se una clip non ne ha, la dissolvenza si accorcia (il pannello lo indica). Fra foto è sempre piena.
-- **Di tendenza** (in cima all'elenco): **Blackout** (pochi fotogrammi neri secchi sul taglio), **Flash esposizione** (l'immagine si brucia di luce per un istante, senza diventare bianca), **Scossa camera** (sobbalzo da ripresa a mano), **Zoom secco** (spinta in avanti rapida). Sono gli stacchi delle velocity edit: brevi, da 0,2–0,3 s.
+- **Di tendenza** (in cima all'elenco): **Blackout** (pochi fotogrammi neri secchi sul taglio), **Flash esposizione** (l'immagine si brucia di luce per un istante, senza diventare bianca), **Scossa camera** (sobbalzo da ripresa a mano), **Zoom secco** (spinta in avanti rapida). Sono gli stacchi delle velocity edit: brevi, da 0,2–0,3 s. Morbide: **Zoom morbido** e **Scivolata**, da 0,8–1,2 s, per natura, viaggi e momenti calmi.
 - Altre: Nero, Flash, Zoom, Sfocatura, Scorrimento, Rotazione (metà alla fine di una clip, metà all'inizio della successiva).
 - **Wow**: **Glitch** (strisce e colori sfasati), **Prisma** (zoom con i colori divisi), **Luce** (bagliore caldo che brucia nel bianco), **Cerchio** (si chiude al nero e si riapre), **Pixel** (si scompone in quadretti), **Scossa** (scatto mosso).
 - Lo slideshow "Varie" usa solo le transizioni morbide; Glitch, Pixel e Scossa vanno scelte apposta.

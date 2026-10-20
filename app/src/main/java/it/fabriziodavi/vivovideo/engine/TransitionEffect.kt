@@ -111,6 +111,10 @@ class TransitionEffect(
         )
         // Zoom secco: spinta in avanti rapida con scia radiale, senza prisma né lampo.
         TransitionType.SNAPZOOM -> Params(zoom = 1f + 0.35f * e * e, blur = 0.03f * e * e, blurMode = 2)
+        // Zoom morbido: spinta lenta in avanti con una sfocatura che nasconde il taglio (documentari e viaggi).
+        TransitionType.SOFTZOOM -> Params(zoom = 1f + 0.12f * e * e, blur = 0.022f * e * e, blurMode = 2)
+        // Scivolata: l'immagine scorre appena di lato con una scia leggera, e la successiva continua il movimento.
+        TransitionType.DRIFT -> Params(shift = (if (entering) -0.1f else 0.1f) * e * e, blur = 0.035f * e, blurMode = 1, zoom = 1f + 0.03f * e)
     }
 }
 

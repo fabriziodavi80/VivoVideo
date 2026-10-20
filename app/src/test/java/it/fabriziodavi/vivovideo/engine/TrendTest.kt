@@ -63,7 +63,9 @@ class TrendTest {
         assertTrue(listOf(FxType.HALATION, FxType.DIGICAM, FxType.GRAIN, FxType.MUTED).all { it.category == FxCategory.TREND && it.wow2 })
         assertEquals(FxCategory.TREND, FxCategory.entries.first())
         assertTrue(TransitionType.entries.filter { it.trend }.containsAll(listOf(TransitionType.BLACKOUT, TransitionType.EXPOSE, TransitionType.CAMSHAKE, TransitionType.SNAPZOOM)))
-        assertTrue(TransitionType.entries.filter { it.trend }.all { it.punchy && !it.soft })
+        // Gli stacchi di tendenza sono d'impatto; zoom morbido e scivolata sono morbidi (per i temi calmi).
+        assertTrue(TransitionType.entries.filter { it.trend && !it.gentleTrend }.all { it.punchy && !it.soft })
+        assertTrue(TransitionType.entries.filter { it.gentleTrend }.all { it.trend && it.soft && !it.punchy })
     }
 
     @Test fun beatShapesOfTheNewEffects() {
@@ -77,6 +79,20 @@ class TrendTest {
         val after = (1..40).map { w.bounceAt(1_000_000L + it * 10_000L) }
         assertTrue("non rimbalza: $after", after.any { it < -0.05f })
         assertEquals(0f, w.bounceAt(1_700_000), 0f)
+    }
+
+    @Test fun gentleTransitionsAreSubtle() {
+        // Zoom morbido e scivolata: movimento piccolo e sfocatura leggera, niente onde, prismi o lampi.
+        listOf(TransitionType.SOFTZOOM, TransitionType.DRIFT).forEach { t ->
+            val fx = TransitionEffect(0, 2_000_000, null, 0, t, 550_000)
+            val at = fx.params(1_999_000)
+            assertTrue("$t zoom", at.zoom <= 1.13f)
+            assertTrue("$t spostamento", abs(at.shift) <= 0.11f)
+            assertEquals("$t onde", 0f, at.warp, 0f)
+            assertEquals("$t prisma", 0f, at.prism, 0f)
+            assertEquals("$t lampo", 0f, at.white, 0f)
+            assertTrue("$t non nasconde il taglio", at.blur > 0f)
+        }
     }
 
     @Test fun trendTransitionsAreBriefAndClean() {

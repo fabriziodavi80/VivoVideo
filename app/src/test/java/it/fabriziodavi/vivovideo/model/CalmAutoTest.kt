@@ -42,6 +42,11 @@ class CalmAutoTest {
         assertTrue(st.beatFx.isEmpty())
         assertFalse(st.gentlePops)
         assertTrue(st.impact.isNotEmpty()) // serve per i drop
+        // Niente onde (Liquido) né passaggi vistosi: dissolvenze e passaggi morbidi di tendenza.
+        val all = st.transitions + st.impact
+        assertTrue(all.none { it == TransitionType.LIQUID || it == TransitionType.SWIRL || it == TransitionType.CUBE })
+        assertTrue(all.any { it.gentleTrend })
+        assertTrue(listOf(AutoStyle.SOGNO, AutoStyle.MARE).none { s -> (s.transitions + s.impact).contains(TransitionType.LIQUID) })
     }
 
     /** Brano veloce con un ritornello che attacca (drop) a metà. */

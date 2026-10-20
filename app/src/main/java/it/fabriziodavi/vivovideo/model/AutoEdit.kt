@@ -118,7 +118,7 @@ enum class AutoStyle(
     SOGNO(
         "Sogno", "Morbido e luminoso: alone di luce, riflessi iridescenti, dissolvenze di luce, titolo che va a fuoco.",
         photoUs = 3_200_000, videoUs = 3_400_000, beatsPerSlot = 4,
-        transitions = listOf(TransitionType.CROSSFADE, TransitionType.LUMA, TransitionType.LIQUID, TransitionType.LEAK),
+        transitions = listOf(TransitionType.CROSSFADE, TransitionType.LUMA, TransitionType.SOFTZOOM, TransitionType.LEAK),
         transitionUs = 1_000_000,
         fx = listOf(ClipFx(FxType.DREAMY, 0.55f), ClipFx(FxType.VIVID, 0.15f)),
         accents = listOf(ClipFx(FxType.HOLO, 0.4f), ClipFx(FxType.SPARKLE, 0.45f)),
@@ -299,16 +299,16 @@ enum class AutoStyle(
         introCut = TransitionType.GLITCH, introFx = ClipFx(FxType.RGBBEAT, 0.5f),
     ),
     NATURA(
-        "Natura", "Verdi e azzurri ricchi, foschia leggera, scene lunghe, passaggi morbidi senza lampi; rallenty e foto che scorrono piano.",
+        "Natura", "Verdi e azzurri ricchi, foschia leggera, scene lunghe, dissolvenze, zoom morbidi e scivolate; qualche stacco netto a tempo; rallenty.",
         photoUs = 3_400_000, videoUs = 3_600_000, beatsPerSlot = 4,
-        // Niente passaggi con il lampo bianco (Luce, Luce che dissolve, Bokeh): solo dissolvenze, sfocature e liquido.
-        transitions = listOf(TransitionType.CROSSFADE, TransitionType.CROSSFADE, TransitionType.BLUR, TransitionType.LIQUID),
+        // Niente lampi bianchi né onde: dissolvenze, zoom morbido, scivolata e sfocatura (come nei documentari di oggi).
+        transitions = listOf(TransitionType.CROSSFADE, TransitionType.CROSSFADE, TransitionType.SOFTZOOM, TransitionType.DRIFT, TransitionType.BLUR),
         transitionUs = 1_100_000,
         fx = listOf(ClipFx(FxType.SKYGRAD, 0.35f)),
         // Niente aloni né raggi: solo foschia e una vignettatura leggera.
         accents = listOf(ClipFx(FxType.HAZE, 0.3f), ClipFx(FxType.VIGNETTE, 0.3f)),
         title = TextPreset.ELEGANTE,
-        impact = listOf(TransitionType.CROSSFADE, TransitionType.BLUR, TransitionType.LIQUID),
+        impact = listOf(TransitionType.CROSSFADE, TransitionType.SOFTZOOM, TransitionType.DRIFT),
         // Niente effetti a ritmo: nessun bagliore che pulsa.
         beatFx = emptyList(),
         slowmo = true,
@@ -317,11 +317,13 @@ enum class AutoStyle(
         // Foto con panoramiche e zoom lenti e continui, non piccoli zoom a scatti sui battiti.
         gentlePops = false,
         minSceneUs = 3_200_000, shorterOnEnergy = false,
+        // Qualche stacco netto sul battito, come nei montaggi di viaggio di oggi (resta disteso: scene lunghe).
+        cutShare = 0.2f,
     ),
     MARE(
-        "Mare", "Turchesi e luce d'estate: riflessi d'acqua, swipe e passaggi liquidi, pellicola moderna, fotocamera digitale, rimbalzi a tempo.",
+        "Mare", "Turchesi e luce d'estate: riflessi d'acqua, swipe e scivolate, pellicola moderna, fotocamera digitale, rimbalzi a tempo.",
         photoUs = 2_400_000, videoUs = 2_600_000, beatsPerSlot = 2,
-        transitions = listOf(TransitionType.LIQUID, TransitionType.SLIDE_UP, TransitionType.WHIP, TransitionType.CROSSFADE),
+        transitions = listOf(TransitionType.DRIFT, TransitionType.SLIDE_UP, TransitionType.WHIP, TransitionType.CROSSFADE),
         transitionUs = 500_000,
         fx = listOf(ClipFx(FxType.HALATION, 0.35f)),
         accents = listOf(ClipFx(FxType.WATER, 0.4f), ClipFx(FxType.DIGICAM, 0.4f)),

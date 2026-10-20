@@ -64,7 +64,10 @@ enum class TransitionType(val label: String) {
     BLACKOUT("Blackout"),
     EXPOSE("Flash esposizione"),
     CAMSHAKE("Scossa camera"),
-    SNAPZOOM("Zoom secco");
+    SNAPZOOM("Zoom secco"),
+    // Tendenze 2026, morbide (documentari, viaggi, natura): niente onde né lampi.
+    SOFTZOOM("Zoom morbido"),
+    DRIFT("Scivolata");
 
     /** Transizioni adatte a uno slideshow "vario" (quelle più nervose solo se scelte apposta). */
     val soft: Boolean get() = this !in setOf(GLITCH, PIXELATE, SHAKE, RGB, PUNCH, TEAR, STRIPES, SHUTTER, BURST, SPEEDZOOM, SMASH, SQUASH, REWIND,
@@ -76,6 +79,9 @@ enum class TransitionType(val label: String) {
 
     /** Di tendenza (2026): da mostrare per prime nel pannello. */
     val trend: Boolean get() = ordinal >= BLACKOUT.ordinal
+
+    /** Di tendenza e morbide (adatte ai temi calmi). */
+    val gentleTrend: Boolean get() = this == SOFTZOOM || this == DRIFT
 
     /** Premium: le novità da far vedere nel pannello in cima. */
     val premium: Boolean get() = ordinal >= PUNCH.ordinal
