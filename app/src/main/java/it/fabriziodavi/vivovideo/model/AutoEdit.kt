@@ -107,7 +107,7 @@ enum class AutoStyle(
         photoUs = 3_000_000, videoUs = 3_000_000, beatsPerSlot = 4,
         transitions = listOf(TransitionType.CROSSFADE, TransitionType.CROSSFADE, TransitionType.BURN, TransitionType.LEAK, TransitionType.LUMA),
         transitionUs = 900_000,
-        fx = listOf(ClipFx(FxType.FILM35, 0.6f), ClipFx(FxType.LIGHTLEAK, 0.3f), ClipFx(FxType.VIGNETTE, 0.5f)),
+        fx = listOf(ClipFx(FxType.FILM35, 0.45f), ClipFx(FxType.LIGHTLEAK, 0.25f), ClipFx(FxType.VIGNETTE, 0.5f)),
         accents = listOf(ClipFx(FxType.BOKEH, 0.35f), ClipFx(FxType.DREAMY, 0.4f)),
         title = TextPreset.CASCATA,
         impact = listOf(TransitionType.FLASH, TransitionType.BURN),

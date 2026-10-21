@@ -3,6 +3,7 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **Ricordi senza tremolio**: l'effetto Pellicola 35 mm non fa più variare la luce a ogni fotogramma e la sua grana non "scorre" più (era quella a dare il leggero tremolio); nel tema Ricordi pellicola e luce calda sono un po' più delicate. Anche l'effetto Grana è più fermo e naturale.
 - **Testi e livelli più facili da spostare nella timeline**: righe più alte, maniglie fuori dal blocco (tutto il blocco si afferra), il trascinamento parte anche se il dito non va perfettamente in orizzontale. Nel pannello: **Inizia qui** e **Finisci qui** portano inizio o fine all'indicatore.
 - **La barra segue il dito**: a schermo intero (e scorrendo la timeline) l'immagine si aggiorna mentre trascini, non solo quando lasci.
 - **Segnalazioni più facili**: "Copia per la chat" mette il rapporto negli appunti da incollare nella chat con Claude; "Salva in Download" lo salva come file da allegare.

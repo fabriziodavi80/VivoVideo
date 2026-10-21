@@ -189,6 +189,18 @@ class EngineTest {
         assertEquals(FX_UNIFORMS.size, FX_UNIFORMS.values.toSet().size)
     }
 
+    @Test fun filmGrainDoesNotCrawlOrFlicker() {
+        val f = WowFxEffect.FRAGMENT
+        val film = f.substringAfter("#if defined(FX_FILM35)").substringBefore("#endif")
+        // Niente sbalzi di luce di tutta l'immagine a ogni fotogramma.
+        assertTrue(!Regex("col \\*= 1\\.0 \\+ \\(hash").containsMatchIn(film))
+        // La grana non è lo stesso disegno spostato di un passo per fotogramma (sembrerebbe tremare).
+        listOf(film, f.substringAfter("#if defined(FX_GRAIN)").substringBefore("#endif")).forEach { b ->
+            assertTrue(b, b.contains("hash(vec2(hash(floor(vUv * uRes"))
+            assertTrue(b, !b.contains(") + floor(uTime"))
+        }
+    }
+
     @Test fun clipFadesInAndOut() {
         val fx = FxEffect(emptyList(), emptyList(), clipStartUs = 10_000_000, clipOutputUs = 4_000_000, fadeInUs = 1_000_000, fadeOutUs = 2_000_000)
         assertEquals(1f, fx.fadeAt(10_000_000), 1e-3f)       // inizio: tutto nero

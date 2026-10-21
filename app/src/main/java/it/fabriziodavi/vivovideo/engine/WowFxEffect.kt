@@ -163,7 +163,7 @@ void main() {
     col = mix(col, col * vec3(1.06, 1.0, 0.92) + 0.04, uDreamy * 0.5);
   }
 #endif
-  // Pellicola 35 mm: grana fine, alone rosso attorno alle luci (halation), nero morbido, piccolo tremolio.
+  // Pellicola 35 mm: grana fine, alone rosso attorno alle luci (halation), nero morbido; luce ferma, nessun tremolio.
 #if defined(FX_FILM35)
   if (uFilm35 > 0.0) {
     vec3 h = vec3(0.0);
@@ -172,9 +172,9 @@ void main() {
     float hl = max(lum(h) - 0.6, 0.0);
     col += vec3(1.0, 0.25, 0.1) * hl * 0.9 * uFilm35;
     col = mix(col, col * 0.92 + 0.05, uFilm35 * 0.6);
-    float grain = hash(floor(vUv * uRes / 1.5) + floor(uTime * 24.0)) - 0.5;
-    col += grain * 0.07 * uFilm35;
-    col *= 1.0 + (hash(vec2(floor(uTime * 24.0), 7.0)) - 0.5) * 0.04 * uFilm35;
+    // Grana nuova a ogni fotogramma ma senza scorrere (niente tremolio) e senza sbalzi di luce.
+    float grain = hash(vec2(hash(floor(vUv * uRes / 1.5)) * 4096.0, floor(uTime * 24.0))) - 0.5;
+    col += grain * 0.045 * uFilm35 * (1.0 - abs(lum(col) - 0.5));
   }
 #endif
   // Duotono pop: due colori accesi che cambiano piano nel tempo.
@@ -428,7 +428,7 @@ void main() {
   // Grana fine: rumore minuto che cambia a ogni fotogramma, più visibile nei mezzitoni.
 #if defined(FX_GRAIN)
   if (uGrain > 0.0) {
-    float g = hash(floor(vUv * uRes / 1.2) + floor(uTime * 24.0) * 13.7) - 0.5;
+    float g = hash(vec2(hash(floor(vUv * uRes / 1.2)) * 4096.0, floor(uTime * 24.0))) - 0.5;
     col += g * 0.07 * uGrain * (1.0 - abs(lum(col) - 0.5));
   }
 #endif

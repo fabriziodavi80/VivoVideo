@@ -27,6 +27,13 @@ class CalmAutoTest {
         assertTrue(AutoEdit.beatSlotUs(AutoStyle.NATURA, fastSong())!! >= AutoStyle.NATURA.minSceneUs)
     }
 
+    @Test fun ricordiHasNothingThatFlickers() {
+        val r = AutoStyle.RICORDI
+        val flicker = setOf(FxType.STROBE, FxType.PULSE, FxType.FLASHBEAT, FxType.BWBEAT, FxType.PROJECTOR, FxType.SUPER8, FxType.SHAKE)
+        assertFalse((r.fx + r.accents + r.beatFx).any { it.type in flicker })
+        assertTrue(r.fx.first { it.type == FxType.FILM35 }.amount <= 0.5f)
+    }
+
     @Test fun naturaHasNoFallingLeaves() {
         val all = AutoStyle.NATURA.fx + AutoStyle.NATURA.accents + AutoStyle.NATURA.beatFx
         assertFalse(all.any { it.type == FxType.LEAVES })
