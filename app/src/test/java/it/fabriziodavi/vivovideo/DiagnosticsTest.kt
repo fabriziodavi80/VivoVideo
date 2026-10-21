@@ -57,9 +57,21 @@ class DiagnosticsTest {
             .forEach { assertTrue("manca \"$it\"", r.contains(it)) }
         assertFalse(r.contains("jamendo1234567")); assertFalse(r.contains("freesoundABCDEFGH"))
         assertTrue(r.contains("client_id=•••"))
+        // Versione da incollare nella chat: stesse informazioni essenziali, senza i dati completi del progetto.
+        val c = Diagnostics.report(app, p, "si blocca in esportazione", compact = true)
+        listOf("si blocca in esportazione", "KO  Intelligenti", "bordo sfrangiato", "3840×2160").forEach { assertTrue("compatto: manca \"$it\"", c.contains(it)) }
+        assertFalse(c.contains("===== Progetto (dati completi)")); assertFalse(c.contains("jamendo1234567"))
+        assertTrue(c.length <= r.length)
         val f = Diagnostics.write(app, r)
         assertTrue(f.exists() && f.length() > 100 && f.parentFile!!.name == "segnalazioni")
         LibraryKeys.save(app, LibraryKeys(null, null))
+    }
+
+    @Test fun compactLogKeepsOnlyErrors() {
+        val log = "10-21 15:00:01.000  123  456 I Foo: tutto bene\n10-21 15:00:02.000  123  456 E Exporter: errore 4002\n" +
+            "java.lang.IllegalStateException: boom\nCaused by: x\n10-21 15:00:03.000  123  456 D Bar: dettaglio"
+        assertEquals(listOf("10-21 15:00:02.000  123  456 E Exporter: errore 4002", "java.lang.IllegalStateException: boom", "Caused by: x"),
+            Diagnostics.errorLines(log).lines())
     }
 
     @Test fun scrubCatchesLooseKeys() {

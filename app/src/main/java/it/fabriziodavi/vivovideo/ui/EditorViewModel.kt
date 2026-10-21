@@ -2167,6 +2167,48 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     var showTestPlan by mutableStateOf(false)
 
     /** Prepara il rapporto (con il progetto aperto, se [withProject]) e apre la condivisione per mandarlo. */
+    /** Rapporto compatto negli appunti: si incolla nella chat con Claude. */
+    fun copyReport(note: String, withProject: Boolean = true, extra: String = "") {
+        val ctx = getApplication<Application>()
+        val p = if (withProject) project else null
+        viewModelScope.launch {
+            busy = "Preparo la segnalazione…"
+            val text = withContext(Dispatchers.IO) { runCatching { Diagnostics.report(ctx, p, note, extra, compact = true) } }
+            busy = null
+            text.onSuccess { t ->
+                val cm = ctx.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                cm.setPrimaryClip(android.content.ClipData.newPlainText("VivoVideo: segnalazione", t))
+                message = "Segnalazione copiata (${t.length / 1000} mila caratteri). Apri la chat con Claude, tieni premuto nel campo del messaggio e scegli Incolla."
+            }.onFailure { message = "Segnalazione non riuscita: ${it.message}" }
+        }
+    }
+
+    /** Rapporto completo nella cartella Download (da allegare alla chat come documento). */
+    fun saveReportToDownloads(note: String, withProject: Boolean = true, extra: String = "") {
+        val ctx = getApplication<Application>()
+        val p = if (withProject) project else null
+        viewModelScope.launch {
+            busy = "Preparo la segnalazione…"
+            val r = withContext(Dispatchers.IO) {
+                runCatching {
+                    val text = Diagnostics.report(ctx, p, note, extra)
+                    val name = "VivoVideo_segnalazione_" + java.text.SimpleDateFormat("yyyyMMdd_HHmm", java.util.Locale.ITALY).format(java.util.Date()) + ".txt"
+                    val values = android.content.ContentValues().apply {
+                        put(android.provider.MediaStore.Downloads.DISPLAY_NAME, name)
+                        put(android.provider.MediaStore.Downloads.MIME_TYPE, "text/plain")
+                        put(android.provider.MediaStore.Downloads.RELATIVE_PATH, android.os.Environment.DIRECTORY_DOWNLOADS)
+                    }
+                    val uri = ctx.contentResolver.insert(android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI, values) ?: error("cartella Download non disponibile")
+                    ctx.contentResolver.openOutputStream(uri)!!.use { it.write(text.toByteArray()) }
+                    name
+                }
+            }
+            busy = null
+            r.onSuccess { name -> message = "Salvata in Download: $name. Nella chat con Claude tocca la graffetta (o +), scegli File e cerca in Download." }
+                .onFailure { message = "Non riesco a salvare in Download: ${it.message}" }
+        }
+    }
+
     fun shareReport(note: String, withProject: Boolean = true, extra: String = "") {
         val ctx = getApplication<Application>()
         val p = if (withProject) project else null

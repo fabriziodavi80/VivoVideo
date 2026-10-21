@@ -52,7 +52,11 @@ object Diagnostics {
 
     private fun section(sb: StringBuilder, title: String) { sb.append("\n\n===== ").append(title).append(" =====\n") }
 
-    fun report(ctx: Context, project: Project?, note: String, extra: String = ""): String {
+    /**
+     * Rapporto completo; con [compact] è più corto (da incollare nella chat): niente dati completi del progetto,
+     * diario breve e solo le righe di errore del log.
+     */
+    fun report(ctx: Context, project: Project?, note: String, extra: String = "", compact: Boolean = false): String {
         val sb = StringBuilder()
         sb.append("VivoVideo · segnalazione del ${SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.ITALY).format(Date())}\n")
         sb.append("Versione app: ${BuildConfig.VERSION_NAME}\n")
@@ -104,25 +108,33 @@ object Diagnostics {
                 if (!c.isPhoto && i < 30) runCatching { sb.append(" · ").append(readVideoInfo(ctx, Uri.parse(c.uri)).summary().replace('\n', ' ')) }
                 sb.append('\n')
             }
-            section(sb, "Progetto (dati completi)")
-            sb.append(project.toJson().take(80_000)).append('\n')
+            if (!compact) {
+                section(sb, "Progetto (dati completi)")
+                sb.append(project.toJson().take(80_000)).append('\n')
+            }
         }
 
         section(sb, "Ultimi crash")
-        sb.append(runCatching { crashHistory(ctx).takeIf { it.exists() }?.readText()?.takeLast(12_000) }.getOrNull() ?: "nessuno").append('\n')
+        sb.append(runCatching { crashHistory(ctx).takeIf { it.exists() }?.readText()?.takeLast(if (compact) 4_000 else 12_000) }.getOrNull() ?: "nessuno").append('\n')
 
         section(sb, "Diario")
-        Diary.tail(300).forEach { sb.append(it).append('\n') }
+        Diary.tail(if (compact) 80 else 300).forEach { sb.append(it).append('\n') }
 
-        section(sb, "Log dell'app")
+        section(sb, if (compact) "Errori nel log dell'app" else "Log dell'app")
         sb.append(runCatching {
             val p = Runtime.getRuntime().exec(arrayOf("logcat", "-d", "-t", "1500", "--pid=${android.os.Process.myPid()}"))
-            p.inputStream.bufferedReader().readText().takeLast(150_000)
+            val text = p.inputStream.bufferedReader().readText()
+            if (compact) errorLines(text).takeLast(12_000) else text.takeLast(150_000)
         }.getOrDefault("(non disponibile)"))
 
         val keys = LibraryKeys.load(ctx).let { listOfNotNull(it.jamendo, it.freesound) }
         return scrub(sb.toString(), keys)
     }
+
+    /** Solo le righe di errore e avviso (e le cause) di un log: per il rapporto compatto. */
+    fun errorLines(log: String): String = log.lineSequence()
+        .filter { l -> Regex(" [EWF] |Exception|Caused by|FATAL").containsMatchIn(l) }
+        .joinToString("\n")
 
     /** Scrive il rapporto in un file da condividere. */
     fun write(ctx: Context, text: String): File {

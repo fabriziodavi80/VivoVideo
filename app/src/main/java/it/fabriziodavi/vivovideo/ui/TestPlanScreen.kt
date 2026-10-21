@@ -118,8 +118,9 @@ fun TestPlanScreen(vm: EditorViewModel) {
             dismissButton = {
                 TextButton(onClick = {
                     store.set(item.id, false, note); tick++; noteFor = null
-                    vm.shareReport("Collaudo · ${item.area} · ${item.title}: $note")
-                }) { Text("Salva e segnala", color = VV.Danger) }
+                    // Copia nella chat: funziona sempre (il file allegato a volte non passa).
+                    vm.copyReport("Collaudo · ${item.area} · ${item.title}: $note")
+                }) { Text("Salva e copia per la chat", color = VV.Danger) }
             },
         )
     }
@@ -141,10 +142,15 @@ fun ReportDialog(vm: EditorViewModel, onDismiss: () -> Unit) {
                     value = note, onValueChange = { note = it }, modifier = Modifier.fillMaxWidth(), minLines = 3,
                     colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = VV.Tally, unfocusedBorderColor = VV.Line, focusedTextColor = VV.Text, unfocusedTextColor = VV.Text),
                 )
-                Hint("Si prepara un file di testo: mandalo a Claude (allegalo nella chat). Dentro ci sono versione, telefono, collaudo, il progetto aperto (senza video) e gli ultimi errori. Le chiavi dei servizi musicali vengono tolte.")
+                Hint("Dentro ci sono versione, telefono, collaudo (con le tue note), il progetto aperto (senza video) e gli ultimi errori. Le chiavi dei servizi musicali vengono tolte.")
+                PrimaryButton("Copia per la chat", Modifier.fillMaxWidth()) { vm.copyReport(note); onDismiss() }
+                Hint("Poi apri la chat con Claude e incolla nel messaggio. È il modo più semplice.")
+                SecondaryButton("Salva in Download", Modifier.fillMaxWidth(), onClick = { vm.saveReportToDownloads(note); onDismiss() })
+                Hint("Versione completa, come file: nella chat lo alleghi con la graffetta → File → Download.")
+                SecondaryButton("Condividi il file", Modifier.fillMaxWidth(), onClick = { vm.shareReport(note); onDismiss() })
             }
         },
-        confirmButton = { TextButton(onClick = { vm.shareReport(note); onDismiss() }) { Text("Prepara e manda", color = VV.Tally) } },
+        confirmButton = {},
         dismissButton = { TextButton(onClick = onDismiss) { Text("Annulla", color = VV.Dim) } },
     )
 }

@@ -3,6 +3,7 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **Segnalazioni più facili**: "Copia per la chat" mette il rapporto negli appunti da incollare nella chat con Claude; "Salva in Download" lo salva come file da allegare.
 - **Guida più comoda**: si apre su un indice diviso per argomenti, con la **ricerca** in alto (scrivi una parola: trovi gli argomenti che la contengono, evidenziata); ogni argomento ha la sua pagina con **precedente** e **successivo**. Dal punto di domanda nell'editor la guida si apre sull'argomento dello strumento che stai usando.
 - **Privacy: oscura volti, targhe e oggetti** (Effetti → Privacy): l'app trova cosa coprire in ogni fotogramma, sul telefono e senza internet, e lo segue mentre si muove; pixel, sfocato o nero.
 - **Strumenti per i tutorial**: **Zoom su un punto** (Modifica → Inquadra: l'immagine si avvicina morbida alla zona scelta, resta e torna), **evidenziazioni** pronte (Livelli: freccia, cerchio, riquadro, numero) e **passi numerati** (Testo → Passo numerato).
@@ -233,7 +234,8 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 ## Collaudo e segnalazioni
 - Home → **Collaudo e segnalazioni**: le prove sono divise per area (Base, Anteprima, Esportazione, Audio, Testo, Colore, Strumenti, Intelligenti, Progetto). In alto vedi quante ne hai fatte.
 - **Funziona** la segna in arancione; **Problema** chiede cosa non va (bordo rosso). "Salva e segnala" manda subito la segnalazione su quella prova.
-- **Segnala un problema**: scrivi cosa è successo, poi "Prepara e manda" apre la condivisione: salva il file (per esempio in Download o su Drive) e allegalo nella chat con Claude. Meglio farlo subito dopo il problema, con il progetto aperto.
+- **Segnala un problema**: scrivi cosa è successo, poi **Copia per la chat** (il rapporto va negli appunti: nella chat con Claude tieni premuto nel campo del messaggio e scegli Incolla). In alternativa **Salva in Download** (versione completa: nella chat lo alleghi con la graffetta → File → Download) o **Condividi il file**. Meglio farlo subito dopo il problema, con il progetto aperto.
+- Nel Collaudo, **Problema** → **Salva e copia per la chat** salva la nota e copia subito la segnalazione.
 - "Ricomincia il collaudo" azzera gli esiti (per rifare le prove su una versione nuova).
 
 ## Se qualcosa va storto
