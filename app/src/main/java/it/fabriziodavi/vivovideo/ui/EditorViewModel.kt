@@ -68,6 +68,7 @@ import it.fabriziodavi.vivovideo.model.Transform
 import android.app.Application
 import android.content.Intent
 import android.net.Uri
+import android.os.SystemClock
 import android.os.Handler
 import android.os.Looper
 import androidx.compose.runtime.getValue
@@ -103,6 +104,8 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 private const val SNAP_US = 150_000L
+
+private const val SCRUB_MS = 120L
 
 class EditorViewModel(app: Application) : AndroidViewModel(app) {
 
@@ -2133,6 +2136,30 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         val t = us.coerceIn(0, d)
         playheadUs = t
         player?.seekTo(t / 1000)
+    }
+
+    /** Trascinando (barra o timeline): l'indicatore segue subito il dito, il lettore riceve un punto ogni [SCRUB_MS]. */
+    private var lastScrubAt = 0L
+    private var scrubTarget = -1L
+    private val scrubSeek = Runnable { if (scrubTarget >= 0) { player?.seekTo(scrubTarget / 1000); lastScrubAt = SystemClock.uptimeMillis() } }
+
+    fun scrubTo(us: Long) {
+        val d = project?.durationUs ?: return
+        val t = us.coerceIn(0, d)
+        playheadUs = t
+        scrubTarget = t
+        handler.removeCallbacks(scrubSeek)
+        val wait = SCRUB_MS - (SystemClock.uptimeMillis() - lastScrubAt)
+        // Troppe richieste di fila si annullano a vicenda e l'immagine resta ferma: se ne manda una ogni SCRUB_MS,
+        // e comunque l'ultima arriva (anche quando il dito si ferma).
+        if (wait <= 0) scrubSeek.run() else handler.postDelayed(scrubSeek, wait)
+    }
+
+    /** Fine del trascinamento: il punto esatto dove si è lasciato il dito. */
+    fun endScrub() {
+        handler.removeCallbacks(scrubSeek)
+        if (scrubTarget >= 0) seekTo(scrubTarget)
+        scrubTarget = -1
     }
 
     // ---------------- Export ----------------

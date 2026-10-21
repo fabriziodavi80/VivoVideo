@@ -504,7 +504,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
             playheadUs = vm.playheadUs,
             selectedClipId = vm.selectedClipId,
             dpPerSecond = ZOOMS[zoom],
-            onSeek = vm::seekTo,
+            onSeek = vm::scrubTo,
             onScrubStart = vm::pause,
             multiIds = vm.multiIds,
             onSelect = {
@@ -858,9 +858,9 @@ private fun SeekBar(vm: EditorViewModel, durationUs: Long) {
         onValueChange = { v ->
             if (dragging == null) vm.pause()
             dragging = v
-            vm.seekTo((v * durationUs).toLong())
+            vm.scrubTo((v * durationUs).toLong())
         },
-        onValueChangeFinished = { dragging = null },
+        onValueChangeFinished = { vm.endScrub(); dragging = null },
         modifier = Modifier.fillMaxWidth().height(28.dp).semantics { contentDescription = "Avanzamento" },
         colors = androidx.compose.material3.SliderDefaults.colors(
             thumbColor = VV.Tally, activeTrackColor = VV.Tally, inactiveTrackColor = Color(0x66FFFFFF),

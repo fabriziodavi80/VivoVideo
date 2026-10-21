@@ -3,6 +3,7 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **La barra segue il dito**: a schermo intero (e scorrendo la timeline) l'immagine si aggiorna mentre trascini, non solo quando lasci.
 - **Segnalazioni più facili**: "Copia per la chat" mette il rapporto negli appunti da incollare nella chat con Claude; "Salva in Download" lo salva come file da allegare.
 - **Guida più comoda**: si apre su un indice diviso per argomenti, con la **ricerca** in alto (scrivi una parola: trovi gli argomenti che la contengono, evidenziata); ogni argomento ha la sua pagina con **precedente** e **successivo**. Dal punto di domanda nell'editor la guida si apre sull'argomento dello strumento che stai usando.
 - **Privacy: oscura volti, targhe e oggetti** (Effetti → Privacy): l'app trova cosa coprire in ogni fotogramma, sul telefono e senza internet, e lo segue mentre si muove; pixel, sfocato o nero.
