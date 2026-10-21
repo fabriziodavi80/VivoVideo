@@ -1,6 +1,6 @@
 # VivoVideo · note per riprendere il lavoro
 
-Aggiornate al 20/10/2026, ultima versione **v0.3.156**. Da leggere insieme a `CLAUDE.md`.
+Aggiornate al 21/10/2026, ultima versione **v0.3.162**. Da leggere insieme a `CLAUDE.md`.
 
 ## 1. Stato attuale dell'app
 
@@ -57,7 +57,15 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, minSdk 33, solo arm64-v8a 
 - Data della videocamera nei temi vintage.
 - "Altra proposta" e cambio di stile.
 
-### Ultime modifiche (v0.3.148–v0.3.156)
+### Collaudo e correzioni (v0.3.157–v0.3.162)
+- Collaudo guidato (Progetto → Collaudo, `TestPlan`, 36 prove): il rapporto si copia per la chat o si salva in Download (`copyReport`, `saveReportToDownloads`); l'utente incolla il rapporto in chat.
+- Guida con indice, ricerca e argomenti (`GuideIndex`, `GuideScreen`), dal "?" dell'editor si apre l'argomento dello strumento (`topicFor`).
+- Schermo intero: la barra segue il dito (`scrubTo`/`endScrub`, ogni 120 ms).
+- Timeline: righe testi/livelli più alte (`OVER_H`), maniglie fuori dal blocco, conta solo lo spostamento orizzontale; Inizia qui/Finisci qui (`snapToPlayhead`).
+- Ricordi: tolto il tremolio (FILM35 non varia più la luce per fotogramma; grana FILM35 e GRAIN con hash annidato, prima era lo stesso disegno spostato a ogni fotogramma), FILM35 0,45 e LIGHTLEAK 0,25.
+- Esiti collaudo v0.3.161: OK base, schermo intero, dissolvenza, libreria, stili WOW; KO solo tremolio Ricordi (corretto in v0.3.162).
+
+### Modifiche v0.3.148–v0.3.156
 - Interfaccia: Home con "Video automatico" e "Monta tu" grandi, "Da un modello" accanto, servizi in fondo. Video automatico in 3 passi (`AutoScreen`: Cosa usare / Stile / Musica e dettagli, `STYLE_GROUPS`), scelta di singole foto e video (`MediaGrid`, `autoCreate(handPicked)`).
 - Taglia pause e ehm (Audio → Clip, `SpeechCutScreen`): `SpeechCuts` (silenzi con soglia adattiva, filler da Whisper con `FILLER_PROMPT`/initial_prompt), `Project.cutTimeline` + `shiftAfterCut`.
 - Titoli di coda (Testo → Titoli di coda, `CreditsScreen`): `TextItem.roll` + `rollSettings` (ancore dell'overlay), `Credits`, clip nera `Credits.BLACK_ID`.
