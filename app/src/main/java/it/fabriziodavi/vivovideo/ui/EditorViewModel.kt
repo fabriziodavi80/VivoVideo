@@ -541,6 +541,22 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /** Modifica del testo selezionato; [typing] = scrittura in corso (senza annulla per ogni lettera). */
+    /** Il testo selezionato inizia (si sposta) o finisce all'indicatore: per piazzarlo preciso senza trascinare. */
+    fun textToPlayhead(start: Boolean) {
+        val p = project ?: return
+        val t = selectedText ?: return
+        val (st, du) = p.snapToPlayhead(t.startUs, t.durationUs, playheadUs, start, TextItem.MIN_US)
+        update { it.replaceText(t.copy(startUs = st, durationUs = du)) }
+    }
+
+    /** Lo stesso per il livello selezionato. */
+    fun layerToPlayhead(start: Boolean) {
+        val p = project ?: return
+        val l = selectedLayer ?: return
+        val (st, du) = p.snapToPlayhead(l.startUs, l.durationUs, playheadUs, start, Layer.MIN_US)
+        update { it.replaceLayer(l.copy(startUs = st, durationUs = if (l.isVideo) minOf(du, l.sourceDurationUs - l.sourceStartUs).coerceAtLeast(Layer.MIN_US) else du)) }
+    }
+
     fun updateText(typing: Boolean = false, change: (TextItem) -> TextItem) {
         val t = selectedText ?: return
         update(keepUndo = !typing, rebuild = false) { it.replaceText(change(t)) }

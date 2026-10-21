@@ -811,6 +811,21 @@ data class Project(
 
     fun replaceText(t: TextItem): Project = copy(texts = texts.map { if (it.id == t.id) t else it })
 
+    /**
+     * Inizio o fine di un elemento ([startUs], [durationUs]) portati all'indicatore [atUs]: con [start] l'elemento si sposta
+     * (la durata resta), altrimenti finisce lì (non meno di [minUs]). Sempre dentro al video.
+     */
+    fun snapToPlayhead(startUs: Long, durationUs: Long, atUs: Long, start: Boolean, minUs: Long): Pair<Long, Long> {
+        val total = this.durationUs
+        return if (start) {
+            val st = atUs.coerceIn(0L, (total - minUs).coerceAtLeast(0L))
+            st to durationUs.coerceAtMost(total - st).coerceAtLeast(minUs)
+        } else {
+            val end = atUs.coerceIn(startUs + minUs, total.coerceAtLeast(startUs + minUs))
+            startUs to (end - startUs)
+        }
+    }
+
     val durationUs: Long get() = clips.sumOf { it.outputUs }
 
     /** Brani che suonano davvero (dentro la durata del video). */

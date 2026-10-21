@@ -1554,6 +1554,11 @@ private fun TextPanel(vm: EditorViewModel, running: Boolean, tab: Int, onPickFon
         }
     }
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        SecondaryButton("Inizia qui", Modifier.weight(1f), onClick = { if (enabled) vm.textToPlayhead(start = true) })
+        SecondaryButton("Finisci qui", Modifier.weight(1f), onClick = { if (enabled) vm.textToPlayhead(start = false) })
+    }
+    Hint("Inizia qui sposta il testo all'indicatore; Finisci qui lo fa finire lì. Nella timeline: tocca il testo, poi trascinalo; le maniglie ai lati cambiano la durata.")
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         SecondaryButton("Nuovo", onClick = { if (enabled) vm.addText() })
         SecondaryButton("Duplica", onClick = { if (enabled) vm.duplicateText() })
         SecondaryButton("Elimina", onClick = { if (enabled) vm.deleteText() })
@@ -1702,6 +1707,10 @@ private fun LayerPanel(vm: EditorViewModel, running: Boolean, tab: Int, onAdd: (
     }
     val pose = vm.editedLayerPose() ?: l.pose
     Text(l.name, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        SecondaryButton("Inizia qui", Modifier.weight(1f), onClick = { if (enabled) vm.layerToPlayhead(start = true) })
+        SecondaryButton("Finisci qui", Modifier.weight(1f), onClick = { if (enabled) vm.layerToPlayhead(start = false) })
+    }
     when (tab) {
         0 -> {
             Hint("Trascina, pizzica e ruota il riquadro sull'anteprima con due dita.")

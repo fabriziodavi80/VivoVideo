@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.DragInteraction
@@ -73,6 +74,8 @@ private val AUDIO_H = 18.dp
 private val RULER_H = 20.dp
 private val HANDLE_W = 14.dp
 private val MUSIC_H = 22.dp
+/** Righe di testi e livelli: più alte della musica, per prenderle bene col dito anche in verticale. */
+private val OVER_H = 32.dp
 private val CUT_D = 22.dp
 
 /**
@@ -219,7 +222,7 @@ fun Timeline(
                 Spacer(Modifier.height(3.dp))
                 Row {
                     Spacer(Modifier.width(half))
-                    Box(Modifier.width(totalW).height(MUSIC_H)) {
+                    Box(Modifier.width(totalW).height(OVER_H)) {
                         lane.forEach { l ->
                             RangeBar(
                                 id = l.id, startUs = l.startUs, durationUs = l.durationUs,
@@ -248,7 +251,7 @@ fun Timeline(
                 Spacer(Modifier.height(3.dp))
                 Row {
                     Spacer(Modifier.width(half))
-                    Box(Modifier.width(totalW).height(MUSIC_H)) {
+                    Box(Modifier.width(totalW).height(OVER_H)) {
                         lane.forEach { t ->
                             RangeBar(
                                 id = t.id, startUs = t.startUs, durationUs = t.durationUs,
@@ -770,14 +773,15 @@ private fun RangeBar(
     var d0 by remember { mutableStateOf(0L) }
     var acc by remember { mutableStateOf(0f) }
     val shape = RoundedCornerShape(4.dp)
+    // Trascinamento in qualunque direzione (in verticale il dito va spesso un po' in diagonale): conta solo lo spostamento orizzontale.
     fun drag(mode: Int) = Modifier.pointerInput(id, mode) {
-        detectHorizontalDragGestures(
+        detectDragGestures(
             onDragStart = { o0 = curStart; d0 = curDur; acc = 0f },
             onDragEnd = onCommit,
             onDragCancel = onCommit,
-        ) { change, dx ->
+        ) { change, delta ->
             change.consume()
-            acc += dx
+            acc += delta.x
             val d = (acc / pxPerUs).toLong()
             when (mode) {
                 0 -> onDraft((o0 + d).coerceIn(0L, (projectUs - d0).coerceAtLeast(0L)), d0)
@@ -786,10 +790,13 @@ private fun RangeBar(
             }
         }
     }
+    val x0 = (startUs / 1e6f * dpPerSecond).dp
+    val w = (durationUs / 1e6f * dpPerSecond).dp.coerceAtLeast(6.dp)
+    // Il blocco intero si afferra per spostarlo; le maniglie stanno fuori, ai lati (non rubano spazio ai testi brevi).
     Box(
         Modifier
-            .offset(x = (startUs / 1e6f * dpPerSecond).dp)
-            .width((durationUs / 1e6f * dpPerSecond).dp.coerceAtLeast(6.dp))
+            .offset(x = x0)
+            .width(w)
             .fillMaxHeight()
             .clip(shape)
             .background(background)
@@ -797,23 +804,25 @@ private fun RangeBar(
             .then(if (selected) drag(0) else Modifier)
     ) {
         Row(
-            Modifier.align(Alignment.CenterStart).padding(start = if (selected) HANDLE_W + 3.dp else 4.dp, end = 4.dp),
+            Modifier.align(Alignment.CenterStart).padding(horizontal = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(icon, null, tint = VV.Tally, modifier = Modifier.size(11.dp))
+            Icon(icon, null, tint = VV.Tally, modifier = Modifier.size(12.dp))
             Spacer(Modifier.width(3.dp))
-            Text(label, color = Color.White, fontSize = 10.sp, fontFamily = Plex, maxLines = 1)
+            Text(label, color = Color.White, fontSize = 11.sp, fontFamily = Plex, maxLines = 1)
         }
-        if (selected) {
-            Box(Modifier.fillMaxSize().border(2.dp, VV.Tally, shape))
-            for (left in listOf(true, false)) {
-                Box(
-                    Modifier.align(if (left) Alignment.CenterStart else Alignment.CenterEnd)
-                        .width(HANDLE_W).fillMaxHeight().background(VV.Tally)
-                        .then(drag(if (left) 1 else 2)),
-                    contentAlignment = Alignment.Center,
-                ) { Box(Modifier.width(2.dp).height(10.dp).clip(RoundedCornerShape(1.dp)).background(VV.TallyInk)) }
-            }
+        if (selected) Box(Modifier.fillMaxSize().border(2.dp, VV.Tally, shape))
+    }
+    if (selected) {
+        for (left in listOf(true, false)) {
+            Box(
+                Modifier.offset(x = if (left) x0 - HANDLE_W else x0 + w)
+                    .width(HANDLE_W).fillMaxHeight()
+                    .clip(RoundedCornerShape(if (left) 6.dp else 0.dp, if (left) 0.dp else 6.dp, if (left) 0.dp else 6.dp, if (left) 6.dp else 0.dp))
+                    .background(VV.Tally)
+                    .then(drag(if (left) 1 else 2)),
+                contentAlignment = Alignment.Center,
+            ) { Box(Modifier.width(2.dp).height(12.dp).clip(RoundedCornerShape(1.dp)).background(VV.TallyInk)) }
         }
     }
 }

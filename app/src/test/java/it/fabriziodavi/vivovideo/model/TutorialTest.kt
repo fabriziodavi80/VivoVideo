@@ -47,3 +47,18 @@ class TutorialTest {
         assertEquals(4, Tutorial.nextStep(p))
     }
 }
+
+class SnapToPlayheadTest {
+    private val p = Project(name = "x", clips = listOf(Clip(id = "a", uri = "content://v/a", sourceDurationUs = 20_000_000, trimEndUs = 10_000_000)))
+
+    @org.junit.Test fun startMovesKeepingLengthInsideTheVideo() {
+        org.junit.Assert.assertEquals(4_000_000L to 3_000_000L, p.snapToPlayhead(1_000_000, 3_000_000, 4_000_000, true, 300_000))
+        // Vicino alla fine: si accorcia per restare dentro.
+        org.junit.Assert.assertEquals(9_000_000L to 1_000_000L, p.snapToPlayhead(1_000_000, 3_000_000, 9_000_000, true, 300_000))
+    }
+
+    @org.junit.Test fun endCutsAtThePlayheadButNotBeforeTheMinimum() {
+        org.junit.Assert.assertEquals(1_000_000L to 5_000_000L, p.snapToPlayhead(1_000_000, 3_000_000, 6_000_000, false, 300_000))
+        org.junit.Assert.assertEquals(1_000_000L to 300_000L, p.snapToPlayhead(1_000_000, 3_000_000, 500_000, false, 300_000))
+    }
+}
