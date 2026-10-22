@@ -34,6 +34,15 @@ class CalmAutoTest {
         assertTrue(r.fx.first { it.type == FxType.FILM35 }.amount <= 0.5f)
     }
 
+    @Test fun ricordiAndCinemaHaveNoFlameOrFlashTransitions() {
+        // "Pellicola bruciata" sembra una fiammata; luce e flash bianchi stonano nei temi calmi.
+        val loud = setOf(TransitionType.BURN, TransitionType.FLASH, TransitionType.LEAK, TransitionType.LUMA)
+        listOf(AutoStyle.RICORDI, AutoStyle.CINEMA).forEach { st ->
+            assertFalse(st.name, st.transitions.any { it in loud })
+        }
+        assertFalse(AutoStyle.RICORDI.impact.any { it in loud })
+    }
+
     @Test fun naturaHasNoFallingLeaves() {
         val all = AutoStyle.NATURA.fx + AutoStyle.NATURA.accents + AutoStyle.NATURA.beatFx
         assertFalse(all.any { it.type == FxType.LEAVES })

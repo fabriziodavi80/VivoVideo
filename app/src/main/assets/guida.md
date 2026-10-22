@@ -3,6 +3,7 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **Ricordi più delicato**: tolta la transizione "pellicola bruciata", che sembrava una fiammata, e i flash di luce; ora i passaggi sono dissolvenze, zoom morbidi e scivolate lente. Anche Cinema non usa più la pellicola bruciata (resta disponibile a mano fra le transizioni e nel tema Super 8).
 - **Voce fuori campo che si sente bene**: la voce registrata viene portata subito a un volume chiaro, e la musica si abbassa davvero mentre parli, **anche in anteprima** (prima solo nel video esportato). Il rumore di fondo delle clip non tiene più la musica sempre bassa.
 - **Ricordi senza tremolio**: l'effetto Pellicola 35 mm non fa più variare la luce a ogni fotogramma e la sua grana non "scorre" più (era quella a dare il leggero tremolio); nel tema Ricordi pellicola e luce calda sono un po' più delicate. Anche l'effetto Grana è più fermo e naturale.
 - **Testi e livelli più facili da spostare nella timeline**: righe più alte, maniglie fuori dal blocco (tutto il blocco si afferra), il trascinamento parte anche se il dito non va perfettamente in orizzontale. Nel pannello: **Inizia qui** e **Finisci qui** portano inizio o fine all'indicatore.
