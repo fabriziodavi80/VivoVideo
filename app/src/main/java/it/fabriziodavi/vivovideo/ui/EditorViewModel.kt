@@ -14,6 +14,8 @@ import it.fabriziodavi.vivovideo.engine.Whisper
 import it.fabriziodavi.vivovideo.engine.Proxies
 import it.fabriziodavi.vivovideo.engine.Decoders
 import it.fabriziodavi.vivovideo.engine.DuckPreview
+import it.fabriziodavi.vivovideo.engine.VoiceChain
+import it.fabriziodavi.vivovideo.engine.VoiceRecorder
 import it.fabriziodavi.vivovideo.engine.AudioDsp
 import it.fabriziodavi.vivovideo.model.ClipAttr
 import it.fabriziodavi.vivovideo.model.ClipStyle
@@ -1808,7 +1810,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
 
     // ---------------- Voce fuori campo, audio staccato, ducking ----------------
 
-    private var recorder: android.media.MediaRecorder? = null
+    private var recorder: VoiceRecorder? = null
     private var recordFile: File? = null
     private var recordStartUs = 0L
     var recording by mutableStateOf(false)
@@ -1822,21 +1824,11 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         val p = project ?: return
         if (p.clips.isEmpty() || recording) return
         val dir = File(ctx.filesDir, "voice").apply { mkdirs() }
-        val f = File(dir, "voce_${System.currentTimeMillis()}.m4a")
-        val r = android.media.MediaRecorder(ctx)
-        try {
-            r.setAudioSource(android.media.MediaRecorder.AudioSource.MIC)
-            r.setOutputFormat(android.media.MediaRecorder.OutputFormat.MPEG_4)
-            r.setAudioEncoder(android.media.MediaRecorder.AudioEncoder.AAC)
-            r.setAudioSamplingRate(48_000)
-            r.setAudioEncodingBitRate(160_000)
-            r.setAudioChannels(1)
-            r.setOutputFile(f.absolutePath)
-            r.prepare()
-            r.start()
-        } catch (e: Exception) {
-            runCatching { r.release() }
-            message = "Non riesco a usare il microfono: ${e.message}"
+        val f = File(dir, "voce_${System.currentTimeMillis()}.pcm")
+        val r = VoiceRecorder(f)
+        if (!runCatching { r.start() }.getOrDefault(false)) {
+            f.delete()
+            message = "Non riesco a usare il microfono (forse lo usa un'altra app)."
             return
         }
         recorder = r; recordFile = f; recording = true
@@ -1846,36 +1838,36 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
 
     fun stopVoice() {
         val r = recorder ?: return
-        val f = recordFile
+        val raw = recordFile
         recorder = null; recording = false
-        runCatching { r.stop() }
-        runCatching { r.release() }
+        val n = runCatching { r.stop() }.getOrDefault(0L)
         pause()
         player?.let { pl -> runCatching { pl.volume = 1f } }
         val ctx = getApplication<Application>()
         val p = project ?: return
-        if (f == null || !f.exists() || f.length() < 1024) { message = "Registrazione troppo breve."; return }
+        if (raw == null || n < VoiceChain.RATE / 2) { raw?.delete(); message = "Registrazione troppo breve."; return }
+        message = "Pulisco la voce…"
         viewModelScope.launch {
-            val durUs = withContext(Dispatchers.IO) { runCatching { readAudioInfo(ctx, Uri.fromFile(f)).second }.getOrDefault(0L) }
-            if (durUs <= 0) { message = "Registrazione non leggibile."; return@launch }
-            // Il microfono registra piano: la voce si porta a un volume chiaro (file WAV, senza perdite).
-            val voiceFile = withContext(Dispatchers.IO) {
+            // Catena da podcast: niente rimbombo né fruscio, volume uniforme e chiaro (WAV senza perdite).
+            val wav = withContext(Dispatchers.IO) {
                 runCatching {
-                    val audio = decodeAudioRange(ctx, Uri.fromFile(f), 0, durUs) ?: return@runCatching f
-                    AudioDsp.levelVoice(audio)
-                    val wav = File(f.parentFile, f.nameWithoutExtension + ".wav")
-                    writeWavFile(wav, audio)
-                    f.delete()
-                    wav
-                }.getOrDefault(f)
+                    val clean = VoiceChain.process(VoiceRecorder.read(raw))
+                    val out = File(raw.parentFile, raw.nameWithoutExtension + ".wav")
+                    writeWavFile(out, VoiceChain.toStereo(clean))
+                    out
+                }.getOrNull().also { raw.delete() }
             }
-            val n = p.music.count { it.dialog && it.uri.contains("/voice/") } + 1
+            if (wav == null) { message = "Registrazione non leggibile."; return@launch }
+            val durUs = n * 1_000_000 / VoiceChain.RATE
+            val q = project ?: p
+            val count = q.music.count { it.dialog && it.uri.contains("/voice/") } + 1
             val t = MusicTrack(
-                uri = Uri.fromFile(voiceFile).toString(), name = "Voce $n", sourceDurationUs = durUs,
-                startUs = recordStartUs, lengthUs = minOf(durUs, p.durationUs - recordStartUs), dialog = true,
+                uri = Uri.fromFile(wav).toString(), name = "Voce $count", sourceDurationUs = durUs,
+                startUs = recordStartUs, lengthUs = minOf(durUs, q.durationUs - recordStartUs), dialog = true,
             )
             update { it.copy(music = it.music + t, duck = if (it.music.any { m -> !m.dialog }) true else it.duck) }
             selectedMusicId = t.id
+            message = "Voce aggiunta: pulita e a volume uniforme."
         }
     }
 
@@ -2507,7 +2499,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     override fun onCleared() {
-        runCatching { recorder?.release() }
+        runCatching { recorder?.stop() }
         project?.let { store.save(it) }
         releasePlayer()
     }

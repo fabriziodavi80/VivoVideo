@@ -12,6 +12,8 @@ import android.net.Uri
 import it.fabriziodavi.vivovideo.online.Library
 import it.fabriziodavi.vivovideo.engine.AudioDsp
 import it.fabriziodavi.vivovideo.engine.DuckPreview
+import it.fabriziodavi.vivovideo.engine.VoiceChain
+import it.fabriziodavi.vivovideo.engine.VoiceRecorder
 import it.fabriziodavi.vivovideo.engine.Decoders
 import it.fabriziodavi.vivovideo.engine.Whisper
 import it.fabriziodavi.vivovideo.model.Subtitles
@@ -302,6 +304,24 @@ class DeviceTest {
         val lufs = AudioDsp.LoudnessMeter().apply { addInterleaved(pcm) }.lufs()
         android.util.Log.i("VivoVideoTest", "volume del video esportato: $lufs LUFS")
         assertTrue("volume $lufs invece di circa -14 LUFS", lufs in -16.5..-12.0 || lufs < -16.5 && pcm.maxOf { kotlin.math.abs(it) } > 0.85f)
+    }
+
+    /** Registrazione vera dal microfono (sull'emulatore è virtuale): file grezzo leggibile, pulito e salvato in WAV. */
+    @Test fun voiceRecorderRecordsAndCleans() {
+        InstrumentationRegistry.getInstrumentation().uiAutomation.grantRuntimePermission(ctx.packageName, android.Manifest.permission.RECORD_AUDIO)
+        val raw = File(ctx.cacheDir, "voce_prova.pcm")
+        val rec = VoiceRecorder(raw)
+        assertTrue("il microfono non parte", rec.start())
+        Thread.sleep(1500)
+        val n = rec.stop()
+        assertTrue("campioni: $n", n > VoiceChain.RATE / 2)
+        val pcm = VoiceRecorder.read(raw)
+        assertEquals(n, pcm.size.toLong())
+        val clean = VoiceChain.process(pcm)
+        val wav = File(ctx.cacheDir, "voce_prova.wav")
+        writeWavFile(wav, VoiceChain.toStereo(clean))
+        val back = decodeAudioRange(ctx, Uri.fromFile(wav), 0, 1_000_000)
+        assertTrue(back != null && back.size >= VoiceChain.RATE)
     }
 
     /** Voce fuori campo: registrazione portata a volume chiaro e musica abbassata sotto la voce anche in anteprima. */

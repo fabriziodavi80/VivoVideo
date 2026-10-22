@@ -3,6 +3,7 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **Voce fuori campo nitida e a volume costante**: la registrazione ora è senza compressione e passa da una catena "da podcast" (via rimbombo e fruscio, più presenza, volume uniforme fra frasi forti e deboli, niente distorsione). Risolto anche il messaggio "Registrazione non leggibile" che poteva comparire dopo una registrazione.
 - **Foto più pulite in Ricordi**: tolto l'effetto Sogno (sfocatura con alone) che su alcune foto chiare le rendeva slavate; pellicola, luce calda, vignettatura e ombre schiarite più leggere. Il look resta caldo e nostalgico, ma la foto si vede nitida.
 - **Passaggio da video a foto fluido in anteprima**: le foto grandi hanno una copia leggera solo per l'anteprima (si prepara in pochi istanti), così l'inizio della foto non scatta più. Il video esportato usa sempre la foto piena.
 - **Ricordi più delicato**: tolta la transizione "pellicola bruciata", che sembrava una fiammata, e i flash di luce; ora i passaggi sono dissolvenze, zoom morbidi e scivolate lente. Anche Cinema non usa più la pellicola bruciata (resta disponibile a mano fra le transizioni e nel tema Super 8).
@@ -160,7 +161,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - **Audio → Voce → Registra la voce**: porta l'indicatore dove vuoi iniziare, tocca e parla mentre il video scorre; tocca di nuovo per fermare. La voce diventa una riga ("Voce 1"…) nella timeline: si sposta, si accorcia, si divide come un brano. La prima volta l'app chiede il permesso del microfono.
 - **Silenzia l'anteprima mentre registro** (acceso di serie): senza cuffie evita che il microfono registri anche l'audio del video.
 - **Stacca l'audio** (Audio → Clip, o tieni premuta la clip): l'audio della clip diventa una riga a sé e la clip resta muta. Allungando la riga all'indietro la voce arriva prima dell'immagine (taglio a J); in avanti continua sopra la clip successiva (taglio a L). Serve la clip a velocità normale.
-- **La voce registrata ha subito un volume chiaro**: quando fermi la registrazione l'app la porta al volume giusto per il parlato (il microfono del telefono registra piano), senza farla distorcere.
+- **La voce viene pulita come in un podcast**: si registra senza compressione e, quando fermi ("Pulisco la voce…"), l'app toglie il rimbombo dei bassi, riduce il fruscio fra le parole, rende la voce più nitida (meno "scatola", più presenza), uniforma il volume fra frasi forti e deboli e la porta a un livello chiaro senza distorcere. Per il risultato migliore parla a 20–30 cm dal telefono, in un ambiente non troppo rimbombante.
 - **Abbassa la musica quando si parla** (ducking, si accende da solo quando registri una voce sopra un brano): dove parli, la musica scende dei dB scelti e poi risale dolcemente. In **anteprima** si sente sotto la voce fuori campo e l'audio staccato (dopo un attimo, il tempo di misurare le voci); nel **video esportato** anche dove si parla nell'audio delle clip. Il rumore di fondo costante (vento, traffico) non fa abbassare la musica.
 - **Volume uniformato** (Esporta, acceso di serie): il video finito ha il volume standard di YouTube e Instagram (–14 LUFS), con i picchi sotto –1 dB.
 
