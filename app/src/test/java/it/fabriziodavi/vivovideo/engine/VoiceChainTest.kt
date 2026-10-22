@@ -53,7 +53,7 @@ class VoiceChainTest {
         assertTrue("fruscio: prima $gapBefore dB sotto la voce, dopo $gapAfter", gapAfter > gapBefore + 6)
         // Volume finale chiaro e niente distorsione.
         val m = AudioDsp.LoudnessMeter().apply { out.forEach { add(it, it) } }
-        assertEquals(-16.0, m.lufs(), 2.0)
+        assertEquals(VoiceChain.TARGET_LUFS, m.lufs(), 2.0)
         assertTrue("picco ${m.peak}", m.peak <= 0.9f)
     }
 

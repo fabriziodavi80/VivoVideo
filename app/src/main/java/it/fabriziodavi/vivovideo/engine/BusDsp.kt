@@ -96,7 +96,9 @@ object Meters {
 
     /** Livello in dBFS (da -60 a 0) per l'indicatore. */
     fun db(b: Bus?): Float {
-        val i = b?.ordinal ?: Bus.entries.size
+        // Uscita: il più alto dei gruppi (in anteprima l'uscita non ha un suo passaggio).
+        if (b == null) return Bus.entries.maxOf { db(it) }
+        val i = b.ordinal
         val v = Float.fromBits(peaks.get(i))
         val age = (System.nanoTime() - times[i]) / 1e9f
         val shown = v * (1f - (age * 2.5f).coerceIn(0f, 1f))

@@ -12,8 +12,7 @@ import java.nio.ByteOrder
 
 /**
  * Registra la voce senza compressione (PCM 16 bit mono a 48 kHz) in un file grezzo.
- * Prima fonte: "riconoscimento vocale" (risposta piatta, senza controllo automatico del volume),
- * se il telefono non la offre si usa il microfono normale. Niente file MP4 da chiudere: anche
+ * Fonte: il microfono normale (sul telefono registra più forte del "riconoscimento vocale", che resta di riserva). Niente file MP4 da chiudere: anche
  * una registrazione interrotta resta leggibile.
  */
 class VoiceRecorder(private val raw: File) {
@@ -28,7 +27,7 @@ class VoiceRecorder(private val raw: File) {
         val min = AudioRecord.getMinBufferSize(VoiceChain.RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT)
         if (min <= 0) return false
         val size = maxOf(min * 4, VoiceChain.RATE / 5 * 2)
-        val r = listOf(MediaRecorder.AudioSource.VOICE_RECOGNITION, MediaRecorder.AudioSource.MIC).firstNotNullOfOrNull { src ->
+        val r = listOf(MediaRecorder.AudioSource.MIC, MediaRecorder.AudioSource.VOICE_RECOGNITION).firstNotNullOfOrNull { src ->
             runCatching {
                 val a = AudioRecord(src, VoiceChain.RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, size)
                 if (a.state == AudioRecord.STATE_INITIALIZED) a else { a.release(); null }

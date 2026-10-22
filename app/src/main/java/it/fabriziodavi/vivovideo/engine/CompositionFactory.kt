@@ -27,6 +27,7 @@ import it.fabriziodavi.vivovideo.model.packLanes
 import it.fabriziodavi.vivovideo.model.FxType
 import it.fabriziodavi.vivovideo.model.Project
 import it.fabriziodavi.vivovideo.model.Bus
+import it.fabriziodavi.vivovideo.model.Comp
 import it.fabriziodavi.vivovideo.model.bus
 import it.fabriziodavi.vivovideo.model.PersonMode
 import it.fabriziodavi.vivovideo.model.SpeedCurve
@@ -114,6 +115,21 @@ class CurveSpeedProvider(private val curve: SpeedCurve) : SpeedProvider {
 
 /** Traduce il progetto in una Composition di Media3, la stessa per anteprima ed export. */
 class CompositionFactory(private val context: Context) {
+    /** Schermata del mixer aperta: in anteprima ogni gruppo passa dal suo canale (per gli indicatori). */
+    var metering = false
+
+    /** Canale del mixer per l'anteprima, solo se serve (gruppo regolato o mixer aperto): altrimenti l'audio passa intatto. */
+    private fun mixFx(project: Project, b: Bus): List<androidx.media3.common.audio.AudioProcessor> {
+        val m = project.mix.bus(b)
+        if (metering || !m.eq.flat || m.comp != Comp.OFF) return listOf(MixAudioProcessor.bus(project.mix, b))
+        if (!BusDsp.needed(project.mix, b)) return emptyList()
+        // Solo volume, bilanciamento o muto: il miscelatore di canali di Media3 (collaudato).
+        val (gl, gr) = project.mix.gains(b)
+        val p = androidx.media3.common.audio.ChannelMixingAudioProcessor()
+        p.putChannelMixingMatrix(androidx.media3.common.audio.ChannelMixingMatrix(1, 1, floatArrayOf((gl + gr) / 2)))
+        p.putChannelMixingMatrix(androidx.media3.common.audio.ChannelMixingMatrix(2, 2, floatArrayOf(gl, 0f, 0f, gr)))
+        return listOf(p)
+    }
 
     private val builtInLog by lazy {
         CubeLut.fromAsset(context, CubeLut.BUILT_IN_LOG, "vivo LOG → normale")
@@ -310,7 +326,7 @@ class CompositionFactory(private val context: Context) {
                     EditedMediaItem.Builder(item)
                         .setDurationUs(t.sourceDurationUs)
                         .setRemoveVideo(true)
-                        .setEffects(Effects(volumeProcessors(t.volume) + listOfNotNull(duck?.takeIf { !t.dialog }?.let { DuckAudioProcessor(it, t.startUs) }) + MixAudioProcessor.bus(project.mix, t.bus()), emptyList()))
+                        .setEffects(Effects(volumeProcessors(t.volume) + listOfNotNull(duck?.takeIf { !t.dialog }?.let { DuckAudioProcessor(it, t.startUs) }) + mixFx(project, t.bus()), emptyList()))
                         .build()
                 )
                 cursor = maxOf(cursor, t.startUs) + len
@@ -417,7 +433,7 @@ class CompositionFactory(private val context: Context) {
             val b = EditedMediaItem.Builder(mediaItem)
                 .setDurationUs(clip.sourceDurationUs)
                 // Anteprima: canale "Audio delle clip" del mixer (in esportazione lo fa il mix nativo).
-                .setEffects(Effects(volumeProcessors(clip.volume) + (if (forPreview && nativeAudio == null) listOf(MixAudioProcessor.bus(project.mix, Bus.CLIPS)) else emptyList()), effects))
+                .setEffects(Effects(volumeProcessors(clip.volume) + (if (forPreview && nativeAudio == null) mixFx(project, Bus.CLIPS) else emptyList()), effects))
                 .setRemoveAudio(removeAudio || clip.muted)
             val curve = clip.speedCurve()
             if (curve.speeds.any { it != 1f }) {
@@ -476,8 +492,7 @@ class CompositionFactory(private val context: Context) {
         // Di solito tutto in SDR; in HDR i nostri filtri lavorano in una scala con gamma (HdrGl).
         return Composition.Builder(sequences)
             .setHdrMode(hdrMode)
-            // Anteprima: uscita del mixer (limitatore e indicatore generale).
-            .apply { if (forPreview && nativeAudio == null) setEffects(Effects(listOf(MixAudioProcessor.master(project.mix.limiter)), emptyList())) }
+            // Niente effetti audio sull'uscita in anteprima: in Media3 sono ancora sperimentali (distorcevano).
             .build()
     }
 }

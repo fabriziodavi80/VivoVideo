@@ -18,6 +18,7 @@ import it.fabriziodavi.vivovideo.engine.Meters
 import it.fabriziodavi.vivovideo.model.Bus
 import it.fabriziodavi.vivovideo.model.BusMix
 import it.fabriziodavi.vivovideo.model.Mix
+import it.fabriziodavi.vivovideo.model.bus
 import it.fabriziodavi.vivovideo.engine.VoiceChain
 import it.fabriziodavi.vivovideo.engine.VoiceRecorder
 import it.fabriziodavi.vivovideo.engine.AudioDsp
@@ -1875,9 +1876,17 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                 uri = Uri.fromFile(wav).toString(), name = "Voce $count", sourceDurationUs = durUs,
                 startUs = recordStartUs, lengthUs = minOf(durUs, q.durationUs - recordStartUs), dialog = true,
             )
-            update { it.copy(music = it.music + t, duck = if (it.music.any { m -> !m.dialog }) true else it.duck) }
+            // Prima voce sopra un brano: mix automatico come in un podcast (musica un po' più bassa e ducking acceso).
+            var autoMix = false
+            update {
+                val hasSong = it.music.any { m -> !m.dialog }
+                val firstVoice = it.music.none { m -> m.bus() == Bus.VOICE }
+                val mix = if (hasSong && firstVoice && it.mix.bus(Bus.MUSIC).neutral) { autoMix = true; it.mix.with(Bus.MUSIC, BusMix(gainDb = -6f)) } else it.mix
+                it.copy(music = it.music + t, duck = if (hasSong) true else it.duck, mix = mix)
+            }
             selectedMusicId = t.id
-            message = "Voce aggiunta: pulita e a volume uniforme."
+            message = if (autoMix) "Voce aggiunta e pulita. Musica abbassata di 6 dB e ducking acceso: regola tutto in Audio → Mixer audio."
+                else "Voce aggiunta: pulita e a volume uniforme."
         }
     }
 
@@ -1901,8 +1910,8 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     var showMixer by mutableStateOf(false)
         private set
 
-    fun openMixer() { Meters.reset(); showMixer = true }
-    fun closeMixer() { showMixer = false }
+    fun openMixer() { Meters.reset(); showMixer = true; factory.metering = true; rebuildPreview(playheadUs / 1000) }
+    fun closeMixer() { showMixer = false; factory.metering = false; rebuildPreview(playheadUs / 1000) }
 
     /** Canale del mixer cambiato: si rifà l'anteprima per sentirlo subito. */
     fun setBus(b: Bus, m: BusMix) = update { it.copy(mix = it.mix.with(b, m)) }

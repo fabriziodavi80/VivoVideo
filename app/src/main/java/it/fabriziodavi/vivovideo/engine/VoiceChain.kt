@@ -16,10 +16,12 @@ import kotlin.math.sqrt
  * 3. riduzione del fruscio fra le parole (espansore morbido sotto il rumore di fondo);
  * 4. livellatore lento (la voce non cambia volume se ci si allontana o si abbassa il tono);
  * 5. compressore veloce (sillabe forti e deboli più vicine);
- * 6. volume finale a -16 LUFS e limitatore a -1 dBFS (niente distorsione).
+ * 6. volume finale a -14 LUFS e limitatore a -1 dBFS (niente distorsione).
  */
 object VoiceChain {
     const val RATE = 48_000
+    /** Volume della voce pulita. */
+    const val TARGET_LUFS = -14.0
     private const val BLOCK = RATE / 100 // 10 ms
 
     /** Filtro biquad (formule RBJ), forma diretta I. */
@@ -142,12 +144,12 @@ object VoiceChain {
             s[i] = (s[i] * lin(cg)).toFloat()
         }
 
-        // 6. Volume a -16 LUFS (misurato come stereo con due canali uguali) e limitatore.
+        // 6. Volume a -14 LUFS (come i video social: la voce sta davanti alla musica) e limitatore.
         val meter = AudioDsp.LoudnessMeter()
         for (v in s) meter.add(v, v)
         val lufs = meter.lufs()
         if (lufs > -69) {
-            val k = minOf(lin(-16.0 - lufs), 16.0).toFloat() // al massimo +24 dB
+            val k = minOf(lin(TARGET_LUFS - lufs), 31.6).toFloat() // al massimo +30 dB (microfono lontano)
             for (i in s.indices) s[i] *= k
         }
         limit(s, lin(-1.0).toFloat())

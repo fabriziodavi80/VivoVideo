@@ -177,7 +177,8 @@ private fun finish(raf: RandomAccessFile, frames: Long, wav: File, targetLufs: D
         }
         val lufs = meter.lufs()
         gain = if (lufs <= -69.0) 1f
-            else if (limiter) minOf(Math.pow(10.0, (targetLufs - lufs) / 20), 8.0).toFloat()
+            // Con il limitatore si può andare oltre il picco, ma al massimo di 4 dB: di più si sentirebbe "schiacciato".
+            else if (limiter) minOf(AudioDsp.normalizeGain(lufs, meter.peak, targetLufs, ceilingDb = 3.0), 8f)
             else AudioDsp.normalizeGain(lufs, meter.peak, targetLufs)
     }
     val lim = if (limiter) PeakLimiter() else null
