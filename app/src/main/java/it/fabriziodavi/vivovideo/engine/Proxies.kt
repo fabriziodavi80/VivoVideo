@@ -46,12 +46,15 @@ object Proxies {
     /** Fa la copia leggera di una foto (già raddrizzata all'importazione): veloce, si chiama fuori dal thread principale. */
     fun makePhoto(context: Context, uri: String): Boolean {
         val u = Uri.parse(uri)
+        // Le foto importate sono file dell'app: si leggono direttamente; le altre dal gestore dei contenuti.
+        fun open() = if (u.scheme == "file") u.path?.let { File(it) }?.takeIf { it.exists() }?.inputStream()
+            else context.contentResolver.openInputStream(u)
         val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-        context.contentResolver.openInputStream(u)?.use { BitmapFactory.decodeStream(it, null, bounds) } ?: return false
+        (open() ?: return false).use { BitmapFactory.decodeStream(it, null, bounds) }
         if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return false
         var sample = 1
         while (maxOf(bounds.outWidth, bounds.outHeight) / (sample * 2) >= PHOTO_SIDE) sample *= 2
-        var bmp = context.contentResolver.openInputStream(u)?.use {
+        var bmp = open()?.use {
             BitmapFactory.decodeStream(it, null, BitmapFactory.Options().apply { inSampleSize = sample })
         } ?: return false
         val long = maxOf(bmp.width, bmp.height)
