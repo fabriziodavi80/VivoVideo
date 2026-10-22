@@ -1178,6 +1178,8 @@ private fun TransitionPanel(vm: EditorViewModel, running: Boolean) {
 private fun MusicPanel(vm: EditorViewModel, running: Boolean, tab: Int, onAdd: () -> Unit) {
     val p = vm.project ?: return
     val enabled = !running
+    // Mixer: tutti i suoni del progetto in una schermata (volume, bilanciamento, equalizzatore, compressore, uscita).
+    PrimaryButton("Mixer audio", Modifier.fillMaxWidth(), enabled = enabled) { vm.openMixer() }
     if (tab == 4) { ClipAudioTab(vm, running); return }
     if (tab == 3) { VoiceTab(vm, running); return }
     // Nessun brano selezionato: prende quello sotto l'indicatore (o il primo).
@@ -2113,7 +2115,7 @@ private fun ExportPanel(vm: EditorViewModel, onOpen: (android.net.Uri) -> Unit) 
             else "Nel progetto ci sono video HDR: ora vengono convertiti in SDR, il formato che si vede bene ovunque.")
     }
     ToggleRow("Audio a tono naturale nei cambi di velocità", o.keepPitch, !running) { vm.exportOptions = o.copy(keepPitch = it) }
-    ToggleRow("Volume uniformato (–14 LUFS, come YouTube e Instagram)", o.loudness, !running) { vm.exportOptions = o.copy(loudness = it) }
+    ToggleRow("Volume uniformato: ${vm.project?.mix?.target?.label ?: "–14 LUFS"} (si cambia in Audio → Mixer)", o.loudness, !running) { vm.exportOptions = o.copy(loudness = it) }
     PanelLabel("Sperimentale: dissolvenze incrociate e video sovrapposti")
     ToggleRow("Nel video esportato", vm.multiExportEnabled, !running) { vm.setMultiExport(it) }
     Hint("In anteprima dissolvenze incrociate e video sovrapposti si preparano in anticipo (pochi secondi dopo una modifica). Se l'app si chiude per un errore, questa opzione si spegne da sola.")

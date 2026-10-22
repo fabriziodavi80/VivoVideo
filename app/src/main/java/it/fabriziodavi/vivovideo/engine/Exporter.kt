@@ -58,7 +58,9 @@ class Exporter(
             val needsNative = project.audibleMusic().isNotEmpty() || project.layers.any { it.isVideo && !it.muted } ||
                 project.clips.any { it.fadeAudio && !it.muted && (it.fadeInUs > 0 || it.fadeOutUs > 0) } ||
                 (options.keepPitch && project.clips.any { c -> !c.muted && c.speedCurve().speeds.any { it != 1f } }) ||
-                (options.loudness && project.clips.any { !it.muted && !it.isPhoto })
+                (options.loudness && project.clips.any { !it.muted && !it.isPhoto }) ||
+                // Mixer toccato sull'audio delle clip: serve il mix nativo.
+                (!project.mix.neutral && project.clips.any { !it.muted && !it.isPhoto })
             var audio: File? = null
             if (needsNative) {
                 onState(ExportState.Running(null, "Elaborazione audio…"))

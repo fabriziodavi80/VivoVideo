@@ -760,6 +760,8 @@ data class Project(
     /** Ducking: la musica si abbassa di [duckDb] dB dove si parla (clip, voce fuori campo, audio staccato). */
     val duck: Boolean = false,
     val duckDb: Int = 12,
+    /** Mixer: volume, bilanciamento, equalizzatore e compressore per gruppo; volume finale e limitatore. */
+    val mix: Mix = Mix(),
 ) {
     /** Orientamento del video finito. */
     fun outputOrientation(): Orientation = when (format) {

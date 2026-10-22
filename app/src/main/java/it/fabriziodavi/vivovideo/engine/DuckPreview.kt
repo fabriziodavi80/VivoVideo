@@ -7,6 +7,7 @@ import androidx.media3.common.audio.AudioProcessor
 import androidx.media3.common.audio.BaseAudioProcessor
 import it.fabriziodavi.vivovideo.decodeAudioRange
 import it.fabriziodavi.vivovideo.model.Project
+import it.fabriziodavi.vivovideo.model.Bus
 import java.nio.ByteBuffer
 
 /**
@@ -32,8 +33,9 @@ object DuckPreview {
     /** Curva della musica (blocchi da 10 ms) o null se non serve / non è pronta. */
     fun gainsFor(p: Project): FloatArray? {
         val k = key(p) ?: return null
+        if (!p.mix.audible(Bus.VOICE) && !p.mix.audible(Bus.DETACHED)) return null
         val lv = synchronized(levels) { levels[k] } ?: return null
-        return AudioDsp.duckGainsFrom(AudioDsp.voiceMask(lv), p.duckDb.toFloat())
+        return AudioDsp.duckGainsFrom(AudioDsp.voiceMask(lv), p.duckDb.toFloat(), p.mix.duckSpeed.holdBlocks, p.mix.duckSpeed.releaseBlocks)
     }
 
     /** Legge le voci e ne misura il livello (lento: da chiamare fuori dal thread principale). */

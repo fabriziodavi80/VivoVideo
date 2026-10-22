@@ -90,9 +90,9 @@ object AudioDsp {
         duckGainsFrom(BooleanArray(levels.size) { levels[it] > thresholdDb }, depthDb)
 
     /** Come [duckGains], partendo dai blocchi in cui si parla. */
-    fun duckGainsFrom(speech: BooleanArray, depthDb: Float): FloatArray {
+    fun duckGainsFrom(speech: BooleanArray, depthDb: Float, hold: Int = 30, release: Int = 50): FloatArray {
         val low = 10f.pow(-depthDb / 20f)
-        val attack = 8; val hold = 30; val release = 50
+        val attack = 8
         var since = Int.MAX_VALUE / 2
         var g = 1f
         // Si guarda un po' avanti: la musica inizia a scendere prima della prima sillaba.

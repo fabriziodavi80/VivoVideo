@@ -14,6 +14,10 @@ import it.fabriziodavi.vivovideo.engine.Whisper
 import it.fabriziodavi.vivovideo.engine.Proxies
 import it.fabriziodavi.vivovideo.engine.Decoders
 import it.fabriziodavi.vivovideo.engine.DuckPreview
+import it.fabriziodavi.vivovideo.engine.Meters
+import it.fabriziodavi.vivovideo.model.Bus
+import it.fabriziodavi.vivovideo.model.BusMix
+import it.fabriziodavi.vivovideo.model.Mix
 import it.fabriziodavi.vivovideo.engine.VoiceChain
 import it.fabriziodavi.vivovideo.engine.VoiceRecorder
 import it.fabriziodavi.vivovideo.engine.AudioDsp
@@ -1892,6 +1896,18 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         selectedMusicId = t.id
         message = "Audio staccato: ora è una riga nella timeline. Trascinalo o allungalo con le maniglie per farlo iniziare prima o finire dopo il taglio."
     }
+
+    // ---------------- Mixer ----------------
+    var showMixer by mutableStateOf(false)
+        private set
+
+    fun openMixer() { Meters.reset(); showMixer = true }
+    fun closeMixer() { showMixer = false }
+
+    /** Canale del mixer cambiato: si rifà l'anteprima per sentirlo subito. */
+    fun setBus(b: Bus, m: BusMix) = update { it.copy(mix = it.mix.with(b, m)) }
+    fun setMix(change: (Mix) -> Mix) = update { it.copy(mix = change(it.mix)) }
+    fun resetMix() = update { it.copy(mix = Mix()) }
 
     // Il ducking ora si sente anche in anteprima: si rifà l'anteprima.
     fun setDuck(on: Boolean? = null, db: Int? = null) = update { it.copy(duck = on ?: it.duck, duckDb = db ?: it.duckDb) }

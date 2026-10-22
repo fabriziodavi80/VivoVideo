@@ -101,6 +101,13 @@ class EditorUiTest {
         assertEquals(listOf("a", "b", "c"), vm.project!!.clips.map { it.id })
     }
 
+    @Test fun mixerOpensAndMutesAGroup() {
+        val vm = vm(); show(vm)
+        bar("Audio").performClick()
+        compose.onNodeWithText("Mixer audio").performClick()
+        assertTrue(vm.showMixer)
+    }
+
     @Test fun audioPanelHasTabs() {
         val vm = vm(); show(vm)
         bar("Audio").performClick()

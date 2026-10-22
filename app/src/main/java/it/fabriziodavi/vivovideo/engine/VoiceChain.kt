@@ -45,6 +45,15 @@ object VoiceChain {
                 return make(1 + al * a, -2 * c, 1 - al * a, 1 + al / a, -2 * c, 1 - al / a)
             }
 
+            fun lowShelf(f: Double, gainDb: Double, rate: Int = RATE): Biquad {
+                val a = 10.0.pow(gainDb / 40); val w = 2 * PI * f / rate; val c = cos(w)
+                val al = sin(w) / 2 * sqrt(2.0); val sa = 2 * sqrt(a) * al
+                return make(
+                    a * ((a + 1) - (a - 1) * c + sa), 2 * a * ((a - 1) - (a + 1) * c), a * ((a + 1) - (a - 1) * c - sa),
+                    (a + 1) + (a - 1) * c + sa, -2 * ((a - 1) + (a + 1) * c), (a + 1) + (a - 1) * c - sa,
+                )
+            }
+
             fun highShelf(f: Double, gainDb: Double, rate: Int = RATE): Biquad {
                 val a = 10.0.pow(gainDb / 40); val w = 2 * PI * f / rate; val c = cos(w)
                 val al = sin(w) / 2 * sqrt(2.0); val sa = 2 * sqrt(a) * al

@@ -21,6 +21,7 @@ import it.fabriziodavi.vivovideo.ui.EditorViewModel
 import it.fabriziodavi.vivovideo.ui.HomeScreen
 import it.fabriziodavi.vivovideo.ui.ObjectPickScreen
 import it.fabriziodavi.vivovideo.ui.CreditsScreen
+import it.fabriziodavi.vivovideo.ui.MixerScreen
 import it.fabriziodavi.vivovideo.ui.SpeechCutScreen
 import it.fabriziodavi.vivovideo.ui.VivoTheme
 
@@ -80,6 +81,7 @@ class MainActivity : ComponentActivity() {
                     if (vm.showSubtitles && vm.project != null) SubtitlesScreen(vm)
                     if (vm.showSpeechCut && vm.project != null) SpeechCutScreen(vm)
                     if (vm.showCredits && vm.project != null) CreditsScreen(vm)
+                    if (vm.showMixer && vm.project != null) MixerScreen(vm)
                     if (vm.objectPick != null && vm.project != null) ObjectPickScreen(vm)
                 }
             }

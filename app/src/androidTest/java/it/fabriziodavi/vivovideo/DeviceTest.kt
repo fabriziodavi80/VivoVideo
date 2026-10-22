@@ -12,6 +12,10 @@ import android.net.Uri
 import it.fabriziodavi.vivovideo.online.Library
 import it.fabriziodavi.vivovideo.engine.AudioDsp
 import it.fabriziodavi.vivovideo.engine.DuckPreview
+import it.fabriziodavi.vivovideo.model.Bus
+import it.fabriziodavi.vivovideo.model.BusMix
+import it.fabriziodavi.vivovideo.model.LoudTarget
+import it.fabriziodavi.vivovideo.model.Mix
 import it.fabriziodavi.vivovideo.engine.VoiceChain
 import it.fabriziodavi.vivovideo.engine.VoiceRecorder
 import it.fabriziodavi.vivovideo.engine.Decoders
@@ -304,6 +308,23 @@ class DeviceTest {
         val lufs = AudioDsp.LoudnessMeter().apply { addInterleaved(pcm) }.lufs()
         android.util.Log.i("VivoVideoTest", "volume del video esportato: $lufs LUFS")
         assertTrue("volume $lufs invece di circa -14 LUFS", lufs in -16.5..-12.0 || lufs < -16.5 && pcm.maxOf { kotlin.math.abs(it) } > 0.85f)
+    }
+
+    /** Mixer nel video esportato: musica muta = silenzio; musica a -12 dB = molto più bassa; limitatore sotto -1 dBFS. */
+    @Test fun exportFollowsTheMixer() {
+        val a = video("a", videoA, s = 0, e = 4_000_000).copy(muted = true)
+        val song = MusicTrack(uri = music.toString(), name = "musica", sourceDurationUs = 30_000_000, lengthUs = 4_000_000)
+        val base = Project(name = "mixer", clips = listOf(a), music = listOf(song), mix = Mix(target = LoudTarget.OFF))
+        fun rms(p: Project): Double {
+            val pcm = decodeAudioRange(ctx, exportAndCheckUri(p), 500_000, 3_500_000)!!
+            return 20 * kotlin.math.log10(kotlin.math.sqrt(pcm.sumOf { (it * it).toDouble() } / pcm.size) + 1e-9)
+        }
+        val full = rms(base)
+        val low = rms(base.copy(mix = base.mix.with(Bus.MUSIC, BusMix(gainDb = -12f))))
+        val muted = rms(base.copy(mix = base.mix.with(Bus.MUSIC, BusMix(mute = true))))
+        android.util.Log.i("VivoVideoTest", "mixer: piena $full, -12 dB $low, muta $muted")
+        assertTrue("-12 dB: $full → $low", full - low in 9.0..15.0)
+        assertTrue("muta: $muted", muted < full - 40)
     }
 
     /** Registrazione vera dal microfono (sull'emulatore è virtuale): file grezzo leggibile, pulito e salvato in WAV. */

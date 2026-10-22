@@ -26,6 +26,8 @@ import it.fabriziodavi.vivovideo.model.LayerMask
 import it.fabriziodavi.vivovideo.model.packLanes
 import it.fabriziodavi.vivovideo.model.FxType
 import it.fabriziodavi.vivovideo.model.Project
+import it.fabriziodavi.vivovideo.model.Bus
+import it.fabriziodavi.vivovideo.model.bus
 import it.fabriziodavi.vivovideo.model.PersonMode
 import it.fabriziodavi.vivovideo.model.SpeedCurve
 import it.fabriziodavi.vivovideo.model.Transform
@@ -308,7 +310,7 @@ class CompositionFactory(private val context: Context) {
                     EditedMediaItem.Builder(item)
                         .setDurationUs(t.sourceDurationUs)
                         .setRemoveVideo(true)
-                        .setEffects(Effects(volumeProcessors(t.volume) + listOfNotNull(duck?.takeIf { !t.dialog }?.let { DuckAudioProcessor(it, t.startUs) }), emptyList()))
+                        .setEffects(Effects(volumeProcessors(t.volume) + listOfNotNull(duck?.takeIf { !t.dialog }?.let { DuckAudioProcessor(it, t.startUs) }) + MixAudioProcessor.bus(project.mix, t.bus()), emptyList()))
                         .build()
                 )
                 cursor = maxOf(cursor, t.startUs) + len
@@ -414,7 +416,8 @@ class CompositionFactory(private val context: Context) {
             }
             val b = EditedMediaItem.Builder(mediaItem)
                 .setDurationUs(clip.sourceDurationUs)
-                .setEffects(Effects(volumeProcessors(clip.volume), effects))
+                // Anteprima: canale "Audio delle clip" del mixer (in esportazione lo fa il mix nativo).
+                .setEffects(Effects(volumeProcessors(clip.volume) + (if (forPreview && nativeAudio == null) listOf(MixAudioProcessor.bus(project.mix, Bus.CLIPS)) else emptyList()), effects))
                 .setRemoveAudio(removeAudio || clip.muted)
             val curve = clip.speedCurve()
             if (curve.speeds.any { it != 1f }) {
@@ -473,6 +476,8 @@ class CompositionFactory(private val context: Context) {
         // Di solito tutto in SDR; in HDR i nostri filtri lavorano in una scala con gamma (HdrGl).
         return Composition.Builder(sequences)
             .setHdrMode(hdrMode)
+            // Anteprima: uscita del mixer (limitatore e indicatore generale).
+            .apply { if (forPreview && nativeAudio == null) setEffects(Effects(listOf(MixAudioProcessor.master(project.mix.limiter)), emptyList())) }
             .build()
     }
 }

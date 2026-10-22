@@ -13,6 +13,11 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.RandomAccessFile
 import it.fabriziodavi.vivovideo.engine.AudioDsp
+import it.fabriziodavi.vivovideo.engine.BusDsp
+import it.fabriziodavi.vivovideo.engine.PeakLimiter
+import it.fabriziodavi.vivovideo.model.Bus
+import it.fabriziodavi.vivovideo.model.Mix
+import it.fabriziodavi.vivovideo.model.bus
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
@@ -43,9 +48,12 @@ private const val OUT_CH = 2
  */
 fun renderTimelineAudio(context: Context, project: Project, loudness: Boolean = false, onProgress: (Float) -> Unit = {}): File {
     val file = File(context.cacheDir, "timeline_${System.currentTimeMillis()}.wav")
+    // Il mix si fa in virgola mobile (niente tagli prima del volume finale e del limitatore); il WAV a 16 bit alla fine.
+    val raw = File(context.cacheDir, "mix_${System.currentTimeMillis()}.f32")
+    val mix = project.mix
+    val clipDsp = if (BusDsp.needed(mix, Bus.CLIPS)) BusDsp.of(mix, Bus.CLIPS) else null
     var frames = 0L
-    BufferedOutputStream(FileOutputStream(file), 1 shl 16).use { out ->
-        out.write(ByteArray(44)) // intestazione scritta alla fine
+    BufferedOutputStream(FileOutputStream(raw), 1 shl 16).use { out ->
         project.clips.forEachIndexed { i, clip ->
             val target = clip.outputUs * OUT_RATE / 1_000_000
             val audio = if (clip.muted || clip.isPhoto) null else runCatching {
@@ -86,13 +94,13 @@ fun renderTimelineAudio(context: Context, project: Project, loudness: Boolean = 
                     samples[samples.size - (f + 1) * OUT_CH + ch] *= g
                 }
             }
-            writePcm16(out, samples)
+            clipDsp?.process(samples)
+            writeF32(out, samples)
             frames += target
             onProgress((i + 1f) / project.clips.size * if (project.music.isEmpty() && project.layers.none { it.isVideo }) 1f else 0.6f)
         }
     }
-    RandomAccessFile(file, "rw").use { raf ->
-        raf.write(wavHeader(frames))
+    RandomAccessFile(raw, "rw").use { raf ->
         // Prima le voci (voce fuori campo, audio staccato) e l'audio dei video sovrapposti, poi la musica:
         // così si sa dove si parla e la musica può abbassarsi lì (ducking).
         val layerAudio = project.layers.filter { it.isVideo && !it.muted && it.startUs < project.durationUs }.map { l ->
@@ -101,8 +109,9 @@ fun renderTimelineAudio(context: Context, project: Project, loudness: Boolean = 
                 offsetUs = l.sourceStartUs, lengthUs = l.durationUs, volume = l.volume, fadeInUs = 30_000, fadeOutUs = 30_000, dialog = true,
             )
         }
-        val dialog = project.audibleMusic().filter { it.dialog } + layerAudio
-        val music = project.audibleMusic().filter { !it.dialog }
+        // Gruppi del mixer muti (o esclusi dal "solo"): non si leggono nemmeno.
+        val dialog = (project.audibleMusic().filter { it.dialog } + layerAudio).filter { mix.audible(busOf(it, layerAudio)) }
+        val music = project.audibleMusic().filter { !it.dialog && mix.audible(Bus.MUSIC) }
         val all = dialog.size + music.size
         var k = 0
         val ducking = project.duck && music.isNotEmpty()
@@ -110,67 +119,97 @@ fun renderTimelineAudio(context: Context, project: Project, loudness: Boolean = 
         // con una soglia sopra il suo rumore di fondo.
         val clipLevels = if (ducking) levelsOf(raf, frames) else null
         val voiceEnergy = if (ducking) DoubleArray((frames / AudioDsp.BLOCK).toInt()) else null
-        dialog.forEach { t -> mixTrack(context, raf, frames, t, project.durationUs, null, voiceEnergy); onProgress(0.6f + 0.3f * ++k / all) }
+        dialog.forEach { t -> mixTrack(context, raf, frames, t, project.durationUs, null, voiceEnergy, dspFor(mix, busOf(t, layerAudio))); onProgress(0.6f + 0.3f * ++k / all) }
         val duck = if (ducking) {
             val v = AudioDsp.voiceMask(AudioDsp.levelsFromEnergy(voiceEnergy!!))
             val c = AudioDsp.clipSpeechMask(clipLevels!!)
-            AudioDsp.duckGainsFrom(BooleanArray(v.size) { v[it] || c.getOrElse(it) { false } }, project.duckDb.toFloat())
+            AudioDsp.duckGainsFrom(BooleanArray(v.size) { v[it] || c.getOrElse(it) { false } }, project.duckDb.toFloat(),
+                mix.duckSpeed.holdBlocks, mix.duckSpeed.releaseBlocks)
         } else null
-        music.forEach { t -> mixTrack(context, raf, frames, t, project.durationUs, duck); onProgress(0.6f + 0.3f * ++k / all) }
-        if (loudness) normalize(raf, frames)
+        music.forEach { t -> mixTrack(context, raf, frames, t, project.durationUs, duck, null, dspFor(mix, Bus.MUSIC)); onProgress(0.6f + 0.3f * ++k / all) }
+        // Uscita: volume per la destinazione scelta e limitatore dei picchi, poi WAV a 16 bit.
+        finish(raf, frames, file, if (loudness) mix.target.lufs else null, mix.limiter)
         onProgress(1f)
     }
+    raw.delete()
     return file
+}
+
+private fun busOf(t: MusicTrack, layerAudio: List<MusicTrack>): Bus = if (t in layerAudio) Bus.OVERLAY else t.bus()
+
+private fun dspFor(mix: Mix, b: Bus): BusDsp? = if (BusDsp.needed(mix, b)) BusDsp.of(mix, b) else null
+
+private fun writeF32(out: BufferedOutputStream, samples: FloatArray) {
+    val chunk = ByteBuffer.allocate(1 shl 16).order(ByteOrder.LITTLE_ENDIAN)
+    for (v in samples) {
+        if (!chunk.hasRemaining()) { out.write(chunk.array(), 0, chunk.position()); chunk.clear() }
+        chunk.putFloat(v)
+    }
+    out.write(chunk.array(), 0, chunk.position())
+}
+
+/** Legge [n] fotogrammi del mix in virgola mobile a partire da [from]. */
+private fun readF32(raf: RandomAccessFile, from: Long, n: Int, bytes: ByteArray, out: FloatArray) {
+    raf.seek(from * OUT_CH * 4)
+    raf.readFully(bytes, 0, n * OUT_CH * 4)
+    val bb = ByteBuffer.wrap(bytes, 0, n * OUT_CH * 4).order(ByteOrder.LITTLE_ENDIAN)
+    for (i in 0 until n * OUT_CH) out[i] = bb.getFloat(i * 4)
+}
+
+/**
+ * Uscita del mix: porta il volume percepito a [targetLufs] (null = com'è) e scrive il WAV.
+ * Con il limitatore il volume arriva al livello scelto e i picchi si tengono sotto -1 dBFS;
+ * senza, il guadagno si ferma prima che i picchi superino -1 dBFS.
+ */
+private fun finish(raf: RandomAccessFile, frames: Long, wav: File, targetLufs: Double?, limiter: Boolean) {
+    val blockFrames = 1 shl 14
+    val bytes = ByteArray(blockFrames * OUT_CH * 4)
+    val buf = FloatArray(blockFrames * OUT_CH)
+    var gain = 1f
+    if (targetLufs != null) {
+        val meter = AudioDsp.LoudnessMeter()
+        var done = 0L
+        while (done < frames) {
+            val n = minOf(blockFrames.toLong(), frames - done).toInt()
+            readF32(raf, done, n, bytes, buf)
+            for (f in 0 until n) meter.add(buf[f * 2], buf[f * 2 + 1])
+            done += n
+        }
+        val lufs = meter.lufs()
+        gain = if (lufs <= -69.0) 1f
+            else if (limiter) minOf(Math.pow(10.0, (targetLufs - lufs) / 20), 8.0).toFloat()
+            else AudioDsp.normalizeGain(lufs, meter.peak, targetLufs)
+    }
+    val lim = if (limiter) PeakLimiter() else null
+    BufferedOutputStream(FileOutputStream(wav), 1 shl 16).use { out ->
+        out.write(wavHeader(frames))
+        var done = 0L
+        while (done < frames) {
+            val n = minOf(blockFrames.toLong(), frames - done).toInt()
+            readF32(raf, done, n, bytes, buf)
+            if (gain != 1f) for (i in 0 until n * OUT_CH) buf[i] *= gain
+            lim?.process(buf, 0, n)
+            writePcm16(out, if (n * OUT_CH == buf.size) buf else buf.copyOf(n * OUT_CH))
+            done += n
+        }
+    }
 }
 
 /** Livelli (10 ms) di quello che è già nel WAV: clip e voci, per capire dove si parla. */
 private fun levelsOf(raf: RandomAccessFile, frames: Long): FloatArray {
     val blocks = (frames / AudioDsp.BLOCK).toInt()
     val out = FloatArray(blocks)
-    val bytes = ByteArray(AudioDsp.BLOCK * OUT_CH * 2)
+    val bytes = ByteArray(AudioDsp.BLOCK * OUT_CH * 4)
     val tmp = FloatArray(AudioDsp.BLOCK * OUT_CH)
     for (b in 0 until blocks) {
-        raf.seek(44L + b.toLong() * bytes.size)
-        raf.readFully(bytes)
-        val bb = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN)
-        for (i in tmp.indices) tmp[i] = bb.getShort(i * 2) / 32768f
+        readF32(raf, b.toLong() * AudioDsp.BLOCK, AudioDsp.BLOCK, bytes, tmp)
         out[b] = AudioDsp.blockLevels(tmp)[0]
     }
     return out
 }
 
-/** Volume uniformato: misura il volume percepito del mix e lo porta a -14 LUFS (picchi sotto -1 dBFS). */
-private fun normalize(raf: RandomAccessFile, frames: Long) {
-    val meter = AudioDsp.LoudnessMeter()
-    val blockFrames = 1 shl 14
-    val bytes = ByteArray(blockFrames * OUT_CH * 2)
-    var done = 0L
-    while (done < frames) {
-        val n = minOf(blockFrames.toLong(), frames - done).toInt()
-        raf.seek(44 + done * OUT_CH * 2)
-        raf.readFully(bytes, 0, n * OUT_CH * 2)
-        val bb = ByteBuffer.wrap(bytes, 0, n * OUT_CH * 2).order(ByteOrder.LITTLE_ENDIAN)
-        for (f in 0 until n) meter.add(bb.getShort(f * 4) / 32768f, bb.getShort(f * 4 + 2) / 32768f)
-        done += n
-    }
-    val gain = AudioDsp.normalizeGain(meter.lufs(), meter.peak)
-    if (kotlin.math.abs(gain - 1f) < 0.01f) return
-    done = 0L
-    while (done < frames) {
-        val n = minOf(blockFrames.toLong(), frames - done).toInt()
-        val pos = 44 + done * OUT_CH * 2
-        raf.seek(pos)
-        raf.readFully(bytes, 0, n * OUT_CH * 2)
-        val bb = ByteBuffer.wrap(bytes, 0, n * OUT_CH * 2).order(ByteOrder.LITTLE_ENDIAN)
-        for (i in 0 until n * OUT_CH) bb.putShort(i * 2, (bb.getShort(i * 2) * gain).toInt().coerceIn(-32768, 32767).toShort())
-        raf.seek(pos)
-        raf.write(bytes, 0, n * OUT_CH * 2)
-        done += n
-    }
-}
-
-/** Somma un brano (con volume e dissolvenze) nel WAV già scritto, a blocchi. */
-private fun mixTrack(context: Context, raf: RandomAccessFile, totalFrames: Long, t: MusicTrack, projectUs: Long, duck: FloatArray?, energy: DoubleArray? = null) {
+/** Somma un brano (canale del mixer, volume, dissolvenze, ducking) nel mix in virgola mobile, a blocchi. */
+private fun mixTrack(context: Context, raf: RandomAccessFile, totalFrames: Long, t: MusicTrack, projectUs: Long, duck: FloatArray?, energy: DoubleArray? = null, dsp: BusDsp? = null) {
     val len = t.playUs(projectUs)
     val audio = runCatching {
         decodeAudioRange(context, Uri.parse(t.uri), t.offsetUs, t.offsetUs + len)
@@ -178,29 +217,30 @@ private fun mixTrack(context: Context, raf: RandomAccessFile, totalFrames: Long,
     val startFrame = t.startUs * OUT_RATE / 1_000_000
     val frames = minOf((audio.size / OUT_CH).toLong(), totalFrames - startFrame, len * OUT_RATE / 1_000_000)
     if (frames <= 0) return
+    // Canale del mixer (equalizzatore, compressore, volume, bilanciamento) prima di misurare la voce:
+    // una voce messa muta o abbassata non fa abbassare la musica.
+    dsp?.process(audio, 0, frames.toInt())
     energy?.let { AudioDsp.addEnergy(it, audio, startFrame, frames) { fi -> t.gainAt(fi * 1_000_000 / OUT_RATE, projectUs) } }
     val blockFrames = 1 shl 14
-    val bytes = ByteArray(blockFrames * OUT_CH * 2)
+    val bytes = ByteArray(blockFrames * OUT_CH * 4)
     var done = 0L
     while (done < frames) {
         val n = minOf(blockFrames.toLong(), frames - done).toInt()
-        val pos = 44 + (startFrame + done) * OUT_CH * 2
+        val pos = (startFrame + done) * OUT_CH * 4
         raf.seek(pos)
-        raf.readFully(bytes, 0, n * OUT_CH * 2)
-        val bb = ByteBuffer.wrap(bytes, 0, n * OUT_CH * 2).order(ByteOrder.LITTLE_ENDIAN)
+        raf.readFully(bytes, 0, n * OUT_CH * 4)
+        val bb = ByteBuffer.wrap(bytes, 0, n * OUT_CH * 4).order(ByteOrder.LITTLE_ENDIAN)
         for (f in 0 until n) {
             val fi = done + f
             var g = t.gainAt(fi * 1_000_000 / OUT_RATE, projectUs)
             if (duck != null) g *= duck.getOrElse(((startFrame + fi) / AudioDsp.BLOCK).toInt()) { 1f }
             for (c in 0 until OUT_CH) {
-                val idx = (f * OUT_CH + c) * 2
-                val cur = bb.getShort(idx) / 32768f
-                val v = (cur + audio[(fi * OUT_CH + c).toInt()] * g).coerceIn(-1f, 1f)
-                bb.putShort(idx, (v * 32767f).toInt().toShort())
+                val idx = (f * OUT_CH + c) * 4
+                bb.putFloat(idx, bb.getFloat(idx) + audio[(fi * OUT_CH + c).toInt()] * g)
             }
         }
         raf.seek(pos)
-        raf.write(bytes, 0, n * OUT_CH * 2)
+        raf.write(bytes, 0, n * OUT_CH * 4)
         done += n
     }
 }
