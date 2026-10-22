@@ -80,7 +80,7 @@ class DuckingTest {
         val p = DuckAudioProcessor(gains, itemStartUs = 500_000)
         p.configure(AudioProcessor.AudioFormat(48_000, 2, C.ENCODING_PCM_16BIT))
         // Salto a 1 s dentro il brano = 1,5 s del montaggio: musica bassa.
-        assertEquals(2500, process(p, 1_000_000, 10000, 480).first().toInt(), 2)
+        assertEquals(2500.0, process(p, 1_000_000, 10000, 480).first().toDouble(), 2.0)
         // Salto all'inizio del brano (0,5 s del montaggio): piena.
         assertEquals(10000, process(p, 0, 10000, 480).first().toInt())
         // Scorre: 3 s nel brano = 3,5 s del montaggio, di nuovo piena.
