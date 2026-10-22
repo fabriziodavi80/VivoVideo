@@ -79,7 +79,7 @@ class EditorUiTest {
     @Test fun dragAClipWithTheFingerToANewPlace() {
         val vm = vm(); show(vm)
         val tile = (48 + 4) * 3f // tessera da 52 dp con densità xxhdpi (3 px per dp)
-        compose.onNodeWithTag("timelineClips").performTouchInput {
+        compose.onNodeWithTag("timelineClips", useUnmergedTree = true).performTouchInput {
             // La prima clip parte al centro (indicatore a 0): tieni premuto, poi trascina di due tessere e mezzo.
             down(androidx.compose.ui.geometry.Offset(412 * 3f / 2 + 20f, centerY)) // metà schermo = inizio della prima clip
             advanceEventTime(900)
@@ -92,7 +92,7 @@ class EditorUiTest {
 
     @Test fun holdWithoutMovingStillOpensTheClipMenu() {
         val vm = vm(); show(vm)
-        compose.onNodeWithTag("timelineClips").performTouchInput {
+        compose.onNodeWithTag("timelineClips", useUnmergedTree = true).performTouchInput {
             down(androidx.compose.ui.geometry.Offset(412 * 3f / 2 + 20f, centerY)) // metà schermo = inizio della prima clip
             advanceEventTime(900)
             up()
