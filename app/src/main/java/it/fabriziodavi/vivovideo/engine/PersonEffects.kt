@@ -53,12 +53,33 @@ class ReframeTransformation(private val clip: Clip, private val startUs: Long, p
 
 /**
  * Maschere della persona (scontorno con ML Kit, sul telefono): [RATE] al secondo, [SIDE]×[SIDE] in 8 bit,
- * salvate in un file per non rifarle a ogni anteprima.
+ * salvate in un file per non rifarle a ogni anteprima. Alla riproduzione il bordo si affina sull'immagine piena
+ * (filtro guidato nello shader): segue capelli e contorni del video, non i quadretti della maschera.
  */
 object PersonMasks {
     const val RATE = 15
-    const val SIDE = 128
-    private const val IN = 256
+    /** Risoluzione della maschera salvata (quella del modello: niente dettagli persi). */
+    const val SIDE = 256
+    /** Lato lungo dell'immagine data al modello (lui la riduce con un buon filtro). */
+    private const val IN = 448
+    /** Quanto conta la maschera precedente: toglie lo sfarfallio del bordo fra un fotogramma e l'altro. */
+    const val SMOOTH = 0.3f
+
+    /** Ricampiona una maschera [mw]×[mh] (valori 0…1) a [side]×[side] con interpolazione bilineare. */
+    fun resample(src: FloatArray, mw: Int, mh: Int, side: Int): FloatArray = FloatArray(side * side) { i ->
+        val x = (i % side + 0.5f) * mw / side - 0.5f
+        val y = (i / side + 0.5f) * mh / side - 0.5f
+        val x0 = x.toInt().coerceIn(0, mw - 1); val y0 = y.toInt().coerceIn(0, mh - 1)
+        val x1 = (x0 + 1).coerceAtMost(mw - 1); val y1 = (y0 + 1).coerceAtMost(mh - 1)
+        val fx = (x - x0).coerceIn(0f, 1f); val fy = (y - y0).coerceIn(0f, 1f)
+        val a = src[y0 * mw + x0] + (src[y0 * mw + x1] - src[y0 * mw + x0]) * fx
+        val b = src[y1 * mw + x0] + (src[y1 * mw + x1] - src[y1 * mw + x0]) * fx
+        (a + (b - a) * fy).coerceIn(0f, 1f)
+    }
+
+    /** Mescola la maschera nuova con la precedente (stabilità nel tempo). */
+    fun smooth(cur: FloatArray, prev: FloatArray?): FloatArray =
+        if (prev == null || prev.size != cur.size) cur else FloatArray(cur.size) { cur[it] * (1 - SMOOTH) + prev[it] * SMOOTH }
 
     fun dir(ctx: Context) = File(ctx.filesDir, "maschere").apply { mkdirs() }
 
@@ -82,17 +103,17 @@ object PersonMasks {
             )
             val masks = java.io.ByteArrayOutputStream()
             var count = 0
+            var prev: FloatArray? = null
             try {
                 FrameReader.read(ctx, uri, fromUs, toUs, RATE, IN) { bmp, t ->
                     coroutineContext.ensureActive()
                     val m = Tasks.await(seg.process(InputImage.fromBitmap(bmp, 0)), 10, TimeUnit.SECONDS)
                     val buf = m.buffer.asFloatBuffer()
                     val mw = m.width; val mh = m.height
-                    val out = ByteArray(SIDE * SIDE)
-                    for (y in 0 until SIDE) for (x in 0 until SIDE) {
-                        val v = buf.get((y * mh / SIDE) * mw + (x * mw / SIDE))
-                        out[y * SIDE + x] = (v.coerceIn(0f, 1f) * 255).toInt().toByte()
-                    }
+                    val raw = FloatArray(mw * mh) { buf.get(it) }
+                    val cur = smooth(resample(raw, mw, mh, SIDE), prev)
+                    prev = cur
+                    val out = ByteArray(SIDE * SIDE) { (cur[it] * 255).toInt().toByte() }
                     masks.write(out); count++
                     onProgress(((t - fromUs).toFloat() / (toUs - fromUs).coerceAtLeast(1)).coerceIn(0f, 1f))
                 }
@@ -173,11 +194,14 @@ object FrameReader {
         val hi = if (yP.pixelStride >= 2) 1 else 0
         val chi = if (uP.pixelStride >= 4 || (hi == 1 && uP.pixelStride >= 2)) 1 else 0
         val px = IntArray(ow * oh)
+        // Luminosità media di 4 punti per pixel (niente scalette sui bordi quando si riduce molto).
+        val dx = maxOf(1, w / ow / 2); val dy = maxOf(1, h / oh / 2)
+        fun luma(x: Int, y: Int) = yb.get(y.coerceAtMost(h - 1) * yP.rowStride + x.coerceAtMost(w - 1) * yP.pixelStride + hi).toInt() and 255
         for (y in 0 until oh) {
             val sy = y * h / oh
             for (x in 0 until ow) {
                 val sx = x * w / ow
-                val yy = (yb.get(sy * yP.rowStride + sx * yP.pixelStride + hi).toInt() and 255)
+                val yy = (luma(sx, sy) + luma(sx + dx, sy) + luma(sx, sy + dy) + luma(sx + dx, sy + dy)) / 4
                 val ci = (sy / 2) * uP.rowStride + (sx / 2) * uP.pixelStride + chi
                 val cv = (sy / 2) * vP.rowStride + (sx / 2) * vP.pixelStride + chi
                 val u = (ub.get(ci).toInt() and 255) - 128
@@ -204,7 +228,7 @@ class PersonEffect(private val fx: PersonFx, private val srcTimeUs: (Long) -> Lo
 }
 
 private class PersonProgram(private val fx: PersonFx, private val srcTimeUs: (Long) -> Long, useHdr: Boolean) : BaseGlShaderProgram(useHdr, 1) {
-    private val program: GlProgram = try { GlProgram(VERTEX, HdrGl.fragment(FRAGMENT, useHdr)) } catch (e: GlUtil.GlException) { throw VideoFrameProcessingException(e) }
+    private val program: GlProgram = try { GlProgram(VERTEX, HdrGl.fragment(PERSON_FRAGMENT, useHdr)) } catch (e: GlUtil.GlException) { throw VideoFrameProcessingException(e) }
     private val masks = PersonMasks.load(fx.maskFile)
     private val tex = IntArray(2)
     private val loaded = intArrayOf(-1, -1)
@@ -284,8 +308,12 @@ void main() {
   vUv = aFramePosition.xy * 0.5 + 0.5;
 }
 """
-        // Le maschere si leggono con "texture2D (" (con lo spazio): in HDR non vanno convertite come i colori.
-        private const val FRAGMENT = """
+
+    }
+}
+
+// Le maschere si leggono con "texture2D (" (con lo spazio): in HDR non vanno convertite come i colori.
+internal const val PERSON_FRAGMENT = """
 precision highp float;
 uniform sampler2D uTex;
 uniform sampler2D uMaskA;
@@ -299,14 +327,37 @@ void main() {
   vec4 src = texture2D(uTex, vUv);
   // Le maschere sono dritte (in alto la prima riga), le texture OpenGL partono dal basso.
   vec2 mu = vec2(vUv.x, 1.0 - vUv.y);
-  float m = mix(texture2D (uMaskA, mu).r, texture2D (uMaskB, mu).r, uMix);
-  m = smoothstep(0.35, 0.7, m);
+  // Filtro guidato (He et al.): la maschera, piccola, si adatta ai bordi dell'immagine piena.
+  // In una finestra attorno al pixel: m ≈ a·L + b, con L la luminosità; dove l'immagine ha un bordo, lo segue.
+  vec2 asp = vec2(uTexel.y / uTexel.x, 1.0);
+  float sI = 0.0; float sP = 0.0; float sIP = 0.0; float sII = 0.0;
+  for (int i = 0; i < 17; i++) {
+    vec2 o = vec2(0.0);
+    if (i > 0) {
+      float a = float(i) * 0.7854 + (i > 8 ? 0.3927 : 0.0);
+      float r = i > 8 ? 0.012 : 0.0055;
+      o = vec2(cos(a), sin(a)) * r / asp;
+    }
+    vec2 q = clamp(vUv + o, 0.0, 1.0);
+    float li = dot(texture2D(uTex, q).rgb, vec3(0.299, 0.587, 0.114));
+    vec2 qm = vec2(q.x, 1.0 - q.y);
+    float pi = mix(texture2D (uMaskA, qm).r, texture2D (uMaskB, qm).r, uMix);
+    sI += li; sP += pi; sIP += li * pi; sII += li * li;
+  }
+  sI /= 17.0; sP /= 17.0; sIP /= 17.0; sII /= 17.0;
+  float ga = (sIP - sI * sP) / (sII - sI * sI + 0.0025);
+  float gb = sP - ga * sI;
+  float l0 = dot(src.rgb, vec3(0.299, 0.587, 0.114));
+  float m = clamp(ga * l0 + gb, 0.0, 1.0);
+  // Dove l'immagine è piatta resta la maschera morbida; poi un bordo pulito ma non tagliente.
+  float m0 = mix(texture2D (uMaskA, mu).r, texture2D (uMaskB, mu).r, uMix);
+  m = mix(m0, m, 0.85);
+  m = smoothstep(0.25, 0.75, m);
   vec3 bg;
   if (uMode < 0.5) {
     // Sfocatura forte: due anelli di campioni.
     vec3 acc = src.rgb;
     float r1 = 0.025; float r2 = 0.055;
-    vec2 asp = vec2(uTexel.y / uTexel.x, 1.0);
     for (int i = 0; i < 8; i++) {
       float a = float(i) * 0.7854;
       vec2 d = vec2(cos(a), sin(a)) / asp;
@@ -325,5 +376,3 @@ void main() {
   gl_FragColor = vec4(mix(bg, src.rgb, m), alpha);
 }
 """
-    }
-}
