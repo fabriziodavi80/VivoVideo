@@ -175,6 +175,7 @@ fun Timeline(
         val viewPx = with(density) { maxWidth.toPx() }
         val tilePx = with(density) { TILE.toPx() }
         val edgePx = with(density) { 56.dp.toPx() }
+        val pxPerDp = density.density
         // Vicino ai bordi la timeline scorre da sola mentre si trascina.
         LaunchedEffect(reorder != null) {
             while (reorder != null) {
@@ -204,7 +205,7 @@ fun Timeline(
                 Modifier.testTag("timelineClips").then(if (multiIds != null) Modifier else Modifier.pointerInput(Unit) {
                     detectDragGesturesAfterLongPress(
                         onDragStart = { off ->
-                            val widths = clipsNow.map { it.outputUs / 1e6f * dpsNow * density } // qui density è quella del tocco (px per dp)
+                            val widths = clipsNow.map { it.outputUs / 1e6f * dpsNow * pxPerDp }
                             val i = Reorder.indexAt(off.x, halfPx, widths) ?: return@detectDragGesturesAfterLongPress
                             onScrubStart()
                             val vx = off.x - scroll.value
