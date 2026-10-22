@@ -287,6 +287,8 @@ class CompositionFactory(private val context: Context) {
 
     private fun musicSequences(project: Project): List<EditedMediaItemSequence> {
         val total = project.durationUs
+        // Ducking (anteprima): la musica scende sotto le voci, se i loro livelli sono già pronti.
+        val duck = DuckPreview.gainsFor(project)
         return project.musicLanes(project.audibleMusic()).map { lane ->
             val b = EditedMediaItemSequence.Builder(setOf(C.TRACK_TYPE_AUDIO))
             var cursor = 0L
@@ -306,7 +308,7 @@ class CompositionFactory(private val context: Context) {
                     EditedMediaItem.Builder(item)
                         .setDurationUs(t.sourceDurationUs)
                         .setRemoveVideo(true)
-                        .setEffects(Effects(volumeProcessors(t.volume), emptyList()))
+                        .setEffects(Effects(volumeProcessors(t.volume) + listOfNotNull(duck?.takeIf { !t.dialog }?.let { DuckAudioProcessor(it, t.startUs) }), emptyList()))
                         .build()
                 )
                 cursor = maxOf(cursor, t.startUs) + len

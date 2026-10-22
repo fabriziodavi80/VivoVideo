@@ -11,6 +11,7 @@ import android.media.MediaMetadataRetriever
 import android.net.Uri
 import it.fabriziodavi.vivovideo.online.Library
 import it.fabriziodavi.vivovideo.engine.AudioDsp
+import it.fabriziodavi.vivovideo.engine.DuckPreview
 import it.fabriziodavi.vivovideo.engine.Decoders
 import it.fabriziodavi.vivovideo.engine.Whisper
 import it.fabriziodavi.vivovideo.model.Subtitles
@@ -301,6 +302,33 @@ class DeviceTest {
         val lufs = AudioDsp.LoudnessMeter().apply { addInterleaved(pcm) }.lufs()
         android.util.Log.i("VivoVideoTest", "volume del video esportato: $lufs LUFS")
         assertTrue("volume $lufs invece di circa -14 LUFS", lufs in -16.5..-12.0 || lufs < -16.5 && pcm.maxOf { kotlin.math.abs(it) } > 0.85f)
+    }
+
+    /** Voce fuori campo: registrazione portata a volume chiaro e musica abbassata sotto la voce anche in anteprima. */
+    @Test fun voiceOverLevelAndPreviewDucking() {
+        // "Registrazione" piana: 1 s di tono a 0,03 fra mezzo secondo di silenzio prima e dopo.
+        val sr = AudioDsp.RATE
+        val rec = FloatArray(sr * 2 * 2) { i -> val f = i / 2; if (f in sr / 2 until sr * 3 / 2) (0.03f * kotlin.math.sin(2 * Math.PI * 220.0 * f / sr)).toFloat() else 0f }
+        assertTrue(AudioDsp.levelVoice(rec) > 3f)
+        val wav = File(ctx.cacheDir, "voice/voce_test.wav").apply { parentFile?.mkdirs() }
+        writeWavFile(wav, rec)
+        val a = video("a", videoA, s = 0, e = 5_000_000)
+        val p = Project(
+            name = "voce", clips = listOf(a.copy(muted = true)), duck = true,
+            music = listOf(
+                MusicTrack(uri = music.toString(), name = "musica", sourceDurationUs = 30_000_000, lengthUs = 5_000_000),
+                MusicTrack(uri = Uri.fromFile(wav).toString(), name = "Voce 1", sourceDurationUs = 2_000_000, startUs = 1_000_000, lengthUs = 2_000_000, dialog = true),
+            ),
+        )
+        assertTrue(DuckPreview.needs(p))
+        DuckPreview.prepare(ctx, p)
+        val g = DuckPreview.gainsFor(p)!!
+        // La voce suona fra 1,5 s e 2,5 s del montaggio.
+        assertEquals(1f, g[80], 0.02f)
+        assertTrue("musica non abbassata: ${g[200]}", g[200] < 0.3f)
+        assertEquals(1f, g[450], 0.02f)
+        // L'anteprima con la musica che si abbassa scorre senza errori.
+        playFor(p, seconds = 5, minFps = 3f)
     }
 
     /** Sottotitoli: riconoscimento vocale vero (modello minimo) sull'audio d'esempio di whisper.cpp. */

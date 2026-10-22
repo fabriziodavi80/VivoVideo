@@ -58,7 +58,7 @@ object TestPlan {
             "Risultati in pochi secondi, il brano entra nella timeline con il credito."),
         Item("aud_voice", "Audio", "Voce fuori campo e ducking",
             "Musica → Voce → registra 10 s parlando, con un brano sotto e il ducking acceso.",
-            "Quando parli la musica si abbassa, poi risale."),
+            "La voce si sente chiara; in anteprima (dopo un attimo) e nel video esportato la musica si abbassa quando parli, poi risale."),
         Item("aud_beats", "Audio", "Tagli a ritmo",
             "Musica → Battiti → trova i battiti, poi Ascolta e tocca a tempo.",
             "I tagli cadono sui colpi della musica."),

@@ -86,18 +86,90 @@ object AudioDsp {
      * Guadagno della musica per blocco da 10 ms: scende di [depthDb] quando nel parlato c'è voce
      * (livello sopra [thresholdDb]), con discesa rapida (80 ms), tenuta (300 ms) e risalita lenta (500 ms).
      */
-    fun duckGains(levels: FloatArray, depthDb: Float, thresholdDb: Float = -38f): FloatArray {
+    fun duckGains(levels: FloatArray, depthDb: Float, thresholdDb: Float = -38f): FloatArray =
+        duckGainsFrom(BooleanArray(levels.size) { levels[it] > thresholdDb }, depthDb)
+
+    /** Come [duckGains], partendo dai blocchi in cui si parla. */
+    fun duckGainsFrom(speech: BooleanArray, depthDb: Float): FloatArray {
         val low = 10f.pow(-depthDb / 20f)
         val attack = 8; val hold = 30; val release = 50
         var since = Int.MAX_VALUE / 2
         var g = 1f
         // Si guarda un po' avanti: la musica inizia a scendere prima della prima sillaba.
-        val active = BooleanArray(levels.size) { i -> (i until minOf(levels.size, i + attack)).any { levels[it] > thresholdDb } }
-        return FloatArray(levels.size) { i ->
+        val active = BooleanArray(speech.size) { i -> (i until minOf(speech.size, i + attack)).any { speech[it] } }
+        return FloatArray(speech.size) { i ->
             if (active[i]) since = 0 else since++
             val target = if (since <= hold) low else 1f
             g = if (target < g) maxOf(target, g - (1f - low) / attack) else minOf(target, g + (1f - low) / release)
             g
         }
+    }
+
+    /**
+     * Blocchi in cui si parla: livello sopra [minDb] e almeno [aboveFloorDb] sopra il "fondo"
+     * (il 20% più basso dei blocchi non muti). Così un rumore d'ambiente costante non conta come voce.
+     */
+    fun speechMask(levels: FloatArray, minDb: Float, aboveFloorDb: Float): BooleanArray {
+        val audible = levels.filter { it > -90f }.sorted()
+        if (audible.isEmpty()) return BooleanArray(levels.size)
+        val floor = audible[(audible.size * 0.2f).toInt().coerceAtMost(audible.size - 1)]
+        val thr = maxOf(minDb, floor + aboveFloorDb)
+        return BooleanArray(levels.size) { levels[it] > thr }
+    }
+
+    /**
+     * Voce fuori campo e audio staccato: ci sono apposta, quindi conta tutto ciò che non è quasi silenzio
+     * (fino a 30 dB sotto le parti forti, mai sotto -50 dB). Così la musica resta giù anche nelle brevi pause fra le frasi.
+     */
+    fun voiceMask(levels: FloatArray): BooleanArray {
+        val audible = levels.filter { it > -90f }.sorted()
+        if (audible.isEmpty()) return BooleanArray(levels.size)
+        val loud = audible[(audible.size * 0.95f).toInt().coerceAtMost(audible.size - 1)]
+        val thr = maxOf(-50f, loud - 30f)
+        return BooleanArray(levels.size) { levels[it] > thr }
+    }
+    /** Audio delle clip: serve uno stacco netto sul rumore di fondo. */
+    fun clipSpeechMask(levels: FloatArray) = speechMask(levels, -38f, 14f)
+
+    /**
+     * Somma l'energia di un audio stereo (con guadagno per fotogramma) nei blocchi da 10 ms del montaggio,
+     * a partire dal fotogramma [startFrame].
+     */
+    fun addEnergy(energy: DoubleArray, audio: FloatArray, startFrame: Long, frames: Long, gain: (Long) -> Float) {
+        for (f in 0 until frames) {
+            val b = ((startFrame + f) / BLOCK).toInt()
+            if (b < 0) continue
+            if (b >= energy.size) break
+            val g = gain(f)
+            val l = audio[(f * 2).toInt()] * g; val r = audio[(f * 2 + 1).toInt()] * g
+            energy[b] += (l * l + r * r).toDouble()
+        }
+    }
+
+    /** Livelli (dBFS RMS) dall'energia per blocco. */
+    fun levelsFromEnergy(energy: DoubleArray) = FloatArray(energy.size) { b ->
+        val rms = sqrt(energy[b] / (BLOCK * 2))
+        if (rms <= 1e-9) -120f else (20 * log10(rms)).toFloat()
+    }
+
+    /** Guadagno a [us] (tempo del montaggio) da una curva a blocchi da 10 ms, interpolata (niente scalini). */
+    fun gainAt(gains: FloatArray, us: Long): Float {
+        if (gains.isEmpty() || us < 0) return 1f
+        val pos = us / 10_000.0
+        val i = pos.toInt()
+        if (i >= gains.size - 1) return if (i < gains.size) gains[i] else 1f
+        val f = (pos - i).toFloat()
+        return gains[i] + (gains[i + 1] - gains[i]) * f
+    }
+
+    /**
+     * Voce registrata col microfono: la porta a un volume chiaro ([targetLufs], picchi sotto -1 dBFS,
+     * al massimo +18 dB). Modifica [audio] e restituisce il guadagno usato.
+     */
+    fun levelVoice(audio: FloatArray, targetLufs: Double = -16.0): Float {
+        val m = LoudnessMeter().apply { addInterleaved(audio) }
+        val g = normalizeGain(m.lufs(), m.peak, targetLufs)
+        if (g != 1f) for (i in audio.indices) audio[i] *= g
+        return g
     }
 }

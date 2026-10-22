@@ -13,6 +13,8 @@ import it.fabriziodavi.vivovideo.model.withoutCredits
 import it.fabriziodavi.vivovideo.engine.Whisper
 import it.fabriziodavi.vivovideo.engine.Proxies
 import it.fabriziodavi.vivovideo.engine.Decoders
+import it.fabriziodavi.vivovideo.engine.DuckPreview
+import it.fabriziodavi.vivovideo.engine.AudioDsp
 import it.fabriziodavi.vivovideo.model.ClipAttr
 import it.fabriziodavi.vivovideo.model.ClipStyle
 import it.fabriziodavi.vivovideo.model.ClipTools
@@ -1856,9 +1858,20 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch {
             val durUs = withContext(Dispatchers.IO) { runCatching { readAudioInfo(ctx, Uri.fromFile(f)).second }.getOrDefault(0L) }
             if (durUs <= 0) { message = "Registrazione non leggibile."; return@launch }
+            // Il microfono registra piano: la voce si porta a un volume chiaro (file WAV, senza perdite).
+            val voiceFile = withContext(Dispatchers.IO) {
+                runCatching {
+                    val audio = decodeAudioRange(ctx, Uri.fromFile(f), 0, durUs) ?: return@runCatching f
+                    AudioDsp.levelVoice(audio)
+                    val wav = File(f.parentFile, f.nameWithoutExtension + ".wav")
+                    writeWavFile(wav, audio)
+                    f.delete()
+                    wav
+                }.getOrDefault(f)
+            }
             val n = p.music.count { it.dialog && it.uri.contains("/voice/") } + 1
             val t = MusicTrack(
-                uri = Uri.fromFile(f).toString(), name = "Voce $n", sourceDurationUs = durUs,
+                uri = Uri.fromFile(voiceFile).toString(), name = "Voce $n", sourceDurationUs = durUs,
                 startUs = recordStartUs, lengthUs = minOf(durUs, p.durationUs - recordStartUs), dialog = true,
             )
             update { it.copy(music = it.music + t, duck = if (it.music.any { m -> !m.dialog }) true else it.duck) }
@@ -1882,7 +1895,25 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         message = "Audio staccato: ora è una riga nella timeline. Trascinalo o allungalo con le maniglie per farlo iniziare prima o finire dopo il taglio."
     }
 
-    fun setDuck(on: Boolean? = null, db: Int? = null) = update(rebuild = false) { it.copy(duck = on ?: it.duck, duckDb = db ?: it.duckDb) }
+    // Il ducking ora si sente anche in anteprima: si rifà l'anteprima.
+    fun setDuck(on: Boolean? = null, db: Int? = null) = update { it.copy(duck = on ?: it.duck, duckDb = db ?: it.duckDb) }
+
+    /** Voci di cui si stanno misurando i livelli per il ducking in anteprima. */
+    private var duckPreparing: String? = null
+
+    private fun prepareDuckPreview(p: Project) {
+        if (!DuckPreview.needs(p)) return
+        val k = DuckPreview.key(p) ?: return
+        if (duckPreparing == k) return
+        duckPreparing = k
+        val ctx = getApplication<Application>()
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) { runCatching { DuckPreview.prepare(ctx, p) } }
+            duckPreparing = null
+            val now = project ?: return@launch
+            if (DuckPreview.key(now) == k && player != null) rebuildPreview(playheadUs / 1000)
+        }
+    }
 
     /** Correzione colore copiata (per "Incolla" su un'altra clip). */
     var copiedGrade by mutableStateOf<Grade?>(null)
@@ -2068,6 +2099,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         val allowMulti = false // l'anteprima con più video insieme si blocca sul telefono: dissolvenze preparate in anticipo
         val (fw, fh) = previewFrameSize()
         val shown = runCatching { CrossfadePreview.previewProject(getApplication(), previewSource(p), fw, fh) }.getOrDefault(p)
+        prepareDuckPreview(p)
         val composition = runCatching { factory.build(shown, exportOptions, forPreview = true, nativeAudio = null, allowMulti = allowMulti) }
             .getOrElse { previewError = "Anteprima non disponibile: ${it.message}"; return }
         // Con video sovrapposti o dissolvenze incrociate serve il compositore a più ingressi:

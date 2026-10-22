@@ -3,6 +3,7 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **Voce fuori campo che si sente bene**: la voce registrata viene portata subito a un volume chiaro, e la musica si abbassa davvero mentre parli, **anche in anteprima** (prima solo nel video esportato). Il rumore di fondo delle clip non tiene più la musica sempre bassa.
 - **Ricordi senza tremolio**: l'effetto Pellicola 35 mm non fa più variare la luce a ogni fotogramma e la sua grana non "scorre" più (era quella a dare il leggero tremolio); nel tema Ricordi pellicola e luce calda sono un po' più delicate. Anche l'effetto Grana è più fermo e naturale.
 - **Testi e livelli più facili da spostare nella timeline**: righe più alte, maniglie fuori dal blocco (tutto il blocco si afferra), il trascinamento parte anche se il dito non va perfettamente in orizzontale. Nel pannello: **Inizia qui** e **Finisci qui** portano inizio o fine all'indicatore.
 - **La barra segue il dito**: a schermo intero (e scorrendo la timeline) l'immagine si aggiorna mentre trascini, non solo quando lasci.
@@ -156,7 +157,8 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - **Audio → Voce → Registra la voce**: porta l'indicatore dove vuoi iniziare, tocca e parla mentre il video scorre; tocca di nuovo per fermare. La voce diventa una riga ("Voce 1"…) nella timeline: si sposta, si accorcia, si divide come un brano. La prima volta l'app chiede il permesso del microfono.
 - **Silenzia l'anteprima mentre registro** (acceso di serie): senza cuffie evita che il microfono registri anche l'audio del video.
 - **Stacca l'audio** (Audio → Clip, o tieni premuta la clip): l'audio della clip diventa una riga a sé e la clip resta muta. Allungando la riga all'indietro la voce arriva prima dell'immagine (taglio a J); in avanti continua sopra la clip successiva (taglio a L). Serve la clip a velocità normale.
-- **Abbassa la musica quando si parla** (ducking): dove ci sono voci, audio delle clip o audio staccato, la musica scende dei dB scelti e poi risale dolcemente. Si sente nel video esportato.
+- **La voce registrata ha subito un volume chiaro**: quando fermi la registrazione l'app la porta al volume giusto per il parlato (il microfono del telefono registra piano), senza farla distorcere.
+- **Abbassa la musica quando si parla** (ducking, si accende da solo quando registri una voce sopra un brano): dove parli, la musica scende dei dB scelti e poi risale dolcemente. In **anteprima** si sente sotto la voce fuori campo e l'audio staccato (dopo un attimo, il tempo di misurare le voci); nel **video esportato** anche dove si parla nell'audio delle clip. Il rumore di fondo costante (vento, traffico) non fa abbassare la musica.
 - **Volume uniformato** (Esporta, acceso di serie): il video finito ha il volume standard di YouTube e Instagram (–14 LUFS), con i picchi sotto –1 dB.
 
 ## Audio delle clip

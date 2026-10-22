@@ -105,8 +105,17 @@ fun renderTimelineAudio(context: Context, project: Project, loudness: Boolean = 
         val music = project.audibleMusic().filter { !it.dialog }
         val all = dialog.size + music.size
         var k = 0
-        dialog.forEach { t -> mixTrack(context, raf, frames, t, project.durationUs, null); onProgress(0.6f + 0.3f * ++k / all) }
-        val duck = if (project.duck && music.isNotEmpty()) AudioDsp.duckGains(levelsOf(raf, frames), project.duckDb.toFloat()) else null
+        val ducking = project.duck && music.isNotEmpty()
+        // Dove si parla: le voci (voce fuori campo, audio staccato) si misurano da sole, l'audio delle clip a parte,
+        // con una soglia sopra il suo rumore di fondo.
+        val clipLevels = if (ducking) levelsOf(raf, frames) else null
+        val voiceEnergy = if (ducking) DoubleArray((frames / AudioDsp.BLOCK).toInt()) else null
+        dialog.forEach { t -> mixTrack(context, raf, frames, t, project.durationUs, null, voiceEnergy); onProgress(0.6f + 0.3f * ++k / all) }
+        val duck = if (ducking) {
+            val v = AudioDsp.voiceMask(AudioDsp.levelsFromEnergy(voiceEnergy!!))
+            val c = AudioDsp.clipSpeechMask(clipLevels!!)
+            AudioDsp.duckGainsFrom(BooleanArray(v.size) { v[it] || c.getOrElse(it) { false } }, project.duckDb.toFloat())
+        } else null
         music.forEach { t -> mixTrack(context, raf, frames, t, project.durationUs, duck); onProgress(0.6f + 0.3f * ++k / all) }
         if (loudness) normalize(raf, frames)
         onProgress(1f)
@@ -161,7 +170,7 @@ private fun normalize(raf: RandomAccessFile, frames: Long) {
 }
 
 /** Somma un brano (con volume e dissolvenze) nel WAV già scritto, a blocchi. */
-private fun mixTrack(context: Context, raf: RandomAccessFile, totalFrames: Long, t: MusicTrack, projectUs: Long, duck: FloatArray?) {
+private fun mixTrack(context: Context, raf: RandomAccessFile, totalFrames: Long, t: MusicTrack, projectUs: Long, duck: FloatArray?, energy: DoubleArray? = null) {
     val len = t.playUs(projectUs)
     val audio = runCatching {
         decodeAudioRange(context, Uri.parse(t.uri), t.offsetUs, t.offsetUs + len)
@@ -169,6 +178,7 @@ private fun mixTrack(context: Context, raf: RandomAccessFile, totalFrames: Long,
     val startFrame = t.startUs * OUT_RATE / 1_000_000
     val frames = minOf((audio.size / OUT_CH).toLong(), totalFrames - startFrame, len * OUT_RATE / 1_000_000)
     if (frames <= 0) return
+    energy?.let { AudioDsp.addEnergy(it, audio, startFrame, frames) { fi -> t.gainAt(fi * 1_000_000 / OUT_RATE, projectUs) } }
     val blockFrames = 1 shl 14
     val bytes = ByteArray(blockFrames * OUT_CH * 2)
     var done = 0L

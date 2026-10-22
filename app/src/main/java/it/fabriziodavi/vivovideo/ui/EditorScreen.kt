@@ -1241,7 +1241,7 @@ private fun MusicPanel(vm: EditorViewModel, running: Boolean, tab: Int, onAdd: (
             }
             PanelLabel("Voci e musica")
             ToggleRow("Abbassa la musica quando si parla", p.duck, enabled) { vm.setDuck(on = it) }
-            if (p.duck) LabeledSlider("Quanto abbassarla", "Si sente nel video esportato.", p.duckDb, enabled, range = 4..24, format = { "–$it dB" }) { vm.setDuck(db = it) }
+            if (p.duck) LabeledSlider("Quanto abbassarla", "In anteprima sotto la voce fuori campo; nel video esportato anche dove si parla nelle clip.", p.duckDb, enabled, range = 4..24, format = { "–$it dB" }) { vm.setDuck(db = it) }
             PanelLabel("Aggiungi")
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 SecondaryButton("Libreria", Modifier.weight(1f), onClick = { if (enabled) vm.openLibrary(effects = false) })
