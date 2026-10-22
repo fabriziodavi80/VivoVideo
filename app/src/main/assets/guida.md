@@ -3,6 +3,8 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **Foto più pulite in Ricordi**: tolto l'effetto Sogno (sfocatura con alone) che su alcune foto chiare le rendeva slavate; pellicola, luce calda, vignettatura e ombre schiarite più leggere. Il look resta caldo e nostalgico, ma la foto si vede nitida.
+- **Passaggio da video a foto fluido in anteprima**: le foto grandi hanno una copia leggera solo per l'anteprima (si prepara in pochi istanti), così l'inizio della foto non scatta più. Il video esportato usa sempre la foto piena.
 - **Ricordi più delicato**: tolta la transizione "pellicola bruciata", che sembrava una fiammata, e i flash di luce; ora i passaggi sono dissolvenze, zoom morbidi e scivolate lente. Anche Cinema non usa più la pellicola bruciata (resta disponibile a mano fra le transizioni e nel tema Super 8).
 - **Voce fuori campo che si sente bene**: la voce registrata viene portata subito a un volume chiaro, e la musica si abbassa davvero mentre parli, **anche in anteprima** (prima solo nel video esportato). Il rumore di fondo delle clip non tiene più la musica sempre bassa.
 - **Ricordi senza tremolio**: l'effetto Pellicola 35 mm non fa più variare la luce a ogni fotogramma e la sua grana non "scorre" più (era quella a dare il leggero tremolio); nel tema Ricordi pellicola e luce calda sono un po' più delicate. Anche l'effetto Grana è più fermo e naturale.
@@ -231,7 +233,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 ## Esportare
 - **Esporta** in alto. **Pronto per**: YouTube 4K (4K, fino a 60 fps, H.265), YouTube 1080p, Reels e TikTok (1080p 30 fps; meglio con formato verticale), WhatsApp (720p, file leggero). Sotto si vedono misure e peso stimato.
 - Oppure a mano: risoluzione (Originale, 4K, 1080p, 720p), fotogrammi al secondo, codec (**H.265** consigliato, H.264 più compatibile).
-- **Copie leggere per i video 4K, 8K e 120 fps** (acceso di serie): solo per un'anteprima fluida; la prima volta si preparano in sottofondo ("Preparo le copie leggere…").
+- **Copie leggere per i video 4K, 8K e 120 fps** (acceso di serie): solo per un'anteprima fluida; la prima volta si preparano in sottofondo ("Preparo le copie leggere…"). Anche le foto grandi hanno la loro copia leggera, per passaggi senza scatti.
 - **HDR 10 bit** (solo se nel progetto ci sono video HDR, HLG, HDR10 o Dolby Vision): il video esportato resta HDR, in H.265. Spento, l'HDR viene convertito in SDR, che si vede bene su ogni schermo. WhatsApp esporta sempre in SDR. Nel risultato la riga **Colore** dice com'è uscito davvero.
 - Il video finito va in galleria, cartella Movies/VivoVideo.
 - Se qualcosa va storto l'app riprova da sola con impostazioni più prudenti; se si guasta il decodificatore video riprova con quello software (più lento); se si ferma il codificatore riprova con un ritmo più tranquillo. Nel risultato, "Tentativi falliti prima" elenca cosa non è andato.

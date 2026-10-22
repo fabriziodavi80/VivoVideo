@@ -87,3 +87,34 @@ class ProxiesTest {
         assertEquals("circa 1,2 GB", ExportEstimate.label(1_200_000_000))
     }
 }
+
+@RunWith(AndroidJUnit4::class)
+@Config(sdk = [35])
+@org.robolectric.annotation.GraphicsMode(org.robolectric.annotation.GraphicsMode.Mode.NATIVE)
+class PhotoProxyTest {
+    private val app: Application = ApplicationProvider.getApplicationContext()
+
+    @Test fun bigPhotosGetALightCopyForThePreview() {
+        val src = java.io.File(app.filesDir, "photos/grande.jpg").apply { parentFile?.mkdirs() }
+        val bmp = android.graphics.Bitmap.createBitmap(4000, 3000, android.graphics.Bitmap.Config.ARGB_8888)
+        bmp.eraseColor(android.graphics.Color.rgb(200, 120, 60))
+        src.outputStream().use { bmp.compress(android.graphics.Bitmap.CompressFormat.JPEG, 90, it) }
+        val uri = android.net.Uri.fromFile(src).toString()
+        val photo = Clip(uri = uri, sourceDurationUs = 3_000_000, trimEndUs = 3_000_000, width = 4000, height = 3000, isPhoto = true)
+        val small = photo.copy(uri = "file:///piccola.jpg", width = 1600, height = 1200)
+        assertTrue(Proxies.photoNeeds(photo)); assertFalse(Proxies.photoNeeds(small))
+        val p = Project(name = "f", clips = listOf(photo, small))
+        assertEquals(listOf(uri), Proxies.missingPhotos(app, p))
+        // Prima della copia l'anteprima usa l'originale.
+        assertEquals(uri, Proxies.forPreview(app, p).clips[0].uri)
+        assertTrue(Proxies.makePhoto(app, uri))
+        assertTrue(Proxies.missingPhotos(app, p).isEmpty())
+        val shown = Proxies.forPreview(app, p)
+        assertTrue(shown.clips[0].uri.endsWith(".jpg") && shown.clips[0].uri != uri)
+        assertEquals(small.uri, shown.clips[1].uri)
+        val o = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        android.graphics.BitmapFactory.decodeFile(Proxies.photoFile(app, uri).path, o)
+        assertTrue("lato lungo ${o.outWidth}", o.outWidth in 1000..Proxies.PHOTO_SIDE)
+        Proxies.clear(app)
+    }
+}

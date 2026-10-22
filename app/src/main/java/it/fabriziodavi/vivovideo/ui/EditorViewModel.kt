@@ -2391,6 +2391,14 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             val p0 = project ?: return@launch
             if (exportState is ExportState.Running) return@launch
             val ctx = getApplication<Application>()
+            if (useProxies) {
+                // Foto grandi: copie leggere (pochi istanti), poi l'anteprima le usa.
+                val photos = runCatching { Proxies.missingPhotos(ctx, p0) }.getOrDefault(emptyList())
+                if (photos.isNotEmpty()) {
+                    withContext(Dispatchers.IO) { photos.forEach { u -> runCatching { Proxies.makePhoto(ctx, u) } } }
+                    if (project === p0) rebuildPreview(playheadUs / 1000)
+                }
+            }
             if (useProxies && proxyTransformer == null && segTransformer == null) {
                 val missing = runCatching { Proxies.missing(ctx, p0) }.getOrDefault(emptyList()).filter { it !in failedProxies }
                 if (missing.isNotEmpty()) { nextProxy(ArrayDeque(missing)); return@launch }

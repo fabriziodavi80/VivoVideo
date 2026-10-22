@@ -31,7 +31,10 @@ class CalmAutoTest {
         val r = AutoStyle.RICORDI
         val flicker = setOf(FxType.STROBE, FxType.PULSE, FxType.FLASHBEAT, FxType.BWBEAT, FxType.PROJECTOR, FxType.SUPER8, FxType.SHAKE)
         assertFalse((r.fx + r.accents + r.beatFx).any { it.type in flicker })
-        assertTrue(r.fx.first { it.type == FxType.FILM35 }.amount <= 0.5f)
+        assertTrue(r.fx.first { it.type == FxType.FILM35 }.amount <= 0.4f)
+        // Niente sfocatura con alone (Sogno) né doppio alone: sulle foto chiare le rendevano slavate.
+        assertFalse((r.fx + r.accents).any { it.type == FxType.DREAMY || it.type == FxType.HALATION })
+        assertTrue(r.grade.shadows <= 0.15f && r.grade.contrast >= -0.08f)
     }
 
     @Test fun ricordiAndCinemaHaveNoFlameOrFlashTransitions() {
