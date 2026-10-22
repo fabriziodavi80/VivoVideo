@@ -1,6 +1,6 @@
 # VivoVideo · note per riprendere il lavoro
 
-Aggiornate al 21/10/2026, ultima versione **v0.3.162**. Da leggere insieme a `CLAUDE.md`.
+Aggiornate al 21/10/2026, ultima versione **v0.3.174**. Da leggere insieme a `CLAUDE.md`.
 
 ## 1. Stato attuale dell'app
 
@@ -56,6 +56,15 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, minSdk 33, solo arm64-v8a 
 - Regia intelligente: momenti migliori, volti, orientamento.
 - Data della videocamera nei temi vintage.
 - "Altra proposta" e cambio di stile.
+
+### Audio, mixer, timeline (v0.3.163–v0.3.174)
+- Voce fuori campo: `VoiceRecorder` (AudioRecord PCM, fonte MIC poi VOICE_RECOGNITION) + `VoiceChain` (passa-alto, EQ, espansore, livellatore, compressore, -14 LUFS, limitatore), WAV in `files/voice`.
+- Ducking: `AudioDsp.voiceMask`/`clipSpeechMask`/`duckGainsFrom(hold, release)`; in anteprima `DuckPreview` + `DuckAudioProcessor` (posizione da `StreamMetadata.positionOffsetUs`).
+- Mixer (`model/Mix.kt`, `engine/BusDsp.kt`, `ui/MixerScreen.kt`): gruppi CLIPS/VOICE/MUSIC/DETACHED/OVERLAY; export con mix float32 (`AudioStretch` → `finish`: LUFS per destinazione, `PeakLimiter`, al massimo +4 dB oltre il picco).
+- Anteprima: NIENTE effetti audio a livello di Composition (sperimentali in Media3 1.11, hanno distorto in v0.3.173). Canale del mixer solo se serve: guadagno/bilanciamento con `ChannelMixingAudioProcessor`, EQ/compressore o mixer aperto (`factory.metering`) con `MixAudioProcessor`.
+- Prima voce sopra un brano: musica -6 dB e ducking acceso.
+- Timeline: trascinamento clip col dito (`Reorder`, `Project.moveClipTo`, testi/livelli seguono), tag `timelineClips` (prove con `useUnmergedTree`).
+- Copie leggere delle foto per l'anteprima (`Proxies.makePhoto`, lato 2160). Ricordi senza BURN/FLASH/LEAK/DREAMY.
 
 ### Collaudo e correzioni (v0.3.157–v0.3.162)
 - Collaudo guidato (Progetto → Collaudo, `TestPlan`, 36 prove): il rapporto si copia per la chat o si salva in Download (`copyReport`, `saveReportToDownloads`); l'utente incolla il rapporto in chat.
