@@ -1,6 +1,6 @@
 # VivoVideo · note per riprendere il lavoro
 
-Aggiornate al 21/10/2026, ultima versione **v0.3.174**. Da leggere insieme a `CLAUDE.md`.
+Aggiornate al 21/10/2026, ultima versione **v0.3.176**. Da leggere insieme a `CLAUDE.md`.
 
 ## 1. Stato attuale dell'app
 
@@ -56,6 +56,9 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, minSdk 33, solo arm64-v8a 
 - Regia intelligente: momenti migliori, volti, orientamento.
 - Data della videocamera nei temi vintage.
 - "Altra proposta" e cambio di stile.
+
+### Da riprendere dopo il collaudo
+- Scontorno della persona (v0.3.175–176: maschera 256, filtro guidato, smussatura; modello "Preciso" Google subject segmentation). L'utente lo accetta ma "non è il top": non convincono **alcuni bordi della persona e i capelli**. Idee: pennello di ritocco (aggiungi/togli con propagazione ai fotogrammi vicini), filtro guidato a colori/a due passaggi, modello di matting più pesante incluso nell'app.
 
 ### Audio, mixer, timeline (v0.3.163–v0.3.174)
 - Voce fuori campo: `VoiceRecorder` (AudioRecord PCM, fonte MIC poi VOICE_RECOGNITION) + `VoiceChain` (passa-alto, EQ, espansore, livellatore, compressore, -14 LUFS, limitatore), WAV in `files/voice`.
