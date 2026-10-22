@@ -102,6 +102,8 @@ dependencies {
     // Funzioni intelligenti, tutto sul telefono (modelli inclusi nell'app): volti e scontorno della persona.
     implementation("com.google.mlkit:face-detection:16.1.7")
     implementation("com.google.mlkit:segmentation-selfie:16.0.0-beta6")
+    // Scontorno "Preciso": modello di Google (servizi Google Play, si scarica alla prima volta).
+    implementation("com.google.android.gms:play-services-mlkit-subject-segmentation:16.0.0-beta1")
     // Oscuramento automatico: targhe (riconoscimento del testo) e oggetti da seguire.
     implementation("com.google.mlkit:text-recognition:16.0.1")
     implementation("com.google.mlkit:object-detection:17.0.2")

@@ -176,4 +176,6 @@ data class PersonFx(
     val fromUs: Long = 0,
     val rateHz: Int = 15,
     val count: Int = 0,
+    /** Fatto con il modello "Preciso" di Google (altrimenti quello veloce del telefono). */
+    val precise: Boolean = false,
 )

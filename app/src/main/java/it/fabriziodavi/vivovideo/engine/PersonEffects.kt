@@ -23,6 +23,11 @@ import com.google.android.gms.tasks.Tasks
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.segmentation.Segmentation
 import com.google.mlkit.vision.segmentation.selfie.SelfieSegmenterOptions
+import com.google.mlkit.vision.segmentation.subject.SubjectSegmentation
+import com.google.mlkit.vision.segmentation.subject.SubjectSegmenter
+import com.google.mlkit.vision.segmentation.subject.SubjectSegmenterOptions
+import com.google.android.gms.common.moduleinstall.ModuleInstall
+import com.google.android.gms.common.moduleinstall.ModuleInstallRequest
 import it.fabriziodavi.vivovideo.model.Clip
 import it.fabriziodavi.vivovideo.model.Moments
 import it.fabriziodavi.vivovideo.model.PersonFx
@@ -95,33 +100,76 @@ object PersonMasks {
         }
     }.getOrNull()
 
-    /** Analizza [uri] da [fromUs] a [toUs] (tempo del file); [onProgress] 0…1. */
-    suspend fun analyze(ctx: Context, uri: String, fromUs: Long, toUs: Long, mode: PersonMode, onProgress: (Float) -> Unit): PersonFx =
+    /** Modello "Preciso": immagine più grande e maschera più fine. */
+    const val PRECISE_IN = 640
+    const val PRECISE_SIDE = 384
+
+    /**
+     * Prepara il modello di scontorno di Google (servizi Google Play): se manca lo fa scaricare e aspetta
+     * fino a 3 minuti. Restituisce il segmentatore pronto o null (niente servizi Google, niente internet…).
+     */
+    private suspend fun preciseSegmenter(ctx: Context, onStatus: (String) -> Unit): SubjectSegmenter? = runCatching {
+        val seg = SubjectSegmentation.getClient(SubjectSegmenterOptions.Builder().enableForegroundConfidenceMask().build())
+        val modules = ModuleInstall.getClient(ctx)
+        fun ready() = Tasks.await(modules.areModulesAvailable(seg), 20, TimeUnit.SECONDS).areModulesAvailable()
+        if (!ready()) {
+            onStatus("Scarico il modello di Google…")
+            Tasks.await(modules.installModules(ModuleInstallRequest.newBuilder().addApi(seg).build()), 60, TimeUnit.SECONDS)
+            var waited = 0
+            while (!ready()) {
+                coroutineContext.ensureActive()
+                check(waited < 180) { "modello non arrivato" }
+                kotlinx.coroutines.delay(2000); waited += 2
+            }
+        }
+        seg
+    }.getOrNull()
+
+    /**
+     * Analizza [uri] da [fromUs] a [toUs] (tempo del file); [onProgress] 0…1.
+     * Con [precise] usa il modello di Google (più preciso, più lento); se non è disponibile torna a quello veloce
+     * e il risultato ha `precise = false`.
+     */
+    suspend fun analyze(
+        ctx: Context, uri: String, fromUs: Long, toUs: Long, mode: PersonMode, onProgress: (Float) -> Unit,
+        precise: Boolean = false, onStatus: (String) -> Unit = {},
+    ): PersonFx =
         withContext(Dispatchers.Default) {
-            val seg = Segmentation.getClient(
+            val subject = if (precise) preciseSegmenter(ctx, onStatus) else null
+            if (subject != null) onStatus("Scontorno preciso…")
+            val selfie = if (subject == null) Segmentation.getClient(
                 SelfieSegmenterOptions.Builder().setDetectorMode(SelfieSegmenterOptions.STREAM_MODE).enableRawSizeMask().build()
-            )
+            ) else null
+            val side = if (subject != null) PRECISE_SIDE else SIDE
             val masks = java.io.ByteArrayOutputStream()
             var count = 0
             var prev: FloatArray? = null
             try {
-                FrameReader.read(ctx, uri, fromUs, toUs, RATE, IN) { bmp, t ->
+                FrameReader.read(ctx, uri, fromUs, toUs, RATE, if (subject != null) PRECISE_IN else IN) { bmp, t ->
                     coroutineContext.ensureActive()
-                    val m = Tasks.await(seg.process(InputImage.fromBitmap(bmp, 0)), 10, TimeUnit.SECONDS)
-                    val buf = m.buffer.asFloatBuffer()
-                    val mw = m.width; val mh = m.height
-                    val raw = FloatArray(mw * mh) { buf.get(it) }
-                    val cur = smooth(resample(raw, mw, mh, SIDE), prev)
+                    val img = InputImage.fromBitmap(bmp, 0)
+                    val raw: FloatArray; val mw: Int; val mh: Int
+                    if (subject != null) {
+                        val r = Tasks.await(subject.process(img), 20, TimeUnit.SECONDS)
+                        mw = bmp.width; mh = bmp.height
+                        val fb = r.foregroundConfidenceMask
+                        raw = if (fb == null) FloatArray(mw * mh) else { fb.rewind(); FloatArray(mw * mh) { if (fb.hasRemaining()) fb.get() else 0f } }
+                    } else {
+                        val m = Tasks.await(selfie!!.process(img), 10, TimeUnit.SECONDS)
+                        val buf = m.buffer.asFloatBuffer()
+                        mw = m.width; mh = m.height
+                        raw = FloatArray(mw * mh) { buf.get(it) }
+                    }
+                    val cur = smooth(resample(raw, mw, mh, side), prev)
                     prev = cur
-                    val out = ByteArray(SIDE * SIDE) { (cur[it] * 255).toInt().toByte() }
-                    masks.write(out); count++
+                    masks.write(ByteArray(side * side) { (cur[it] * 255).toInt().toByte() }); count++
                     onProgress(((t - fromUs).toFloat() / (toUs - fromUs).coerceAtLeast(1)).coerceIn(0f, 1f))
                 }
-            } finally { seg.close() }
+            } finally { selfie?.close(); subject?.close() }
             check(count > 0) { "Non sono riuscito a leggere i fotogrammi del video." }
             val f = File(dir(ctx), "persona_${System.currentTimeMillis()}.bin")
-            DataOutputStream(f.outputStream().buffered()).use { o -> o.writeInt(count); o.writeInt(SIDE); o.write(masks.toByteArray()) }
-            PersonFx(mode = mode, maskFile = f.absolutePath, fromUs = fromUs, rateHz = RATE, count = count)
+            DataOutputStream(f.outputStream().buffered()).use { o -> o.writeInt(count); o.writeInt(side); o.write(masks.toByteArray()) }
+            PersonFx(mode = mode, maskFile = f.absolutePath, fromUs = fromUs, rateHz = RATE, count = count, precise = subject != null)
         }
 }
 

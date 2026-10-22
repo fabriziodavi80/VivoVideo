@@ -1374,18 +1374,24 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
 
     fun stopFollow() = updateSelected { it.copy(reframe = null) }
 
+    /** Scontorno "Preciso" (modello di Google) invece di quello veloce del telefono. */
+    var personPrecise by mutableStateOf(false)
+
+    private fun personMessage(fx: it.fabriziodavi.vivovideo.model.PersonFx, ok: String) =
+        if (personPrecise && !fx.precise) "Il modello preciso di Google non è disponibile ora (servono i servizi Google e internet la prima volta): ho usato quello veloce. $ok" else ok
+
     /** Scontorna la persona della clip (maschere calcolate una volta) e tratta lo sfondo come [mode]. */
     fun cutPerson(mode: PersonMode = PersonMode.BLUR) {
         val c = workClip() ?: return
         if (c.isPhoto) { message = "Lo scontorno della persona è per i video."; return }
         val ctx = getApplication<Application>()
-        runClipWork("Scontorno la persona…") { prog ->
+        runClipWork(if (personPrecise) "Scontorno preciso…" else "Scontorno la persona…") { prog ->
             val from = (c.trimStartUs - 500_000).coerceAtLeast(0)
             val to = (c.trimEndUs + 500_000).coerceAtMost(c.sourceDurationUs)
-            val fx = PersonMasks.analyze(ctx, c.uri, from, to, mode, prog)
+            val fx = PersonMasks.analyze(ctx, c.uri, from, to, mode, prog, personPrecise) { st -> viewModelScope.launch { if (clipWork != null) clipWork = st } }
             val now = project?.clips?.firstOrNull { it.id == c.id } ?: return@runClipWork
             update { it.replaceClip(now.copy(person = fx)) }
-            message = "Persona scontornata: scegli cosa fare dello sfondo."
+            message = personMessage(fx, "Persona scontornata: scegli cosa fare dello sfondo.")
         }
     }
 
@@ -1482,11 +1488,13 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         val l = selectedLayer ?: return
         if (!l.isVideo) { message = "Lo scontorno della persona è per i video sovrapposti."; return }
         val ctx = getApplication<Application>()
-        runClipWork("Scontorno la persona…") { prog ->
-            val fx = PersonMasks.analyze(ctx, l.uri, l.sourceStartUs, l.sourceStartUs + l.durationUs, PersonMode.REMOVE, prog)
+        runClipWork(if (personPrecise) "Scontorno preciso…" else "Scontorno la persona…") { prog ->
+            val fx = PersonMasks.analyze(ctx, l.uri, l.sourceStartUs, l.sourceStartUs + l.durationUs, PersonMode.REMOVE, prog, personPrecise) { st ->
+                viewModelScope.launch { if (clipWork != null) clipWork = st }
+            }
             val now = project?.layers?.firstOrNull { it.id == l.id } ?: return@runClipWork
             update { it.replaceLayer(now.copy(person = fx)) }
-            message = "Persona scontornata: in anteprima si vede appena il tratto è pronto, nel video esportato sempre."
+            message = personMessage(fx, "Persona scontornata: in anteprima si vede appena il tratto è pronto, nel video esportato sempre.")
         }
     }
 

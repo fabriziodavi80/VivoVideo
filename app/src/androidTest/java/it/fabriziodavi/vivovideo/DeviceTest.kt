@@ -914,6 +914,17 @@ class DeviceTest {
         exportAndCheck(Project(name = "segui", clips = listOf(follow), format = VideoFormat.VERTICAL))
     }
 
+    /** Scontorno "Preciso" (Google): se l'emulatore non ha i servizi Google si torna a quello veloce, senza errori. */
+    @Test fun precisePersonCutoutOrFallback() {
+        val status = mutableListOf<String>()
+        val fx = runBlocking { PersonMasks.analyze(ctx, videoA.toString(), 0, 2_000_000, PersonMode.BLUR, {}, precise = true) { status += it } }
+        android.util.Log.i("VivoVideoTest", "scontorno preciso: ${fx.precise}, stati $status")
+        val m = PersonMasks.load(fx.maskFile)!!
+        assertTrue("maschere ${fx.count}", fx.count in 25..35 && m.count == fx.count)
+        assertEquals(if (fx.precise) PersonMasks.PRECISE_SIDE else PersonMasks.SIDE, m.side)
+        exportAndCheck(Project(name = "preciso", clips = listOf(video("a", videoA, s = 0, e = 2_000_000).copy(person = fx))))
+    }
+
     /** Copia di sicurezza con i video, riaperta: il progetto si esporta come prima. E un file spostato si ritrova per nome. */
     @Test fun backupWithMediaAndRelink() {
         val p = Project(name = "copia", clips = listOf(video("a", videoA), photoClip("f"), video("b", videoB, s = 1_000_000, e = 3_000_000)))

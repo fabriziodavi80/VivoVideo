@@ -1748,6 +1748,7 @@ private fun LayerPanel(vm: EditorViewModel, running: Boolean, tab: Int, onAdd: (
             if (l.isVideo) {
                 PanelLabel("Solo la persona")
                 if (l.person == null) {
+                    PersonQuality(vm, enabled)
                     SecondaryButton("Scontorna la persona", Modifier.fillMaxWidth(), onClick = { if (enabled && vm.clipWork == null) vm.cutLayerPerson() })
                     Hint("Toglie lo sfondo dietro alla persona, senza telo verde: resta solo lei sopra al video principale.")
                 } else {
@@ -2261,13 +2262,22 @@ private fun PrivacyTab(vm: EditorViewModel, clip: Clip, enabled: Boolean) {
     }
 }
 
+/** Scelta del modello di scontorno: veloce (sul telefono) o preciso (Google). */
+@Composable
+private fun PersonQuality(vm: EditorViewModel, enabled: Boolean) {
+    Segmented(listOf(false, true), vm.personPrecise, { if (it) "Preciso (Google)" else "Veloce" }, enabled) { vm.personPrecise = it }
+    Hint(if (vm.personPrecise) "Bordo più fedele anche su capelli e oggetti in mano; più lento (circa 2–4 volte il tempo della clip). La prima volta Google scarica il modello: serve internet."
+        else "Sul telefono, senza internet, circa il tempo della clip.")
+}
+
 @Composable
 private fun PersonTab(vm: EditorViewModel, clip: Clip, enabled: Boolean) {
     if (clip.isPhoto) { Hint("Lo scontorno della persona funziona sui video."); return }
     val fx = clip.person
     if (fx == null) {
         PanelLabel("Persona e sfondo")
-        Hint("L'app riconosce la persona in ogni fotogramma (sul telefono, senza internet) e ti lascia sfocare lo sfondo, cambiarlo con un colore o metterlo in bianco e nero. Ci vuole circa il tempo della clip.")
+        Hint("L'app riconosce la persona in ogni fotogramma e ti lascia sfocare lo sfondo, cambiarlo con un colore o metterlo in bianco e nero.")
+        PersonQuality(vm, enabled)
         PrimaryButton("Scontorna la persona", Modifier.fillMaxWidth(), enabled = enabled && vm.clipWork == null) { vm.cutPerson() }
         return
     }
@@ -2284,7 +2294,8 @@ private fun PersonTab(vm: EditorViewModel, clip: Clip, enabled: Boolean) {
             }
         }
     }
-    Hint("Se accorci o allunghi molto la clip, rifai lo scontorno.")
+    Hint((if (fx.precise) "Scontorno preciso (Google). " else "Scontorno veloce. ") + "Se accorci o allunghi molto la clip, rifai lo scontorno.")
+    PersonQuality(vm, enabled)
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         SecondaryButton("Rifai lo scontorno", onClick = { if (enabled && vm.clipWork == null) vm.cutPerson(fx.mode) })
         SecondaryButton("Togli", onClick = { if (enabled) vm.removePerson() })
