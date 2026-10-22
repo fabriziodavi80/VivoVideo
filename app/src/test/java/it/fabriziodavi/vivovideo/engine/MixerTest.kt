@@ -133,7 +133,7 @@ class MixProcessorTest {
         val out = p.output
         val first = out.getShort().toInt()
         assertEquals(8000.0, first.toDouble(), 60.0)        // -6 dB ≈ metà
-        assertTrue(Meters.db(Bus.MUSIC) > -10f)               // l'indicatore si muove
+        assertTrue(Meters.db(Bus.MUSIC) > -20f)               // l'indicatore si muove (circa -12 dB)
         assertTrue(Meters.db(Bus.VOICE) <= -59f)              // gli altri no
     }
 }

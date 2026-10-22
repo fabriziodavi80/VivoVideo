@@ -101,7 +101,7 @@ private fun ChannelCard(vm: EditorViewModel, b: Bus, m: BusMix, audible: Boolean
             SmallToggle("M", "Muto: ${b.label}", m.mute, VV.Danger) { vm.setBus(b, m.copy(mute = it)) }
             SmallToggle("S", "Solo: ${b.label}", m.solo, VV.Tally) { vm.setBus(b, m.copy(solo = it)) }
         }
-        LevelMeter(b, Modifier.fillMaxWidth().height(8.dp))
+        LevelMeter(b, vm.isPlaying, Modifier.fillMaxWidth().height(8.dp))
         LabeledSlider("Volume", null, m.gainDb.roundToInt(), range = -30..12, format = { if (it > 0) "+$it dB" else "$it dB" }) {
             vm.setBus(b, m.copy(gainDb = it.toFloat()))
         }
@@ -130,7 +130,7 @@ private fun MasterCard(vm: EditorViewModel) {
     val mix = p.mix
     Card {
         Text("Uscita", style = MaterialTheme.typography.titleSmall)
-        LevelMeter(null, Modifier.fillMaxWidth().height(10.dp))
+        LevelMeter(null, vm.isPlaying, Modifier.fillMaxWidth().height(10.dp))
         PanelLabel("Volume finale per")
         PillRow(LoudTarget.entries, mix.target, { it.label }) { vm.setMix { m -> m.copy(target = it) } }
         Hint("Si applica nel video esportato, se in Esporta è acceso \"Volume uniformato\".")
@@ -156,10 +156,12 @@ private fun SmallToggle(text: String, desc: String, on: Boolean, color: Color, o
 
 /** Indicatore di livello (da -60 a 0 dBFS): verde, giallo sopra -12, rosso sopra -3. */
 @Composable
-private fun LevelMeter(b: Bus?, modifier: Modifier) {
+private fun LevelMeter(b: Bus?, playing: Boolean, modifier: Modifier) {
     var db by remember { mutableFloatStateOf(-60f) }
-    LaunchedEffect(b) {
-        while (true) { withFrameMillis { }; val v = Meters.db(b); if (abs(v - db) > 0.2f) db = v }
+    // Si aggiorna solo durante l'ascolto (da fermo l'indicatore scende a zero).
+    LaunchedEffect(b, playing) {
+        while (playing) { withFrameMillis { }; val v = Meters.db(b); if (abs(v - db) > 0.2f) db = v }
+        db = -60f
     }
     Canvas(modifier.clip(RoundedCornerShape(4.dp)).background(VV.Raised).semantics { contentDescription = "Livello ${db.roundToInt()} dB" }) {
         val x = ((db + 60f) / 60f).coerceIn(0f, 1f) * size.width
