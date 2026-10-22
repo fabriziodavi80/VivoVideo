@@ -10,6 +10,16 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.gestures.scrollBy
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.runtime.key
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.withFrameNanos
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.zIndex
+import androidx.compose.ui.platform.testTag
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.DragInteraction
@@ -105,6 +115,8 @@ fun Timeline(
     onSelectLayer: (String) -> Unit = {},
     onLayerChange: (Layer) -> Unit = {},
     onClipLongPress: (String) -> Unit = {},
+    /** Clip trascinata col dito in una nuova posizione. */
+    onReorder: (clipId: String, toIndex: Int) -> Unit = { _, _ -> },
     onCutTap: (index: Int) -> Unit = {},
     /** Selezione multipla in corso: le clip scelte. */
     multiIds: Set<String>? = null,
@@ -144,6 +156,13 @@ fun Timeline(
     val layerItems = project.layers.map { if (it.id == layerDraft?.id) layerDraft!! else it }
     val layerLanes = packLanes(layerItems, { it.startUs }, { it.endUs })
     val noRipple = remember { MutableInteractionSource() }
+    // Spostamento di una clip col dito: le clip diventano tessere quadrate (così si va lontano con poco),
+    // la tessera segue il dito, le altre si aprono per farle posto.
+    var reorder by remember { mutableStateOf<ReorderDrag?>(null) }
+    val scope = rememberCoroutineScope()
+    val clipsNow by rememberUpdatedState(project.clips)
+    val dpsNow by rememberUpdatedState(dpPerSecond)
+    val playNow by rememberUpdatedState(playheadUs)
 
     BoxWithConstraints(
         modifier
@@ -152,6 +171,23 @@ fun Timeline(
             .background(VV.Panel)
     ) {
         val half = maxWidth / 2
+        val halfPx = with(density) { half.toPx() }
+        val viewPx = with(density) { maxWidth.toPx() }
+        val tilePx = with(density) { TILE.toPx() }
+        val edgePx = with(density) { 56.dp.toPx() }
+        // Vicino ai bordi la timeline scorre da sola mentre si trascina.
+        LaunchedEffect(reorder != null) {
+            while (reorder != null) {
+                val v = reorder?.vx ?: break
+                val speed = when {
+                    v < edgePx -> -(edgePx - v) / edgePx * 22f
+                    v > viewPx - edgePx -> (v - (viewPx - edgePx)) / edgePx * 22f
+                    else -> 0f
+                }
+                if (speed != 0f) scroll.scrollBy(speed)
+                withFrameNanos { }
+            }
+        }
         Column(
             Modifier
                 .horizontalScroll(scroll)
@@ -164,7 +200,73 @@ fun Timeline(
             }
             Spacer(Modifier.height(4.dp))
             // Clip e, sopra, i pulsanti delle transizioni sui tagli.
-            Box {
+            Box(
+                Modifier.testTag("timelineClips").then(if (multiIds != null) Modifier else Modifier.pointerInput(Unit) {
+                    detectDragGesturesAfterLongPress(
+                        onDragStart = { off ->
+                            val widths = clipsNow.map { it.outputUs / 1e6f * dpsNow * density } // qui density è quella del tocco (px per dp)
+                            val i = Reorder.indexAt(off.x, halfPx, widths) ?: return@detectDragGesturesAfterLongPress
+                            onScrubStart()
+                            val vx = off.x - scroll.value
+                            reorder = ReorderDrag(clipsNow[i].id, i, vx, 0f)
+                            // Dopo il passaggio alle tessere, la tessera presa resta sotto il dito.
+                            scope.launch {
+                                withFrameNanos { }
+                                scroll.scrollTo((halfPx + i * tilePx + tilePx / 2 - vx).roundToInt().coerceAtLeast(0))
+                            }
+                        },
+                        onDrag = { change, amount ->
+                            val r = reorder ?: return@detectDragGesturesAfterLongPress
+                            change.consume()
+                            reorder = r.copy(vx = r.vx + amount.x, moved = r.moved + abs(amount.x) + abs(amount.y))
+                        },
+                        onDragEnd = {
+                            val r = reorder
+                            reorder = null
+                            if (r != null) {
+                                // Tenuta senza spostare: si apre il menu della clip come prima.
+                                if (r.moved < tilePx / 3) onClipLongPress(r.id)
+                                else {
+                                    val to = Reorder.target(scroll.value + r.vx, halfPx, tilePx, clipsNow.size)
+                                    if (to != r.from) onReorder(r.id, to)
+                                }
+                            }
+                            scope.launch { withFrameNanos { }; scroll.scrollTo((playNow * pxPerUs).roundToInt()) }
+                        },
+                        onDragCancel = {
+                            reorder = null
+                            scope.launch { withFrameNanos { }; scroll.scrollTo((playNow * pxPerUs).roundToInt()) }
+                        },
+                    )
+                })
+            ) {
+            val rd = reorder
+            if (rd != null) {
+                val n = project.clips.size
+                val to = Reorder.target(scroll.value + rd.vx, halfPx, tilePx, n)
+                Box(Modifier.width(half * 2 + TILE * n + 52.dp).height(maxOf(VIDEO_H + 3.dp + AUDIO_H, 40.dp))) {
+                    project.clips.forEachIndexed { i, clip ->
+                        if (i == rd.from) return@forEachIndexed
+                        key(clip.id) {
+                            val x by animateFloatAsState((halfPx + Reorder.slot(i, rd.from, to) * tilePx), label = "tessera")
+                            ReorderTile(clip, Modifier.offset(x = with(density) { x.toDp() }, y = AUDIO_H / 2))
+                        }
+                    }
+                    // Dove andrà: una linea arancione nello spazio libero.
+                    Box(
+                        Modifier.offset(x = with(density) { (halfPx + to * tilePx).toDp() } + TILE / 2 - 1.5.dp, y = AUDIO_H / 2)
+                            .width(3.dp).height(VIDEO_H).background(VV.Tally.copy(alpha = 0.5f))
+                    )
+                    val dragged = project.clips[rd.from]
+                    ReorderTile(
+                        dragged,
+                        Modifier.zIndex(2f)
+                            .offset(x = with(density) { (scroll.value + rd.vx - tilePx / 2).toDp() }, y = AUDIO_H / 2)
+                            .scale(1.15f),
+                        lifted = true,
+                    )
+                }
+            } else {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Spacer(Modifier.width(half))
                 project.clips.forEach { original ->
@@ -179,7 +281,7 @@ fun Timeline(
                             picking = multiIds != null,
                             pxPerUs = pxPerUs,
                             onClick = { onSelect(clip.id) },
-                            onLongClick = { onClipLongPress(clip.id) },
+                            onLongClick = {},
                             onTrimDrag = { s, e -> trimDraft = Triple(clip.id, s, e) },
                             onTrimEnd = {
                                 trimDraft?.let { (id, s, e) -> onTrim(id, s, e) }
@@ -214,6 +316,7 @@ fun Timeline(
                         onClick = { onCutTap(i) },
                     )
                 }
+            }
             }
             }
             val totalW = (project.durationUs / 1e6f * dpPerSecond).dp
@@ -405,7 +508,8 @@ private fun ClipBox(
             .height(VIDEO_H)
             .clip(shape)
             .background(VV.Raised)
-            .combinedClickable(onClick = onClick, onLongClick = onLongClick)
+            // La tenuta col dito la gestisce la timeline (spostamento della clip, o menu se non si muove).
+            .clickable(onClick = onClick)
     ) {
         Filmstrip(clip, width)
         Row(Modifier.align(Alignment.BottomStart).padding(start = if (selected && !picking) HANDLE_W + 3.dp else 4.dp, bottom = 3.dp)) {
@@ -823,6 +927,48 @@ private fun RangeBar(
                     .then(drag(if (left) 1 else 2)),
                 contentAlignment = Alignment.Center,
             ) { Box(Modifier.width(2.dp).height(12.dp).clip(RoundedCornerShape(1.dp)).background(VV.TallyInk)) }
+        }
+    }
+}
+
+private val TILE = VIDEO_H + 4.dp
+
+/** Clip presa col dito: posizione di partenza, dito (in px dallo schermo) e quanto si è mosso. */
+private data class ReorderDrag(val id: String, val from: Int, val vx: Float, val moved: Float)
+
+/** Calcoli dello spostamento delle clip (senza Compose, così si provano facilmente). */
+object Reorder {
+    /** Clip sotto il dito nella timeline normale ([x] dall'inizio del contenuto, dopo [lead] di margine). */
+    fun indexAt(x: Float, lead: Float, widths: List<Float>): Int? {
+        var acc = lead
+        widths.forEachIndexed { i, w -> if (x >= acc && x < acc + w) return i; acc += w }
+        return null
+    }
+
+    /** Posto in cui cadrebbe la clip con il dito a [x] (tessere larghe [tile]). */
+    fun target(x: Float, lead: Float, tile: Float, n: Int): Int =
+        if (n <= 0) 0 else kotlin.math.floor((x - lead) / tile).toInt().coerceIn(0, n - 1)
+
+    /** Posto della clip [i] mentre quella in [from] sta per andare in [to] (le altre si aprono). */
+    fun slot(i: Int, from: Int, to: Int): Int {
+        val k = if (i < from) i else i - 1
+        return if (k >= to) k + 1 else k
+    }
+}
+
+/** Tessera quadrata di una clip durante lo spostamento. */
+@Composable
+private fun ReorderTile(clip: Clip, modifier: Modifier, lifted: Boolean = false) {
+    Box(
+        modifier
+            .size(VIDEO_H)
+            .clip(RoundedCornerShape(8.dp))
+            .background(VV.Raised)
+            .then(if (lifted) Modifier.border(2.dp, VV.Tally, RoundedCornerShape(8.dp)) else Modifier)
+    ) {
+        Filmstrip(clip, VIDEO_H)
+        Box(Modifier.align(Alignment.BottomStart).padding(2.dp)) {
+            Badge("%.1f".format(clip.outputUs / 1e6).replace('.', ','))
         }
     }
 }

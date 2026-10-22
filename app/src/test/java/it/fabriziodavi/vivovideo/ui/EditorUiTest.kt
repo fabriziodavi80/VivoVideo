@@ -12,6 +12,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import it.fabriziodavi.vivovideo.model.Clip
@@ -73,6 +74,31 @@ class EditorUiTest {
         compose.onNodeWithText("Altro").performClick()
         compose.onNodeWithText("Duplica").performClick()
         assertEquals(4, vm.project!!.clips.size)
+    }
+
+    @Test fun dragAClipWithTheFingerToANewPlace() {
+        val vm = vm(); show(vm)
+        val tile = (48 + 4) * 3f // tessera da 52 dp con densità xxhdpi (3 px per dp)
+        compose.onNodeWithTag("timelineClips").performTouchInput {
+            // La prima clip parte al centro (indicatore a 0): tieni premuto, poi trascina di due tessere e mezzo.
+            down(androidx.compose.ui.geometry.Offset(412 * 3f / 2 + 20f, centerY)) // metà schermo = inizio della prima clip
+            advanceEventTime(900)
+            repeat(10) { moveBy(androidx.compose.ui.geometry.Offset(tile * 0.22f, 0f)) }
+            up()
+        }
+        compose.waitForIdle()
+        assertEquals(listOf("b", "c", "a"), vm.project!!.clips.map { it.id })
+    }
+
+    @Test fun holdWithoutMovingStillOpensTheClipMenu() {
+        val vm = vm(); show(vm)
+        compose.onNodeWithTag("timelineClips").performTouchInput {
+            down(androidx.compose.ui.geometry.Offset(412 * 3f / 2 + 20f, centerY)) // metà schermo = inizio della prima clip
+            advanceEventTime(900)
+            up()
+        }
+        compose.onNodeWithText("Duplica").assertIsDisplayed()
+        assertEquals(listOf("a", "b", "c"), vm.project!!.clips.map { it.id })
     }
 
     @Test fun audioPanelHasTabs() {

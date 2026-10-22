@@ -526,6 +526,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
             onSelectLayer = { vm.selectLayer(it); activeTool = Tool.LAYER },
             onLayerChange = vm::setLayerItem,
             onClipLongPress = { vm.selectedClipId = it; clipMenu = true },
+            onReorder = { id, to -> vm.moveClipTo(id, to) },
             onCutTap = { i -> vm.selectedClipId = project.clips[i].id; group = ToolGroup.EDIT; activeTool = Tool.TRANSITION },
         )
     }

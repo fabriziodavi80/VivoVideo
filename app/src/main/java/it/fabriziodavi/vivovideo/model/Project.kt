@@ -989,11 +989,29 @@ data class Project(
 
     fun moveClip(id: String, delta: Int): Project {
         val i = clips.indexOfFirst { it.id == id }
-        val j = i + delta
-        if (i < 0 || j !in clips.indices) return this
+        return if (i < 0) this else moveClipTo(id, i + delta)
+    }
+
+    /**
+     * Porta la clip [id] alla posizione [to]. Testi e livelli che cominciano dentro la clip la seguono
+     * (stessa distanza dal suo inizio); gli altri restano dove sono.
+     */
+    fun moveClipTo(id: String, to: Int): Project {
+        val i = clips.indexOfFirst { it.id == id }
+        if (i < 0 || to !in clips.indices || to == i) return this
+        val oldStarts = clipStartsUs()
+        val from = oldStarts[i]
+        val until = from + clips[i].outputUs
         val list = clips.toMutableList()
-        list.add(j, list.removeAt(i))
-        return copy(clips = list)
+        list.add(to, list.removeAt(i))
+        val moved = copy(clips = list)
+        val shift = moved.clipStartsUs()[to] - from
+        fun inside(t: Long) = t >= from && t < until
+        val end = moved.durationUs
+        return moved.copy(
+            texts = texts.map { if (inside(it.startUs)) it.copy(startUs = (it.startUs + shift).coerceIn(0, maxOf(0, end - it.durationUs))) else it },
+            layers = layers.map { if (inside(it.startUs)) it.copy(startUs = (it.startUs + shift).coerceIn(0, maxOf(0, end - it.durationUs))) else it },
+        )
     }
 
     /**

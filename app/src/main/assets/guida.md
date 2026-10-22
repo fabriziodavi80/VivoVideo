@@ -3,6 +3,7 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **Sposta le clip col dito**: tieni premuta una clip e trascinala dove vuoi; le altre si aprono per farle posto, la timeline scorre da sola ai bordi, testi e livelli sopra la clip la seguono. Tenendola premuta senza muoverla si apre il menu di sempre.
 - **Voce fuori campo nitida e a volume costante**: la registrazione ora è senza compressione e passa da una catena "da podcast" (via rimbombo e fruscio, più presenza, volume uniforme fra frasi forti e deboli, niente distorsione). Risolto anche il messaggio "Registrazione non leggibile" che poteva comparire dopo una registrazione.
 - **Foto più pulite in Ricordi**: tolto l'effetto Sogno (sfocatura con alone) che su alcune foto chiare le rendeva slavate; pellicola, luce calda, vignettatura e ombre schiarite più leggere. Il look resta caldo e nostalgico, ma la foto si vede nitida.
 - **Passaggio da video a foto fluido in anteprima**: le foto grandi hanno una copia leggera solo per l'anteprima (si prepara in pochi istanti), così l'inizio della foto non scatta più. Il video esportato usa sempre la foto piena.
@@ -56,7 +57,8 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 ## Tagliare e ordinare
 - **Maniglie arancioni** ai lati della clip selezionata: trascinale per accorciare o allungare.
 - **Modifica → Dividi**: taglia nel punto dell'indicatore (anche un brano musicale, se selezionato).
-- **Tieni premuta una clip** (oppure Modifica → **Altro**): Sposta prima/dopo, Duplica, Dividi, Aggiungi video e foto, Elimina.
+- **Spostare una clip col dito**: tieni premuta la clip e, senza staccare, trascinala. Le clip diventano tessere quadrate (così arrivi lontano con poco), le altre si aprono per farle posto e una linea arancione mostra dove andrà; vicino ai bordi la timeline scorre da sola. Lascia per metterla lì. Testi e livelli che stanno sopra quella clip la seguono. Annulla torna com'era.
+- **Tieni premuta una clip senza muoverla** (oppure Modifica → **Altro**): menu con Sposta prima/dopo, Duplica, Dividi, Aggiungi video e foto, Elimina.
 
 ## Fermo immagine, al contrario, stabilizzazione
 - **Fermo immagine**: metti l'indicatore sul fotogramma, tieni premuta la clip → **Fermo immagine all'indicatore**. La clip si divide e in mezzo compare una foto di 2 s (segno FERMO) con lo stesso colore e inquadratura; allungala o accorciala come una foto. Testi e livelli che vengono dopo si spostano con lei.

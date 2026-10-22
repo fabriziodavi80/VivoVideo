@@ -1533,6 +1533,12 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         selectedClipId = project?.clips?.firstOrNull()?.id
     }
 
+    /** Clip trascinata col dito in una nuova posizione (testi e livelli dentro la clip la seguono). */
+    fun moveClipTo(id: String, to: Int) {
+        update { p -> p.moveClipTo(id, to).takeIf { it != p } }
+        selectedClipId = id
+    }
+
     fun moveSelected(delta: Int) {
         val id = selectedClipId ?: return
         update { p -> p.moveClip(id, delta).takeIf { it != p } }
