@@ -29,8 +29,11 @@ data class Stabilization(
 )
 
 object StabMath {
-    /** Zoom massimo usato per nascondere i bordi (oltre, la stabilizzazione si limita). */
-    const val MAX_ZOOM = 1.2f
+    /** Zoom massimo (forza al massimo): oltre l'immagine perde troppa nitidezza. */
+    const val MAX_ZOOM = 1.12f
+
+    /** Zoom concesso per una forza 0…1: dal 4% al 12%. */
+    fun budget(strength: Float) = 1.04f + 0.08f * strength.coerceIn(0f, 1f)
 
     /** Media mobile gaussiana; [sigma] in campioni. */
     fun smooth(v: FloatArray, sigma: Float): FloatArray {
@@ -40,8 +43,14 @@ object StabMath {
         return FloatArray(v.size) { i ->
             var acc = 0f; var ws = 0f
             for (k in -r..r) {
-                val j = (i + k).coerceIn(0, v.lastIndex) // bordi: si ripete il valore estremo
-                acc += v[j] * w[k + r]; ws += w[k + r]
+                // Bordi: riflessione "dispari" (una panoramica continua dritta, non si ferma all'inizio e alla fine).
+                val j = i + k
+                val x = when {
+                    j < 0 -> 2 * v[0] - v[(-j).coerceAtMost(v.lastIndex)]
+                    j > v.lastIndex -> 2 * v[v.lastIndex] - v[(2 * v.lastIndex - j).coerceAtLeast(0)]
+                    else -> v[j]
+                }
+                acc += x * w[k + r]; ws += w[k + r]
             }
             acc / ws
         }
@@ -64,18 +73,29 @@ object StabMath {
         val rx = s.dx.toFloatArray(); val ry = s.dy.toFloatArray()
         // Da 0,15 s (leggera) a 1,5 s (forte, quasi un treppiede).
         val sigma = s.rateHz * (0.15f + 1.35f * s.strength.coerceIn(0f, 1f))
-        val sx = smooth(rx, sigma); val sy = smooth(ry, sigma)
-        var cx = FloatArray(rx.size) { sx[it] - rx[it] }
-        var cy = FloatArray(ry.size) { sy[it] - ry[it] }
-        // Lo zoom deve coprire lo spostamento più grande; oltre il massimo si riducono le correzioni.
+        // Zoom concesso dalla forza: il percorso levigato non può allontanarsi dal vero più di metà del margine.
+        // Invece di tagliare le correzioni (scatti quando si tocca il limite) il percorso si "piega" dolcemente
+        // per restare nel margine: si leviga, si riporta dentro, si leviga di nuovo.
+        val maxZoom = budget(s.strength)
+        val limit = (maxZoom - 1f) / 2f / 1.05f
+        val cx = constrained(rx, sigma, limit)
+        val cy = constrained(ry, sigma, limit)
+        // Lo zoom è quello che serve davvero (spesso meno del massimo).
         val need = max(cx.maxOfOrNull { abs(it) } ?: 0f, cy.maxOfOrNull { abs(it) } ?: 0f)
-        val zoom = (1f + 2f * need * 1.05f).coerceIn(1f, MAX_ZOOM)
-        val limit = (zoom - 1f) / 2f
-        if (need > limit && need > 0f) {
-            cx = FloatArray(cx.size) { cx[it].coerceIn(-limit, limit) }
-            cy = FloatArray(cy.size) { cy[it].coerceIn(-limit, limit) }
-        }
+        val zoom = (1f + 2f * need * 1.05f).coerceIn(1f, maxZoom)
         return Plan(cx, cy, zoom, s.rateHz, s.fromUs)
+    }
+
+    /** Correzioni (levigato − vero) che restano entro ±[limit], senza scatti. */
+    fun constrained(raw: FloatArray, sigma: Float, limit: Float): FloatArray {
+        if (raw.isEmpty()) return raw
+        var p = smooth(raw, sigma)
+        repeat(8) {
+            if (raw.indices.all { abs(p[it] - raw[it]) <= limit }) return FloatArray(raw.size) { p[it] - raw[it] }
+            val inside = FloatArray(raw.size) { raw[it] + (p[it] - raw[it]).coerceIn(-limit, limit) }
+            p = smooth(inside, sigma * 0.5f)
+        }
+        return FloatArray(raw.size) { (p[it] - raw[it]).coerceIn(-limit, limit) }
     }
 
     /**

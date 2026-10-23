@@ -3,6 +3,7 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **Stabilizzazione più nitida**: lo zoom per nascondere i bordi va dal 4% al 12% secondo la Forza (prima arrivava al 20%, e l'immagine si impastava). Quando il movimento è troppo grande la levigatura si piega dolcemente invece di fermarsi di colpo. Rifai la stabilizzazione sulle clip già fatte.
 - **File spostati ritrovati in tempo reale**: mentre il progetto è aperto l'app si accorge subito se sposti o cancelli un video e, appena il telefono registra il file nella nuova cartella (di solito pochi secondi), lo ricollega da sola. Non serve chiudere e riaprire l'app.
 - **File spostati ritrovati da soli**: appena un file del progetto non si trova più l'app lo cerca subito per nome e per peso (anche se il telefono gli ha dato un nome a numeri) e lo ricollega senza chiederti niente, dicendoti quale file ha ritrovato. Se non lo trova, l'avviso dice quale file manca e basta toccare «Scegli». Un file scelto a mano resta collegato anche dopo il riavvio. Niente più errori tecnici in rosso sull'anteprima.
 - **Ricollega più bravo a ritrovare i file**: "Cerca nel telefono" guarda in tutte le cartelle (anche Download) e riconosce le copie rinominate dai gestori file ("video (1).mp4", "video_1.mp4", "video copia.mp4"). Se non trova nulla ti dice perché (accesso solo ad alcune foto, file appena spostati non ancora registrati dal telefono).
@@ -71,7 +72,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 ## Fermo immagine, al contrario, stabilizzazione
 - **Fermo immagine**: metti l'indicatore sul fotogramma, tieni premuta la clip → **Fermo immagine all'indicatore**. La clip si divide e in mezzo compare una foto di 2 s (segno FERMO) con lo stesso colore e inquadratura; allungala o accorciala come una foto. Testi e livelli che vengono dopo si spostano con lei.
 - **Al contrario**: tieni premuta la clip → **Al contrario** (fino a 60 s). L'app prepara una copia rovesciata, anche l'audio (segno ◀); keyframe e curva di velocità si specchiano. La copia è al massimo in 1080p. **Di nuovo nel verso normale** torna all'originale.
-- **Stabilizzazione**: Modifica → **Inquadra** → **Stabilizza la clip**. L'app misura il tremolio della camera e lo leviga con un leggero zoom (segno STAB). **Forza** regola quanto: più forza = immagine più ferma ma più zoom (al massimo 20%). Si vede subito in anteprima. Se poi accorci o allunghi molto la clip, rifai la stabilizzazione.
+- **Stabilizzazione**: Modifica → **Inquadra** → **Stabilizza la clip**. L'app misura il tremolio della camera e lo leviga con un leggero zoom (segno STAB). **Forza** regola quanto: più forza = immagine più ferma ma più zoom (dal 4% al 12%, e solo quanto serve davvero: oltre l'immagine perderebbe nitidezza). Si vede subito in anteprima. Se poi accorci o allunghi molto la clip, rifai la stabilizzazione.
 - Durante al contrario e stabilizzazione l'anteprima si ferma; c'è **Annulla**.
 
 ## Progetto: copie di sicurezza, file spariti, modelli

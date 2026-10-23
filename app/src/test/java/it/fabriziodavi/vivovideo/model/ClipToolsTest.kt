@@ -37,10 +37,19 @@ class ClipToolsTest {
         val jitter = (1 until n).maxOf { abs(fixed[it] - fixed[it - 1]) }
         assertTrue("tremolio residuo $jitter", jitter < 0.002f)
         assertTrue(p.zoom in 1.015f..1.05f)
-        // Un movimento enorme non fa zoomare oltre il massimo.
+        // Un movimento enorme non fa zoomare oltre quanto concede la forza (al massimo 12%).
         val big = StabMath.plan(Stabilization(dx = List(n) { if (it % 2 == 0) 0.3f else -0.3f }, dy = List(n) { 0f }))
-        assertEquals(StabMath.MAX_ZOOM, big.zoom)
-        assertTrue(big.cx.all { abs(it) <= (StabMath.MAX_ZOOM - 1) / 2 + 1e-6f })
+        assertTrue(big.zoom <= StabMath.budget(0.6f) + 1e-6f && StabMath.budget(1f) == StabMath.MAX_ZOOM)
+        assertTrue(big.cx.all { abs(it) <= (big.zoom - 1) / 2 + 1e-6f })
+        // Camminata: panoramica lenta + tremolio. Il tremolio sparisce, la panoramica resta, lo zoom è moderato,
+        // e le correzioni cambiano senza scatti anche quando toccano il margine.
+        val walk = Stabilization(strength = 1f, dx = List(150) { it * 0.004f + (if (it % 2 == 0) 0.012f else -0.012f) }, dy = List(150) { 0f })
+        val w = StabMath.plan(walk)
+        assertTrue("zoom ${w.zoom}", w.zoom <= StabMath.MAX_ZOOM)
+        val path = List(150) { walk.dx[it] + w.cx[it] }
+        val shake = (2 until 148).maxOf { abs(path[it + 1] - 2 * path[it] + path[it - 1]) }
+        assertTrue("scossa residua $shake", shake < 0.006f)
+        assertTrue(path.last() - path.first() > 0.4f)
         // Interpolazione nel tempo del file.
         val s = Stabilization(fromUs = 1_000_000, dx = listOf(0f, 0f, 0f), dy = listOf(0f, 0f, 0f))
         assertEquals(0f to 0f, StabMath.plan(s).at(0))
