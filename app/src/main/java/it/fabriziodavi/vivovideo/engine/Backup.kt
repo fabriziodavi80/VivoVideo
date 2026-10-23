@@ -158,21 +158,40 @@ object Backup {
      */
     fun findByName(ctx: Context, ref: MediaRef): String? {
         if (ref.name.isBlank()) return null
-        // Per nome; la dimensione serve solo a scegliere fra file con lo stesso nome (Android la aggiorna con calma).
-        for (base in listOf(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, MediaStore.Images.Media.EXTERNAL_CONTENT_URI, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI)) {
-            val hits = runCatching {
+        // Per nome, in tutte le raccolte (video, foto, musica, Download e "tutti i file"); anche con il nome che
+        // alcuni gestori file danno alle copie ("video (1).mp4"). A parità, prima lo stesso peso e il nome esatto.
+        val base = ref.name.substringBeforeLast('.')
+        val collections = listOf(
+            MediaStore.Video.Media.EXTERNAL_CONTENT_URI, MediaStore.Images.Media.EXTERNAL_CONTENT_URI, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+            MediaStore.Downloads.EXTERNAL_CONTENT_URI, MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL),
+        )
+        val hits = ArrayList<Pair<String, Pair<String, Long>>>()
+        for (col in collections) {
+            runCatching {
                 ctx.contentResolver.query(
-                    base, arrayOf(MediaStore.MediaColumns._ID, MediaStore.MediaColumns.SIZE),
-                    MediaStore.MediaColumns.DISPLAY_NAME + "=?", arrayOf(ref.name), MediaStore.MediaColumns.DATE_MODIFIED + " DESC",
+                    col, arrayOf(MediaStore.MediaColumns._ID, MediaStore.MediaColumns.SIZE, MediaStore.MediaColumns.DISPLAY_NAME),
+                    MediaStore.MediaColumns.DISPLAY_NAME + " LIKE ?", arrayOf("$base%"), MediaStore.MediaColumns.DATE_MODIFIED + " DESC",
                 )?.use { c ->
-                    val out = ArrayList<Pair<String, Long>>()
-                    while (c.moveToNext()) out += ContentUris.withAppendedId(base, c.getLong(0)).toString() to (if (c.isNull(1)) 0L else c.getLong(1))
-                    out
+                    while (c.moveToNext()) {
+                        val name = c.getString(2) ?: continue
+                        if (!sameFile(ref.name, name)) continue
+                        hits += ContentUris.withAppendedId(col, c.getLong(0)).toString() to (name to (if (c.isNull(1)) 0L else c.getLong(1)))
+                    }
                 }
-            }.getOrNull().orEmpty()
-            val best = hits.sortedByDescending { ref.size > 0 && it.second == ref.size }.firstOrNull { exists(ctx, it.first) }
-            if (best != null) return best.first
+            }
         }
-        return null
+        return hits.sortedWith(compareByDescending<Pair<String, Pair<String, Long>>> { ref.size > 0 && it.second.second == ref.size }
+            .thenByDescending { it.second.first == ref.name })
+            .firstOrNull { exists(ctx, it.first) }?.first
+    }
+
+    /** Stesso file con nome uguale o copia rinominata: "video.mp4", "video (1).mp4", "video_1.mp4", "video-copia.mp4". */
+    fun sameFile(original: String, candidate: String): Boolean {
+        if (candidate.equals(original, ignoreCase = true)) return true
+        val base = original.substringBeforeLast('.'); val ext = original.substringAfterLast('.', "")
+        val cBase = candidate.substringBeforeLast('.'); val cExt = candidate.substringAfterLast('.', "")
+        if (!cExt.equals(ext, ignoreCase = true) || !cBase.startsWith(base, ignoreCase = true)) return false
+        val rest = cBase.substring(base.length).trim()
+        return rest.matches(Regex("^(\\(\\d+\\)|[_-]\\d+|[ _-]?(copia|copy)( \\d+)?)$", RegexOption.IGNORE_CASE))
     }
 }

@@ -333,13 +333,16 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     fun autoRelink() {
         val ctx = getApplication<Application>()
         val todo = missingFiles
+        if (todo.isEmpty()) { message = "Tutti i file sono al loro posto."; return }
         viewModelScope.launch {
             busy = "Cerco i file nel telefono…"
             val found = withContext(Dispatchers.IO) { todo.mapNotNull { u -> Backup.findByName(ctx, missingInfo(u))?.let { u to it } }.toMap() }
             busy = null
             relink(found)
             message = when {
-                found.isEmpty() -> "Non li ho trovati: sceglili tu, uno per uno."
+                found.isEmpty() && !it.fabriziodavi.vivovideo.media.Gallery.fullAccess(ctx) ->
+                    "Non li ho trovati: l'app vede solo le foto e i video che le hai permesso. Sceglili tu, uno per uno (oppure dai l'accesso a tutti nelle impostazioni del telefono)."
+                found.isEmpty() -> "Non li ho trovati (se li hai appena spostati, il telefono potrebbe non averli ancora registrati: riprova tra poco). Oppure sceglili tu, uno per uno."
                 found.size == todo.size -> "Ritrovati tutti i ${found.size} file."
                 else -> "Ritrovati ${found.size} file su ${todo.size}: gli altri sceglili tu."
             }

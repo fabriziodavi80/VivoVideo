@@ -3,6 +3,7 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **Ricollega più bravo a ritrovare i file**: "Cerca nel telefono" guarda in tutte le cartelle (anche Download) e riconosce le copie rinominate dai gestori file ("video (1).mp4", "video_1.mp4", "video copia.mp4"). Se non trova nulla ti dice perché (accesso solo ad alcune foto, file appena spostati non ancora registrati dal telefono).
 - **File spariti controllati anche a progetto aperto**: se sposti o cancelli un video mentre l'app è aperta, al ritorno nell'app (o al primo errore dell'anteprima) compare subito "file non trovati · Ricollega". Nota: spostando un video con la Galleria, Android di solito lo segue da solo e il progetto continua a funzionare.
 - **Scontorno "Preciso" di Google**: in Effetti → Persona (e Livelli → Solo la persona) scegli **Veloce** o **Preciso (Google)**. Il preciso usa il modello di scontorno di Google: bordo più fedele su capelli, mani e oggetti tenuti in mano, ma è più lento. La prima volta Google scarica il modello (serve internet); se non è disponibile l'app usa quello veloce e te lo dice.
 - **Scontorno della persona più preciso**: la maschera ha il doppio del dettaglio, non sfarfalla più sul bordo e, mentre il video scorre, il contorno si aggancia ai bordi veri dell'immagine (capelli, spalle, braccia) invece di restare a quadretti. Rifai lo scontorno sulle clip già fatte.

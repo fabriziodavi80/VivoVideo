@@ -79,4 +79,15 @@ class BackupTest {
         File(Uri.parse(p.clips[1].uri).path!!).delete()
         assertTrue(p.clips[1].uri in Backup.missing(app, p))
     }
+
+    @Test fun renamedCopiesStillMatch() {
+        assertTrue(Backup.sameFile("VID_2026.mp4", "VID_2026.mp4"))
+        assertTrue(Backup.sameFile("VID_2026.mp4", "vid_2026.MP4"))
+        assertTrue(Backup.sameFile("VID_2026.mp4", "VID_2026 (1).mp4"))
+        assertTrue(Backup.sameFile("VID_2026.mp4", "VID_2026_1.mp4"))
+        assertTrue(Backup.sameFile("VID_2026.mp4", "VID_2026 - copia.mp4") || Backup.sameFile("VID_2026.mp4", "VID_2026-copia.mp4"))
+        assertTrue(!Backup.sameFile("VID_2026.mp4", "VID_20261.mp4"))
+        assertTrue(!Backup.sameFile("VID_2026.mp4", "VID_2026.mov"))
+        assertTrue(!Backup.sameFile("VID_2026.mp4", "VID_2026_vacanze.mp4"))
+    }
 }
