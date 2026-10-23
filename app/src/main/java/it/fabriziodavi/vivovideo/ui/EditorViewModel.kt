@@ -2149,18 +2149,57 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         recheckFiles()
     }
 
-    /** Ricontrolla quali file del progetto mancano (veloce, in sottofondo). */
-    fun recheckFiles() {
+    // Galleria osservata mentre l'app è aperta: uno spostamento o una cancellazione si nota subito,
+    // e un file appena spostato si ritrova appena il telefono lo registra nella nuova cartella.
+    private val mediaObserver = object : android.database.ContentObserver(handler) {
+        override fun onChange(selfChange: Boolean) {
+            handler.removeCallbacks(mediaChanged)
+            handler.postDelayed(mediaChanged, 1200)
+        }
+    }
+    private val mediaChanged = Runnable { if (project != null) recheckFiles(force = true) }
+
+    init {
+        runCatching {
+            getApplication<Application>().contentResolver.registerContentObserver(
+                android.provider.MediaStore.Files.getContentUri(android.provider.MediaStore.VOLUME_EXTERNAL), true, mediaObserver,
+            )
+        }
+    }
+
+    /** File che l'anteprima non è riuscita a leggere (anche se Android dice ancora che c'è). */
+    private val unreadable = mutableSetOf<String>()
+    private var retryJob: kotlinx.coroutines.Job? = null
+
+    /**
+     * Ricontrolla quali file del progetto mancano (veloce, in sottofondo) e, se ne manca qualcuno, lo cerca;
+     * finché non lo trova riprova ogni pochi secondi per un minuto (il telefono registra con calma i file spostati).
+     */
+    fun recheckFiles(force: Boolean = false) {
         val p = project ?: return
         val ctx = getApplication<Application>()
         viewModelScope.launch {
-            val missing = withContext(Dispatchers.IO) { runCatching { Backup.missing(ctx, p) }.getOrDefault(emptyList()) }
+            val missing = withContext(Dispatchers.IO) {
+                val m = runCatching { Backup.missing(ctx, p) }.getOrDefault(emptyList())
+                // Quelli che l'anteprima non leggeva contano come mancanti finché non si leggono davvero.
+                (m + unreadable.filter { u -> !Backup.readable(ctx, u) }).distinct()
+            }
             if (project?.id != p.id) return@launch
+            unreadable.retainAll(missing.toSet())
             val appeared = missingFiles.isNotEmpty() && missing.isEmpty()
             val newlyMissing = missing.any { it !in missingFiles }
             missingFiles = missing
             // Appena manca qualcosa si cerca subito da soli (per nome e per peso): spesso non serve fare altro.
-            if (newlyMissing) autoRelink(quiet = true)
+            if (newlyMissing || (force && missing.isNotEmpty())) autoRelink(quiet = true)
+            if (missing.isNotEmpty() && retryJob?.isActive != true) {
+                retryJob = viewModelScope.launch {
+                    repeat(15) {
+                        kotlinx.coroutines.delay(4000)
+                        if (missingFiles.isEmpty() || project?.id != p.id) return@launch
+                        autoRelink(quiet = true)
+                    }
+                }
+            }
             // Un file ricomparso (per esempio la fine di uno spostamento): l'anteprima riparte.
             if (appeared) { previewError = null; if (player != null) rebuildPreview(playheadUs / 1000) }
             // L'anteprima non leggeva un file, ma tutti i file risultano a posto: si riprova una volta.
@@ -2212,6 +2251,10 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                         return
                     }
                     if (error.errorCode in 2000..2999) {
+                        // L'indirizzo del file che non si legge, preso dal messaggio d'errore.
+                        val bad = Regex("(content|file)://[^\\s]+").findAll(generateSequence(error as Throwable) { it.cause }.joinToString(" ") { it.message ?: "" })
+                            .map { it.value.trimEnd('.', ',', ')') }.toSet()
+                        project?.let { q -> bad.filter { b -> ProjectRefs.refs(q).contains(b) } }?.let { unreadable += it }
                         // Un file non si legge più (spostato, cancellato, permesso scaduto): niente errore tecnico,
                         // si ricontrolla, si cerca da soli e, se serve, si offre Ricollega.
                         previewError = "Un file del progetto non si legge più. Lo sto cercando…"
@@ -2595,6 +2638,8 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     override fun onCleared() {
+        runCatching { getApplication<Application>().contentResolver.unregisterContentObserver(mediaObserver) }
+        handler.removeCallbacks(mediaChanged)
         runCatching { recorder?.stop() }
         project?.let { store.save(it) }
         releasePlayer()

@@ -3,6 +3,7 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **File spostati ritrovati in tempo reale**: mentre il progetto è aperto l'app si accorge subito se sposti o cancelli un video e, appena il telefono registra il file nella nuova cartella (di solito pochi secondi), lo ricollega da sola. Non serve chiudere e riaprire l'app.
 - **File spostati ritrovati da soli**: appena un file del progetto non si trova più l'app lo cerca subito per nome e per peso (anche se il telefono gli ha dato un nome a numeri) e lo ricollega senza chiederti niente, dicendoti quale file ha ritrovato. Se non lo trova, l'avviso dice quale file manca e basta toccare «Scegli». Un file scelto a mano resta collegato anche dopo il riavvio. Niente più errori tecnici in rosso sull'anteprima.
 - **Ricollega più bravo a ritrovare i file**: "Cerca nel telefono" guarda in tutte le cartelle (anche Download) e riconosce le copie rinominate dai gestori file ("video (1).mp4", "video_1.mp4", "video copia.mp4"). Se non trova nulla ti dice perché (accesso solo ad alcune foto, file appena spostati non ancora registrati dal telefono).
 - **File spariti controllati anche a progetto aperto**: se sposti o cancelli un video mentre l'app è aperta, al ritorno nell'app (o al primo errore dell'anteprima) compare subito "file non trovati · Ricollega". Nota: spostando un video con la Galleria, Android di solito lo segue da solo e il progetto continua a funzionare.

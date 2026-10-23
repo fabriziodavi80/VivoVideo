@@ -87,6 +87,12 @@ object Backup {
         return runCatching { ctx.contentResolver.openFileDescriptor(Uri.parse(ref), "r")?.use { true } ?: false }.getOrDefault(false)
     }
 
+    /** Si legge davvero? (apre il file e legge qualche byte: più severo di [exists]). */
+    fun readable(ctx: Context, ref: String): Boolean {
+        localFile(ref)?.let { return it.exists() && it.length() > 0 }
+        return runCatching { ctx.contentResolver.openInputStream(Uri.parse(ref))?.use { it.read(ByteArray(16)) > 0 } ?: false }.getOrDefault(false)
+    }
+
     /** File che il progetto cita ma non si trovano più (video, foto, brani, livelli). */
     fun missing(ctx: Context, p: Project): List<String> =
         (p.clips.map { it.uri } + p.layers.map { it.uri } + p.music.map { it.uri }).distinct().filter { !exists(ctx, it) }

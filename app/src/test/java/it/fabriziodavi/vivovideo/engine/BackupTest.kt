@@ -90,4 +90,13 @@ class BackupTest {
         assertTrue(!Backup.sameFile("VID_2026.mp4", "VID_2026.mov"))
         assertTrue(!Backup.sameFile("VID_2026.mp4", "VID_2026_vacanze.mp4"))
     }
+
+    @Test fun readableReallyReadsTheFile() {
+        val ctx = androidx.test.core.app.ApplicationProvider.getApplicationContext<android.app.Application>()
+        val f = java.io.File(ctx.filesDir, "leggibile.mp4").apply { writeBytes(ByteArray(64) { 1 }) }
+        assertTrue(Backup.readable(ctx, android.net.Uri.fromFile(f).toString()))
+        f.delete()
+        assertTrue(!Backup.readable(ctx, android.net.Uri.fromFile(f).toString()))
+        assertTrue(!Backup.readable(ctx, "content://nessuno/niente/1"))
+    }
 }
