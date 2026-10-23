@@ -89,7 +89,7 @@ class Exporter(
     private fun sourceBps(project: Project, outW: Int, outH: Int, outFps: Float): Int =
         project.clips.filter { !it.isPhoto && !it.baked }.maxOfOrNull { c ->
             val (bps, fps) = sourceCache.getOrPut(c.uri) {
-                runCatching { it.fabriziodavi.vivovideo.readVideoInfo(context, android.net.Uri.parse(c.uri)).let { (it.bitrate ?: 0) to it.fps } }.getOrDefault(0 to 0f)
+                runCatching { it.fabriziodavi.vivovideo.readVideoInfo(context, android.net.Uri.parse(c.uri)).let { (it.bitrate ?: 0) to (it.fps ?: 0f) } }.getOrDefault(0 to 0f)
             }
             if (bps <= 0 || c.width <= 0 || c.height <= 0) 0.0
             else bps.toDouble() * (outW.toDouble() * outH / (c.width.toDouble() * c.height)) * (if (fps > 0f) (outFps / fps).coerceAtMost(1f) else 1f)
