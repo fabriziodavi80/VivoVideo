@@ -3,6 +3,7 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **File spariti controllati anche a progetto aperto**: se sposti o cancelli un video mentre l'app è aperta, al ritorno nell'app (o al primo errore dell'anteprima) compare subito "file non trovati · Ricollega". Nota: spostando un video con la Galleria, Android di solito lo segue da solo e il progetto continua a funzionare.
 - **Scontorno "Preciso" di Google**: in Effetti → Persona (e Livelli → Solo la persona) scegli **Veloce** o **Preciso (Google)**. Il preciso usa il modello di scontorno di Google: bordo più fedele su capelli, mani e oggetti tenuti in mano, ma è più lento. La prima volta Google scarica il modello (serve internet); se non è disponibile l'app usa quello veloce e te lo dice.
 - **Scontorno della persona più preciso**: la maschera ha il doppio del dettaglio, non sfarfalla più sul bordo e, mentre il video scorre, il contorno si aggancia ai bordi veri dell'immagine (capelli, spalle, braccia) invece di restare a quadretti. Rifai lo scontorno sulle clip già fatte.
 - **Audio corretto dopo il mixer**: in anteprima la colonna sonora non passa più da un'elaborazione sperimentale che la distorceva; la voce si registra dal microfono normale (più forte) e viene portata a –14 LUFS, davanti alla musica. Alla prima voce registrata sopra un brano l'app abbassa la musica di 6 dB e accende il ducking (si cambia in Audio → Mixer audio). Nel video esportato il volume finale non schiaccia più i suoni per raggiungere il livello.

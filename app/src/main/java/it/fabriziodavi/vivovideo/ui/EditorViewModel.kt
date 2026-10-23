@@ -2119,7 +2119,25 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
 
     /** In secondo piano non c'è rischio di crash dell'anteprima: si toglie il segnale; al ritorno si rimette. */
     fun onAppStop() { if (playerMulti) Safety.pendingPreview(getApplication(), false) }
-    fun onAppStart() { if (playerMulti && player != null) Safety.pendingPreview(getApplication(), true) }
+    fun onAppStart() {
+        if (playerMulti && player != null) Safety.pendingPreview(getApplication(), true)
+        // Al ritorno nell'app: i file potrebbero essere stati spostati o cancellati nel frattempo.
+        recheckFiles()
+    }
+
+    /** Ricontrolla quali file del progetto mancano (veloce, in sottofondo). */
+    fun recheckFiles() {
+        val p = project ?: return
+        val ctx = getApplication<Application>()
+        viewModelScope.launch {
+            val missing = withContext(Dispatchers.IO) { runCatching { Backup.missing(ctx, p) }.getOrDefault(emptyList()) }
+            if (project?.id != p.id) return@launch
+            val appeared = missingFiles.isNotEmpty() && missing.isEmpty()
+            missingFiles = missing
+            // Un file ricomparso (per esempio la fine di uno spostamento): l'anteprima riparte.
+            if (appeared) { previewError = null; if (player != null) rebuildPreview(playheadUs / 1000) }
+        }
+    }
     /** Il compositore a più ingressi ha dato errore in anteprima: si usa il ripiego. */
     private var multiFailed = false
 
@@ -2159,6 +2177,12 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                             rebuildPreview(playheadUs / 1000)
                             previewError = "Anteprima semplificata (dissolvenza incrociata mostrata come passaggio al nero, video sovrapposti nascosti). Dettaglio: $detail"
                         }
+                        return
+                    }
+                    if (error.errorCode == PlaybackException.ERROR_CODE_IO_FILE_NOT_FOUND) {
+                        // Un file è sparito mentre il progetto era aperto (spostato, cancellato): si ricontrolla e si offre Ricollega.
+                        previewError = "Un file del progetto non si trova più (spostato o cancellato). Tocca \"file non trovati · Ricollega\"."
+                        handler.post { recheckFiles() }
                         return
                     }
                     previewError = "Errore anteprima: $detail"

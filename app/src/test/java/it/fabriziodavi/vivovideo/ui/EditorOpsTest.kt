@@ -354,4 +354,23 @@ class EditorOpsTest {
         vm.endMultiSelect()
         assertNull(vm.multiIds)
     }
+
+    @Test fun aFileThatDisappearsWhileOpenIsReportedOnReturn() {
+        val app = ApplicationProvider.getApplicationContext<Application>()
+        val f = java.io.File(app.filesDir, "sparisce.mp4").apply { writeBytes(ByteArray(2048)) }
+        val vm = vm(listOf(Clip(id = "x", uri = android.net.Uri.fromFile(f).toString(), sourceDurationUs = 2_000_000, trimEndUs = 2_000_000)))
+        fun settle(until: () -> Boolean) = repeat(300) { if (!until()) { shadowOf(Looper.getMainLooper()).idle(); Thread.sleep(10) } }
+        settle { false }
+        assertTrue(vm.missingFiles.isEmpty())
+        // Il file sparisce mentre l'app è in secondo piano; al ritorno l'avviso compare.
+        f.delete()
+        vm.onAppStart()
+        settle { vm.missingFiles.isNotEmpty() }
+        assertEquals(1, vm.missingFiles.size)
+        // Il file ricompare (fine di uno spostamento): l'avviso sparisce.
+        f.writeBytes(ByteArray(2048))
+        vm.recheckFiles()
+        settle { vm.missingFiles.isEmpty() }
+        assertTrue(vm.missingFiles.isEmpty())
+    }
 }
