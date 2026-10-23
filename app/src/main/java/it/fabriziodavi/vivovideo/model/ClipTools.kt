@@ -26,6 +26,8 @@ data class Stabilization(
     val fromUs: Long = 0,
     val dx: List<Float> = emptyList(),
     val dy: List<Float> = emptyList(),
+    /** Rotazione accumulata della camera (radianti, verso orario sull'immagine); vuota nelle analisi vecchie. */
+    val dr: List<Float> = emptyList(),
 )
 
 object StabMath {
@@ -56,8 +58,16 @@ object StabMath {
         }
     }
 
-    /** Correzioni per campione e zoom che le contiene. */
-    class Plan(val cx: FloatArray, val cy: FloatArray, val zoom: Float, val rateHz: Int, val fromUs: Long) {
+    /** Correzioni per campione (spostamento e rotazione) e zoom che le contiene. */
+    class Plan(val cx: FloatArray, val cy: FloatArray, val zoom: Float, val rateHz: Int, val fromUs: Long, val cr: FloatArray = FloatArray(0)) {
+        /** Rotazione di correzione (radianti) al tempo [tUs] del file. */
+        fun rotAt(tUs: Long): Float {
+            if (cr.isEmpty()) return 0f
+            val f = ((tUs - fromUs) * rateHz / 1e6f).coerceIn(0f, (cr.size - 1).toFloat())
+            val i = f.toInt().coerceAtMost(cr.size - 1); val j = (i + 1).coerceAtMost(cr.size - 1)
+            return cr[i] + (cr[j] - cr[i]) * (f - i)
+        }
+
         /** Correzione (x, y) al tempo [tUs] del file, interpolata. */
         fun at(tUs: Long): Pair<Float, Float> {
             if (cx.isEmpty()) return 0f to 0f
@@ -69,7 +79,8 @@ object StabMath {
         }
     }
 
-    fun plan(s: Stabilization): Plan {
+    /** [aspect] = larghezza/altezza del fotogramma come lo si vede (serve per il margine della rotazione). */
+    fun plan(s: Stabilization, aspect: Float = 16f / 9f): Plan {
         val rx = s.dx.toFloatArray(); val ry = s.dy.toFloatArray()
         // Da 0,15 s (leggera) a 1,5 s (forte, quasi un treppiede).
         val sigma = s.rateHz * (0.15f + 1.35f * s.strength.coerceIn(0f, 1f))
@@ -77,13 +88,142 @@ object StabMath {
         // Invece di tagliare le correzioni (scatti quando si tocca il limite) il percorso si "piega" dolcemente
         // per restare nel margine: si leviga, si riporta dentro, si leviga di nuovo.
         val maxZoom = budget(s.strength)
-        val limit = (maxZoom - 1f) / 2f / 1.05f
+        val rr = s.dr.toFloatArray()
+        val hasRot = rr.size == rx.size && rr.isNotEmpty()
+        // Il margine si divide: 70% agli spostamenti, 30% alla rotazione (al massimo 1°).
+        // Ruotare un quadro di θ richiede circa θ·max(a, 1/a) di zoom in più.
+        val k = max(aspect, 1f / aspect)
+        val margin = maxZoom - 1f
+        val limit = (if (hasRot) 0.7f else 1f) * margin / 2f / 1.05f
+        val rLimit = if (hasRot) minOf(0.3f * margin / k, 0.0175f) else 0f
         val cx = constrained(rx, sigma, limit)
         val cy = constrained(ry, sigma, limit)
+        val cr = if (hasRot) constrained(rr, sigma, rLimit) else FloatArray(0)
         // Lo zoom è quello che serve davvero (spesso meno del massimo).
         val need = max(cx.maxOfOrNull { abs(it) } ?: 0f, cy.maxOfOrNull { abs(it) } ?: 0f)
-        val zoom = (1f + 2f * need * 1.05f).coerceIn(1f, maxZoom)
-        return Plan(cx, cy, zoom, s.rateHz, s.fromUs)
+        val needR = cr.maxOfOrNull { abs(it) } ?: 0f
+        val zoom = (1f + 2f * need * 1.05f + needR * k).coerceIn(1f, maxZoom)
+        return Plan(cx, cy, zoom, s.rateHz, s.fromUs, cr)
+    }
+
+    fun aspectOf(w: Int, h: Int): Float = if (w > 0 && h > 0) w.toFloat() / h else 16f / 9f
+
+    /**
+     * Matrice 3×3 (per righe, come android.graphics.Matrix) della correzione al tempo [tUs], nello spazio -1…1:
+     * rotazione fatta con le proporzioni vere del quadro (niente immagine "storta"), zoom, poi spostamento.
+     * Sull'immagine l'asse y scende, nello spazio -1…1 sale: per questo spostamento verticale e rotazione cambiano segno.
+     */
+    fun matrixValues(plan: Plan, tUs: Long, aspect: Float): FloatArray {
+        val (cx, cy) = plan.at(tUs)
+        val phi = -plan.rotAt(tUs)
+        val z = plan.zoom
+        val c = kotlin.math.cos(phi); val sn = kotlin.math.sin(phi)
+        return floatArrayOf(z * c, -z * sn / aspect, 2f * cx * z, z * aspect * sn, z * c, -2f * cy * z, 0f, 0f, 1f)
+    }
+
+    /** Movimento fra due fotogrammi: spostamento (pixel, con i decimali) e rotazione (radianti). */
+    data class Motion(val dx: Float, val dy: Float, val rot: Float)
+
+    /**
+     * Movimento del contenuto da [a] a [b] (grigio [w]×[h]): spostamento al centro con precisione al decimo di pixel,
+     * rotazione dalla differenza di spostamento fra lati opposti (sinistra/destra, sopra/sotto).
+     */
+    fun motion(a: ByteArray, b: ByteArray, w: Int, h: Int, range: Int = 16): Motion {
+        val c = shiftSub(a, b, w, h, w / 10, w - w / 10, h / 10, h - h / 10, range)
+        // Bande laterali: la differenza di spostamento verticale fra destra e sinistra dice la rotazione.
+        val l = shiftSub(a, b, w, h, w / 12, w * 4 / 12, h / 5, h * 4 / 5, range, c)
+        val r = shiftSub(a, b, w, h, w * 8 / 12, w * 11 / 12, h / 5, h * 4 / 5, range, c)
+        val t = shiftSub(a, b, w, h, w / 5, w * 4 / 5, h / 12, h * 4 / 12, range, c)
+        val bt = shiftSub(a, b, w, h, w / 5, w * 4 / 5, h * 8 / 12, h * 11 / 12, range, c)
+        val dxLR = (w * 8 / 12 + w * 11 / 12 - w / 12 - w * 4 / 12) / 2f
+        val dyTB = (h * 8 / 12 + h * 11 / 12 - h / 12 - h * 4 / 12) / 2f
+        val rot1 = (r.second - l.second) / dxLR
+        val rot2 = -(bt.first - t.first) / dyTB
+        // Se le due stime non vanno d'accordo (soggetti che si muovono) la rotazione non si usa.
+        val rot = if (abs(rot1 - rot2) < 0.01f) (rot1 + rot2) / 2f else 0f
+        return Motion(c.first, c.second, rot.coerceIn(-0.05f, 0.05f))
+    }
+
+    /** Spostamento con i decimali nella zona [x0,x1)×[y0,y1): grossolano a metà risoluzione, fine, poi parabola sul minimo. */
+    fun shiftSub(a: ByteArray, b: ByteArray, w: Int, h: Int, x0: Int, x1: Int, y0: Int, y1: Int, range: Int, guess: Pair<Float, Float>? = null): Pair<Float, Float> {
+        val (bx, by) = if (guess == null) {
+            val w2 = w / 2; val h2 = h / 2
+            val a2 = half(a, w, h); val b2 = half(b, w, h)
+            val r2 = (range / 2).coerceAtLeast(1)
+            val (cx, cy) = bestIn(a2, b2, w2, x0 / 2, x1 / 2, y0 / 2, y1 / 2, h2, -r2..r2, -r2..r2, 1)
+            bestIn(a, b, w, x0, x1, y0, y1, h, (cx * 2 - 2)..(cx * 2 + 2), (cy * 2 - 2)..(cy * 2 + 2), 2)
+        } else {
+            val gx = Math.round(guess.first); val gy = Math.round(guess.second)
+            bestIn(a, b, w, x0, x1, y0, y1, h, (gx - 3)..(gx + 3), (gy - 3)..(gy + 3), 2)
+        }
+        return refine(a, b, w, h, x0, x1, y0, y1, bx.toFloat(), by.toFloat(), if (guess == null) 2 else 3)
+    }
+
+    /**
+     * Rifinitura con i decimali (metodo di Lucas-Kanade): partendo dallo spostamento intero, usa le pendenze
+     * dell'immagine per trovare lo spostamento esatto in x e y insieme (anche in diagonale).
+     */
+    private fun refine(a: ByteArray, b: ByteArray, w: Int, h: Int, x0: Int, x1: Int, y0: Int, y1: Int, sx: Float, sy: Float, step: Int): Pair<Float, Float> {
+        fun px(img: ByteArray, x: Int, y: Int) = (img[y.coerceIn(0, h - 1) * w + x.coerceIn(0, w - 1)].toInt() and 255).toFloat()
+        fun bil(x: Float, y: Float): Float {
+            val xi = kotlin.math.floor(x).toInt(); val yi = kotlin.math.floor(y).toInt()
+            val fx = x - xi; val fy = y - yi
+            val p = px(b, xi, yi) + (px(b, xi + 1, yi) - px(b, xi, yi)) * fx
+            val q = px(b, xi, yi + 1) + (px(b, xi + 1, yi + 1) - px(b, xi, yi + 1)) * fx
+            return p + (q - p) * fy
+        }
+        var ux = sx; var uy = sy
+        val m = 2 + kotlin.math.ceil(maxOf(abs(sx), abs(sy))).toInt()
+        val xa = maxOf(x0, m); val xb = minOf(x1, w - m); val ya = maxOf(y0, m); val yb = minOf(y1, h - m)
+        if (xb <= xa || yb <= ya) return sx to sy
+        repeat(4) {
+            var gxx = 0.0; var gxy = 0.0; var gyy = 0.0; var ex = 0.0; var ey = 0.0
+            var y = ya
+            while (y < yb) {
+                var x = xa
+                while (x < xb) {
+                    val bx = x + ux; val by = y + uy
+                    val ix = (bil(bx + 1, by) - bil(bx - 1, by)) / 2f
+                    val iy = (bil(bx, by + 1) - bil(bx, by - 1)) / 2f
+                    val e = px(a, x, y) - bil(bx, by)
+                    gxx += ix * ix; gxy += ix * iy; gyy += iy * iy; ex += ix * e; ey += iy * e
+                    x += step
+                }
+                y += step
+            }
+            val det = gxx * gyy - gxy * gxy
+            if (det < 1e-6) return ux to uy
+            val dx = ((gyy * ex - gxy * ey) / det).toFloat().coerceIn(-1f, 1f)
+            val dy = ((gxx * ey - gxy * ex) / det).toFloat().coerceIn(-1f, 1f)
+            ux += dx; uy += dy
+            if (abs(dx) < 0.01f && abs(dy) < 0.01f) return ux to uy
+        }
+        return ux to uy
+    }
+
+    private fun sadAt(a: ByteArray, b: ByteArray, w: Int, h: Int, x0: Int, x1: Int, y0: Int, y1: Int, dx: Int, dy: Int, step: Int): Long {
+        val xa = maxOf(x0, -dx); val xb = minOf(x1, w - dx)
+        val ya = maxOf(y0, -dy); val yb = minOf(y1, h - dy)
+        if (xb <= xa || yb <= ya) return Long.MAX_VALUE / 4
+        var sad = 0L; var n = 0L
+        var y = ya
+        while (y < yb) {
+            val ra = y * w; val rb = (y + dy) * w + dx
+            var x = xa
+            while (x < xb) { sad += abs((a[ra + x].toInt() and 255) - (b[rb + x].toInt() and 255)); n++; x += step }
+            y += step
+        }
+        // Media per pixel (le zone hanno misure diverse a seconda dello spostamento).
+        return if (n == 0L) Long.MAX_VALUE / 4 else sad * 1024 / n
+    }
+
+    private fun bestIn(a: ByteArray, b: ByteArray, w: Int, x0: Int, x1: Int, y0: Int, y1: Int, h: Int, rx: IntRange, ry: IntRange, step: Int): Pair<Int, Int> {
+        var best = Long.MAX_VALUE; var bx = 0; var by = 0
+        for (dy in ry) for (dx in rx) {
+            val sad = sadAt(a, b, w, h, x0, x1, y0, y1, dx, dy, step)
+            if (sad < best || (sad == best && abs(dx) + abs(dy) < abs(bx) + abs(by))) { best = sad; bx = dx; by = dy }
+        }
+        return bx to by
     }
 
     /** Correzioni (levigato − vero) che restano entro ±[limit], senza scatti. */

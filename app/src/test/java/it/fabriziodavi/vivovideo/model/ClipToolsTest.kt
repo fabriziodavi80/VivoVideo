@@ -55,6 +55,52 @@ class ClipToolsTest {
         assertEquals(0f to 0f, StabMath.plan(s).at(0))
     }
 
+    /** Trama liscia (come una foto vera, senza bordi a scalino) spostata di (dx, dy) e ruotata di [rot] attorno al centro. */
+    private fun scene(w: Int, h: Int, dx: Float, dy: Float, rot: Float): ByteArray {
+        val cx = w / 2f; val cy = h / 2f
+        return ByteArray(w * h) { i ->
+            val px = (i % w) - cx - dx; val py = (i / w) - cy - dy
+            val x = kotlin.math.cos(rot) * px + kotlin.math.sin(rot) * py + cx
+            val y = -kotlin.math.sin(rot) * px + kotlin.math.cos(rot) * py + cy
+            val v = 128 + 40 * kotlin.math.sin(x * 0.21f) * kotlin.math.cos(y * 0.17f) + 30 * kotlin.math.sin((x + 2 * y) * 0.09f) +
+                25 * kotlin.math.cos((x - y) * 0.31f) + 20 * kotlin.math.tanh(3 * kotlin.math.sin(x * 0.27f)) * kotlin.math.tanh(3 * kotlin.math.sin(y * 0.33f))
+            v.coerceIn(0f, 255f).toInt().toByte()
+        }
+    }
+
+    @Test fun motionIsMeasuredToATenthOfAPixelAndRotationToo() {
+        val w = 384; val h = 216
+        val a = scene(w, h, 0f, 0f, 0f)
+        for (d in listOf(-0.75f, -0.25f, 0.25f, 0.5f, 1.5f, -7.2f, 12f)) {
+            val m = StabMath.motion(a, scene(w, h, d, d / 2, 0f), w, h)
+            assertEquals("x $d", d, m.dx, 0.1f); assertEquals("y $d", d / 2, m.dy, 0.1f)
+            assertEquals(0f, m.rot, 0.001f)
+        }
+        // Rotazione di mezzo grado in un verso e nell'altro (con un po' di spostamento).
+        val r1 = StabMath.motion(a, scene(w, h, 0f, 0f, 0.009f), w, h)
+        val r2 = StabMath.motion(a, scene(w, h, 2f, -1f, -0.009f), w, h)
+        assertEquals(0.009f, r1.rot, 0.002f)
+        assertEquals(-0.009f, r2.rot, 0.002f)
+    }
+
+    @Test fun rotationIsUndoneWithTheRightProportions() {
+        // Il contenuto è ruotato di θ: la correzione (−θ) deve riportare il bordo destro al suo posto, anche in un quadro 16:9.
+        val th = 0.01f; val a = 16f / 9f
+        val plan = StabMath.Plan(floatArrayOf(0f), floatArrayOf(0f), 1f, 30, 0, floatArrayOf(-th))
+        val m = StabMath.matrixValues(plan, 0, a)
+        // Punto del bordo destro (x = 1) ruotato sull'immagine (y verso il basso) e portato nello spazio -1…1 (y verso l'alto).
+        val px = kotlin.math.cos(th); val py = -kotlin.math.sin(th) * a
+        val x = m[0] * px + m[1] * py; val y = m[3] * px + m[4] * py
+        assertEquals(1f, x, 1e-3f); assertEquals(0f, y, 1e-3f)
+        // Con la rotazione il piano tiene conto del margine in più e resta entro il massimo.
+        val n = 120
+        val s = Stabilization(strength = 1f, dx = List(n) { 0f }, dy = List(n) { 0f }, dr = List(n) { if (it % 2 == 0) 0.004f else -0.004f })
+        val p = StabMath.plan(s, 9f / 16f)
+        assertTrue(p.zoom <= StabMath.MAX_ZOOM)
+        val fixed = List(n) { s.dr[it] + p.cr[it] }
+        assertTrue((1 until n).maxOf { abs(fixed[it] - fixed[it - 1]) } < 0.001f)
+    }
+
     @Test fun rotationMapsToTheViewer() {
         assertEquals(-2f to 1f, StabMath.rotate(1f, 2f, 90))
         assertEquals(-1f to -2f, StabMath.rotate(1f, 2f, 180))

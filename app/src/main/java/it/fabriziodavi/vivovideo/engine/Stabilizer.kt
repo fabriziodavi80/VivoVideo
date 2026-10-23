@@ -22,7 +22,8 @@ import kotlin.coroutines.coroutineContext
  * poi l'effetto sposta e ingrandisce leggermente ogni fotogramma per levigare il movimento.
  */
 object Stabilizer {
-    private const val AW = 192
+    /** Larghezza dell'immagine di misura (più grande = più precisione; con i decimali di pixel basta). */
+    private const val AW = 384
     const val RATE = 30
 
     /** Analizza il tratto tagliato di [clip]; [onProgress] 0…1. */
@@ -47,10 +48,10 @@ object Stabilizer {
         codec.start()
         ex.seekTo(clip.trimStartUs, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
 
-        val times = ArrayList<Long>(); val px = ArrayList<Float>(); val py = ArrayList<Float>()
+        val times = ArrayList<Long>(); val px = ArrayList<Float>(); val py = ArrayList<Float>(); val pr = ArrayList<Float>()
         var prev: ByteArray? = null
         var aw = 0; var ah = 0
-        var accX = 0f; var accY = 0f
+        var accX = 0f; var accY = 0f; var accR = 0f
         var lastKept = Long.MIN_VALUE
         val info = MediaCodec.BufferInfo()
         var inDone = false
@@ -96,13 +97,13 @@ object Stabilizer {
                         }
                         img.close()
                         prev?.let { p ->
-                            val (dx, dy) = StabMath.shift(p, g, aw, ah)
-                            // In frazioni dell'immagine come la vede chi guarda.
-                            val (rx, ry) = StabMath.rotate(dx.toFloat() / aw, dy.toFloat() / ah, rotation)
-                            accX += rx; accY += ry
+                            val m = StabMath.motion(p, g, aw, ah)
+                            // In frazioni dell'immagine come la vede chi guarda (la rotazione non cambia girando il video).
+                            val (rx, ry) = StabMath.rotate(m.dx / aw, m.dy / ah, rotation)
+                            accX += rx; accY += ry; accR += m.rot
                         }
                         prev = g
-                        times += t; px += accX; py += accY
+                        times += t; px += accX; py += accY; pr += accR
                         lastKept = t
                         onProgress(((t - clip.trimStartUs).toFloat() / clip.trimmedUs.coerceAtLeast(1)).coerceIn(0f, 1f))
                     }
@@ -116,7 +117,7 @@ object Stabilizer {
         check(times.size >= 2) { "Non sono riuscito a leggere i fotogrammi del video." }
         // Ricampiona a passo fisso dall'inizio del taglio.
         val n = ((clip.trimmedUs * RATE) / 1_000_000L).toInt().coerceAtLeast(2) + 1
-        val dx = ArrayList<Float>(n); val dy = ArrayList<Float>(n)
+        val dx = ArrayList<Float>(n); val dy = ArrayList<Float>(n); val dr = ArrayList<Float>(n)
         var k = 0
         for (i in 0 until n) {
             val t = clip.trimStartUs + i * 1_000_000L / RATE
@@ -125,23 +126,20 @@ object Stabilizer {
             val u = ((t - t0).toFloat() / (t1 - t0).coerceAtLeast(1)).coerceIn(0f, 1f)
             dx += px[k] + (px[k + 1] - px[k]) * u
             dy += py[k] + (py[k + 1] - py[k]) * u
+            dr += pr[k] + (pr[k + 1] - pr[k]) * u
         }
         onProgress(1f)
-        Stabilization(strength = strength, rateHz = RATE, fromUs = clip.trimStartUs, dx = dx, dy = dy)
+        Stabilization(strength = strength, rateHz = RATE, fromUs = clip.trimStartUs, dx = dx, dy = dy, dr = dr)
     }
 }
 
 /** Sposta e ingrandisce ogni fotogramma per levigare il movimento (prima dell'inquadratura). */
 class StabilizeTransformation(private val clip: Clip, private val startUs: Long) : MatrixTransformation {
-    private val plan = StabMath.plan(clip.stab ?: Stabilization())
+    private val aspect = StabMath.aspectOf(clip.width, clip.height)
+    private val plan = StabMath.plan(clip.stab ?: Stabilization(), aspect)
 
     override fun getMatrix(presentationTimeUs: Long): Matrix {
         val src = clip.trimStartUs + clip.speedCurve().sourceTimeAt(localTimeUs(presentationTimeUs, startUs))
-        val (cx, cy) = plan.at(src)
-        val z = plan.zoom
-        return Matrix().apply {
-            postScale(z, z)
-            postTranslate(2f * cx * z, -2f * cy * z)
-        }
+        return StabMath.matrixValues(plan, src, aspect).let { v -> Matrix().apply { setValues(v) } }
     }
 }
