@@ -89,16 +89,22 @@ enum class ExportPreset(val label: String, val hint: String, val options: Export
 object ExportEstimate {
     const val AUDIO_BPS = 192_000
 
-    fun bitrate(outW: Int, outH: Int, outFps: Float, codec: OutputCodec, maxBitrate: Int? = null, attempt: Int = 0): Int {
+    /**
+     * Bit al secondo: come le riprese del telefono (4K 30 fps H.265 ≈ 60 Mbps, 1080p ≈ 15), un po' di più per i
+     * fotogrammi al secondo, ×1,4 in H.264 e ×1,25 in HDR a 10 bit (più sfumature da conservare).
+     */
+    fun bitrate(outW: Int, outH: Int, outFps: Float, codec: OutputCodec, maxBitrate: Int? = null, attempt: Int = 0, hdr: Boolean = false): Int {
         val top = if (attempt >= 1) 100_000_000.0 else 160_000_000.0
-        var b = (45_000_000.0 * outW * outH * outFps / (3840.0 * 2160 * 30)).coerceIn(8_000_000.0, top).toInt()
-        if (codec == OutputCodec.H264) b = minOf((b * 1.4).toInt(), top.toInt())
-        maxBitrate?.let { b = minOf(b, it) }
-        return b
+        var b = (60_000_000.0 * outW * outH * outFps / (3840.0 * 2160 * 30)).coerceIn(10_000_000.0, top)
+        if (hdr) b *= 1.25
+        if (codec == OutputCodec.H264) b *= 1.4
+        var r = b.coerceAtMost(top).toInt()
+        maxBitrate?.let { r = minOf(r, it) }
+        return r
     }
 
-    fun bytes(outW: Int, outH: Int, outFps: Float, codec: OutputCodec, durationUs: Long, maxBitrate: Int? = null): Long =
-        ((bitrate(outW, outH, outFps, codec, maxBitrate).toLong() + AUDIO_BPS) * durationUs / 8_000_000L)
+    fun bytes(outW: Int, outH: Int, outFps: Float, codec: OutputCodec, durationUs: Long, maxBitrate: Int? = null, hdr: Boolean = false): Long =
+        ((bitrate(outW, outH, outFps, codec, maxBitrate, hdr = hdr).toLong() + AUDIO_BPS) * durationUs / 8_000_000L)
 
     /** "circa 85 MB" / "circa 1,2 GB". */
     fun label(bytes: Long): String {

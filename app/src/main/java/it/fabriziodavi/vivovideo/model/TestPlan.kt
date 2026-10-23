@@ -47,7 +47,7 @@ object TestPlan {
             "Esporta con Reels e TikTok, poi con WhatsApp; confronta il peso stimato con quello vero.",
             "Il peso reale è vicino a quello stimato; il file WhatsApp è leggero."),
         Item("exp_hdr", "Esportazione", "HDR a 10 bit",
-            "Progetto con un video HDR del telefono → Esporta → HDR 10 bit acceso.",
+            "Progetto con un video HDR del telefono (anche Dolby Vision) → Esporta → Risoluzione Originale (o 4K) → HDR 10 bit acceso.",
             "Nel risultato la riga Colore dice HDR; in galleria il video ha luci piene come l'originale."),
         Item("exp_long", "Esportazione", "Progetto lungo",
             "Un progetto di 10 minuti o più (4K) con musica e testi → esporta.",

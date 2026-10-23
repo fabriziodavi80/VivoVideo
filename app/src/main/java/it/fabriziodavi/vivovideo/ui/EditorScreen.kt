@@ -2116,6 +2116,11 @@ private fun ExportPanel(vm: EditorViewModel, onOpen: (android.net.Uri) -> Unit) 
         ToggleRow("HDR 10 bit, come l'hai girato", o.hdr, !running) { vm.exportOptions = o.copy(hdr = it, codec = if (it) OutputCodec.H265 else o.codec) }
         Hint(if (o.hdr) "Luci e colori pieni sugli schermi HDR (YouTube, Instagram, galleria del telefono). Si usa H.265. Se qualcosa non lo regge, l'app esporta in SDR e te lo scrive nel risultato."
             else "Nel progetto ci sono video HDR: ora vengono convertiti in SDR, il formato che si vede bene ovunque.")
+        // Dettaglio: un video 4K esportato in 1080p perde finezza (le luci HDR restano).
+        val src4k = vm.project?.clips?.any { !it.isPhoto && minOf(it.width, it.height) >= 2000 } == true
+        if (src4k && o.size != OutputSize.ORIGINAL && o.size != OutputSize.P2160) {
+            Hint("I video del progetto sono in 4K: in ${o.size.label} si perde un po' di dettaglio. Per avere la stessa nitidezza dell'originale scegli Risoluzione Originale o 4K.")
+        }
     }
     ToggleRow("Audio a tono naturale nei cambi di velocità", o.keepPitch, !running) { vm.exportOptions = o.copy(keepPitch = it) }
     ToggleRow("Volume uniformato: ${vm.project?.mix?.target?.label ?: "–14 LUFS"} (si cambia in Audio → Mixer)", o.loudness, !running) { vm.exportOptions = o.copy(loudness = it) }

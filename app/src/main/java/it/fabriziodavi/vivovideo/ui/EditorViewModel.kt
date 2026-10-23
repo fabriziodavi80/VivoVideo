@@ -2395,7 +2395,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         val (w, h) = factory.outputSize(p, o.size.shortSide)
         val maxFps = p.clips.maxOfOrNull { it.fps } ?: 30f
         val fps = o.fps.max?.let { minOf(it.toFloat(), maxFps) } ?: maxFps
-        val bytes = ExportEstimate.bytes(w, h, fps, if (o.hdr) OutputCodec.H265 else o.codec, p.durationUs, o.maxBitrate)
+        val bytes = ExportEstimate.bytes(w, h, fps, if (o.hdr) OutputCodec.H265 else o.codec, p.durationUs, o.maxBitrate, hdr = o.hdr && p.clips.any { it.hdr > 0 })
         return "${w}×$h · ${"%.0f".format(fps)} fps" + (if (o.hdr && hasHdr) " · HDR" else "") + " · " + ExportEstimate.label(bytes)
     }
     var exportState by mutableStateOf<ExportState>(ExportState.Idle)

@@ -104,7 +104,8 @@ class Exporter(
         val (outW, outH) = factory.outputSize(project, options.size.shortSide)
         val maxClipFps = project.clips.maxOfOrNull { it.fps } ?: 30f
         val outFps = options.fps.max?.let { minOf(it.toFloat(), maxClipFps) } ?: maxClipFps
-        val bitrate = ExportEstimate.bitrate(outW, outH, outFps, options.codec, options.maxBitrate, attempt)
+        val bitrate = ExportEstimate.bitrate(outW, outH, outFps, options.codec, options.maxBitrate, attempt,
+            hdr = options.hdr && project.clips.any { it.hdr > 0 })
 
         val heavy = project.clips.any { it.isHeavy }
         val step = if (heavy) attempt + 1 else attempt

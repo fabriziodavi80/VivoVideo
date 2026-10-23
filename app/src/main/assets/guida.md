@@ -3,6 +3,7 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **Video esportati più nitidi**: la qualità (bit al secondo) è ora come quella delle riprese del telefono (4K ≈ 60 Mbps, 1080p ≈ 15 Mbps) e in HDR a 10 bit un quarto in più, per conservare le sfumature. Se esporti in 1080p un progetto con video 4K, l'app ti ricorda che per la stessa nitidezza dell'originale serve Originale o 4K.
 - **Stabilizzazione da professionisti**: il movimento si misura su un'immagine grande il doppio e con precisione al decimo di pixel (niente più piccolo tremolio residuo), e ora si corregge anche la **rotazione** della camera (il dondolio di lato quando si cammina, fino a circa 1°) senza deformare l'immagine. Rifai la stabilizzazione sulle clip già fatte.
 - **Stabilizzazione più nitida**: lo zoom per nascondere i bordi va dal 4% al 12% secondo la Forza (prima arrivava al 20%, e l'immagine si impastava). Quando il movimento è troppo grande la levigatura si piega dolcemente invece di fermarsi di colpo. Rifai la stabilizzazione sulle clip già fatte.
 - **File spostati ritrovati in tempo reale**: mentre il progetto è aperto l'app si accorge subito se sposti o cancelli un video e, appena il telefono registra il file nella nuova cartella (di solito pochi secondi), lo ricollega da sola. Non serve chiudere e riaprire l'app.
