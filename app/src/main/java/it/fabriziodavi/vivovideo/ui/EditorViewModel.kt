@@ -220,6 +220,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             }
             if (project?.id != p.id) return@launch
             missingFiles = info.missing
+            if (info.missing.isNotEmpty()) autoRelink(quiet = true)
             if (info.hdr.isEmpty() && info.names.isEmpty()) return@launch
             project = project?.let { q ->
                 q.copy(
@@ -329,23 +330,37 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         missingFiles = missingFiles - map.keys
     }
 
-    /** Cerca nel telefono, per nome, i file spariti. */
-    fun autoRelink() {
+    /** Esito dell'ultima ricerca, mostrato nella finestra "File non trovati". */
+    var relinkNote by mutableStateOf<String?>(null)
+        private set
+
+    /** Cerca nel telefono (per nome e per peso) i file spariti; [quiet] = automatica, parla solo se trova qualcosa. */
+    fun autoRelink(quiet: Boolean = false) {
         val ctx = getApplication<Application>()
         val todo = missingFiles
-        if (todo.isEmpty()) { message = "Tutti i file sono al loro posto."; return }
+        if (todo.isEmpty()) { if (!quiet) message = "Tutti i file sono al loro posto."; return }
         viewModelScope.launch {
-            busy = "Cerco i file nel telefono…"
+            if (!quiet) busy = "Cerco i file nel telefono…"
             val found = withContext(Dispatchers.IO) { todo.mapNotNull { u -> Backup.findByName(ctx, missingInfo(u))?.let { u to it } }.toMap() }
             busy = null
+            val names = found.keys.map { missingInfo(it).name.ifBlank { "il file" } }
             relink(found)
-            message = when {
-                found.isEmpty() && !it.fabriziodavi.vivovideo.media.Gallery.fullAccess(ctx) ->
-                    "Non li ho trovati: l'app vede solo le foto e i video che le hai permesso. Sceglili tu, uno per uno (oppure dai l'accesso a tutti nelle impostazioni del telefono)."
-                found.isEmpty() -> "Non li ho trovati (se li hai appena spostati, il telefono potrebbe non averli ancora registrati: riprova tra poco). Oppure sceglili tu, uno per uno."
-                found.size == todo.size -> "Ritrovati tutti i ${found.size} file."
-                else -> "Ritrovati ${found.size} file su ${todo.size}: gli altri sceglili tu."
+            // L'avviso tecnico dell'anteprima non serve più: o il file è tornato, o c'è il pulsante Ricollega.
+            if (previewError?.startsWith("Un file del progetto") == true) previewError = null
+            if (found.isNotEmpty() && player != null) rebuildPreview(playheadUs / 1000)
+            val left = todo.filter { it !in found }.map { missingInfo(it).name.ifBlank { "un file senza nome" } }
+            relinkNote = when {
+                left.isEmpty() -> null
+                !it.fabriziodavi.vivovideo.media.Gallery.fullAccess(ctx) ->
+                    "Non trovo ${left.joinToString { "«$it»" }}: l'app vede solo le foto e i video che le hai permesso. Tocca «Scegli» e indicalo tu."
+                else -> "Non trovo ${left.joinToString { "«$it»" }} nel telefono (forse è stato cancellato, o rinominato con un altro nome). Tocca «Scegli» e indicalo tu."
             }
+            message = when {
+                found.isNotEmpty() && left.isEmpty() -> "Ritrovat${if (names.size == 1) "o ${names[0].let { "«$it»" }}" else "i tutti i ${names.size} file"}: il progetto è a posto."
+                found.isNotEmpty() -> "Ritrovati ${found.size} file; ${relinkNote}"
+                quiet -> null
+                else -> relinkNote
+            } ?: message
         }
     }
 
@@ -353,8 +368,14 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     fun relinkManual(old: String, new: Uri) {
         val ctx = getApplication<Application>()
         runCatching { ctx.contentResolver.takePersistableUriPermission(new, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
-        relink(mapOf(old to new.toString()))
-        message = "File ricollegato."
+        // Indirizzo della galleria quando possibile: quello del documento può smettere di funzionare dopo un riavvio.
+        val stable = Backup.stableUri(ctx, new)
+        val name = missingInfo(old).name
+        relink(mapOf(old to stable))
+        if (missingFiles.isEmpty()) relinkNote = null
+        previewError = null
+        rebuildPreview(playheadUs / 1000)
+        message = if (name.isNotBlank()) "«$name» ricollegato." else "File ricollegato."
     }
 
     /** Copia di sicurezza del progetto in [target] (file .vivo scelto dall'utente). */
@@ -2136,9 +2157,17 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             val missing = withContext(Dispatchers.IO) { runCatching { Backup.missing(ctx, p) }.getOrDefault(emptyList()) }
             if (project?.id != p.id) return@launch
             val appeared = missingFiles.isNotEmpty() && missing.isEmpty()
+            val newlyMissing = missing.any { it !in missingFiles }
             missingFiles = missing
+            // Appena manca qualcosa si cerca subito da soli (per nome e per peso): spesso non serve fare altro.
+            if (newlyMissing) autoRelink(quiet = true)
             // Un file ricomparso (per esempio la fine di uno spostamento): l'anteprima riparte.
             if (appeared) { previewError = null; if (player != null) rebuildPreview(playheadUs / 1000) }
+            // L'anteprima non leggeva un file, ma tutti i file risultano a posto: si riprova una volta.
+            if (missing.isEmpty() && previewError?.startsWith("Un file del progetto") == true) {
+                previewError = null
+                if (player != null) rebuildPreview(playheadUs / 1000)
+            }
         }
     }
     /** Il compositore a più ingressi ha dato errore in anteprima: si usa il ripiego. */
@@ -2182,9 +2211,10 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                         }
                         return
                     }
-                    if (error.errorCode == PlaybackException.ERROR_CODE_IO_FILE_NOT_FOUND) {
-                        // Un file è sparito mentre il progetto era aperto (spostato, cancellato): si ricontrolla e si offre Ricollega.
-                        previewError = "Un file del progetto non si trova più (spostato o cancellato). Tocca \"file non trovati · Ricollega\"."
+                    if (error.errorCode in 2000..2999) {
+                        // Un file non si legge più (spostato, cancellato, permesso scaduto): niente errore tecnico,
+                        // si ricontrolla, si cerca da soli e, se serve, si offre Ricollega.
+                        previewError = "Un file del progetto non si legge più. Lo sto cercando…"
                         handler.post { recheckFiles() }
                         return
                     }

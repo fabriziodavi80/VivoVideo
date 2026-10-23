@@ -424,7 +424,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
             }
             if (vm.missingFiles.isNotEmpty() && vm.clipWork == null) {
                 Text(
-                    "${vm.missingFiles.size} file non trovati · Ricollega",
+                    if (vm.missingFiles.size == 1) "1 file non trovato · tocca per ricollegarlo" else "${vm.missingFiles.size} file non trovati · tocca per ricollegarli",
                     color = Color.White, fontSize = 13.sp,
                     modifier = Modifier.align(Alignment.TopCenter).padding(8.dp)
                         .background(VV.Danger, RoundedCornerShape(8.dp)).clickable { relinkOpen = true }.padding(horizontal = 10.dp, vertical = 6.dp),
@@ -444,7 +444,8 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
                     TextButton(onClick = vm::cancelClipWork) { Text("Annulla", color = VV.Dim) }
                 }
             }
-            vm.previewError?.let {
+            // Con l'avviso dei file mancanti l'errore tecnico non si mostra (sarebbero due scritte una sopra l'altra).
+            vm.previewError?.takeIf { vm.missingFiles.isEmpty() }?.let {
                 Text(it, color = VV.Danger, fontSize = 12.sp, modifier = Modifier.align(Alignment.TopCenter).padding(8.dp))
             }
             if (overlay) {
@@ -756,8 +757,9 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
                         }
                     }
                     if (vm.missingFiles.isNotEmpty()) {
-                        SecondaryButton("Cerca nel telefono per nome", Modifier.fillMaxWidth(), onClick = vm::autoRelink)
-                        Hint("Se hai spostato o rinominato i file, sceglili tu: tagli, effetti e tutto il resto restano.")
+                        vm.relinkNote?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = VV.Tally) }
+                        SecondaryButton("Cerca di nuovo nel telefono", Modifier.fillMaxWidth(), onClick = { vm.autoRelink() })
+                        Hint("L'app cerca da sola il file per nome e per peso. Se non lo trova, tocca «Scegli» e indicalo tu: tagli, effetti e tutto il resto restano.")
                     }
                 }
             },

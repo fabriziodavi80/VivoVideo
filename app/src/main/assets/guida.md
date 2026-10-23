@@ -3,6 +3,7 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **File spostati ritrovati da soli**: appena un file del progetto non si trova più l'app lo cerca subito per nome e per peso (anche se il telefono gli ha dato un nome a numeri) e lo ricollega senza chiederti niente, dicendoti quale file ha ritrovato. Se non lo trova, l'avviso dice quale file manca e basta toccare «Scegli». Un file scelto a mano resta collegato anche dopo il riavvio. Niente più errori tecnici in rosso sull'anteprima.
 - **Ricollega più bravo a ritrovare i file**: "Cerca nel telefono" guarda in tutte le cartelle (anche Download) e riconosce le copie rinominate dai gestori file ("video (1).mp4", "video_1.mp4", "video copia.mp4"). Se non trova nulla ti dice perché (accesso solo ad alcune foto, file appena spostati non ancora registrati dal telefono).
 - **File spariti controllati anche a progetto aperto**: se sposti o cancelli un video mentre l'app è aperta, al ritorno nell'app (o al primo errore dell'anteprima) compare subito "file non trovati · Ricollega". Nota: spostando un video con la Galleria, Android di solito lo segue da solo e il progetto continua a funzionare.
 - **Scontorno "Preciso" di Google**: in Effetti → Persona (e Livelli → Solo la persona) scegli **Veloce** o **Preciso (Google)**. Il preciso usa il modello di scontorno di Google: bordo più fedele su capelli, mani e oggetti tenuti in mano, ma è più lento. La prima volta Google scarica il modello (serve internet); se non è disponibile l'app usa quello veloce e te lo dice.
@@ -77,7 +78,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - **Copia leggera**: il progetto con tutto quello che l'app ha creato o copiato (foto importate, voce registrata, fermi immagine, clip al contrario, maschere della persona, LUT, font, brani scaricati). I video restano nella galleria: va bene per tenere il progetto al sicuro sullo stesso telefono.
 - **Con tutti i video**: dentro ci sono anche i video originali (file grande): si apre su un altro telefono identico a com'era.
 - **Apri una copia** (Home): il progetto torna nella lista; se ce n'è già uno uguale, si chiama "(copia)".
-- **Ricollega**: se un file non si trova più compare l'avviso rosso sull'anteprima. "Cerca nel telefono per nome" li ritrova se li hai spostati di cartella; altrimenti "Scegli" per ciascuno. Funziona anche per i brani e i video sovrapposti.
+- **Ricollega**: se un file non si trova più compare l'avviso rosso sull'anteprima. L'app li cerca da sola per nome e per peso appena se ne accorge (anche dopo uno spostamento in un'altra cartella); "Cerca di nuovo nel telefono" ripete la ricerca; altrimenti "Scegli" per ciascuno. Funziona anche per i brani e i video sovrapposti.
 - **Modelli**: Salva come modello tiene la struttura del progetto (ogni clip diventa uno "spazio" con la sua durata, velocità, transizione, effetti, colore, inquadratura e movimento) e anche testi, musica, livelli e formato. Da un modello: scegli i video e le foto nell'ordine giusto; per ogni video si prende il momento migliore della durata giusta. Se scegli più elementi degli spazi, il modello si ripete.
 
 ## Video automatico

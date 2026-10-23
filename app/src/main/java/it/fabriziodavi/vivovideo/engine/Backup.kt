@@ -180,10 +180,32 @@ object Backup {
                 }
             }
         }
-        return hits.sortedWith(compareByDescending<Pair<String, Pair<String, Long>>> { ref.size > 0 && it.second.second == ref.size }
+        hits.sortedWith(compareByDescending<Pair<String, Pair<String, Long>>> { ref.size > 0 && it.second.second == ref.size }
             .thenByDescending { it.second.first == ref.name })
-            .firstOrNull { exists(ctx, it.first) }?.first
+            .firstOrNull { exists(ctx, it.first) }?.first?.let { return it }
+        // Il nome a volte non serve (il selettore delle foto può dare un nome a numeri): si cerca per peso esatto in byte,
+        // che per un video è praticamente un'impronta.
+        return if (ref.size > 100_000) findBySize(ctx, ref.size) else null
     }
+
+    /** File del telefono con esattamente [size] byte (video e foto); null se nessuno o più di uno. */
+    fun findBySize(ctx: Context, size: Long): String? {
+        val found = LinkedHashSet<String>()
+        for (col in listOf(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, MediaStore.Images.Media.EXTERNAL_CONTENT_URI, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI)) {
+            runCatching {
+                ctx.contentResolver.query(col, arrayOf(MediaStore.MediaColumns._ID), MediaStore.MediaColumns.SIZE + "=?", arrayOf(size.toString()), null)
+                    ?.use { c -> while (c.moveToNext()) found += ContentUris.withAppendedId(col, c.getLong(0)).toString() }
+            }
+        }
+        return found.singleOrNull()?.takeIf { exists(ctx, it) }
+    }
+
+    /**
+     * Indirizzo stabile per un file scelto a mano: se è nella galleria si usa quello della galleria
+     * (vale anche dopo un riavvio), altrimenti quello del documento.
+     */
+    fun stableUri(ctx: Context, picked: android.net.Uri): String =
+        runCatching { MediaStore.getMediaUri(ctx, picked)?.toString() }.getOrNull()?.takeIf { exists(ctx, it) } ?: picked.toString()
 
     /** Stesso file con nome uguale o copia rinominata: "video.mp4", "video (1).mp4", "video_1.mp4", "video-copia.mp4". */
     fun sameFile(original: String, candidate: String): Boolean {
