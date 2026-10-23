@@ -194,6 +194,30 @@ object Backup {
         return if (ref.size > 100_000) findBySize(ctx, ref.size) else null
     }
 
+    /**
+     * Video del telefono con la stessa durata (±60 ms) e risoluzione (in un verso o nell'altro): l'ultima risorsa
+     * quando di un file non si conoscono né nome né peso. Restituisce il video solo se è uno solo.
+     */
+    fun findVideo(ctx: Context, durationUs: Long, w: Int, h: Int): String? {
+        if (durationUs < 500_000) return null
+        val ms = durationUs / 1000
+        val col = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+        val found = ArrayList<String>()
+        runCatching {
+            ctx.contentResolver.query(
+                col, arrayOf(MediaStore.MediaColumns._ID, MediaStore.MediaColumns.WIDTH, MediaStore.MediaColumns.HEIGHT),
+                MediaStore.MediaColumns.DURATION + " BETWEEN ? AND ?", arrayOf((ms - 60).toString(), (ms + 60).toString()), null,
+            )?.use { c ->
+                while (c.moveToNext()) {
+                    val cw = c.getInt(1); val ch = c.getInt(2)
+                    val sameSize = w <= 0 || h <= 0 || cw <= 0 || (cw == w && ch == h) || (cw == h && ch == w)
+                    if (sameSize) found += ContentUris.withAppendedId(col, c.getLong(0)).toString()
+                }
+            }
+        }
+        return found.singleOrNull()?.takeIf { exists(ctx, it) }
+    }
+
     /** File del telefono con esattamente [size] byte (video e foto); null se nessuno o più di uno. */
     fun findBySize(ctx: Context, size: Long): String? {
         val found = LinkedHashSet<String>()

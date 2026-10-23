@@ -329,6 +329,14 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         return MediaRef(uri)
     }
 
+    /** Ultima risorsa: lo stesso video riconosciuto da durata e risoluzione (quando nome e peso non si conoscono). */
+    private fun videoLookalike(ctx: android.content.Context, uri: String): String? {
+        val p = project ?: return null
+        p.clips.firstOrNull { it.uri == uri && !it.isPhoto }?.let { return Backup.findVideo(ctx, it.sourceDurationUs, it.width, it.height) }
+        p.layers.firstOrNull { it.uri == uri && it.isVideo }?.let { return Backup.findVideo(ctx, it.sourceDurationUs, it.width, it.height) }
+        return null
+    }
+
     /** Nome che si cerca nel telefono: solo quello vero del file (non le etichette "Video della clip…"). */
     private fun searchInfo(uri: String): MediaRef {
         val p = project ?: return MediaRef(uri)
@@ -367,7 +375,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         if (todo.isEmpty()) { if (!quiet) message = "Tutti i file sono al loro posto."; return }
         viewModelScope.launch {
             if (!quiet) busy = "Cerco i file nel telefono…"
-            val found = withContext(Dispatchers.IO) { todo.mapNotNull { u -> Backup.findByName(ctx, searchInfo(u))?.let { u to it } }.toMap() }
+            val found = withContext(Dispatchers.IO) { todo.mapNotNull { u -> (Backup.findByName(ctx, searchInfo(u)) ?: videoLookalike(ctx, u))?.let { u to it } }.toMap() }
             busy = null
             val names = found.keys.map { missingInfo(it).name.ifBlank { "il file" } }
             relink(found)
