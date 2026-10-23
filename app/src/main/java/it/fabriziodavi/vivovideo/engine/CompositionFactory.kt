@@ -93,11 +93,13 @@ object ExportEstimate {
      * Bit al secondo: come le riprese del telefono (4K 30 fps H.265 ≈ 60 Mbps, 1080p ≈ 15), un po' di più per i
      * fotogrammi al secondo, ×1,4 in H.264 e ×1,25 in HDR a 10 bit (più sfumature da conservare).
      */
-    fun bitrate(outW: Int, outH: Int, outFps: Float, codec: OutputCodec, maxBitrate: Int? = null, attempt: Int = 0, hdr: Boolean = false): Int {
+    fun bitrate(outW: Int, outH: Int, outFps: Float, codec: OutputCodec, maxBitrate: Int? = null, attempt: Int = 0, hdr: Boolean = false, source: Int = 0): Int {
         val top = if (attempt >= 1) 100_000_000.0 else 160_000_000.0
         var b = (60_000_000.0 * outW * outH * outFps / (3840.0 * 2160 * 30)).coerceIn(10_000_000.0, top)
         if (hdr) b *= 1.25
         if (codec == OutputCodec.H264) b *= 1.4
+        // Mai meno dell'originale (riportato alla stessa misura): l'esportazione non deve impoverire il video.
+        if (source > 0) b = maxOf(b, source * 1.1)
         var r = b.coerceAtMost(top).toInt()
         maxBitrate?.let { r = minOf(r, it) }
         return r

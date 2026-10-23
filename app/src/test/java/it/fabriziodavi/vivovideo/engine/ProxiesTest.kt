@@ -87,6 +87,8 @@ class ProxiesTest {
         // 1080p come le riprese del telefono; in HDR a 10 bit un quarto in più.
         assertEquals(15_000_000, ExportEstimate.bitrate(1080, 1920, 30f, OutputCodec.H265))
         assertEquals(18_750_000, ExportEstimate.bitrate(1080, 1920, 30f, OutputCodec.H265, hdr = true))
+        // Mai meno dell'originale (un 1080p Dolby Vision del telefono a circa 17 Mbps): almeno il 10% in più.
+        assertEquals(22_000_000, ExportEstimate.bitrate(1080, 1920, 30f, OutputCodec.H265, hdr = true, source = 20_000_000))
         assertEquals("circa 1,2 GB", ExportEstimate.label(1_200_000_000))
     }
 }
