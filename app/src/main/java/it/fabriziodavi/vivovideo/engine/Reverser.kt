@@ -140,7 +140,14 @@ object Reverser {
         val lastUs = times.last()
         val durUs = lastUs - times.first() + frameUs
 
+        // La copia intermedia può essere salvata "coricata" con l'indicazione di rotazione (lo fa Media3 per i video
+        // verticali): si riporta la stessa indicazione, altrimenti il risultato appare girato di 90°.
+        val rotation = (if (vFormat.containsKey(MediaFormat.KEY_ROTATION)) vFormat.getInteger(MediaFormat.KEY_ROTATION) else runCatching {
+            val r = android.media.MediaMetadataRetriever(); r.setDataSource(src.absolutePath)
+            try { r.extractMetadata(android.media.MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION)?.toInt() ?: 0 } finally { r.release() }
+        }.getOrDefault(0)).let { ((it % 360) + 360) % 360 }
         val muxer = MediaMuxer(out.absolutePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+        if (rotation != 0) muxer.setOrientationHint(rotation)
         // Audio prima, in memoria (al massimo un minuto): entra nel file appena c'è la traccia video.
         val audio = runCatching { reversedAudio(src, durUs) }.getOrNull()
 
@@ -235,7 +242,8 @@ object Reverser {
             runCatching { if (started) muxer.stop() }; muxer.release()
         }
         onProgress(1f)
-        return Result(out, times.size * frameUs, w, h)
+        // Misure come si vede (con la rotazione).
+        return if (rotation % 180 == 0) Result(out, times.size * frameUs, w, h) else Result(out, times.size * frameUs, h, w)
     }
 
     /** Audio del file decodificato, rovesciato e ricodificato in AAC: formato e campioni pronti per il muxer. */

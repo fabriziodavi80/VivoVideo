@@ -3,6 +3,7 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **Al contrario con i video verticali**: la copia rovesciata non esce più girata di 90°. Se l'avevi già fatta, tocca «Di nuovo nel verso normale» e poi di nuovo «Al contrario».
 - **Esportazione a qualità piena**: l'encoder del telefono ora usa davvero i bit al secondo scelti (prima, lasciato libero, ne usava molti meno e si perdeva dettaglio). Nel risultato la riga Encoder dice "qualità piena"; se il telefono non la regge, l'app riprova da sola con le impostazioni di prima.
 - **Video esportati più nitidi**: la qualità (bit al secondo) è ora come quella delle riprese del telefono (4K ≈ 60 Mbps, 1080p ≈ 15 Mbps) e in HDR a 10 bit un quarto in più, per conservare le sfumature; e comunque mai meno del video originale (riportato alla stessa misura). Se esporti in 1080p un progetto con video 4K, l'app ti ricorda che per la stessa nitidezza dell'originale serve Originale o 4K.
 - **Stabilizzazione da professionisti**: il movimento si misura su un'immagine grande il doppio e con precisione al decimo di pixel (niente più piccolo tremolio residuo), e ora si corregge anche la **rotazione** della camera (il dondolio di lato quando si cammina, fino a circa 1°) senza deformare l'immagine. Rifai la stabilizzazione sulle clip già fatte.

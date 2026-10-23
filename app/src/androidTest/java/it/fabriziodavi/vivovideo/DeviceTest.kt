@@ -808,6 +808,16 @@ class DeviceTest {
         // E la clip al contrario si esporta come le altre.
         val rc = ClipTools.reversed(c, uri.toString(), r.durationUs, r.width, r.height)
         exportAndCheck(Project(name = "contrario", clips = listOf(rc, video("b", videoB))))
+        // Video verticale: la copia al contrario resta verticale (prima usciva girata di 90°).
+        val v = video("v", videoA, s = 0, e = 2_000_000).copy(width = 1080, height = 1920)
+        val rv = runBlocking { Reverser.reverse(ctx, v) {} }
+        assertTrue("misure ${rv.width}×${rv.height}", rv.width < rv.height)
+        val mv = MediaMetadataRetriever().apply { setDataSource(ctx, Uri.fromFile(rv.file)) }
+        val rot = mv.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION)?.toInt() ?: 0
+        val vw = mv.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)!!.toInt()
+        val vh = mv.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)!!.toInt(); mv.release()
+        val (dw, dh) = if (rot % 180 == 0) vw to vh else vh to vw
+        assertTrue("si vede ${dw}×${dh} (rotazione $rot)", dw < dh)
     }
 
     /** Video che trema (macchie spostate a caso a ogni fotogramma): la misura trova il tremolio e l'esportazione lo usa. */
