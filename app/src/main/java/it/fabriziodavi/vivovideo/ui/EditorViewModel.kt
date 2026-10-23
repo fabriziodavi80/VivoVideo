@@ -321,13 +321,39 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         p.clips.firstOrNull { it.uri == uri && it.fileName.isNotBlank() }?.let { return MediaRef(uri, it.fileName, it.fileSize) }
         p.layers.firstOrNull { it.uri == uri && it.fileName.isNotBlank() }?.let { return MediaRef(uri, it.fileName, it.fileSize) }
         p.music.firstOrNull { it.uri == uri }?.let { return MediaRef(uri, it.name) }
+        // Senza nome registrato: si dice almeno quale elemento è.
+        p.clips.indexOfFirst { it.uri == uri }.takeIf { it >= 0 }?.let { i ->
+            return MediaRef(uri, (if (p.clips[i].isPhoto) "Foto" else "Video") + " della clip ${i + 1}")
+        }
+        p.layers.firstOrNull { it.uri == uri }?.let { return MediaRef(uri, "Livello «${it.name}»") }
         return MediaRef(uri)
+    }
+
+    /** Nome che si cerca nel telefono: solo quello vero del file (non le etichette "Video della clip…"). */
+    private fun searchInfo(uri: String): MediaRef {
+        val p = project ?: return MediaRef(uri)
+        p.clips.firstOrNull { it.uri == uri && it.fileName.isNotBlank() }?.let { return MediaRef(uri, it.fileName, it.fileSize) }
+        p.layers.firstOrNull { it.uri == uri && it.fileName.isNotBlank() }?.let { return MediaRef(uri, it.fileName, it.fileSize) }
+        val size = p.clips.firstOrNull { it.uri == uri }?.fileSize ?: p.layers.firstOrNull { it.uri == uri }?.fileSize ?: 0L
+        p.music.firstOrNull { it.uri == uri }?.let { return MediaRef(uri, it.name) }
+        return MediaRef(uri, "", size)
     }
 
     private fun relink(map: Map<String, String>) {
         if (map.isEmpty()) return
-        update { p -> ProjectRefs.replace(p) { r -> map[r] } }
+        val ctx = getApplication<Application>()
+        // Nome e peso del file nuovo: servono per ritrovarlo se si sposterà ancora.
+        val info = map.values.associateWith { runCatching { Backup.describe(ctx, it) }.getOrNull() }
+        update { p ->
+            ProjectRefs.replace(p) { r -> map[r] }.let { q ->
+                q.copy(
+                    clips = q.clips.map { c -> info[c.uri]?.takeIf { it.name.isNotBlank() }?.let { c.copy(fileName = it.name, fileSize = it.size) } ?: c },
+                    layers = q.layers.map { l -> info[l.uri]?.takeIf { it.name.isNotBlank() }?.let { l.copy(fileName = it.name, fileSize = it.size) } ?: l },
+                )
+            }
+        }
         missingFiles = missingFiles - map.keys
+        unreadable.removeAll(map.keys)
     }
 
     /** Esito dell'ultima ricerca, mostrato nella finestra "File non trovati". */
@@ -341,7 +367,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         if (todo.isEmpty()) { if (!quiet) message = "Tutti i file sono al loro posto."; return }
         viewModelScope.launch {
             if (!quiet) busy = "Cerco i file nel telefono…"
-            val found = withContext(Dispatchers.IO) { todo.mapNotNull { u -> Backup.findByName(ctx, missingInfo(u))?.let { u to it } }.toMap() }
+            val found = withContext(Dispatchers.IO) { todo.mapNotNull { u -> Backup.findByName(ctx, searchInfo(u))?.let { u to it } }.toMap() }
             busy = null
             val names = found.keys.map { missingInfo(it).name.ifBlank { "il file" } }
             relink(found)
@@ -2233,6 +2259,14 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             .apply { if (multi) setVideoGraphFactory(androidx.media3.effect.MultipleInputVideoGraph.Factory()) }
             .build().also { np ->
             np.addListener(object : Player.Listener {
+                override fun onPlaybackStateChanged(state: Int) {
+                    // L'anteprima è pronta: i file si leggono. Un vecchio "illeggibile" non vale più.
+                    if (state == Player.STATE_READY && player === np && (unreadable.isNotEmpty() || missingFiles.isNotEmpty())) {
+                        unreadable.clear()
+                        recheckFiles()
+                    }
+                }
+
                 override fun onPlayerError(error: PlaybackException) {
                     // Un lettore già chiuso (o in chiusura) non conta: per esempio "release timeout" su un telefono lento.
                     if (player !== np) return
@@ -2254,7 +2288,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                         // L'indirizzo del file che non si legge, preso dal messaggio d'errore.
                         val bad = Regex("(content|file)://[^\\s]+").findAll(generateSequence(error as Throwable) { it.cause }.joinToString(" ") { it.message ?: "" })
                             .map { it.value.trimEnd('.', ',', ')') }.toSet()
-                        project?.let { q -> bad.filter { b -> ProjectRefs.refs(q).contains(b) } }?.let { unreadable += it }
+                        project?.let { q -> bad.filter { b -> q.clips.any { it.uri == b } || q.layers.any { it.uri == b } || q.music.any { it.uri == b } } }?.let { unreadable += it }
                         // Un file non si legge più (spostato, cancellato, permesso scaduto): niente errore tecnico,
                         // si ricontrolla, si cerca da soli e, se serve, si offre Ricollega.
                         previewError = "Un file del progetto non si legge più. Lo sto cercando…"
