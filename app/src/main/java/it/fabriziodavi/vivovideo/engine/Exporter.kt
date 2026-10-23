@@ -119,14 +119,23 @@ class Exporter(
             hdr = options.hdr && project.clips.any { it.hdr > 0 }, source = sourceBps(project, outW, outH, outFps))
 
         val heavy = project.clips.any { it.isHeavy }
-        val step = if (heavy) attempt + 1 else attempt
+        // Scala dei tentativi: prima la qualità piena (bit al secondo costanti: l'encoder del telefono, lasciato libero,
+        // ne usa molti meno di quelli chiesti e si perde dettaglio), poi impostazioni sempre più prudenti.
+        val ladder = if (heavy) listOf(Mode.QUALITY, Mode.STANDARD, Mode.REALTIME, Mode.SOFTWARE)
+            else listOf(Mode.QUALITY, Mode.FAST, Mode.STANDARD, Mode.REALTIME, Mode.SOFTWARE)
+        val step = attempt.coerceAtMost(ladder.lastIndex)
         val settings = VideoEncoderSettings.Builder().setBitrate(bitrate)
         var softwareDecoder = false
-        val mode = when (step) {
-            0 -> "massima velocità"
-            1 -> { settings.setEncoderPerformanceParameters(VideoEncoderSettings.RATE_UNSET, VideoEncoderSettings.RATE_UNSET); "velocità standard" }
-            2 -> { settings.setEncoderPerformanceParameters(outFps.toInt().coerceAtLeast(1), 1); "tempo reale" }
-            else -> {
+        val mode = when (ladder[step]) {
+            Mode.QUALITY -> {
+                settings.setBitrateMode(android.media.MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR)
+                settings.setEncoderPerformanceParameters(VideoEncoderSettings.RATE_UNSET, VideoEncoderSettings.RATE_UNSET)
+                "qualità piena"
+            }
+            Mode.FAST -> "massima velocità"
+            Mode.STANDARD -> { settings.setEncoderPerformanceParameters(VideoEncoderSettings.RATE_UNSET, VideoEncoderSettings.RATE_UNSET); "velocità standard" }
+            Mode.REALTIME -> { settings.setEncoderPerformanceParameters(outFps.toInt().coerceAtLeast(1), 1); "tempo reale" }
+            Mode.SOFTWARE -> {
                 settings.setEncoderPerformanceParameters(outFps.toInt().coerceAtLeast(1), 1)
                 softwareDecoder = true
                 "decoder software (lento)"
@@ -177,6 +186,13 @@ class Exporter(
                     exportException.errorCode == ExportException.ERROR_CODE_MUXING_TIMEOUT ||
                     // Il codificatore si è fermato a metà (capita con progetti lunghi): si riprova con impostazioni più prudenti.
                     exportException.errorCode == ExportException.ERROR_CODE_ENCODING_FAILED
+                if (ladder[step] == Mode.QUALITY && !cancelled) {
+                    // La qualità piena non è riuscita (encoder che non accetta i bit costanti): si riprova normale,
+                    // senza rinunciare all'HDR.
+                    log += "• $mode: ${exportException.errorCodeName}"
+                    handler.post { attempt(project, options, audio, attempt + 1, log, allowMulti) }
+                    return
+                }
                 if (options.hdr && !cancelled) {
                     // L'HDR non è riuscito (encoder o un filtro che non lo regge): di nuovo, in SDR.
                     val why = generateSequence(exportException as Throwable) { it.cause }.take(3)
@@ -190,10 +206,10 @@ class Exporter(
                     // Il decodificatore video si è guastato a metà (capita con progetti lunghi o molti video):
                     // cambiare l'encoder non serve, si riprova subito con il decodificatore software.
                     onState(ExportState.Running(null, "Nuovo tentativo con il decodificatore software…"))
-                    handler.post { attempt(project, options, audio, if (heavy) 2 else 3, log, allowMulti) }
+                    handler.post { attempt(project, options, audio, ladder.lastIndex, log, allowMulti) }
                     return
                 }
-                if (retryable && step < 3 && !cancelled) {
+                if (retryable && step < ladder.lastIndex && !cancelled) {
                     onState(ExportState.Running(null, "Nuovo tentativo con impostazioni più prudenti…"))
                     handler.post { attempt(project, options, audio, attempt + 1, log, allowMulti) }
                     return
@@ -284,3 +300,6 @@ class Exporter(
         return uri
     }
 }
+
+/** Impostazioni dell'encoder, dalla qualità piena alle più prudenti. */
+private enum class Mode { QUALITY, FAST, STANDARD, REALTIME, SOFTWARE }
