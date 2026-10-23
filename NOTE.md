@@ -1,6 +1,6 @@
 # VivoVideo · note per riprendere il lavoro
 
-Aggiornate al 21/10/2026, ultima versione **v0.3.176**. Da leggere insieme a `CLAUDE.md`.
+Aggiornate al 21/10/2026, ultima versione **v0.3.184**. Da leggere insieme a `CLAUDE.md`.
 
 ## 1. Stato attuale dell'app
 
@@ -58,6 +58,8 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, minSdk 33, solo arm64-v8a 
 - "Altra proposta" e cambio di stile.
 
 ### Da riprendere dopo il collaudo
+- Stabilizzazione (v0.3.183–184: zoom 4–12%, percorso vincolato, misura 384 px sub-pixel Lucas-Kanade, rotazione ±1°): approvata ma "miglioramento non sensazionale". Idee: correzione rolling shutter, zoom variabile nel tempo, omografia invece di spostamento+rotazione.
+- Ricollega (v0.3.177–182): osservatore della galleria, ricerca per nome, peso, durata+risoluzione; collaudo OK.
 - Scontorno della persona (v0.3.175–176: maschera 256, filtro guidato, smussatura; modello "Preciso" Google subject segmentation). L'utente lo accetta ma "non è il top": non convincono **alcuni bordi della persona e i capelli**. Idee: pennello di ritocco (aggiungi/togli con propagazione ai fotogrammi vicini), filtro guidato a colori/a due passaggi, modello di matting più pesante incluso nell'app.
 
 ### Audio, mixer, timeline (v0.3.163–v0.3.174)
