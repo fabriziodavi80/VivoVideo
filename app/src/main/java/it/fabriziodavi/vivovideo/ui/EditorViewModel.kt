@@ -1582,7 +1582,9 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     fun copyStyle() {
         val c = selectedClip ?: return
         copiedStyle = c
-        message = "Attributi copiati: scegli le clip e tocca Incolla."
+        // Si entra subito nella scelta delle clip: basta toccarle nella timeline e poi "Incolla attributi".
+        if (multiIds == null) multiIds = emptySet()
+        message = "Attributi copiati. Ora tocca nella timeline le clip su cui incollarli (o «Tutte»), poi «Incolla attributi»."
     }
 
     /** Clip su cui si incolla: quelle della selezione multipla, altrimenti quella selezionata. */

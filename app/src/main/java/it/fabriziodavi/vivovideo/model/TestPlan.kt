@@ -99,7 +99,7 @@ object TestPlan {
             "Una clip girata camminando → Inquadra → Stabilizza la clip; prova la Forza.",
             "L'immagine trema molto meno; lo zoom resta moderato."),
         Item("tool_multi", "Strumenti", "Selezione multipla e incolla attributi",
-            "Copia attributi da una clip con effetti e colore → Seleziona più clip → Incolla attributi.",
+            "Tieni premuta una clip con effetti e colore → Copia attributi → tocca nella timeline le clip su cui incollare (o Tutte) → Incolla attributi.",
             "Le clip scelte prendono effetti e colore; un Annulla torna indietro."),
         Item("tool_tutorial", "Strumenti", "Tutorial: zoom, frecce, passi",
             "Modifica → Inquadra → Zoom su un punto: 2× su un angolo. Livelli → Freccia e Numero. Testo → Passo numerato.",

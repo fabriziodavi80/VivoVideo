@@ -2195,7 +2195,11 @@ private fun MultiSelectBar(vm: EditorViewModel, ids: Set<String>, onPaste: () ->
     Column(Modifier.fillMaxWidth().background(VV.Panel).padding(horizontal = 12.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                if (ids.isEmpty()) "Tocca le clip da scegliere" else "${ids.size} clip scelte",
+                when {
+                    ids.isNotEmpty() -> "${ids.size} clip scelte"
+                    vm.copiedStyle != null -> "Tocca le clip su cui incollare"
+                    else -> "Tocca le clip da scegliere"
+                },
                 style = MaterialTheme.typography.titleSmall, color = VV.Text, modifier = Modifier.weight(1f),
             )
             TextButton(onClick = vm::selectAllClips) { Text("Tutte", color = VV.Tally) }

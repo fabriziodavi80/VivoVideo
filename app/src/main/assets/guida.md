@@ -3,6 +3,7 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **Incolla attributi più semplice**: dopo «Copia attributi» l'app passa subito alla scelta delle clip. Tocca nella timeline quelle su cui incollare (o «Tutte») e poi «Incolla attributi»; «Fine» torna alla selezione normale.
 - **Tagli a ritmo allineati nella timeline**: dopo «Dividi i video sui battiti» ogni taglio fra due clip sta esattamente sotto la sua tacca arancione del righello, anche con centinaia di clip e con lo zoom più lontano. Prima i bordi delle clip, disegnati uno dopo l'altro, si spostavano un po' alla volta e dopo qualche decina di clip sembravano fuori tempo (nel video i tagli erano già giusti).
 - **Anteprima oltre la fine del brano**: se la musica finisce prima del video, scorrendo o riproducendo oltre la sua fine l'anteprima non si blocca più.
 - **Al contrario con i video verticali**: la copia rovesciata non esce più girata di 90°. Se l'avevi già fatta, tocca «Di nuovo nel verso normale» e poi di nuovo «Al contrario».
@@ -67,7 +68,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - Tocca un **testo**, un **livello** o un **brano** nelle loro righe: si apre il loro pannello.
 - Tocca uno spazio vuoto della timeline per togliere la selezione.
 - **Più clip insieme**: tieni premuta una clip → **Seleziona più clip**, poi tocca le altre (spunta in alto a destra) o **Tutte**. Dalla barra: **Incolla attributi** o **Elimina**; **Fine** per tornare normale.
-- **Copia attributi** (tieni premuta una clip): copia effetti, colore, transizione, apri e chiudi, inquadratura, keyframe, velocità e volume. **Incolla attributi** chiede quali gruppi incollare (di serie quelli che la clip copiata ha davvero). I keyframe si adattano alla durata di ogni clip; le foto non prendono velocità e volume. Si annulla con un solo Annulla.
+- **Copia attributi** (tieni premuta una clip): l'app passa subito alla scelta delle clip; tocca quelle su cui incollare (o **Tutte**), poi **Incolla attributi**. Copia effetti, colore, transizione, apri e chiudi, inquadratura, keyframe, velocità e volume. **Incolla attributi** chiede quali gruppi incollare (di serie quelli che la clip copiata ha davvero). I keyframe si adattano alla durata di ogni clip; le foto non prendono velocità e volume. Si annulla con un solo Annulla.
 
 ## Tagliare e ordinare
 - **Maniglie arancioni** ai lati della clip selezionata: trascinale per accorciare o allungare.

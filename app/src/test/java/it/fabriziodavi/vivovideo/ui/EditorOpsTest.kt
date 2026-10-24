@@ -336,6 +336,8 @@ class EditorOpsTest {
         vm.selectedClipId = "a"
         vm.updateSelected { it.copy(grade = it.grade.copy(exposure = 0.7f), volume = 0.3f) }
         vm.copyStyle()
+        // Dopo "Copia attributi" si è già nella scelta delle clip (vuota: la clip copiata non conta).
+        assertEquals(emptySet<String>(), vm.multiIds)
         vm.startMultiSelect()
         assertEquals(setOf("a"), vm.multiIds)
         vm.toggleMulti("b"); vm.toggleMulti("p")
