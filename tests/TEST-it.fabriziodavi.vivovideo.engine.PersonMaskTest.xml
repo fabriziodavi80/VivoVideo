@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.engine.PersonMaskTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-24T14:27:46.319Z" hostname="runnervmtai0g" time="0.001">
+  <properties/>
+  <testcase name="shaderRefinesTheEdgeWithTheImageAndStaysHdrSafe" classname="it.fabriziodavi.vivovideo.engine.PersonMaskTest" time="0.0"/>
+  <testcase name="smoothingDampsFlicker" classname="it.fabriziodavi.vivovideo.engine.PersonMaskTest" time="0.001"/>
+  <testcase name="resampleKeepsShapeAndRange" classname="it.fabriziodavi.vivovideo.engine.PersonMaskTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

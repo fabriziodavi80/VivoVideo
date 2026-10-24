@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.engine.MixProcessorTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-24T14:27:46.067Z" hostname="runnervmtai0g" time="0.167">
+  <properties/>
+  <testcase name="previewChannelAppliesGainAndFeedsTheMeter" classname="it.fabriziodavi.vivovideo.engine.MixProcessorTest" time="0.167"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.engine.BackupTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-24T14:27:39.463Z" hostname="runnervmtai0g" time="0.389">
+  <properties/>
+  <testcase name="renamedCopiesStillMatch" classname="it.fabriziodavi.vivovideo.engine.BackupTest" time="0.041"/>
+  <testcase name="readableReallyReadsTheFile" classname="it.fabriziodavi.vivovideo.engine.BackupTest" time="0.021"/>
+  <testcase name="lightBackupRoundTrip" classname="it.fabriziodavi.vivovideo.engine.BackupTest" time="0.146"/>
+  <testcase name="missingFilesAreReported" classname="it.fabriziodavi.vivovideo.engine.BackupTest" time="0.027"/>
+  <testcase name="refsFindEveryFileInAnyField" classname="it.fabriziodavi.vivovideo.engine.BackupTest" time="0.152"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

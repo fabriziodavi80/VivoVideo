@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.model.FeaturesTest" tests="22" skipped="0" failures="0" errors="0" timestamp="2026-10-24T14:27:47.273Z" hostname="runnervmtai0g" time="0.011">
+  <properties/>
+  <testcase name="addInsertMoveDelete" classname="it.fabriziodavi.vivovideo.model.FeaturesTest" time="0.0"/>
+  <testcase name="everyFieldSurvivesSaveAndLoad" classname="it.fabriziodavi.vivovideo.model.FeaturesTest" time="0.004"/>
+  <testcase name="otherTransitionsUseHalves" classname="it.fabriziodavi.vivovideo.model.FeaturesTest" time="0.001"/>
+  <testcase name="motionStylesStartAndEnd" classname="it.fabriziodavi.vivovideo.model.FeaturesTest" time="0.0"/>
+  <testcase name="slideshowVariedMotionNeverRepeatsBackToBack" classname="it.fabriziodavi.vivovideo.model.FeaturesTest" time="0.002"/>
+  <testcase name="speedsChangeOutputDuration" classname="it.fabriziodavi.vivovideo.model.FeaturesTest" time="0.001"/>
+  <testcase name="easingsStayInRange" classname="it.fabriziodavi.vivovideo.model.FeaturesTest" time="0.0"/>
+  <testcase name="locateAtBoundariesAndEnd" classname="it.fabriziodavi.vivovideo.model.FeaturesTest" time="0.0"/>
+  <testcase name="oldProjectsWithoutNewFieldsStillLoad" classname="it.fabriziodavi.vivovideo.model.FeaturesTest" time="0.0"/>
+  <testcase name="lanesNeverOverlap" classname="it.fabriziodavi.vivovideo.model.FeaturesTest" time="0.001"/>
+  <testcase name="musicStopsAtVideoEndAndFades" classname="it.fabriziodavi.vivovideo.model.FeaturesTest" time="0.0"/>
+  <testcase name="textPresetsAreComplete" classname="it.fabriziodavi.vivovideo.model.FeaturesTest" time="0.0"/>
+  <testcase name="crossfadeNeverLongerThanHalfClip" classname="it.fabriziodavi.vivovideo.model.FeaturesTest" time="0.0"/>
+  <testcase name="splitMovesTransitionToSecondPiece" classname="it.fabriziodavi.vivovideo.model.FeaturesTest" time="0.0"/>
+  <testcase name="beatEveryAndShiftAndOffset" classname="it.fabriziodavi.vivovideo.model.FeaturesTest" time="0.001"/>
+  <testcase name="splitPhotoAndRefuseNearEdges" classname="it.fabriziodavi.vivovideo.model.FeaturesTest" time="0.0"/>
+  <testcase name="crossfadeSkippedWithoutMaterialAndLastClip" classname="it.fabriziodavi.vivovideo.model.FeaturesTest" time="0.0"/>
+  <testcase name="layerMotionInterpolates" classname="it.fabriziodavi.vivovideo.model.FeaturesTest" time="0.0"/>
+  <testcase name="slideshowFixedDurationAndNoTransitions" classname="it.fabriziodavi.vivovideo.model.FeaturesTest" time="0.001"/>
+  <testcase name="fitClipOutputWorksWithRamps" classname="it.fabriziodavi.vivovideo.model.FeaturesTest" time="0.0"/>
+  <testcase name="layerShapeKeepsOldRoundedFlag" classname="it.fabriziodavi.vivovideo.model.FeaturesTest" time="0.0"/>
+  <testcase name="splitOnBeatsCutsEveryBeat" classname="it.fabriziodavi.vivovideo.model.FeaturesTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

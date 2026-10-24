@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.model.PhotoFramingTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-24T14:27:47.304Z" hostname="runnervmtai0g" time="0.04">
+  <properties/>
+  <testcase name="motionStylesAreGentle" classname="it.fabriziodavi.vivovideo.model.PhotoFramingTest" time="0.0"/>
+  <testcase name="photosInTheOtherOrientationStayWhole" classname="it.fabriziodavi.vivovideo.model.PhotoFramingTest" time="0.002"/>
+  <testcase name="photosAreNeverZoomedMuchInAnyTheme" classname="it.fabriziodavi.vivovideo.model.PhotoFramingTest" time="0.038"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

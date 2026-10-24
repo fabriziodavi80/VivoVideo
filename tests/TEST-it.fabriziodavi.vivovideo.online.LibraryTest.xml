@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.online.LibraryTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-10-24T14:27:47.421Z" hostname="runnervmtai0g" time="0.02">
+  <properties/>
+  <testcase name="clearErrorMessages" classname="it.fabriziodavi.vivovideo.online.LibraryTest" time="0.001"/>
+  <testcase name="freesoundLicenseNames" classname="it.fabriziodavi.vivovideo.online.LibraryTest" time="0.001"/>
+  <testcase name="searchAddressesAndCredits" classname="it.fabriziodavi.vivovideo.online.LibraryTest" time="0.017"/>
+  <testcase name="readsFreesound" classname="it.fabriziodavi.vivovideo.online.LibraryTest" time="0.0"/>
+  <testcase name="licensesFromEveryForm" classname="it.fabriziodavi.vivovideo.online.LibraryTest" time="0.001"/>
+  <testcase name="readsJamendo" classname="it.fabriziodavi.vivovideo.online.LibraryTest" time="0.0"/>
+  <testcase name="readsOpenverse" classname="it.fabriziodavi.vivovideo.online.LibraryTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

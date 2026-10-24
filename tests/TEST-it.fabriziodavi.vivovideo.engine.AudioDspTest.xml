@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.engine.AudioDspTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-24T14:27:39.426Z" hostname="runnervmtai0g" time="0.027">
+  <properties/>
+  <testcase name="loudnessOfAKnownTone" classname="it.fabriziodavi.vivovideo.engine.AudioDspTest" time="0.024"/>
+  <testcase name="normalizationHitsTheTargetWithoutClipping" classname="it.fabriziodavi.vivovideo.engine.AudioDspTest" time="0.001"/>
+  <testcase name="musicDucksWhereSomeoneSpeaks" classname="it.fabriziodavi.vivovideo.engine.AudioDspTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

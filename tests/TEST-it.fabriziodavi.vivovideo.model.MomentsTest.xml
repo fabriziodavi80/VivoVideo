@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.model.MomentsTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-24T14:27:47.295Z" hostname="runnervmtai0g" time="0.008">
+  <properties/>
+  <testcase name="bestWindowLandsOnTheGoodPart" classname="it.fabriziodavi.vivovideo.model.MomentsTest" time="0.0"/>
+  <testcase name="sharpAndSmilingWins" classname="it.fabriziodavi.vivovideo.model.MomentsTest" time="0.0"/>
+  <testcase name="smartAutoUsesBestMomentsAndFollowsFaces" classname="it.fabriziodavi.vivovideo.model.MomentsTest" time="0.002"/>
+  <testcase name="subjectPathIsSmoothAndPanStaysInside" classname="it.fabriziodavi.vivovideo.model.MomentsTest" time="0.0"/>
+  <testcase name="imageStatsSeeSharpnessAndWhere" classname="it.fabriziodavi.vivovideo.model.MomentsTest" time="0.006"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
