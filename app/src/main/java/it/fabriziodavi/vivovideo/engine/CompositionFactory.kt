@@ -339,6 +339,10 @@ class CompositionFactory(private val context: Context) {
                 )
                 cursor = maxOf(cursor, t.startUs) + len
             }
+            // Come per i video sovrapposti: la riga della musica arriva oltre la fine del video con una pausa.
+            // Se il brano finisce prima, scorrendo l'anteprima oltre la sua fine il lettore si bloccava.
+            val padTo = total + 1_000_000
+            if (padTo - cursor > 1_000) b.addGap(padTo - cursor)
             b.build()
         }
     }

@@ -310,6 +310,15 @@ class DeviceTest {
         assertTrue("volume $lufs invece di circa -14 LUFS", lufs in -16.5..-12.0 || lufs < -16.5 && pcm.maxOf { kotlin.math.abs(it) } > 0.85f)
     }
 
+    /** Brano più corto del video: l'anteprima continua oltre la fine del brano (prima si bloccava). */
+    @Test fun previewPlaysPastTheEndOfAShortSong() {
+        val p = Project(
+            name = "brano corto", clips = listOf(video("a", videoA, s = 0, e = 6_000_000)),
+            music = listOf(MusicTrack(uri = music.toString(), name = "corto", sourceDurationUs = 30_000_000, lengthUs = 2_000_000)),
+        )
+        playFor(p, seconds = 6, minFps = 3f)
+    }
+
     /** Mixer nel video esportato: musica muta = silenzio; musica a -12 dB = molto più bassa; limitatore sotto -1 dBFS. */
     @Test fun exportFollowsTheMixer() {
         val a = video("a", videoA, s = 0, e = 4_000_000).copy(muted = true)
