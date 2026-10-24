@@ -1,6 +1,6 @@
 # VivoVideo · note per riprendere il lavoro
 
-Aggiornate al 21/10/2026, ultima versione **v0.3.184**. Da leggere insieme a `CLAUDE.md`.
+Aggiornate al 21/10/2026, ultima versione **v0.3.190**. Da leggere insieme a `CLAUDE.md`.
 
 ## 1. Stato attuale dell'app
 
@@ -56,6 +56,11 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, minSdk 33, solo arm64-v8a 
 - Regia intelligente: momenti migliori, volti, orientamento.
 - Data della videocamera nei temi vintage.
 - "Altra proposta" e cambio di stile.
+
+### Prima novità dopo la 1.0: Jump cut pronti (deciso dall'utente il 24/10/2026)
+- Audio → Clip → Jump cut: usa `SpeechCuts` (pause ed "ehm") e a ogni taglio alterna l'inquadratura (normale / +12–15% centrata sul volto con il riconoscimento volti già presente).
+- Stili: Pulito (tagli + zoom alternato), Dinamico (zoom più deciso, punch-in sulle frasi importanti), Social (in più lampo o "whoosh" su qualche taglio e sottotitoli a parole).
+- Micro-dissolvenze audio sui tagli, riepilogo prima di confermare, un solo Annulla.
 
 ### Da riprendere dopo il collaudo
 - Stabilizzazione (v0.3.183–184: zoom 4–12%, percorso vincolato, misura 384 px sub-pixel Lucas-Kanade, rotazione ±1°): approvata ma "miglioramento non sensazionale". Idee: correzione rolling shutter, zoom variabile nel tempo, omografia invece di spostamento+rotazione.
