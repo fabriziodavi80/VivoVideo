@@ -61,7 +61,7 @@ object TestPlan {
             "La voce è nitida e a volume costante (frasi forti e deboli simili, niente fruscio fra le parole); in anteprima (dopo un attimo) e nel video esportato la musica si abbassa quando parli, poi risale."),
         Item("aud_beats", "Audio", "Tagli a ritmo",
             "Musica → Battiti → trova i battiti, poi Ascolta e tocca a tempo.",
-            "I tagli cadono sui colpi della musica."),
+            "I tagli cadono sui colpi della musica; nella timeline il bordo di ogni clip sta sotto la sua tacca arancione del righello, anche dopo centinaia di clip e con lo zoom più lontano."),
         Item("aud_mixer", "Audio", "Mixer audio",
             "Progetto con video parlato, una voce fuori campo e un brano → Audio → Mixer audio. Fai partire l'ascolto: abbassa la musica di 6 dB, metti Voce nitida e compressore Medio sulla voce, prova M e S. Esporta.",
             "Gli indicatori si muovono; ogni modifica si sente subito; M toglie il gruppo, S lascia solo quello; il video esportato suona come l'anteprima, senza distorsioni."),

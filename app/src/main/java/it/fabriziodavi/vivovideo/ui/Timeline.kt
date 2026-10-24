@@ -66,6 +66,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import it.fabriziodavi.vivovideo.model.Clip
@@ -268,13 +269,19 @@ fun Timeline(
                     )
                 }
             } else {
+            // Ogni clip si posiziona dal suo tempo esatto sulla timeline (in pixel interi), non sommando le larghezze:
+            // con centinaia di clip corte gli arrotondamenti si accumulavano e i tagli non cadevano più sui battiti del righello.
+            val shown = project.clips.map { original ->
+                val draft = trimDraft?.takeIf { it.first == original.id }
+                if (draft != null) original.copy(trimStartUs = draft.second, trimEndUs = draft.third) else original
+            }
+            val edges = TimelineGeometry.edgesPx(shown.map { it.outputUs }, pxPerUs)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Spacer(Modifier.width(half))
-                project.clips.forEach { original ->
-                    val draft = trimDraft?.takeIf { it.first == original.id }
-                    val clip = if (draft != null) original.copy(trimStartUs = draft.second, trimEndUs = draft.third) else original
-                    val w = (clip.outputUs / 1e6f * dpPerSecond).dp
-                    Column {
+                Box(Modifier.width(with(density) { edges.last().toDp() }).height(VIDEO_H + 3.dp + AUDIO_H)) {
+                shown.forEachIndexed { i, clip ->
+                    val w = with(density) { (edges[i + 1] - edges[i]).toDp() }
+                    Column(Modifier.offset { IntOffset(edges[i], 0) }) {
                         ClipBox(
                             clip = clip,
                             width = w,
@@ -293,6 +300,7 @@ fun Timeline(
                         AudioLane(clip, w)
                     }
                 }
+                }
                 Box(
                     Modifier
                         .padding(start = 12.dp)
@@ -307,12 +315,12 @@ fun Timeline(
             if (trimDraft == null && project.clips.size > 1) {
                 val colH = VIDEO_H + 3.dp + AUDIO_H
                 val top = (maxOf(colH, 40.dp) - colH) / 2 + (VIDEO_H - CUT_D) / 2
-                var x = half
+                val edgesNow = TimelineGeometry.edgesPx(project.clips.map { it.outputUs }, pxPerUs)
                 project.clips.dropLast(1).forEachIndexed { i, c ->
-                    x += (c.outputUs / 1e6f * dpPerSecond).dp
+                    val x = half + with(density) { edgesNow[i + 1].toDp() }
                     // Ai lati della clip selezionata ci sono le maniglie: lì il pulsante non va.
                     if (c.id != selectedClipId && project.clips[i + 1].id != selectedClipId) CutButton(
-                        Modifier.offset(x = x - 1.dp - CUT_D / 2, y = top),
+                        Modifier.offset(x = x - CUT_D / 2, y = top),
                         has = c.transitionOut != null,
                         onClick = { onCutTap(i) },
                     )
@@ -504,8 +512,8 @@ private fun ClipBox(
     val shape = RoundedCornerShape(6.dp)
     Box(
         Modifier
-            .padding(end = 2.dp)
-            .width((width - 2.dp).coerceAtLeast(4.dp))
+            .padding(horizontal = clipGap(width) / 2)
+            .width((width - clipGap(width)).coerceAtLeast(1.dp))
             .height(VIDEO_H)
             .clip(shape)
             .background(VV.Raised)
@@ -688,8 +696,8 @@ private fun AudioLane(clip: Clip, width: Dp) {
     val curve = remember(clip.speed, clip.trimStartUs, clip.trimEndUs) { clip.speedCurve() }
     Canvas(
         Modifier
-            .padding(end = 2.dp)
-            .width((width - 2.dp).coerceAtLeast(4.dp))
+            .padding(horizontal = clipGap(width) / 2)
+            .width((width - clipGap(width)).coerceAtLeast(1.dp))
             .height(AUDIO_H)
             .clip(RoundedCornerShape(4.dp))
             .background(if (clip.muted || clip.isPhoto) VV.Raised else VV.WaveBg)
@@ -936,6 +944,27 @@ private val TILE = VIDEO_H + 4.dp
 
 /** Clip presa col dito: posizione di partenza, dito (in px dallo schermo) e quanto si è mosso. */
 private data class ReorderDrag(val id: String, val from: Int, val vx: Float, val moved: Float)
+
+/** Spazio fra due clip, centrato sul taglio (più sottile se la clip è strettissima, così nessuna clip si allarga). */
+private fun clipGap(width: Dp): Dp = when {
+    width >= 8.dp -> 2.dp
+    width >= 3.dp -> 1.dp
+    else -> 0.dp
+}
+
+/** Geometria della timeline (senza Compose, così si prova facilmente). */
+object TimelineGeometry {
+    /**
+     * Bordi delle clip in pixel interi: il bordo i è il tempo d'inizio della clip i per [pxPerUs], arrotondato.
+     * Ogni bordo dipende solo dal tempo, quindi gli errori non si sommano: il taglio sta sotto il battito anche dopo 500 clip.
+     */
+    fun edgesPx(outputsUs: List<Long>, pxPerUs: Float): IntArray {
+        val e = IntArray(outputsUs.size + 1)
+        var acc = 0L
+        outputsUs.forEachIndexed { i, d -> acc += d; e[i + 1] = (acc * pxPerUs.toDouble()).roundToInt() }
+        return e
+    }
+}
 
 /** Calcoli dello spostamento delle clip (senza Compose, così si provano facilmente). */
 object Reorder {

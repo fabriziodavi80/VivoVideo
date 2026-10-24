@@ -3,6 +3,7 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **Tagli a ritmo allineati nella timeline**: dopo «Dividi i video sui battiti» ogni taglio fra due clip sta esattamente sotto la sua tacca arancione del righello, anche con centinaia di clip e con lo zoom più lontano. Prima i bordi delle clip, disegnati uno dopo l'altro, si spostavano un po' alla volta e dopo qualche decina di clip sembravano fuori tempo (nel video i tagli erano già giusti).
 - **Anteprima oltre la fine del brano**: se la musica finisce prima del video, scorrendo o riproducendo oltre la sua fine l'anteprima non si blocca più.
 - **Al contrario con i video verticali**: la copia rovesciata non esce più girata di 90°. Se l'avevi già fatta, tocca «Di nuovo nel verso normale» e poi di nuovo «Al contrario».
 - **Esportazione a qualità piena**: l'encoder del telefono ora usa davvero i bit al secondo scelti (prima, lasciato libero, ne usava molti meno e si perdeva dettaglio). Nel risultato la riga Encoder dice "qualità piena"; se il telefono non la regge, l'app riprova da sola con le impostazioni di prima.
@@ -207,6 +208,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - **Scheda Battiti** (a mano): *Segna / togli qui* all'indicatore, oppure **TAP a tempo** durante l'ascolto; ◀ Battito ▶ per saltare.
 - **Taglia le clip a ogni tocco** (acceso di serie): mentre fai TAP a tempo segni anche i tagli; alla pausa il video viene diviso in quei punti, tutto con un solo Annulla. Poi puoi eliminare o sostituire i pezzi.
 - **Aggancia i tagli ai battiti**: accorciando una clip, la fine si ferma sul battito vicino.
+- Nella timeline ogni taglio sta sotto la tacca arancione del suo battito (sul righello), a qualsiasi zoom. Se i tagli cadono tutti un po' prima o dopo il colpo che senti, usa **Sposta i battiti automatici**; se la musica ha un ritmo poco marcato, controlla con ◀ Battito ▶ e correggi i battiti sbagliati a mano.
 
 ## Testo
 - **Testo** nella barra principale: parte dall'indicatore, 3 secondi. Schede **Stile**, **Animazione**, **Movimento**.
