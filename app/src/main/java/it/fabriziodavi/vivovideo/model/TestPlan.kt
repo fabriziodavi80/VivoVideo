@@ -66,8 +66,8 @@ object TestPlan {
             "Progetto con video parlato, una voce fuori campo e un brano → Audio → Mixer audio. Fai partire l'ascolto: abbassa la musica di 6 dB, metti Voce nitida e compressore Medio sulla voce, prova M e S. Esporta.",
             "Gli indicatori si muovono; ogni modifica si sente subito; M toglie il gruppo, S lascia solo quello; il video esportato suona come l'anteprima, senza distorsioni."),
         Item("aud_cut", "Audio", "Taglia pause e ehm",
-            "Un video parlato di 1–2 minuti con pause e qualche \"ehm\" → Audio → Clip → Taglia pause e ehm: 0,7 s, Togli anche ehm → Analizza → Taglia.",
-            "Il riepilogo è sensato; dopo il taglio le frasi non sono mozzate, resta un attimo di respiro, gli ehm spariti; Annulla torna com'era."),
+            "Un video parlato di 1–2 minuti con pause e qualche \"ehm\" → Audio → Clip → Taglia pause e ehm: 0,7 s, Togli anche ehm → Analizza → nella lista ascolta qualche ehm con ▶ e ✂ ▶ → Taglia.",
+            "Ogni voce della lista è davvero un ehm e ✂ ▶ lo toglie senza mozzare le parole vicine; dopo il taglio resta un attimo di respiro e gli ehm sono spariti; Annulla torna com'era."),
         // Testo
         Item("txt_styles", "Testo", "Stili e animazioni WOW",
             "Testo → aggiungi → Stili pronti, prova Glitch, Onda, Oro, Cascata.",

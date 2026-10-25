@@ -16,9 +16,12 @@ import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,7 +40,7 @@ import it.fabriziodavi.vivovideo.engine.Whisper
 fun SpeechCutScreen(vm: EditorViewModel) {
     val ctx = LocalContext.current
     val busy = vm.busy
-    BackHandler { if (busy != null) vm.cancelSubtitles() else { vm.showSpeechCut = false; vm.speechPlan = null } }
+    BackHandler { if (busy != null) vm.cancelSubtitles() else { vm.closeSpeechCut() } }
     var model by remember { mutableStateOf(if (Whisper.isDownloaded(ctx, Whisper.Model.FAST) && !Whisper.isDownloaded(ctx, Whisper.Model.ACCURATE)) Whisper.Model.FAST else Whisper.Model.ACCURATE) }
     var lang by remember { mutableStateOf("it") }
     var minPause by remember { mutableStateOf(700_000L) }
@@ -47,7 +50,7 @@ fun SpeechCutScreen(vm: EditorViewModel) {
 
     Column(Modifier.fillMaxSize().background(VV.Canvas).safeDrawingPadding()) {
         Row(Modifier.fillMaxWidth().height(52.dp).padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-            IconBtn(VVIcons.Back, "Indietro", enabled = busy == null) { vm.showSpeechCut = false; vm.speechPlan = null }
+            IconBtn(VVIcons.Back, "Indietro", enabled = busy == null) { vm.closeSpeechCut() }
             Text("Taglia pause e ehm", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
         }
         Column(
@@ -87,6 +90,24 @@ fun SpeechCutScreen(vm: EditorViewModel) {
                         Text("Il video passa da ${formatTime(total)} a ${formatTime(total - plan.totalUs)}", style = MaterialTheme.typography.titleSmall, color = VV.Tally)
                     }
                 }
+                if (fillers && plan.fillerCuts.isNotEmpty()) {
+                    PanelLabel("Gli ehm trovati")
+                    Hint("Ascolta ognuno: ▶ com'è adesso, ✂ come sarà dopo il taglio. Togli la spunta a quelli da lasciare. Quelli «da controllare» il riconoscimento vocale li ha sentiti ma il suono non sembra un ehm: di serie restano.")
+                    plan.fillerCuts.forEachIndexed { i, f ->
+                        FillerRow(
+                            at = f.span.startUs, lenUs = f.span.lengthUs,
+                            label = when {
+                                f.doubtful -> "«${f.word}»? da controllare"
+                                f.word != null -> "«${f.word}»"
+                                else -> "suono di esitazione"
+                            },
+                            on = f.on,
+                            onToggle = { vm.toggleFiller(i) },
+                            onPlay = { vm.playFiller(i, after = false) },
+                            onPlayAfter = { vm.playFiller(i, after = true) },
+                        )
+                    }
+                }
             }
         }
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -101,6 +122,23 @@ fun SpeechCutScreen(vm: EditorViewModel) {
                 PrimaryButton("Analizza", Modifier.fillMaxWidth(), enabled = minPause > 0 || fillers) { vm.analyzeSpeech(model, lang, minPause, fillers) }
             }
         }
+    }
+}
+
+/** Un ehm della lista: spunta, quando e quanto dura, ascolto prima e dopo il taglio. */
+@Composable
+private fun FillerRow(at: Long, lenUs: Long, label: String, on: Boolean, onToggle: () -> Unit, onPlay: () -> Unit, onPlayAfter: () -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(VV.Raised).padding(start = 4.dp, end = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Checkbox(checked = on, onCheckedChange = { onToggle() }, colors = CheckboxDefaults.colors(checkedColor = VV.Tally, checkmarkColor = VV.TallyInk))
+        Column(Modifier.weight(1f)) {
+            Text(label, style = MaterialTheme.typography.bodyMedium, color = if (on) VV.Text else VV.Dim)
+            Text("${formatTime(at)} · ${sec(lenUs)}", style = MaterialTheme.typography.bodySmall, color = VV.Dim)
+        }
+        TextButton(onClick = onPlay) { Text("▶", color = VV.Text) }
+        TextButton(onClick = onPlayAfter) { Text("✂ ▶", color = VV.Tally) }
     }
 }
 

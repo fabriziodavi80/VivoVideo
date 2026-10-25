@@ -17,9 +17,23 @@ object SpeechCuts {
     const val KEEP_US = 150_000L
     private const val FRAME = 320 // 20 ms a 16 kHz
 
-    data class Result(val spans: List<Span>, val pauses: Int, val pauseUs: Long, val fillers: Int, val fillerUs: Long) {
+    /**
+     * Un ehm da togliere: dove sta, la parola sentita dal riconoscimento vocale (null = trovato solo dal suono)
+     * e se si taglia ([on]: si può cambiare dalla lista prima di confermare).
+     */
+    data class Filler(val span: Span, val word: String?, val on: Boolean = true, val doubtful: Boolean = false)
+
+    data class Result(val pauseSpans: List<Span>, val fillerCuts: List<Filler> = emptyList()) {
+        /** Tutto quello che si toglie (pause ed ehm accesi), unito. */
+        val spans: List<Span> get() = merge(pauseSpans + fillerCuts.filter { it.on }.map { it.span })
+        val pauses: Int get() = pauseSpans.size
+        val pauseUs: Long get() = pauseSpans.sumOf { it.lengthUs }
+        val fillers: Int get() = fillerCuts.count { it.on }
+        val fillerUs: Long get() = fillerCuts.filter { it.on }.sumOf { it.span.lengthUs }
         val totalUs: Long get() = spans.sumOf { it.lengthUs }
         val isEmpty: Boolean get() = spans.isEmpty()
+        /** Accende o spegne l'ehm numero [i] della lista. */
+        fun toggle(i: Int): Result = copy(fillerCuts = fillerCuts.mapIndexed { k, f -> if (k == i) f.copy(on = !f.on) else f })
     }
 
     /**
@@ -68,6 +82,28 @@ object SpeechCuts {
     fun fillers(words: List<SpokenWord>, padUs: Long = 30_000): List<Span> =
         words.filter { isFiller(it.text) }.map { Span((it.startUs - padUs).coerceAtLeast(0), it.endUs + padUs) }
 
+    /**
+     * Gli ehm, con i tempi presi dal suono: per ogni "ehm" sentito dal riconoscimento vocale si cerca nei dintorni il suono
+     * tenuto che lo è davvero (i tempi delle parole sono imprecisi di qualche decimo di secondo); in più si aggiungono gli
+     * ehm isolati fra due pause che il riconoscimento vocale ha saltato. Se attorno a un "ehm" sentito non c'è nulla che
+     * suoni come un ehm, resta nella lista ma spento (da controllare: tagliarlo potrebbe togliere una parola).
+     */
+    fun fillerCuts(pcm: FloatArray, words: List<SpokenWord>): List<Filler> {
+        val frames = Hesitations.analyze(pcm)
+        val islands = Hesitations.islands(frames)
+        val out = mutableListOf<Filler>()
+        fun overlaps(a: Span, b: Span) = a.startUs < b.endUs && b.startUs < a.endUs
+        words.filter { isFiller(it.text) }.forEach { w ->
+            val label = w.text.filter { it.isLetter() }.lowercase()
+            val heard = Span(w.startUs, w.endUs)
+            val at = if (frames.isEmpty()) null else Hesitations.locate(frames, islands, heard)
+            val f = if (at != null) Filler(at, label) else Filler(Span((w.startUs - 30_000).coerceAtLeast(0), w.endUs + 30_000), label, on = false, doubtful = true)
+            if (out.none { overlaps(it.span, f.span) }) out += f
+        }
+        Hesitations.detect(frames, islands).forEach { s -> if (out.none { overlaps(it.span, s) }) out += Filler(s, null) }
+        return out.sortedBy { it.span.startUs }
+    }
+
     /** Unisce i tratti che si toccano o si sovrappongono. */
     fun merge(spans: List<Span>): List<Span> {
         val out = mutableListOf<Span>()
@@ -90,12 +126,14 @@ object SpeechCuts {
     }
 
     /** Tutto insieme: pause (se [minPauseUs] > 0) e parole di riempimento, solo dove c'è audio dei video. */
-    fun plan(p: Project, pcm: FloatArray, words: List<SpokenWord>, minPauseUs: Long, keepUs: Long = KEEP_US): Result {
+    fun plan(p: Project, pcm: FloatArray, words: List<SpokenWord>, minPauseUs: Long, keepUs: Long = KEEP_US, fillers: Boolean = words.isNotEmpty()): Result {
         val allowed = audibleSpans(p)
         val pauses = if (minPauseUs > 0) within(silences(pcm, minUs = minPauseUs, keepUs = keepUs), allowed) else emptyList()
-        val fill = within(fillers(words), allowed)
-        val all = merge(pauses + fill)
-        return Result(all, pauses.size, pauses.sumOf { it.lengthUs }, fill.size, fill.sumOf { it.lengthUs })
+        // Ogni ehm resta un pezzo solo (il tratto più lungo dentro i video con audio).
+        val fill = if (!fillers) emptyList() else fillerCuts(pcm, words).mapNotNull { f ->
+            within(listOf(f.span), allowed).maxByOrNull { it.lengthUs }?.let { f.copy(span = it) }
+        }
+        return Result(pauses, fill)
     }
 }
 

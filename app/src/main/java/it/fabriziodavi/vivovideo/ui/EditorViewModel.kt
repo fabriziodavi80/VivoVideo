@@ -1860,8 +1860,9 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                     words = try { Whisper.transcribe(Whisper.modelFile(ctx, model), pcm, lang, Whisper.FILLER_PROMPT) } finally { poll.cancel() }
                 }
                 busy = "Cerco le pause…"
-                val plan = withContext(Dispatchers.Default) { it.fabriziodavi.vivovideo.model.SpeechCuts.plan(p, pcm, words, minPauseUs) }
+                val plan = withContext(Dispatchers.Default) { it.fabriziodavi.vivovideo.model.SpeechCuts.plan(p, pcm, words, minPauseUs, fillers = fillers) }
                 busy = null
+                speechPcm = pcm
                 speechPlan = plan
             } catch (e: kotlinx.coroutines.CancellationException) {
                 busy = null; throw e
@@ -1872,6 +1873,53 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    /** Audio delle clip analizzato (16 kHz mono, tempi del montaggio), per riascoltare gli ehm trovati. */
+    private var speechPcm: FloatArray? = null
+    private var sampleTrack: android.media.AudioTrack? = null
+
+    /** Spunta o toglie l'ehm numero [i] della lista. */
+    fun toggleFiller(i: Int) { speechPlan = speechPlan?.toggle(i) }
+
+    /**
+     * Fa sentire l'ehm numero [i] col suo contorno (un secondo prima, mezzo dopo): così com'è ([after] = false)
+     * o come sarà dopo il taglio.
+     */
+    fun playFiller(i: Int, after: Boolean) {
+        val pcm = speechPcm ?: return
+        val f = speechPlan?.fillerCuts?.getOrNull(i) ?: return
+        pause()
+        val r = 16_000
+        fun idx(us: Long) = (us * r / 1_000_000).toInt().coerceIn(0, pcm.size)
+        val a = idx(f.span.startUs - 1_000_000); val s = idx(f.span.startUs); val e = idx(f.span.endUs); val b = idx(f.span.endUs + 600_000)
+        val clip = if (after) pcm.copyOfRange(a, s) + pcm.copyOfRange(e, b) else pcm.copyOfRange(a, b)
+        if (clip.isEmpty()) return
+        // Brevi dissolvenze ai bordi (e sul taglio) per non sentire scatti.
+        val fade = r / 200
+        for (k in 0 until minOf(fade, clip.size)) { val g = k.toFloat() / fade; clip[k] *= g; clip[clip.size - 1 - k] *= g }
+        if (after) { val j = s - a; for (k in -fade until fade) { val q = j + k; if (q in clip.indices) clip[q] *= kotlin.math.abs(k).toFloat() / fade } }
+        runCatching {
+            sampleTrack?.run { runCatching { stop() }; release() }
+            val t = android.media.AudioTrack.Builder()
+                .setAudioAttributes(android.media.AudioAttributes.Builder().setUsage(android.media.AudioAttributes.USAGE_MEDIA).setContentType(android.media.AudioAttributes.CONTENT_TYPE_SPEECH).build())
+                .setAudioFormat(android.media.AudioFormat.Builder().setEncoding(android.media.AudioFormat.ENCODING_PCM_FLOAT).setSampleRate(r).setChannelMask(android.media.AudioFormat.CHANNEL_OUT_MONO).build())
+                .setTransferMode(android.media.AudioTrack.MODE_STATIC)
+                .setBufferSizeInBytes(clip.size * 4)
+                .build()
+            t.write(clip, 0, clip.size, android.media.AudioTrack.WRITE_BLOCKING)
+            t.play()
+            sampleTrack = t
+        }
+    }
+
+    /** Chiude la pulizia del parlato (e libera l'audio analizzato). */
+    fun closeSpeechCut() {
+        showSpeechCut = false
+        speechPlan = null
+        speechPcm = null
+        sampleTrack?.run { runCatching { stop() }; release() }
+        sampleTrack = null
+    }
+
     /** Taglia quello che l'analisi ha trovato (un solo Annulla torna indietro). */
     fun applySpeechCuts() {
         val plan = speechPlan ?: return
@@ -1879,8 +1927,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         val before = project?.durationUs ?: return
         update { it.cutTimeline(plan.spans) }
         val after = project?.durationUs ?: before
-        speechPlan = null
-        showSpeechCut = false
+        closeSpeechCut()
         selectedClipId = null
         message = "Tolti ${formatSeconds(before - after)} di pause e parole di riempimento. Annulla per tornare indietro."
     }
@@ -2685,6 +2732,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         runCatching { getApplication<Application>().contentResolver.unregisterContentObserver(mediaObserver) }
         handler.removeCallbacks(mediaChanged)
         runCatching { recorder?.stop() }
+        sampleTrack?.run { runCatching { stop() }; release() }
         project?.let { store.save(it) }
         releasePlayer()
     }
