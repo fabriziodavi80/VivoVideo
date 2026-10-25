@@ -92,11 +92,12 @@ fun SpeechCutScreen(vm: EditorViewModel) {
                 }
                 if (fillers && plan.fillerCuts.isNotEmpty()) {
                     PanelLabel("Gli ehm trovati")
-                    Hint("Ascolta ognuno: ▶ com'è adesso, ✂ come sarà dopo il taglio. Togli la spunta a quelli da lasciare. Quelli «da controllare» il riconoscimento vocale li ha sentiti ma il suono non sembra un ehm: di serie restano.")
+                    Hint("Ascolta ognuno: ▶ com'è adesso, ✂ come sarà dopo il taglio. Togli la spunta a quelli da lasciare. Quelli «da controllare» o «da ascoltare» sono dubbi (forse una parola tenuta a lungo): di serie restano, metti la spunta se sono ehm.")
                     plan.fillerCuts.forEachIndexed { i, f ->
                         FillerRow(
                             at = f.span.startUs, lenUs = f.span.lengthUs,
                             label = when {
+                                f.doubtful && f.word == null -> "possibile ehm · da ascoltare"
                                 f.doubtful -> "«${f.word}»? da controllare"
                                 f.word != null -> "«${f.word}»"
                                 else -> "suono di esitazione"

@@ -38,8 +38,9 @@ class SpeechCutsTest {
     }
 
     @Test fun recognisesFillersButNotTheWordE() {
-        listOf("ehm", "Ehm,", "eh", "ehhh", "uhm", "um", "mmm", "eee", "emm", "mhm").forEach { assertTrue(it, SpeechCuts.isFiller(it)) }
-        listOf("e", "è", "ecco", "allora", "uno", "mamma", "hm").forEach { assertFalse(it, SpeechCuts.isFiller(it)) }
+        // "M": così il riconoscimento vocale scrive spesso "ehm" in italiano.
+        listOf("ehm", "Ehm,", "eh", "ehhh", "uhm", "um", "mmm", "eee", "emm", "mhm", "M", "M.", "hm").forEach { assertTrue(it, SpeechCuts.isFiller(it)) }
+        listOf("e", "è", "ecco", "allora", "uno", "mamma", "ma", "mi").forEach { assertFalse(it, SpeechCuts.isFiller(it)) }
         val words = listOf(SpokenWord(0, 300_000, "Allora"), SpokenWord(400_000, 800_000, "ehm,"), SpokenWord(900_000, 1_200_000, "e"))
         val f = SpeechCuts.fillers(words)
         assertEquals(1, f.size)

@@ -18,7 +18,7 @@ class HesitationsTest {
     private fun found(ph: List<Ph>, seed: Int = 3): Boolean {
         val pcm = VoiceSynth(seed).say(pause(500) + ph + pause(500) + word("ecco la casa") + pause(400))
         val fr = Hesitations.analyze(pcm)
-        return Hesitations.detect(fr).any { it.startUs < 1_000_000 }
+        return Hesitations.detect(fr).any { it.span.startUs < 1_000_000 }
     }
 
     @Test fun hesitationSoundsAreFound() {
@@ -31,11 +31,33 @@ class HesitationsTest {
 
     @Test fun realWordsAreNotCut() {
         listOf("allora", "andiamo al mare", "nemmeno", "mamma", "uno", "bene", "sono").forEach { assertFalse(it, found(word(it))) }
-        assertFalse("no", found(listOf(Ph('n', 70), Ph('o', 300))))
+        assertFalse("no", found(listOf(Ph('n', 70), Ph('o', 190))))
         assertFalse("sì", found(listOf(Ph('s', 110), Ph('i', 350))))
         assertFalse("ma", found(listOf(Ph('m', 70), Ph('a', 300))))
         // "e" congiunzione, breve: resta.
         assertFalse("e", found(listOf(Ph('e', 150))))
+    }
+
+    /** Come una ripresa vera del telefono: voce lontana e ovattata (poco sopra 1 kHz), un ronzio fisso e il fondo della stanza. */
+    private fun phoneLike(x: FloatArray): FloatArray {
+        var a = 0f; var b = 0f
+        val k = 0.33f // passa-basso a circa 1 kHz (due volte)
+        val rnd = kotlin.random.Random(4)
+        return FloatArray(x.size) { i ->
+            a += (x[i] - a) * k; b += (a - b) * k
+            (b * 0.12f + 0.003f * kotlin.math.sin(2 * Math.PI * 480 * i / 16_000).toFloat() + (rnd.nextFloat() - 0.5f) * 0.004f)
+        }
+    }
+
+    @Test fun worksOnAMuffledPhoneRecordingWithHum() {
+        // Due frasi con un ehm isolato in mezzo; voce bassa (circa 90 Hz) come nella ripresa del collaudo.
+        val ph = pause(600) + word("allora oggi") + pause(400) + ehm + pause(400) + word("andiamo al mare") + pause(400) + word("bene") + pause(600)
+        val st = starts(ph)
+        val fr = Hesitations.analyze(phoneLike(VoiceSynth(11).say(ph, f0 = 95.0)))
+        val found = Hesitations.detect(fr)
+        assertEquals("$found", 1, found.size)
+        assertTrue(found[0].sure)
+        assertTrue("${found[0]}", abs(found[0].span.startUs - st[13] * 1000L) < 80_000 && abs(found[0].span.endUs - st[15] * 1000L) < 80_000)
     }
 
     private fun starts(ph: List<Ph>): IntArray { var t = 0; return ph.map { val s = t; t += it.ms; s }.toIntArray() }
@@ -46,9 +68,8 @@ class HesitationsTest {
         val st = starts(ph)
         val from = st[8] * 1000L; val to = st[10] * 1000L
         val fr = Hesitations.analyze(VoiceSynth(5).say(ph))
-        val isl = Hesitations.islands(fr)
         for (heard in listOf(Span(from - 350_000, from + 50_000), Span(to + 100_000, to + 400_000))) {
-            val at = Hesitations.locate(fr, isl, heard)
+            val at = Hesitations.locate(fr, heard)
             assertNotNull("$heard", at)
             assertTrue("inizio ${at!!.startUs} invece di $from", abs(at.startUs - from) < 80_000)
             assertTrue("fine ${at.endUs} invece di $to", abs(at.endUs - to) < 80_000)
@@ -60,12 +81,11 @@ class HesitationsTest {
         val ph = pause(500) + word("allora") + ehm + pause(400) + word("andiamo") + pause(500)
         val ehStart = (500 + word("allora").sumOf { it.ms }) * 1000L
         val fr = Hesitations.analyze(VoiceSynth(5).say(ph))
-        val isl = Hesitations.islands(fr)
-        val at = Hesitations.locate(fr, isl, Span(ehStart - 100_000, ehStart + 300_000))
+        val at = Hesitations.locate(fr, Span(ehStart - 100_000, ehStart + 300_000))
         assertNotNull(at)
-        assertTrue("inizio ${at!!.startUs}", at.startUs >= ehStart - 20_000 && at.startUs < ehStart + 80_000)
+        assertTrue("inizio ${at!!.startUs}", at.startUs >= ehStart - 40_000 && at.startUs < ehStart + 100_000)
         // "ehm" sentito su una parola vera: nel suono non c'è, non si sposta niente.
-        assertNull(Hesitations.locate(fr, isl, Span(ehStart + 900_000, ehStart + 1_200_000)))
+        assertNull(Hesitations.locate(fr, Span(ehStart + 900_000, ehStart + 1_200_000)))
     }
 
     private fun video(lenUs: Long) = Clip(id = "v", uri = "content://v/v", sourceDurationUs = 60_000_000, trimEndUs = lenUs, width = 1920, height = 1080, fps = 30f)

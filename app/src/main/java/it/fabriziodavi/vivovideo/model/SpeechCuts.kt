@@ -73,9 +73,9 @@ object SpeechCuts {
         return out
     }
 
-    private val FILLER = Regex("^(e+h+m*|e+m+|u+h*m+|h?m{2,}|e{3,}|m+h+m+)$")
+    private val FILLER = Regex("^(e+h+m*|e+m+|u+h*m+|h*m+h*|e{3,}|m+h+m+)$")
 
-    /** "Ehm", "eh", "uhm", "mmm", "eee"… ("e" da sola no: è una congiunzione). */
+    /** "Ehm", "eh", "uhm", "mmm", "eee", e "M" (così il riconoscimento vocale scrive spesso "ehm"); "e" da sola no: è una congiunzione. */
     fun isFiller(word: String): Boolean = FILLER.matches(word.lowercase().filter { it.isLetter() })
 
     /** Le parole di riempimento, con un filo di margine. */
@@ -90,17 +90,16 @@ object SpeechCuts {
      */
     fun fillerCuts(pcm: FloatArray, words: List<SpokenWord>): List<Filler> {
         val frames = Hesitations.analyze(pcm)
-        val islands = Hesitations.islands(frames)
         val out = mutableListOf<Filler>()
         fun overlaps(a: Span, b: Span) = a.startUs < b.endUs && b.startUs < a.endUs
         words.filter { isFiller(it.text) }.forEach { w ->
             val label = w.text.filter { it.isLetter() }.lowercase()
             val heard = Span(w.startUs, w.endUs)
-            val at = if (frames.isEmpty()) null else Hesitations.locate(frames, islands, heard)
+            val at = if (frames.isEmpty()) null else Hesitations.locate(frames, heard)
             val f = if (at != null) Filler(at, label) else Filler(Span((w.startUs - 30_000).coerceAtLeast(0), w.endUs + 30_000), label, on = false, doubtful = true)
             if (out.none { overlaps(it.span, f.span) }) out += f
         }
-        Hesitations.detect(frames, islands).forEach { s -> if (out.none { overlaps(it.span, s) }) out += Filler(s, null) }
+        Hesitations.detect(frames).forEach { d -> if (out.none { overlaps(it.span, d.span) }) out += Filler(d.span, null, on = d.sure, doubtful = !d.sure) }
         return out.sortedBy { it.span.startUs }
     }
 

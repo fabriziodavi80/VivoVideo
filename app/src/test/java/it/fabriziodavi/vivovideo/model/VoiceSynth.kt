@@ -35,6 +35,14 @@ class VoiceSynth(seed: Int = 1, private val noise: Float = 0.0006f) {
         val total = phones.sumOf { it.ms } * rate / 1000
         val out = FloatArray(total)
         val voicedPh = phones.map { it.p in table }
+        // Intonazione delle parole: ogni sillaba ha il suo tono (±2 semitoni) e le consonanti abbassano il volume;
+        // i suoni lunghi (oltre 200 ms, come gli ehm) restano sul tono di base, senza accento.
+        val accent = phones.map { if (it.p in "aeiou" && it.ms < 200) (rnd.nextDouble() - 0.5) * 4 else 0.0 }
+        val gainOf = phones.mapIndexed { i, ph ->
+            val inWord = ph.ms < 200 && phones.getOrNull(i - 1)?.p?.let { it != '_' } == true && phones.getOrNull(i + 1)?.p?.let { it != '_' } == true
+            if (ph.p in "lrmn" && inWord) 0.3 else 1.0
+        }
+        var acc = 0.0; var gs = 1.0
         // Traiettoria dei formanti campione per campione (passaggi di 30 ms fra suoni vicini).
         val starts = IntArray(phones.size + 1).also { for (i in phones.indices) it[i + 1] = it[i] + phones[i].ms * rate / 1000 }
         val res = Array(3) { DoubleArray(2) }
@@ -59,7 +67,8 @@ class VoiceSynth(seed: Int = 1, private val noise: Float = 0.0006f) {
                         Triple(f, c.second, c.third)
                     }
                     // Sorgente glottale: impulsi con un filo di jitter, filtrati (–12 dB/ottava).
-                    val f0t = f0 * 2.0.pow(-fall * t / 12)
+                    acc += (accent[i] - acc) * 0.004; gs += (gainOf[i] - gs) * 0.01
+                    val f0t = f0 * 2.0.pow((-fall * t + acc) / 12)
                     phase += f0t * (1 + (rnd.nextDouble() - 0.5) * 0.02) / rate
                     var pulse = 0.0
                     if (phase >= 1) { phase -= 1; pulse = 1.0; shimmer = 1 + (rnd.nextDouble() - 0.5) * 0.1 }
@@ -74,7 +83,7 @@ class VoiceSynth(seed: Int = 1, private val noise: Float = 0.0006f) {
                         res[j][1] = res[j][0]; res[j][0] = y
                         v += gain * y
                     }
-                    v *= 6
+                    v *= 6 * gs
                 } else when (ph.p) {
                     's' -> v = hiss(k, 5000.0, 2500.0) * 0.25
                     'f' -> v = hiss(k, 3000.0, 4000.0) * 0.08
