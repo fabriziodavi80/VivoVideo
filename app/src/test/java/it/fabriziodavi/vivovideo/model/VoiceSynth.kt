@@ -10,7 +10,7 @@ import kotlin.random.Random
  * Voce sintetica per le prove (sintesi a formanti in parallelo, 16 kHz): vocali, nasali, fricative, occlusive,
  * con passaggi morbidi fra un suono e l'altro, tono che cala lungo la frase e piccole irregolarità come una voce vera.
  */
-class VoiceSynth(seed: Int = 1) {
+class VoiceSynth(seed: Int = 1, private val noise: Float = 0.0006f) {
     val rate = 16_000
     private val rnd = Random(seed)
 
@@ -81,7 +81,7 @@ class VoiceSynth(seed: Int = 1) {
                     't', 'k', 'p' -> v = if (starts[i + 1] - k < 15 * rate / 1000) hiss(k, 3500.0, 3000.0) * 0.3 else 0.0
                     else -> v = 0.0
                 }
-                out[k] = (v * amp).toFloat() + (rnd.nextFloat() - 0.5f) * 0.0006f
+                out[k] = (v * amp).toFloat() + (rnd.nextFloat() - 0.5f) * noise
             }
         }
         return out

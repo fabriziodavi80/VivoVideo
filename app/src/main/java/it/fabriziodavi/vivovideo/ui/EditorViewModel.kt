@@ -11,6 +11,7 @@ import it.fabriziodavi.vivovideo.model.cutTimeline
 import it.fabriziodavi.vivovideo.model.withCredits
 import it.fabriziodavi.vivovideo.model.withoutCredits
 import it.fabriziodavi.vivovideo.engine.Whisper
+import it.fabriziodavi.vivovideo.engine.PreviewLoudness
 import it.fabriziodavi.vivovideo.engine.Proxies
 import it.fabriziodavi.vivovideo.engine.Decoders
 import it.fabriziodavi.vivovideo.engine.DuckPreview
@@ -1864,6 +1865,12 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                 busy = null
                 speechPcm = pcm
                 speechPlan = plan
+                // Per le segnalazioni: cosa ha sentito il riconoscimento vocale e cosa ha trovato il suono.
+                if (fillers) Diary.log(
+                    "Analisi del parlato: ${words.size} parole riconosciute, ${plan.fillerCuts.count { it.word != null && !it.doubtful }} ehm sentiti e ritrovati nel suono, " +
+                        "${plan.fillerCuts.count { it.doubtful }} da controllare, ${plan.fillerCuts.count { it.word == null }} trovati solo dal suono, ${plan.pauses} pause. " +
+                        "Testo: " + words.joinToString(" ") { it.text }.take(400)
+                )
             } catch (e: kotlinx.coroutines.CancellationException) {
                 busy = null; throw e
             } catch (e: Exception) {
@@ -1893,6 +1900,12 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         val a = idx(f.span.startUs - 1_000_000); val s = idx(f.span.startUs); val e = idx(f.span.endUs); val b = idx(f.span.endUs + 600_000)
         val clip = if (after) pcm.copyOfRange(a, s) + pcm.copyOfRange(e, b) else pcm.copyOfRange(a, b)
         if (clip.isEmpty()) return
+        // L'audio delle clip è quello grezzo del telefono (spesso basso): si porta a un volume chiaro, senza distorcere.
+        var peak = 1e-6f; var en = 0.0
+        for (v in clip) { peak = maxOf(peak, kotlin.math.abs(v)); en += v * v }
+        val rms = kotlin.math.sqrt(en / clip.size).toFloat().coerceAtLeast(1e-6f)
+        val gain = minOf(0.15f / rms, 0.9f / peak, 30f)
+        for (k in clip.indices) clip[k] *= gain
         // Brevi dissolvenze ai bordi (e sul taglio) per non sentire scatti.
         val fade = r / 200
         for (k in 0 until minOf(fade, clip.size)) { val g = k.toFloat() / fade; clip[k] *= g; clip[clip.size - 1 - k] *= g }
@@ -2053,6 +2066,36 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    private var loudPreparing: String? = null
+    private var loudJob: kotlinx.coroutines.Job? = null
+
+    /**
+     * Misura in secondo piano il volume del mix, così l'anteprima suona forte come il video esportato.
+     * Si aspetta un attimo dopo le modifiche; quando la misura è pronta e il guadagno cambia di almeno 1 dB,
+     * l'anteprima si ricarica (solo da ferma, per non interrompere l'ascolto).
+     */
+    private fun preparePreviewLoudness(p: Project) {
+        if (!exportOptions.loudness || !PreviewLoudness.needs(p)) return
+        val k = PreviewLoudness.key(p) ?: return
+        if (loudPreparing == k) return
+        loudJob?.cancel()
+        loudPreparing = k
+        val ctx = getApplication<Application>()
+        loudJob = viewModelScope.launch {
+            kotlinx.coroutines.delay(1500)
+            val ok = withContext(Dispatchers.Default) { runCatching { PreviewLoudness.prepare(ctx, p) }.isSuccess }
+            if (loudPreparing == k) loudPreparing = null
+            val now = project ?: return@launch
+            if (!ok || PreviewLoudness.key(now) != k || player == null) return@launch
+            val g = PreviewLoudness.gainFor(now)
+            Diary.log("Volume dell'anteprima: ${"%+.1f".format(java.util.Locale.ITALIAN, PreviewLoudness.db(g))} dB, come nel video esportato.")
+            if (kotlin.math.abs(PreviewLoudness.db(g) - PreviewLoudness.db(factory.previewGain)) >= 1.0) {
+                if (isPlaying) pendingLoudRebuild = true else rebuildPreview(playheadUs / 1000)
+            }
+        }
+    }
+    private var pendingLoudRebuild = false
+
     /** Correzione colore copiata (per "Incolla" su un'altra clip). */
     var copiedGrade by mutableStateOf<Grade?>(null)
 
@@ -2174,6 +2217,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                 isPlaying = p.isPlaying
                 watchStall(p)
                 if (!p.playWhenReady && pendingCuts.isNotEmpty()) applyTapCuts()
+                if (!p.playWhenReady && pendingLoudRebuild) { pendingLoudRebuild = false; rebuildPreview(playheadUs / 1000) }
             }
             handler.postDelayed(this, 50)
         }
@@ -2303,6 +2347,8 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         val (fw, fh) = previewFrameSize()
         val shown = runCatching { CrossfadePreview.previewProject(getApplication(), previewSource(p), fw, fh) }.getOrDefault(p)
         prepareDuckPreview(p)
+        preparePreviewLoudness(p)
+        factory.previewGain = if (exportOptions.loudness) PreviewLoudness.gainFor(p) else 1f
         val composition = runCatching { factory.build(shown, exportOptions, forPreview = true, nativeAudio = null, allowMulti = allowMulti) }
             .getOrElse { previewError = "Anteprima non disponibile: ${it.message}"; return }
         // Con video sovrapposti o dissolvenze incrociate serve il compositore a più ingressi:

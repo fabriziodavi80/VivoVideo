@@ -56,12 +56,12 @@ object Hesitations {
                 return 10 * log10(s)
             }
             val bandDb = FloatArray(bands) { b -> band(b * 250.0, (b + 1) * 250.0).toFloat() }
-            // Stabilità del timbro: differenza media (dB) con 20 ms prima, sulle bande che contano.
+            // Stabilità del timbro: differenza media (dB) con 20 ms prima, solo sulle bande forti (quelle deboli sono rumore di fondo).
             val ref = prev2
             val flux = if (ref == null) 99f else {
                 val top = bandDb.max()
                 var s = 0f; var k = 0
-                for (b in 0 until bands) if (bandDb[b] > top - 35 || ref[b] > top - 35) { s += abs(bandDb[b] - ref[b]); k++ }
+                for (b in 0 until bands) if (bandDb[b] > top - 25 && ref[b] > top - 25) { s += abs(bandDb[b] - ref[b]); k++ }
                 if (k == 0) 99f else s / k
             }
             prev2 = prev1; prev1 = bandDb
@@ -78,12 +78,12 @@ object Hesitations {
             }
             var lag = 0
             for (l in 21..113) if (r[l] >= 0.92 * best && r[l] >= r[l - 1] && r[l] >= r[l + 1]) { lag = l; break }
-            val voiced = best > 0.6 && lag > 0
+            val voiced = best > 0.5 && lag > 0
             val st = if (voiced) (12 * ln(RATE.toDouble() / lag / 100.0) / ln(2.0)).toFloat() else 0f
             val kind = if (!voiced) ' ' else {
                 val low = band(94.0, 440.0); val b = band(800.0, 1400.0); val c = band(1500.0, 2700.0)
                 when {
-                    c < low - 28 && low - b > 6 -> 'N'
+                    c < low - 22 && low - b > 6 -> 'N'
                     c - b > 0 -> 'E'
                     else -> 'O'
                 }

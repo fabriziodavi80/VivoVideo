@@ -47,9 +47,9 @@ private const val OUT_CH = 2
  * Alla fine vi somma i brani musicali.
  */
 fun renderTimelineAudio(context: Context, project: Project, loudness: Boolean = false, onProgress: (Float) -> Unit = {}): File {
-    val file = File(context.cacheDir, "timeline_${System.currentTimeMillis()}.wav")
+    val file = File(context.cacheDir, "timeline_${System.nanoTime()}.wav")
     // Il mix si fa in virgola mobile (niente tagli prima del volume finale e del limitatore); il WAV a 16 bit alla fine.
-    val raw = File(context.cacheDir, "mix_${System.currentTimeMillis()}.f32")
+    val raw = File(context.cacheDir, "mix_${System.nanoTime()}.f32")
     val mix = project.mix
     val clipDsp = if (BusDsp.needed(mix, Bus.CLIPS)) BusDsp.of(mix, Bus.CLIPS) else null
     var frames = 0L

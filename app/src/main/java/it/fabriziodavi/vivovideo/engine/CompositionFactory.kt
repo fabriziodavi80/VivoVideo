@@ -129,15 +129,24 @@ class CompositionFactory(private val context: Context) {
     /** Canale del mixer per l'anteprima, solo se serve (gruppo regolato o mixer aperto): altrimenti l'audio passa intatto. */
     private fun mixFx(project: Project, b: Bus): List<androidx.media3.common.audio.AudioProcessor> {
         val m = project.mix.bus(b)
-        if (metering || !m.eq.flat || m.comp != Comp.OFF) return listOf(MixAudioProcessor.bus(project.mix, b))
-        if (!BusDsp.needed(project.mix, b)) return emptyList()
+        val g = gainNow
+        fun gainStage(gl: Float, gr: Float) = androidx.media3.common.audio.ChannelMixingAudioProcessor().apply {
+            putChannelMixingMatrix(androidx.media3.common.audio.ChannelMixingMatrix(1, 1, floatArrayOf((gl + gr) / 2)))
+            putChannelMixingMatrix(androidx.media3.common.audio.ChannelMixingMatrix(2, 2, floatArrayOf(gl, 0f, 0f, gr)))
+        }
+        if (metering || !m.eq.flat || m.comp != Comp.OFF) return listOfNotNull(MixAudioProcessor.bus(project.mix, b), if (g != 1f) gainStage(g, g) else null)
+        if (!BusDsp.needed(project.mix, b)) return if (g != 1f) listOf(gainStage(g, g)) else emptyList()
         // Solo volume, bilanciamento o muto: il miscelatore di canali di Media3 (collaudato).
         val (gl, gr) = project.mix.gains(b)
-        val p = androidx.media3.common.audio.ChannelMixingAudioProcessor()
-        p.putChannelMixingMatrix(androidx.media3.common.audio.ChannelMixingMatrix(1, 1, floatArrayOf((gl + gr) / 2)))
-        p.putChannelMixingMatrix(androidx.media3.common.audio.ChannelMixingMatrix(2, 2, floatArrayOf(gl, 0f, 0f, gr)))
-        return listOf(p)
+        return listOf(gainStage(gl * g, gr * g))
     }
+
+    /**
+     * Volume finale in anteprima (lo stesso guadagno del video esportato, misurato da [PreviewLoudness]).
+     * Si applica a ogni gruppo con il miscelatore di canali, mai come effetto sull'intero montaggio.
+     */
+    var previewGain = 1f
+    private var gainNow = 1f
 
     private val builtInLog by lazy {
         CubeLut.fromAsset(context, CubeLut.BUILT_IN_LOG, "vivo LOG → normale")
@@ -363,6 +372,7 @@ class CompositionFactory(private val context: Context) {
         /** Dissolvenze da usare al posto di quelle calcolate (pezzi preparati). */
         crossfadesOverride: List<Project.Crossfade>? = null,
     ): Composition {
+        gainNow = if (forPreview && nativeAudio == null) previewGain else 1f
         val (outW, outH) = sizeOverride ?: outputSize(project, if (forPreview) 1080 else options.size.shortSide)
         val keepHdr = !forPreview && options.hdr && project.clips.any { it.hdr > 0 }
         if (keepHdr) HdrGl.gain = HdrGl.gainFor(project.clips.count { it.hdr == 2 }, project.clips.count { it.hdr == 1 })
