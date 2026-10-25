@@ -65,6 +65,11 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, minSdk 33, solo arm64-v8a 
 ### Dopo la 1.0: Rimescola clip (chiesto dall'utente il 24/10/2026)
 - Per quando l'ordine dell'album non conta. Idea: Altro / Seleziona più clip → "Rimescola". Se le clip sono tagliate a ritmo, si rimescola il contenuto tenendo le durate al loro posto (i tagli restano sul battito); evitare due pezzi dello stesso video vicini; "Rimescola ancora" per un'altra proposta; un solo Annulla.
 
+### Dopo la 1.0: Intervista doppia (chiesta dall'utente il 25/10/2026)
+- Stile "intervista doppia" (Le Iene): due video, uno per persona, con le stesse domande.
+- Per ogni domanda si sceglie il formato: **alternata** (cartello con la domanda a schermo, poi risponde A, poi B) oppure **schermo diviso** (A e B affiancati o sopra/sotto, sulla stessa domanda). L'utente vuole entrambi.
+- Idee: segnare le risposte in ciascun video (a mano o dai sottotitoli automatici: Whisper trova le pause fra le risposte), elenco delle domande scritte dall'utente, cartelli pronti in stile programma TV, nome e didascalia di ciascuno, audio di una sola persona alla volta nello schermo diviso (o entrambi con ducking). In anteprima lo schermo diviso va preparato in anticipo (niente compositore a più ingressi), come le dissolvenze.
+
 ### Dopo la 1.0: transizioni dal video segnalato dall'utente (24/10/2026)
 - Link: https://youtube.com/watch?v=0putmJCyM1I — "12 Essential Transitions for Editing Your Videos | DaVinci Resolve Tutorial" (Gianmarco Capri).
 - Capitoli: fade in/out, dissolve, iris, wipe, invisible cut, speed ramp, steps, mask passing, whip pan, luma fade, overlay, preset transition.
