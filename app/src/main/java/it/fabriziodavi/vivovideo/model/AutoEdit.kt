@@ -506,13 +506,21 @@ object AutoEdit {
      * Raffiche: foto scattate a pochi secondi l'una dall'altra sono quasi uguali. Si tiene solo la migliore
      * di ogni gruppo (secondo [score]; senza punteggio, quella di mezzo). I video restano tutti.
      */
-    fun dedupeBursts(items: List<AutoSource>, score: (AutoSource) -> Float?, gapMs: Long = 4_000): List<AutoSource> {
+    fun dedupeBursts(items: List<AutoSource>, score: (AutoSource) -> Float?, gapMs: Long = 4_000): List<AutoSource> =
+        dedupeBurstsBy(items, { g -> g.map(score) }, gapMs)
+
+    /** Come [dedupeBursts], ma i punteggi si danno a tutto il gruppo insieme (confronto fra le foto della stessa raffica). */
+    fun dedupeBurstsBy(items: List<AutoSource>, groupScores: (List<AutoSource>) -> List<Float?>, gapMs: Long = 4_000): List<AutoSource> {
         val sorted = items.sortedBy { it.dateMs }
         val out = mutableListOf<AutoSource>()
         var group = mutableListOf<AutoSource>()
         fun flush() {
             if (group.isEmpty()) return
-            out += if (group.size == 1) group[0] else group.maxByOrNull { score(it) ?: -1f }?.takeIf { score(it) != null } ?: group[group.size / 2]
+            out += if (group.size == 1) group[0] else {
+                val sc = groupScores(group)
+                val best = group.indices.filter { sc[it] != null }.maxByOrNull { sc[it]!! }
+                if (best != null) group[best] else group[group.size / 2]
+            }
             group = mutableListOf()
         }
         for (it in sorted) {

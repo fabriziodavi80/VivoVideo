@@ -75,4 +75,32 @@ class MomentsTest {
         val plain = AutoEdit.build("t", clips, null, AutoOptions(targetUs = 0, format = VideoFormat.VERTICAL, smart = false), scans)
         assertTrue(plain.clips.all { it.reframe == null })
     }
+
+    @Test fun shakyCameraAndBlurredMomentsLose() {
+        // 12 s a 4 istanti al secondo, tutto nitido; fra 2 e 5 s la camera trema forte.
+        val shaky = (0 until 48).map { i -> val t = i * 250_000L; s(t, 300f).copy(shake = if (t in 2_000_000L..5_000_000L) 0.03f else 0.003f) }
+        val best = Moments.bestStarts(MomentScan("v", 12_000_000, shaky), 2_000_000, 1).first()
+        assertTrue("migliore $best", best !in 1_000_000L..5_000_000L)
+        // Un attimo mosso (mezzo secondo) dentro un tratto altrimenti nitido lo fa perdere contro uno tutto nitido.
+        val blip = (0 until 48).map { i -> val t = i * 250_000L; s(t, if (t in 2_500_000L..2_750_000L) 30f else 300f) }
+        val b2 = Moments.bestStarts(MomentScan("v", 12_000_000, blip), 2_000_000, 1).first()
+        assertTrue("migliore $b2", b2 + 2_000_000 < 2_500_000 || b2 > 2_750_000)
+    }
+
+    @Test fun explainsWhyAndPicksTheBestOfABurst() {
+        val samples = (0 until 40).map { i -> val t = i * 250_000L; if (t >= 6_000_000) s(t, 500f, faces = 1, smile = 0.9f).copy(shake = 0.002f) else s(t, 80f).copy(shake = 0.02f) }
+        val scan = MomentScan("v", 10_000_000, samples)
+        val start = Moments.bestStarts(scan, 3_000_000, 1).first()
+        assertTrue("$start", start >= 6_000_000)
+        val why = Moments.describe(scan, start, 3_000_000)
+        assertTrue(why, "più nitido" in why && "camera ferma" in why && "volti sorridenti" in why)
+        // Raffica: la seconda foto ha il volto a fuoco e gli occhi aperti; la terza non è stata analizzata.
+        val a = s(0, 300f, faces = 1, smile = 0.5f).copy(faceSharp = 40f, eyes = 0.1f)
+        val b = s(0, 300f, faces = 1, smile = 0.5f).copy(faceSharp = 400f, eyes = 1f)
+        val sc = Moments.burstScores(listOf(a, b, null))
+        assertTrue("$sc", sc[1]!! > sc[0]!!)
+        assertNull(sc[2])
+        val burst = (1..3).map { AutoSource("content://s/$it", isVideo = false, durationUs = 0, dateMs = it * 1000L) }
+        assertEquals("content://s/2", AutoEdit.dedupeBurstsBy(burst, { g -> Moments.burstScores(listOf(a, b, null).take(g.size)) }).single().uri)
+    }
 }

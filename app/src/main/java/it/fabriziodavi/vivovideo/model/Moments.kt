@@ -27,6 +27,10 @@ data class MomentSample(
     val subjectX: Float = 0.5f,
     val subjectY: Float = 0.5f,
     val hasSubject: Boolean = false,
+    /** Tremolio della camera (quanto cambia lo spostamento da un fotogramma al successivo, in frazioni della larghezza). */
+    val shake: Float = 0f,
+    /** Nitidezza dentro il volto più grande (come [sharp]); 0 = nessun volto. */
+    val faceSharp: Float = 0f,
 )
 
 @Serializable
@@ -52,18 +56,27 @@ data class Reframe(val times: List<Long> = emptyList(), val xs: List<Float> = em
 }
 
 object Moments {
-    /** Punteggio 0…1 di ogni istante, confrontato con gli altri dello stesso video (nitidezza relativa). */
+    /**
+     * Punteggio 0…1 di ogni istante, confrontato con gli altri dello stesso video (o della stessa raffica di foto):
+     * nitidezza (del volto, se c'è), luce, volti (sorrisi, occhi aperti), un po' di vita e camera ferma.
+     */
     fun scores(scan: MomentScan): FloatArray {
         val s = scan.samples
         if (s.isEmpty()) return FloatArray(0)
-        val sorted = s.map { it.sharp }.sorted()
+        // Dove c'è un volto conta la sua nitidezza (il fuoco sul soggetto), altrimenti quella di tutta l'immagine.
+        val sharpOf = s.map { m -> if (m.faces > 0 && m.faceSharp > 0f) 0.6f * m.faceSharp + 0.4f * m.sharp else m.sharp }
+        val sorted = sharpOf.sorted()
         val med = sorted[sorted.size / 2].coerceAtLeast(1e-3f)
         return FloatArray(s.size) { i ->
             val m = s[i]
-            // Nitidezza: rispetto alla mediana del video, e penalità forte se è proprio mossa (valore assoluto basso).
-            val sharpRel = (m.sharp / (2f * med)).coerceIn(0f, 1f)
-            val sharpAbs = (m.sharp / 200f).coerceIn(0f, 1f)
-            val sharp = 0.6f * sharpRel + 0.4f * sharpAbs
+            // Nitidezza: rispetto alla mediana; rispetto agli istanti vicini (±1,5 s: stessa scena, quindi la differenza
+            // è il mosso); e in assoluto (penalità se è proprio impastata).
+            var near = 0f
+            s.forEachIndexed { j, o -> if (abs(o.tUs - m.tUs) <= 1_500_000) near = max(near, sharpOf[j]) }
+            val sharpRel = (sharpOf[i] / (2f * med)).coerceIn(0f, 1f)
+            val sharpLocal = if (near > 0f) (sharpOf[i] / near).coerceIn(0f, 1f) else 1f
+            val sharpAbs = (sharpOf[i] / 200f).coerceIn(0f, 1f)
+            val sharp = 0.4f * sharpRel + 0.4f * sharpLocal + 0.2f * sharpAbs
             val exposure = (1f - abs(m.luma - 0.47f) * 2.2f).coerceIn(0f, 1f) * (1f - m.clipped).coerceIn(0f, 1f)
             val face = if (m.faces > 0) {
                 val size = (m.faceSize / 0.25f).coerceIn(0.3f, 1f)
@@ -72,7 +85,9 @@ object Moments {
             // Un po' di movimento è vita; troppo è confusione (o camera che sbanda).
             val mo = m.motion.coerceIn(0f, 1f)
             val motion = (4f * mo * (1f - mo)).coerceIn(0f, 1f)
-            (0.36f * sharp + 0.2f * exposure + 0.3f * face + 0.14f * motion).coerceIn(0f, 1f)
+            // Camera ferma: un leggero tremolio della mano va bene, gli scossoni no.
+            val steady = (1f - (m.shake - 0.004f) / 0.02f).coerceIn(0f, 1f)
+            (0.3f * sharp + 0.16f * exposure + 0.28f * face + 0.1f * motion + 0.16f * steady).coerceIn(0f, 1f)
         }
     }
 
@@ -100,7 +115,10 @@ object Moments {
                 acc += sc[i] * k; w += k
             }
             if (w <= 1e-4f) return 0f
-            var v = acc / w
+            // Anche il momento peggiore dentro il tratto conta: mezzo secondo mosso in una clip di 3 si nota.
+            val inside = ts.indices.filter { ts[it] in start..end }.map { sc[it] }.sorted()
+            val worst = if (inside.size >= 3) inside[inside.size / 10] else acc / w
+            var v = 0.75f * (acc / w) + 0.25f * worst
             // Bordi del video: inizio e fine spesso sono mossi o inquadrano a caso.
             if (maxStart > 2 * EDGE_US) {
                 if (start < EDGE_US) v *= 0.85f
@@ -123,8 +141,38 @@ object Moments {
         return out.ifEmpty { listOf(0L) }
     }
 
+    /** Perché il tratto [start, start+[lenUs]) è buono, in poche parole ("nitido, camera ferma, volti sorridenti"). */
+    fun describe(scan: MomentScan, start: Long, lenUs: Long): String {
+        val inside = scan.samples.filter { it.tUs in start..start + lenUs }.ifEmpty { return "" }
+        val all = scan.samples
+        val words = mutableListOf<String>()
+        val sharpIn = inside.map { it.sharp }.average(); val sharpAll = all.map { it.sharp }.average()
+        if (sharpIn >= sharpAll * 1.05) words += "più nitido"
+        if (all.any { it.shake > 0f }) {
+            val shIn = inside.map { it.shake }.average(); val shAll = all.map { it.shake }.average()
+            if (shIn <= shAll * 0.85 || shIn < 0.006) words += "camera ferma"
+        }
+        val faces = inside.count { it.faces > 0 }
+        if (faces * 2 >= inside.size) words += if (inside.filter { it.faces > 0 }.map { it.smile }.average() > 0.5) "volti sorridenti" else "volti in vista"
+        val lightIn = inside.map { abs(it.luma - 0.47f) }.average(); val lightAll = all.map { abs(it.luma - 0.47f) }.average()
+        if (lightIn < lightAll * 0.85) words += "luce migliore"
+        return words.joinToString(", ")
+    }
+
     /** Primi e ultimi istanti di un video da evitare. */
     const val EDGE_US = 600_000L
+
+    /**
+     * Punteggi delle foto di una raffica, confrontate fra loro (nitidezza relativa al gruppo, del volto se c'è).
+     * Null per le foto non analizzate.
+     */
+    fun burstScores(samples: List<MomentSample?>): List<Float?> {
+        val known = samples.filterNotNull()
+        if (known.isEmpty()) return samples.map { null }
+        val sc = scores(MomentScan("", 1, known.mapIndexed { i, m -> m.copy(tUs = i * 10_000_000L) }))
+        var k = 0
+        return samples.map { if (it == null) null else sc[k++] }
+    }
 
     /** Quanto è riuscita una foto (o un istante), 0…1, senza confronti: per scartare le foto mosse. */
     fun photoScore(m: MomentSample): Float = scores(MomentScan("", 1, listOf(m))).first()

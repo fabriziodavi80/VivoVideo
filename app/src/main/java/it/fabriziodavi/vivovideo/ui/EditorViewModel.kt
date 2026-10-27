@@ -40,6 +40,7 @@ import it.fabriziodavi.vivovideo.engine.PersonMasks
 import it.fabriziodavi.vivovideo.model.PersonMode
 import it.fabriziodavi.vivovideo.model.withMode
 import it.fabriziodavi.vivovideo.model.MomentScan
+import it.fabriziodavi.vivovideo.model.MomentSample
 import it.fabriziodavi.vivovideo.model.Moments
 import it.fabriziodavi.vivovideo.engine.Stabilizer
 import it.fabriziodavi.vivovideo.engine.ExportEstimate
@@ -909,14 +910,15 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         val inBurst = photos.filterIndexed { i, s ->
             (i > 0 && s.dateMs - photos[i - 1].dateMs <= 4_000) || (i < photos.size - 1 && photos[i + 1].dateMs - s.dateMs <= 4_000)
         }.take(240)
-        val scores = HashMap<String, Float>()
+        val samples = HashMap<String, MomentSample>()
         if (o.smart) inBurst.forEachIndexed { i, s ->
             busy = "Scelgo le foto migliori… ${i + 1} di ${inBurst.size}"
             runCatching { SmartAnalyzer.scan(ctx, s.uri, true, 0L) }
                 .onFailure { if (it is kotlinx.coroutines.CancellationException) throw it }
-                .getOrNull()?.samples?.firstOrNull()?.let { scores[s.uri] = Moments.photoScore(it) }
+                .getOrNull()?.samples?.firstOrNull()?.let { samples[s.uri] = it }
         }
-        val deduped = AutoEdit.dedupeBursts(raw, { scores[it.uri] })
+        // Le foto di una raffica si confrontano fra loro (stessa scena): vince la più nitida, con occhi aperti e sorrisi.
+        val deduped = AutoEdit.dedupeBurstsBy(raw, { g -> Moments.burstScores(g.map { samples[it.uri] }) })
         val slot = AutoEdit.beatSlotUs(o.style, music) ?: o.style.photoUs
         val wanted = (o.targetUs / slot.coerceAtLeast(500_000L)).toInt().coerceAtLeast(4)
         return AutoEdit.preferOrientation(deduped, o.format, wanted)
@@ -1404,15 +1406,17 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         if (c.trimmedUs >= c.sourceDurationUs - 100_000) { message = "La clip usa già tutto il video: accorciala prima, poi cerco il tratto migliore di quella durata."; return }
         val ctx = getApplication<Application>()
         runClipWork("Cerco il momento migliore…") { prog ->
-            prog(0.1f)
-            val scan = SmartAnalyzer.scan(ctx, c.uri, false, c.sourceDurationUs)
+            prog(0.02f)
+            val scan = SmartAnalyzer.scan(ctx, c.uri, false, c.sourceDurationUs) { prog(0.02f + 0.95f * it) }
             val best = Moments.bestStarts(scan, c.trimmedUs, 3)
             val now = project?.clips?.firstOrNull { it.id == c.id } ?: return@runClipWork
             val cur = best.indexOfFirst { kotlin.math.abs(it - now.trimStartUs) < 250_000 }
             val k = (cur + 1) % best.size
             val start = best[k]
             update { it.replaceClip(now.copy(trimStartUs = start, trimEndUs = start + now.trimmedUs)) }
-            message = "Tratto ${k + 1} di ${best.size} per qualità (nitidezza, luce, volti). Tocca di nuovo per il successivo."
+            val why = Moments.describe(scan, start, now.trimmedUs)
+            message = "Tratto ${k + 1} di ${best.size}" + (if (why.isNotBlank()) ": $why." else " per qualità (nitidezza, luce, volti, camera ferma).") +
+                (if (best.size > 1) " Tocca di nuovo per il successivo." else "")
         }
     }
 

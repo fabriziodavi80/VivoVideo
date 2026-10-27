@@ -110,7 +110,7 @@ object TestPlan {
             "Il video dura quanto il brano, i tagli sono a tempo, le scene sono le parti migliori; Altra proposta ne fa un'altra."),
         Item("ai_best", "Intelligenti", "Momento migliore",
             "Accorcia una clip lunga a 3 s → tieni premuto → Momento migliore (anche 2–3 volte).",
-            "Sceglie tratti nitidi e con persone, non quelli mossi."),
+            "Sceglie tratti nitidi dall'inizio alla fine, con la camera ferma e le persone a fuoco; il messaggio dice perché (es. «più nitido, camera ferma»)."),
         Item("ai_follow", "Intelligenti", "Segui il soggetto",
             "Progetto verticale con un video orizzontale di una persona che si muove → Inquadra → Segui il soggetto.",
             "La persona resta al centro, il movimento dell'inquadratura è morbido."),
