@@ -57,6 +57,23 @@ object DuckPreview {
 }
 
 /**
+ * Curva del volume di un brano in anteprima (blocchi da 10 ms, tempo del montaggio): dissolvenze in entrata e
+ * in uscita (come nel video esportato) e il ducking, se c'è. Null se il brano suona sempre allo stesso volume.
+ */
+fun musicGainCurve(t: it.fabriziodavi.vivovideo.model.MusicTrack, total: Long, duck: FloatArray?): FloatArray? {
+    val fades = t.fadeInUs > 0 || t.fadeOutUs > 0
+    if (!fades && duck == null) return null
+    val n = ((maxOf(total, t.startUs + t.lengthUs)) / 10_000).toInt() + 2
+    val vol = t.volume.coerceAtLeast(1e-3f) // il volume lo applica già volumeProcessors
+    return FloatArray(n) { i ->
+        val us = i * 10_000L
+        val fade = if (fades && us >= t.startUs) t.gainAt(us - t.startUs, total) / vol else 1f
+        fade * (duck?.let { AudioDsp.gainAt(it, us) } ?: 1f)
+    }
+}
+
+
+/**
  * Applica a un brano la curva del ducking. La posizione nel brano arriva da Media3 a ogni salto
  * ([AudioProcessor.StreamMetadata.positionOffsetUs], dall'inizio del tratto usato); [itemStartUs] è dove
  * il brano comincia nel montaggio.

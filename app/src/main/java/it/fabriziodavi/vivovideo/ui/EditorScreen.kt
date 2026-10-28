@@ -1254,7 +1254,7 @@ private fun MusicPanel(vm: EditorViewModel, running: Boolean, tab: Int, onAdd: (
             }
             SecondaryButton("Brano dal telefono", Modifier.fillMaxWidth(), onClick = { if (enabled) onAdd() })
             CreditsBox(p.credits())
-            Hint("Nella timeline: tocca il brano per selezionarlo, trascinalo per spostarlo, usa le maniglie per accorciarlo. Le dissolvenze si sentono nel video esportato.")
+            Hint("Nella timeline: tocca il brano per selezionarlo, trascinalo per spostarlo, usa le maniglie per accorciarlo. Le dissolvenze si sentono anche in anteprima.")
         }
         1 -> {
             if (t.beatsUs.isEmpty()) {

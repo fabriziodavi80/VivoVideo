@@ -343,7 +343,7 @@ class CompositionFactory(private val context: Context) {
                     EditedMediaItem.Builder(item)
                         .setDurationUs(t.sourceDurationUs)
                         .setRemoveVideo(true)
-                        .setEffects(Effects(volumeProcessors(t.volume) + listOfNotNull(duck?.takeIf { !t.dialog }?.let { DuckAudioProcessor(it, t.startUs) }) + mixFx(project, t.bus()), emptyList()))
+                        .setEffects(Effects(volumeProcessors(t.volume) + listOfNotNull(musicGainCurve(t, total, duck?.takeIf { !t.dialog })?.let { DuckAudioProcessor(it, t.startUs) }) + mixFx(project, t.bus()), emptyList()))
                         .build()
                 )
                 cursor = maxOf(cursor, t.startUs) + len

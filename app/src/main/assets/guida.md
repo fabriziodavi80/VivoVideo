@@ -3,6 +3,7 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **Dissolvenze del brano anche in anteprima**: la musica entra e sfuma in uscita come nel video esportato (prima in anteprima partiva e finiva di colpo).
 - **Progetti lunghi: l'anteprima finisce di prepararsi**: con più di 60 dissolvenze l'app cancellava i primi tratti preparati per fare spazio agli ultimi e poi li rifaceva, senza fine. Ora tiene tutti quelli del progetto aperto e prepara prima quelli vicini all'indicatore.
 - **Dividi i video sui battiti, su tutti i brani**: prima tagliava solo dentro il brano selezionato; ora usa i battiti di tutti i brani del progetto (quelli non ancora analizzati li analizza da sola) e dice quanti tagli ha fatto. Un Annulla li toglie tutti.
 - **Momento migliore più bravo**: l'app guarda il video intero (4 istanti al secondo, prima solo uno al secondo e sempre i fotogrammi più nitidi della compressione) e misura su ogni fotogramma quanto trema la camera. Il tratto scelto è nitido dall'inizio alla fine (mezzo secondo mosso basta a scartarlo), con la camera ferma; con le persone conta la nitidezza del volto, oltre a sorrisi e occhi aperti. Il messaggio dice perché l'ha scelto (per esempio «più nitido, camera ferma, volti sorridenti»). Nel video automatico, fra le foto di una raffica vince quella col volto a fuoco e gli occhi aperti, confrontandole fra loro. La prima analisi di un video lungo richiede qualche secondo in più; poi è immediata.
@@ -206,7 +207,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 ## Musica
 - **Audio → scheda Brano** (o "Aggiungi musica" sotto la timeline): **Libreria online**, **Effetti sonori** o **Dal telefono**: MP3, M4A, WAV, FLAC… e anche **MIDI** (convertiti in audio dal sintetizzatore di Android).
 - Il brano parte dall'indicatore. Nella timeline: tocca per selezionare, trascina per spostare, maniglie per accorciare.
-- Volume, dissolvenze in entrata/uscita (si sentono nel video esportato), **Parti dal punto del brano**, Dividi, Elimina.
+- Volume, dissolvenze in entrata/uscita (si sentono in anteprima e nel video esportato), **Parti dal punto del brano**, Dividi, Elimina.
 
 ## Taglio a ritmo (battiti)
 - **Audio → scheda Ritmo**: **Rileva i battiti automaticamente** (dai MIDI i battiti sono già esatti).
