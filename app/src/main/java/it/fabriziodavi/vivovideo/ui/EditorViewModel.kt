@@ -1097,14 +1097,39 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         update { r }
     }
 
-    /** Divide i video su ogni battito del brano selezionato. */
+    /**
+     * Divide i video sui battiti di tutti i brani del progetto (non solo di quello selezionato): i brani di cui
+     * non si conoscono ancora i battiti vengono analizzati prima. Un solo Annulla toglie tutti i tagli.
+     */
     fun splitOnBeats() {
-        val p = project ?: return
-        val t = selectedMusic ?: return
-        val r = p.splitAtBeats(t.startUs + 1, t.startUs + t.playUs(p.durationUs) - 1)
-        if (r == null) { message = "Nessun battito dentro i video."; return }
-        update { r }
-        message = "Video divisi in ${r.clips.size} clip a ritmo: elimina o sostituisci i pezzi che non ti servono."
+        val p0 = project ?: return
+        val songs = p0.music.filter { !it.dialog }
+        if (songs.isEmpty()) { message = "Aggiungi prima un brano."; return }
+        val ctx = getApplication<Application>()
+        viewModelScope.launch {
+            var unclear = 0
+            val todo = songs.filter { !it.hasBeats }
+            todo.forEachIndexed { i, t ->
+                busy = "Analisi del ritmo… brano ${i + 1} di ${todo.size}"
+                val r = findBeats(ctx, t)
+                if (r == null) unclear++
+                else update(keepUndo = false, rebuild = false) { p ->
+                    val cur = p.music.firstOrNull { it.id == t.id } ?: return@update null
+                    p.replaceMusic(cur.copy(beatsUs = r.beatsUs, bpm = r.bpm))
+                }
+            }
+            busy = null
+            val p = project ?: return@launch
+            val before = p.clips.size
+            val skipped = if (unclear > 0) " ($unclear ${if (unclear == 1) "brano senza" else "brani senza"} un ritmo chiaro: lì niente tagli)" else ""
+            val r = p.splitAtBeats()
+            if (r == null) { message = "Nessun battito dentro i video$skipped."; return@launch }
+            update { r }
+            val brani = p.music.count { !it.dialog && it.hasBeats }
+            message = "Tagliato su ogni battito di $brani ${if (brani == 1) "brano" else "brani"}: da $before a ${r.clips.size} clip$skipped. " +
+                "Elimina o sostituisci i pezzi che non ti servono; un Annulla toglie tutti i tagli." +
+                (if (r.clips.size > 600) " Sono tanti: con «Ogni 2» o «Ogni 4» nella scheda Ritmo i tagli si diradano." else "")
+        }
     }
 
     /** Divide il brano selezionato nel punto dell'indicatore. */
@@ -2584,6 +2609,8 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     var preparing by mutableStateOf(0)
         private set
     private val segQueue = ArrayDeque<CrossfadePreview.Job>()
+    /** Tratti che servono al progetto aperto: non si cancellano per fare spazio. */
+    private var segNeeded: Set<String> = emptySet()
     private var segTransformer: Transformer? = null
     private var segSchedule: Job? = null
     private val failedSegments = mutableSetOf<String>()
@@ -2679,8 +2706,12 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             val p = previewSource(p0)
             val (w, h) = previewFrameSize()
             preparingLabel = ""
-            val jobs = runCatching { CrossfadePreview.jobs(p, w, h) }.getOrDefault(emptyList())
-                .filter { !CrossfadePreview.file(ctx, it.key).exists() && it.key !in failedSegments }
+            val all = runCatching { CrossfadePreview.jobs(p, w, h) }.getOrDefault(emptyList())
+            segNeeded = all.map { it.key }.toSet()
+            // Prima i tratti vicini all'indicatore (quelli che si stanno per guardare), poi gli altri.
+            val here = playheadUs
+            val jobs = all.filter { !CrossfadePreview.file(ctx, it.key).exists() && it.key !in failedSegments }
+                .sortedBy { j -> if (j.endUs < here) Long.MAX_VALUE / 2 + (here - j.endUs) else (j.startUs - here).coerceAtLeast(0) }
             segQueue.clear()
             segQueue.addAll(jobs)
             preparing = segQueue.size
@@ -2712,7 +2743,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             .addListener(object : Transformer.Listener {
                 override fun onCompleted(composition: androidx.media3.transformer.Composition, exportResult: androidx.media3.transformer.ExportResult) {
                     tmp.renameTo(CrossfadePreview.file(ctx, job.key))
-                    CrossfadePreview.trim(ctx)
+                    CrossfadePreview.trim(ctx, segNeeded)
                     segProduced = true
                     segTransformer = null
                     if (segQueue.firstOrNull()?.key == job.key) segQueue.removeFirst()

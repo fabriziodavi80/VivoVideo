@@ -171,7 +171,13 @@ object CrossfadePreview {
     }
 
     /** Tiene solo i pezzi più recenti. */
-    fun trim(context: Context, keep: Int = 60) {
-        dir(context).listFiles()?.sortedByDescending { it.lastModified() }?.drop(keep)?.forEach { it.delete() }
+    /**
+     * Fa spazio: tiene tutti i tratti che servono al progetto aperto ([needed], le chiavi) e, degli altri,
+     * i [keep] più recenti. Prima teneva solo gli ultimi 60 in tutto: con più di 60 dissolvenze l'app cancellava
+     * i primi tratti per fare gli ultimi, poi rifaceva i primi… e non finiva mai.
+     */
+    fun trim(context: Context, needed: Set<String> = emptySet(), keep: Int = 60) {
+        dir(context).listFiles()?.filter { f -> needed.none { f.name.startsWith(it) } }
+            ?.sortedByDescending { it.lastModified() }?.drop(keep)?.forEach { it.delete() }
     }
 }

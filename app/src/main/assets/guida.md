@@ -3,6 +3,8 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **Progetti lunghi: l'anteprima finisce di prepararsi**: con più di 60 dissolvenze l'app cancellava i primi tratti preparati per fare spazio agli ultimi e poi li rifaceva, senza fine. Ora tiene tutti quelli del progetto aperto e prepara prima quelli vicini all'indicatore.
+- **Dividi i video sui battiti, su tutti i brani**: prima tagliava solo dentro il brano selezionato; ora usa i battiti di tutti i brani del progetto (quelli non ancora analizzati li analizza da sola) e dice quanti tagli ha fatto. Un Annulla li toglie tutti.
 - **Momento migliore più bravo**: l'app guarda il video intero (4 istanti al secondo, prima solo uno al secondo e sempre i fotogrammi più nitidi della compressione) e misura su ogni fotogramma quanto trema la camera. Il tratto scelto è nitido dall'inizio alla fine (mezzo secondo mosso basta a scartarlo), con la camera ferma; con le persone conta la nitidezza del volto, oltre a sorrisi e occhi aperti. Il messaggio dice perché l'ha scelto (per esempio «più nitido, camera ferma, volti sorridenti»). Nel video automatico, fra le foto di una raffica vince quella col volto a fuoco e gli occhi aperti, confrontandole fra loro. La prima analisi di un video lungo richiede qualche secondo in più; poi è immediata.
 - **Ehm riconosciuti sulla tua voce vera**: rifatto il riconoscimento degli ehm provandolo su una ripresa del collaudo (voce bassa, microfono lontano, un ronzio di fondo). Ora l'app cerca i suoni tenuti (tono e timbro fermi per più di un terzo di secondo, senza le pause delle consonanti) che partono dopo una pausa e restano sul tono di base della voce; gli «M» scritti dal riconoscimento vocale contano come ehm. Quelli chiari sono già spuntati; i dubbi compaiono come «possibile ehm · da ascoltare», non spuntati.
 - **Anteprima forte come il video esportato**: le riprese del telefono hanno spesso l'audio basso; il video esportato lo porta al volume della destinazione (–14 LUFS per i social), l'anteprima no. Ora l'app misura il mix in secondo piano (qualche secondo dopo ogni modifica all'audio) e l'anteprima suona allo stesso volume, fermandosi prima che i picchi distorcano. Si spegne con «Volume uniformato» in Esporta.
@@ -210,7 +212,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - **Audio → scheda Ritmo**: **Rileva i battiti automaticamente** (dai MIDI i battiti sono già esatti).
 - **Tutti / Ogni 2 / Ogni 4** sceglie quanti battiti usare (Ogni 4 ≈ uno per battuta).
 - **Sposta i battiti automatici** corregge un anticipo/ritardo costante.
-- **Allinea i tagli al ritmo**, **Dividi i video sui battiti** sono nella scheda Ritmo.
+- **Allinea i tagli al ritmo**, **Dividi i video sui battiti** sono nella scheda Ritmo. «Dividi» taglia su ogni battito di tutti i brani del progetto (analizza da sola quelli che non hanno ancora i battiti).
 - **Scheda Battiti** (a mano): *Segna / togli qui* all'indicatore, oppure **TAP a tempo** durante l'ascolto; ◀ Battito ▶ per saltare.
 - **Taglia le clip a ogni tocco** (acceso di serie): mentre fai TAP a tempo segni anche i tagli; alla pausa il video viene diviso in quei punti, tutto con un solo Annulla. Poi puoi eliminare o sostituire i pezzi.
 - **Aggancia i tagli ai battiti**: accorciando una clip, la fine si ferma sul battito vicino.
