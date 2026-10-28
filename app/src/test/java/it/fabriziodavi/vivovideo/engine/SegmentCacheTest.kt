@@ -6,10 +6,12 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.annotation.Config
 import org.robolectric.RobolectricTestRunner
 
 /** Progetti con tante dissolvenze: i tratti del progetto aperto non si cancellano per fare spazio (prima non finiva mai). */
 @RunWith(RobolectricTestRunner::class)
+@Config(sdk = [35])
 class SegmentCacheTest {
     @Test fun neededSegmentsSurviveTheCleanup() {
         val ctx = ApplicationProvider.getApplicationContext<Context>()
