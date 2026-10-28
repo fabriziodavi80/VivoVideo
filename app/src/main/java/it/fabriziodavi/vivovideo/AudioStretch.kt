@@ -46,15 +46,47 @@ private const val OUT_CH = 2
  * Clip mute o senza audio diventano silenzio della durata giusta, così tutto resta in sincrono.
  * Alla fine vi somma i brani musicali.
  */
-fun renderTimelineAudio(context: Context, project: Project, loudness: Boolean = false, onProgress: (Float) -> Unit = {}): File {
+fun renderTimelineAudio(
+    context: Context,
+    project: Project,
+    loudness: Boolean = false,
+    isCancelled: () -> Boolean = { false },
+    onProgress: (Float) -> Unit = {},
+): File {
     val file = File(context.cacheDir, "timeline_${System.nanoTime()}.wav")
     // Il mix si fa in virgola mobile (niente tagli prima del volume finale e del limitatore); il WAV a 16 bit alla fine.
     val raw = File(context.cacheDir, "mix_${System.nanoTime()}.f32")
+    // Annullato o andato storto a metà: nessun file lasciato nella cache (con progetti lunghi sono centinaia di MB).
+    try {
+        renderTimelineAudioInto(context, project, loudness, isCancelled, onProgress, file, raw)
+    } catch (t: Throwable) {
+        file.delete()
+        throw t
+    } finally {
+        raw.delete()
+    }
+    return file
+}
+
+/** Il lavoro è stato annullato: si smette di leggere e mescolare. */
+class AudioRenderCancelled : java.util.concurrent.CancellationException("Elaborazione dell'audio annullata")
+
+private fun renderTimelineAudioInto(
+    context: Context,
+    project: Project,
+    loudness: Boolean,
+    isCancelled: () -> Boolean,
+    onProgress: (Float) -> Unit,
+    file: File,
+    raw: File,
+) {
+    fun stopIfCancelled() { if (isCancelled()) throw AudioRenderCancelled() }
     val mix = project.mix
     val clipDsp = if (BusDsp.needed(mix, Bus.CLIPS)) BusDsp.of(mix, Bus.CLIPS) else null
     var frames = 0L
     BufferedOutputStream(FileOutputStream(raw), 1 shl 16).use { out ->
         project.clips.forEachIndexed { i, clip ->
+            stopIfCancelled()
             val target = clip.outputUs * OUT_RATE / 1_000_000
             val audio = if (clip.muted || clip.isPhoto) null else runCatching {
                 decodeAudioRange(context, Uri.parse(clip.uri), clip.trimStartUs, clip.trimEndUs)
@@ -119,20 +151,19 @@ fun renderTimelineAudio(context: Context, project: Project, loudness: Boolean = 
         // con una soglia sopra il suo rumore di fondo.
         val clipLevels = if (ducking) levelsOf(raf, frames) else null
         val voiceEnergy = if (ducking) DoubleArray((frames / AudioDsp.BLOCK).toInt()) else null
-        dialog.forEach { t -> mixTrack(context, raf, frames, t, project.durationUs, null, voiceEnergy, dspFor(mix, busOf(t, layerAudio))); onProgress(0.6f + 0.3f * ++k / all) }
+        dialog.forEach { t -> stopIfCancelled(); mixTrack(context, raf, frames, t, project.durationUs, null, voiceEnergy, dspFor(mix, busOf(t, layerAudio))); onProgress(0.6f + 0.3f * ++k / all) }
         val duck = if (ducking) {
             val v = AudioDsp.voiceMask(AudioDsp.levelsFromEnergy(voiceEnergy!!))
             val c = AudioDsp.clipSpeechMask(clipLevels!!)
             AudioDsp.duckGainsFrom(BooleanArray(v.size) { v[it] || c.getOrElse(it) { false } }, project.duckDb.toFloat(),
                 mix.duckSpeed.holdBlocks, mix.duckSpeed.releaseBlocks)
         } else null
-        music.forEach { t -> mixTrack(context, raf, frames, t, project.durationUs, duck, null, dspFor(mix, Bus.MUSIC)); onProgress(0.6f + 0.3f * ++k / all) }
+        music.forEach { t -> stopIfCancelled(); mixTrack(context, raf, frames, t, project.durationUs, duck, null, dspFor(mix, Bus.MUSIC)); onProgress(0.6f + 0.3f * ++k / all) }
         // Uscita: volume per la destinazione scelta e limitatore dei picchi, poi WAV a 16 bit.
+        stopIfCancelled()
         finish(raf, frames, file, if (loudness) mix.target.lufs else null, mix.limiter)
         onProgress(1f)
     }
-    raw.delete()
-    return file
 }
 
 private fun busOf(t: MusicTrack, layerAudio: List<MusicTrack>): Bus = if (t in layerAudio) Bus.OVERLAY else t.bus()

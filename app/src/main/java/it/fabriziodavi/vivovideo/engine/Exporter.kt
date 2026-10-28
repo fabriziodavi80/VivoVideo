@@ -48,9 +48,14 @@ class Exporter(
     private var transformer: Transformer? = null
     private var cancelled = false
     private var startedAt = 0L
+    /** File in lavorazione (video parziale e colonna sonora): con un annullamento si cancellano subito. */
+    private var currentOut: File? = null
+    private var currentAudio: File? = null
 
     fun start(project: Project, options: ExportOptions) {
         cancelled = false
+        currentOut = null
+        currentAudio = null
         startedAt = SystemClock.elapsedRealtime()
         scope.launch {
             // Colonna sonora calcolata in proprio se c'è musica (mix con dissolvenze)
@@ -66,16 +71,19 @@ class Exporter(
                 onState(ExportState.Running(null, "Elaborazione audio…"))
                 val r = withContext(Dispatchers.Default) {
                     runCatching {
-                        renderTimelineAudio(context, project, options.loudness) { p ->
+                        renderTimelineAudio(context, project, options.loudness, isCancelled = { cancelled }) { p ->
                             handler.post { if (!cancelled) onState(ExportState.Running((p * 100).toInt(), "Elaborazione audio…")) }
                         }
                     }
                 }
+                // Annullato mentre si preparava l'audio: nessun errore da mostrare (lo stato è già tornato a riposo).
+                if (cancelled) return@launch
                 if (r.isFailure) {
                     onState(ExportState.Failed("Errore nell'elaborazione dell'audio: ${r.exceptionOrNull()}"))
                     return@launch
                 }
                 audio = r.getOrNull()
+                currentAudio = audio
             }
             if (cancelled) { audio?.delete(); return@launch }
             // Lascia all'anteprima il tempo di liberare il decoder hardware.
@@ -101,6 +109,9 @@ class Exporter(
         transformer?.cancel()
         transformer = null
         handler.removeCallbacksAndMessages(null)
+        // Il video a metà (fino a qualche GB con i progetti lunghi) e la colonna sonora non servono più.
+        currentOut?.delete(); currentOut = null
+        currentAudio?.delete(); currentAudio = null
         onState(ExportState.Idle)
     }
 
@@ -142,6 +153,7 @@ class Exporter(
             }
         }
         val outFile = File(context.cacheDir, "export_${System.currentTimeMillis()}.mp4")
+        currentOut = outFile
 
         val listener = object : Transformer.Listener {
             override fun onCompleted(composition: Composition, exportResult: ExportResult) {

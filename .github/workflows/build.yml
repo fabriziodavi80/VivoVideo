@@ -40,7 +40,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           COMMIT_MSG: ${{ github.event.head_commit.message }}
         run: |
-          VER="v0.3.${GITHUB_RUN_NUMBER}"
+          VER="v1.0.${GITHUB_RUN_NUMBER}"
           cp app/build/outputs/apk/release/app-release.apk VivoVideo.apk
           NEWS=$(awk '/^## Novità/{f=1;next} /^## /{f=0} f' app/src/main/assets/guida.md)
           NOTES="${COMMIT_MSG:-Compilazione manuale}

@@ -49,11 +49,14 @@ object PreviewLoudness {
     fun gainOf(lufs: Double, peak: Float, targetLufs: Double): Float =
         if (lufs <= -69.0 || peak <= 0f) 1f else AudioDsp.normalizeGain(lufs, peak, targetLufs).coerceIn(0.25f, 4f)
 
-    /** Misura il mix (lento: fuori dal thread principale). */
-    fun prepare(ctx: Context, p: Project) {
+    /**
+     * Misura il mix (lento: fuori dal thread principale). Con [isCancelled] la misura si ferma appena l'audio
+     * cambia di nuovo: prima andava fino in fondo e, con modifiche ravvicinate, più misure giravano insieme.
+     */
+    fun prepare(ctx: Context, p: Project, isCancelled: () -> Boolean = { false }) {
         val k = key(p) ?: return
         val target = p.mix.target.lufs ?: return
-        val wav = renderTimelineAudio(ctx, p, loudness = false)
+        val wav = renderTimelineAudio(ctx, p, loudness = false, isCancelled = isCancelled)
         val meter = AudioDsp.LoudnessMeter()
         try {
             BufferedInputStream(FileInputStream(wav), 1 shl 16).use { input ->

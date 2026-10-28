@@ -521,7 +521,9 @@ private fun ClipBox(
             .clickable(onClick = onClick)
     ) {
         Filmstrip(clip, width)
-        Row(Modifier.align(Alignment.BottomStart).padding(start = if (selected && !picking) HANDLE_W + 3.dp else 4.dp, bottom = 3.dp)) {
+        // Con la curva di velocità i suoi pallini stanno sul fondo: le etichette salgono un poco per non esserne coperte.
+        val badgeBottom = if (clip.speed == ClipSpeed.RAMP) 12.dp else 3.dp
+        Row(Modifier.align(Alignment.BottomStart).padding(start = if (selected && !picking) HANDLE_W + 3.dp else 4.dp, bottom = badgeBottom)) {
             val label = buildString {
                 if (clip.speed != ClipSpeed.NORMAL) append(clip.speed.label).append("  ")
                 append("%.1f".format(clip.outputUs / 1e6).replace('.', ','))

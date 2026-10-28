@@ -18,6 +18,9 @@ import java.security.MessageDigest
 object Proxies {
     const val SHORT_SIDE = 720
 
+    /** Distanza tra i fotogrammi chiave delle copie leggere nuove (quelle già fatte restano come sono). */
+    const val KEYFRAME_SECONDS = 0.5f
+
     fun needs(c: Clip): Boolean = !c.isPhoto && !c.baked && (minOf(c.width, c.height) > 1200 || c.fps > 61f)
 
     fun dir(context: Context) = File(context.cacheDir, "copie_leggere").apply { mkdirs() }

@@ -12,6 +12,7 @@ import it.fabriziodavi.vivovideo.model.withCredits
 import it.fabriziodavi.vivovideo.model.withoutCredits
 import it.fabriziodavi.vivovideo.engine.Whisper
 import it.fabriziodavi.vivovideo.engine.PreviewLoudness
+import it.fabriziodavi.vivovideo.engine.CacheJanitor
 import it.fabriziodavi.vivovideo.engine.Proxies
 import it.fabriziodavi.vivovideo.engine.Decoders
 import it.fabriziodavi.vivovideo.engine.DuckPreview
@@ -111,6 +112,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import java.io.File
 
@@ -2112,7 +2114,10 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         val ctx = getApplication<Application>()
         loudJob = viewModelScope.launch {
             kotlinx.coroutines.delay(1500)
-            val ok = withContext(Dispatchers.Default) { runCatching { PreviewLoudness.prepare(ctx, p) }.isSuccess }
+            val ok = withContext(Dispatchers.Default) {
+                runCatching { PreviewLoudness.prepare(ctx, p, isCancelled = { !isActive }) }.isSuccess
+            }
+            if (!isActive) return@launch
             if (loudPreparing == k) loudPreparing = null
             val now = project ?: return@launch
             if (!ok || PreviewLoudness.key(now) != k || player == null) return@launch
@@ -2303,6 +2308,24 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         if (playerMulti && player != null) Safety.pendingPreview(getApplication(), true)
         // Al ritorno nell'app: i file potrebbero essere stati spostati o cancellati nel frattempo.
         recheckFiles()
+        cleanCacheOnce()
+    }
+
+    private var cacheCleaned = false
+
+    /** Una volta per avvio, in secondo piano: temporanei rimasti e copie leggere che nessun progetto usa più. */
+    private fun cleanCacheOnce() {
+        if (cacheCleaned) return
+        cacheCleaned = true
+        val ctx = getApplication<Application>()
+        viewModelScope.launch {
+            val freed = withContext(Dispatchers.IO) {
+                runCatching { CacheJanitor.run(ctx, store.list() + listOfNotNull(project)) }.getOrDefault(0L)
+            }
+            if (freed > 50L * 1024 * 1024) {
+                Diary.log("Pulizia della cache: liberati ${"%.0f".format(java.util.Locale.ITALIAN, freed / 1_048_576.0)} MB.")
+            }
+        }
     }
 
     // Galleria osservata mentre l'app è aperta: uno spostamento o una cancellazione si nota subito,
@@ -2669,6 +2692,13 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         val t = Transformer.Builder(ctx)
             .setVideoMimeType(androidx.media3.common.MimeTypes.VIDEO_H264)
             .setMaxDelayBetweenMuxerSamplesMs(30_000)
+            // Fotogrammi chiave ogni mezzo secondo (prima uno al secondo): con centinaia di tagli a ritmo l'anteprima
+            // salta da una clip all'altra senza dover decodificare fino a un secondo di video prima del punto giusto.
+            .setEncoderFactory(
+                androidx.media3.transformer.DefaultEncoderFactory.Builder(ctx).setRequestedVideoEncoderSettings(
+                    androidx.media3.transformer.VideoEncoderSettings.Builder().setiFrameIntervalSeconds(Proxies.KEYFRAME_SECONDS).build(),
+                ).build(),
+            )
             .addListener(object : Transformer.Listener {
                 override fun onCompleted(composition: androidx.media3.transformer.Composition, exportResult: androidx.media3.transformer.ExportResult) = next(true)
                 override fun onError(
