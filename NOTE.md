@@ -1,6 +1,6 @@
 # VivoVideo · note per riprendere il lavoro
 
-Aggiornate al 28/10/2026, ultima versione **v0.3.200** (build 200 riuscita). Da leggere insieme a `CLAUDE.md`.
+Aggiornate al 28/10/2026, ultima versione **v1.0.201** (build 201 riuscita): prima versione 1.0. Da leggere insieme a `CLAUDE.md`.
 
 ## 1. Stato attuale dell'app
 
@@ -9,7 +9,7 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, ML Kit, whisper.cpp e Sign
 
 ### Collaudo
 - Collaudo guidato (Progetto → Collaudo, `model/TestPlan.kt`, **37 prove**): al 28/10/2026 **tutte provate e tutte OK**.
-  L'ultima ("Progetto lungo": 15:57, 368 clip, esportato in 6 minuti, 1,9 GB) è da segnare OK sul telefono dopo la v0.3.200.
+  L'ultima ("Progetto lungo": 15:57, 368 clip, esportato in 6 minuti, 1,9 GB) segnata OK. Dopo "Dividi i video sui battiti" su tutti i brani, dissolvenze dei brani in anteprima e tratti di anteprima dei progetti lunghi: provati poco dall'utente, risultato "comunque accettabile".
 - Accettate con riserva (da migliorare dopo la 1.0): taglio degli **ehm**, **scontorno** (bordi e capelli), **stabilizzazione** ("non sensazionale").
 - Il rapporto "Segnala un problema" (diario, esiti, telefono, impostazioni; niente video né chiavi) l'utente lo incolla in chat: è la fonte delle correzioni.
 
@@ -34,6 +34,13 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, ML Kit, whisper.cpp e Sign
   - **anteprima al volume del video esportato** (`PreviewLoudness`, guadagno per gruppo); **dissolvenze del brano anche in anteprima** (`musicGainCurve`, v0.3.200).
 - Progetto: copie di sicurezza, ricollega file spostati (in tempo reale, per nome, peso, durata e risoluzione), modelli, guida con indice e ricerca.
 
+### Versione 1.0 (v1.0.201)
+- Numerazione `1.0.<run>` (versionName e tag della release).
+- `CacheJanitor` all'avvio (`onAppStart` → `cleanCacheOnce`): via i temporanei (`timeline_`, `mix_`, `export_`, `contrario_`, `.tmp`) fermi da oltre un'ora e le copie leggere non usate dai progetti salvati dopo 14 giorni o oltre 4 GB.
+- `renderTimelineAudio(..., isCancelled)`: si ferma (`AudioRenderCancelled`) e non lascia file; `Exporter.cancel` cancella il video a metà e la colonna sonora; la misura di `PreviewLoudness` si interrompe quando l'audio cambia.
+- Copie leggere nuove con fotogramma chiave ogni 0,5 s (`Proxies.KEYFRAME_SECONDS`).
+- Timeline: etichette delle clip più in alto quando c'è la curva di velocità.
+
 ### Esportazione
 - Preset YouTube 4K/HD, Reels/TikTok, WhatsApp; H.265/H.264; HDR a 10 bit; fino a 4K120/8K30.
 - Qualità: bit al secondo come le riprese del telefono e mai meno dell'originale; "qualità piena" (CBR) con scaletta di ripieghi (`Exporter.Mode`).
@@ -54,7 +61,7 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, ML Kit, whisper.cpp e Sign
 ### Come si lavora
 - L'utente non scrive codice. Claude scrive tutto e comunica in italiano, in modo semplice.
 - Si compila solo su GitHub Actions (repository `fabriziodavi80/VivoVideo`, pubblico); l'utente installa da releases/latest.
-  - Job `build`: prove unitarie (logica, Robolectric con `@Config(sdk = [35])`, schermate Roborazzi) e release `v0.3.<run>`; log nel ramo `build-logs` (`status.txt`, `errors.txt`, `build.log`, `screens/`).
+  - Job `build`: prove unitarie (logica, Robolectric con `@Config(sdk = [35])`, schermate Roborazzi) e release `v1.0.<run>`; log nel ramo `build-logs` (`status.txt`, `errors.txt`, `build.log`, `screens/`).
   - Job `emulatore`: `DeviceTest` su x86_64 (esportazioni vere, anteprima); log nel ramo `emulator-logs`. Non sempre parte (stato "skipped").
   - Attesa della build: `git fetch -q --depth 1 origin +build-logs:refs/remotes/origin/build-logs` finché `status.txt` contiene lo sha.
 - **Repository pubblico**: niente chiavi API in chat o nel codice (le chiavi Jamendo e Freesound si mettono solo nelle impostazioni della Libreria; il rapporto le cancella). **Niente video o audio dell'utente nel repository** (la sua ripresa per gli ehm è stata usata solo nella sessione).
@@ -83,8 +90,7 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, ML Kit, whisper.cpp e Sign
 ## 3. Prossimi passi
 
 ### Subito
-1. L'utente segna OK "Progetto lungo" con la v0.3.200 e verifica che dopo "Dividi i video sui battiti" i tagli compaiano in tutta la timeline (con la 0.3.196 tagliava solo nel brano selezionato); che le dissolvenze dei brani si sentano in anteprima; che i tratti di anteprima di un progetto lungo finiscano di prepararsi.
-2. Con il collaudo completo: versione **1.0** (rifinitura dell'interfaccia, stabilità con progetti lunghi e 8K, prestazioni dell'anteprima).
+1. L'utente usa la v1.0.201 e segnala eventuali problemi (rapporto "Segnala un problema"); poi si parte con le novità dopo la 1.0.
 
 ### Dopo la 1.0, in quest'ordine
 1. **Jump cut pronti** (deciso il 24/10/2026, prima novità): Audio → Clip → Jump cut, usa `SpeechCuts` (pause ed ehm) e a ogni taglio alterna l'inquadratura (normale / +12–15% centrata sul volto). Stili Pulito, Dinamico (punch-in sulle frasi importanti), Social (lampo o whoosh su qualche taglio, sottotitoli a parole). Micro-dissolvenze audio sui tagli, riepilogo prima di confermare, un solo Annulla.

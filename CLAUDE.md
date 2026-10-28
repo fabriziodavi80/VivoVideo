@@ -2,7 +2,7 @@
 
 - A ogni nuova versione aggiornare `app/src/main/assets/guida.md`: la sezione "## Novità di questa versione"
   (finisce anche nelle note della release su GitHub) e le sezioni delle funzioni toccate.
-- L'utente non scrive codice: si compila solo su GitHub Actions (release v0.3.<run>), log nel ramo `build-logs`.
+- L'utente non scrive codice: si compila solo su GitHub Actions (release v1.0.<run>), log nel ramo `build-logs`.
 - Anteprima: niente compositore a più ingressi (CompositionPlayer si blocca sul telefono). Le dissolvenze incrociate
   si preparano in anticipo con Transformer (`CrossfadePreview`) e l'anteprima riproduce i pezzi pronti;
   i video sovrapposti in anteprima sono immagini ferme, veri solo in esportazione.
