@@ -1,1 +1,0 @@
-it.fabriziodavi.vivovideo.DeviceTest#transitionsAreSmoothInExport

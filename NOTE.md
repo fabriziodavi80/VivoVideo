@@ -1,6 +1,6 @@
 # VivoVideo · note per riprendere il lavoro
 
-Aggiornate al 29/10/2026, ultima versione **v1.0.213** (build 213 riuscita). La 1.0 è la v1.0.201; dalla 202 ci sono i jump cut. Da leggere insieme a `CLAUDE.md`.
+Aggiornate al 29/10/2026, ultima versione **v1.0.218** (build 218). La 1.0 è la v1.0.201; dalla 202 ci sono i jump cut. Da leggere insieme a `CLAUDE.md`.
 
 ## 1. Stato attuale dell'app
 
@@ -85,6 +85,8 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, ML Kit, whisper.cpp e Sign
 - Prove di logica in locale (senza Gradle): `java -cp "/opt/gradle-8.14.3/lib/*" org.jetbrains.kotlin.cli.jvm.K2JVMCompiler -no-stdlib -cp kotlin-stdlib-2.0.21.jar:junit-4.13.2.jar` su copie dei file nella cartella temporanea (togliendo `@Serializable`).
 
 ### Vincoli tecnici
+- Media3: due pezzi **uno dopo l'altro nella stessa sequenza secondaria** del compositore → il secondo esce ~2 fotogrammi avanti (misurato con `DeviceTest.transitionsAreSmoothInExport`, 60 fps). Per questo le transizioni a due clip usano **due righe** (teste NEXT e code PREV, ingressi `lanes.size+1` e `+2`), ognuna con una pausa prima di ogni pezzo. Corretto nella v1.0.216 (utente: "lampi o scatti, esitazioni"; i lampi voluti restano, approvato dall'utente).
+- Emulatore: `app/src/androidTest/solo.txt` con `Classe#metodo` fa girare una prova sola (misure in ~10 minuti); toglierlo dopo.
 - Media3 e HDR: sui video HDR `OverlayShaderProgram` accetta solo `TextOverlay` (un `BitmapOverlay` semplice è trattato come Ultra HDR e vuole la gainmap → IllegalArgumentException, esportazione HDR ripiegata in SDR). Per questo `TimedTextOverlay` e `LayerOverlay` estendono `TextOverlay` (getText inutilizzato, l'immagine la dà getBitmap). Sistemato nella v1.0.205.
 - Whisper: `transcribe(..., prompt, beam)`: sottotitoli con beam 5 e senza prompt; ehm con `FILLER_PROMPT` e beam 1. Audio sempre `normalized` (–20 dBFS, max ×20). Modelli: Veloce (base), Preciso (small), **Massima precisione** (medium q5_0, 539 MB); `Whisper.defaultModel` propone il più preciso scaricato.
 - Media3: al massimo **15 overlay per OverlayEffect** (oltre: "more than 15 SDR overlays", anteprima bloccata). Usare sempre `overlayEffects()` in `CompositionFactory` (gruppi da 15). Scoperto il 29/10 con i jump cut Social (35 sottotitoli su una clip di 36 s).
