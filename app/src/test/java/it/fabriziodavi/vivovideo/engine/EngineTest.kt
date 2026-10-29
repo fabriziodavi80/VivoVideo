@@ -180,7 +180,7 @@ class EngineTest {
         assertEquals(0.5f, s.getOverlaySettings(3, 5_000_000).alphaScale, 0.02f)       // continua dopo il taglio (riga delle code)
         assertTrue(s.getOverlaySettings(3, 5_250_000).alphaScale in 0.1f..0.5f)        // poi la precedente svanisce
         assertEquals(0f, s.getOverlaySettings(3, 6_000_000).alphaScale, 0f)
-        assertEquals(1f, s.getOverlaySettings(3, 0).alphaScale, 0f)                    // principale visibile
+        assertEquals(1f, s.getOverlaySettings(4, 0).alphaScale, 0f)                    // principale visibile (dopo le due righe)
         assertEquals(androidx.media3.common.util.Size(1080, 1920), s.getOutputSize(emptyList()))
     }
 
