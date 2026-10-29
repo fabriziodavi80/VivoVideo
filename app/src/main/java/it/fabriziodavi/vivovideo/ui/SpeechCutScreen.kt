@@ -133,6 +133,7 @@ fun SpeechCutScreen(vm: EditorViewModel) {
                     Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(VV.Raised).padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         val pct = kotlin.math.round((JumpCuts.ZOOM - 1) * 100).toInt()
                         Text(count(summary.cuts, "taglio", "tagli") + " con cambio d'inquadratura", style = MaterialTheme.typography.bodyMedium)
+                        if (summary.reframes > 0) Text(count(summary.reframes, "cambio", "cambi") + " d'inquadratura nelle frasi lunghe, senza tagliare", style = MaterialTheme.typography.bodyMedium)
                         Text(count(summary.zoomed, "pezzo stretto", "pezzi stretti") + " (+$pct%) sul volto", style = MaterialTheme.typography.bodyMedium)
                         if (style == JumpStyle.DYNAMIC) Text("${summary.punches} punch-in sulle frasi più forti", style = MaterialTheme.typography.bodyMedium)
                         if (style == JumpStyle.SOCIAL) {
@@ -142,7 +143,7 @@ fun SpeechCutScreen(vm: EditorViewModel) {
                         Text("Micro-dissolvenze dell'audio su ogni taglio, niente clic.", style = MaterialTheme.typography.bodySmall, color = VV.Dim)
                         Text("Il video passa da ${formatTime(summary.beforeUs)} a ${formatTime(summary.afterUs)}", style = MaterialTheme.typography.titleSmall, color = VV.Tally)
                     }
-                    if (summary.cuts == 0) Hint("Nessun taglio dentro una stessa ripresa: l'inquadratura non cambia. Prova pause più corte.")
+                    if (summary.cuts + summary.reframes == 0) Hint("Nessun taglio dentro una stessa ripresa: l'inquadratura non cambia. Prova pause più corte.")
                 }
                 if (fillers && plan.fillerCuts.isNotEmpty()) {
                     PanelLabel("Gli ehm trovati")

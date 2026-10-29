@@ -2097,6 +2097,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                 val sm = outcome.summary
                 message = buildString {
                     append("Jump cut fatti: ${sm.cuts} tagli, tolti ${formatSeconds(sm.removedUs)}")
+                    if (sm.reframes > 0) append(", ${sm.reframes} cambi d'inquadratura nelle frasi lunghe")
                     if (sm.punches > 0) append(", ${sm.punches} punch-in")
                     if (sm.flashes > 0) append(", ${sm.flashes} lampi")
                     if (sm.subtitles > 0) append(", ${sm.subtitles} sottotitoli")
@@ -2104,7 +2105,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                     append(if (paths.isEmpty()) "Nessun volto trovato: l'inquadratura stretta è al centro. " else "Inquadratura stretta centrata sul volto. ")
                     append("Annulla per tornare indietro.")
                 }
-                Diary.log("Jump cut ${style.name}: ${sm.cuts} tagli, ${sm.zoomed} stretti, ${sm.punches} punch-in, ${sm.flashes} lampi, ${sm.whooshes} whoosh, ${sm.subtitles} sottotitoli, volti in ${paths.size} video su ${videos.size}.")
+                Diary.log("Jump cut ${style.name}: ${sm.cuts} tagli, ${sm.reframes} cambi senza taglio, ${sm.zoomed} stretti, ${sm.punches} punch-in, ${sm.flashes} lampi, ${sm.whooshes} whoosh, ${sm.subtitles} sottotitoli, volti in ${paths.size} video su ${videos.size}.")
             } catch (e: kotlinx.coroutines.CancellationException) {
                 busy = null; throw e
             } catch (e: Exception) {

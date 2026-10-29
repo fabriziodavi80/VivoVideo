@@ -139,10 +139,14 @@ class JumpCutsTest {
         val a1 = talk("a")
         val a2 = a1.copy(id = "a2")
         val p = Project(name = "x", clips = listOf(a1, talk("b", lenUs = 2_000_000), a2))
-        // La stessa pausa del file, tolta in tutte e due le copie.
+        // La stessa pausa del file, tolta in tutte e due le copie; dopo la pausa restano 5,5 s di parlato senza pause:
+        // l'inquadratura cambia anche a metà (7,25 s del file), senza tagliare.
         val o = JumpCuts.apply(p, listOf(Span(4_000_000, 4_500_000), Span(16_000_000, 16_500_000)), JumpStyle.CLEAN)
-        assertEquals(listOf(1f, JumpCuts.ZOOM, 1f, 1f, JumpCuts.ZOOM), o.project.clips.map { it.frame.scale })
+        val z = JumpCuts.ZOOM
+        assertEquals(listOf(1f, z, 1f, 1f, 1f, z, 1f), o.project.clips.map { it.frame.scale })
         assertEquals(2, o.summary.cuts)
+        assertEquals(2, o.summary.reframes)
+        assertEquals(p.durationUs - 1_000_000, o.project.durationUs)
     }
 
     @Test fun splitClipsOfTheSameTakeKeepAlternating() {
@@ -156,11 +160,49 @@ class JumpCutsTest {
         assertEquals(3, o.summary.cuts)
     }
 
-    @Test fun nothingToCutChangesNothing() {
+    @Test fun noPausesStillChangesTheFramingInLongPhrases() {
+        // 10 s di parlato senza pause: niente si toglie, ma l'inquadratura cambia ogni 2,5 s (mai oltre 4,5 s).
         val p = Project(name = "x", clips = listOf(talk()))
         val o = JumpCuts.apply(p, emptyList(), JumpStyle.SOCIAL)
-        assertEquals(p.clips.map { it.frame }, o.project.clips.map { it.frame })
         assertEquals(0, o.summary.cuts)
+        assertEquals(3, o.summary.reframes)
         assertEquals(0L, o.summary.removedUs)
+        assertEquals(p.durationUs, o.project.durationUs)
+        val z = JumpCuts.ZOOM
+        assertEquals(listOf(1f, z, 1f, z), o.project.clips.map { it.frame.scale })
+        assertEquals(listOf(0L, 2_500_000L, 5_000_000L, 7_500_000L), o.project.clipStartsUs())
+        // Sui cambi senza taglio niente lampi né whoosh.
+        assertEquals(0, o.summary.flashes)
+        assertTrue(o.project.clips.all { it.transitionOut == null })
+        // Un video corto resta com'è.
+        val short = Project(name = "x", clips = listOf(talk(lenUs = 4_000_000)))
+        assertEquals(short.clips.map { it.frame }, JumpCuts.apply(short, emptyList(), JumpStyle.CLEAN).project.clips.map { it.frame })
+    }
+
+    @Test fun longPhrasesChangeFramingBetweenSentences() {
+        // Parole fino a 9 s: a 3,6 s finisce una frase ("oggi."), a 5,1 s c'è una virgola, il resto è parlato fitto.
+        val words = (0 until 30).map { k ->
+            val s = k * 300_000L
+            val text = when (k) { 11 -> "oggi."; 16 -> "dopo,"; else -> "parola" }
+            SpokenWord(s, s + 250_000, text)
+        }
+        val splits = JumpCuts.holdSplits(0, 9_000_000, words, null)
+        // Il primo cambio cade fra le due frasi (dopo "oggi."), il secondo sulla virgola: pezzi tutti fra 1,5 e 4,5 s.
+        assertEquals(1, splits.count { kotlin.math.abs(it - 3_575_000) < 30_000 })
+        val bounds = listOf(0L) + splits + 9_000_000L
+        bounds.zipWithNext { a, b -> assertTrue("${b - a}", b - a in JumpCuts.MIN_HOLD_US..JumpCuts.MAX_HOLD_US) }
+    }
+
+    @Test fun withoutWordsTheChangeFallsInTheQuietestMoment() {
+        // Voce continua con un calo a 4 s (un respiro): il cambio d'inquadratura cade lì, non a metà (3,5 s).
+        val rate = 16_000
+        val pcm = FloatArray(7 * rate) { i ->
+            val t = i.toFloat() / rate
+            val amp = if (t in 3.9f..4.1f) 0.002f else 0.1f
+            amp * kotlin.math.sin(2 * Math.PI * 180 * t).toFloat()
+        }
+        val splits = JumpCuts.holdSplits(0, 7_000_000, emptyList(), pcm)
+        assertEquals(1, splits.size)
+        assertEquals(4_000_000.0, splits[0].toDouble(), 40_000.0)
     }
 }

@@ -32,6 +32,57 @@ object JumpCuts {
     const val PUNCH_DB = 3f
     const val PUNCH_MIN_US = 500_000L
 
+    /** Frasi lunghe: senza pause l'inquadratura cambia comunque, al più tardi dopo tanto (e mai pezzi più corti di MIN). */
+    const val MAX_HOLD_US = 4_500_000L
+    const val MIN_HOLD_US = 1_500_000L
+
+    /**
+     * Dove cambiare inquadratura dentro un tratto [a, b) senza pause (tempi della timeline): fra due frasi o nello spazio
+     * più lungo fra due parole se ci sono le parole ([words]), altrimenti nel momento più basso della voce ([pcm]),
+     * altrimenti a metà. Si divide finché ogni pezzo dura al massimo [MAX_HOLD_US].
+     */
+    internal fun holdSplits(a: Long, b: Long, words: List<SpokenWord>, pcm: FloatArray?): List<Long> {
+        if (b - a <= MAX_HOLD_US) return emptyList()
+        val lo = a + MIN_HOLD_US; val hi = b - MIN_HOLD_US
+        if (hi <= lo) return emptyList()
+        val w = words.filter { it.endUs > a && it.startUs < b }.sortedBy { it.startUs }
+        var best: Long? = null
+        var bestScore = Double.NEGATIVE_INFINITY
+        for (k in 0 until w.size - 1) {
+            val g = (w[k].endUs + w[k + 1].startUs) / 2
+            if (g < lo || g > hi) continue
+            val gap = (w[k + 1].startUs - w[k].endUs).coerceAtLeast(0)
+            val end = w[k].text.trim().lastOrNull()
+            // Fine frase vale più di una virgola, che vale più di uno spazio fra parole; poi conta il respiro più lungo.
+            val bonus = when (end) { '.', '?', '!' -> 600_000.0; ',', ';', ':' -> 250_000.0; else -> 0.0 }
+            // A parità, meglio verso il centro (pezzi simili).
+            val centre = -kotlin.math.abs(g - (a + b) / 2).toDouble() / 20.0
+            val score = gap + bonus + centre
+            if (score > bestScore) { bestScore = score; best = g }
+        }
+        if (best == null && pcm != null) {
+            // Il punto più basso della voce: finestra di 200 ms che scorre ogni 20 ms.
+            val rate = 16_000
+            var minE = Double.MAX_VALUE
+            var t = lo
+            while (t <= hi) {
+                val i0 = ((t - 100_000) * rate / 1_000_000).toInt().coerceIn(0, pcm.size)
+                val i1 = ((t + 100_000) * rate / 1_000_000).toInt().coerceIn(i0, pcm.size)
+                if (i1 - i0 > 0) {
+                    var e = 0.0
+                    for (i in i0 until i1) e += pcm[i] * pcm[i]
+                    e /= (i1 - i0)
+                    // A parità di silenzio, verso il centro.
+                    e *= 1.0 + kotlin.math.abs(t - (a + b) / 2).toDouble() / (b - a) * 0.3
+                    if (e < minE) { minE = e; best = t }
+                }
+                t += 20_000
+            }
+        }
+        val at = best ?: ((a + b) / 2)
+        return holdSplits(a, at, words, pcm) + at + holdSplits(at, b, words, pcm)
+    }
+
     /** Il whoosh: durata del suono e istante del suo culmine (dall'inizio del suono). */
     const val WHOOSH_US = 500_000L
     const val WHOOSH_PEAK_US = 300_000L
@@ -48,6 +99,10 @@ object JumpCuts {
         val index: Int,
         val zoom: Float,
         val punch: Boolean,
+        /** Inizio sulla timeline prima dei tagli. */
+        val startUs: Long = 0,
+        /** Comincia con un cambio d'inquadratura senza taglio (frase lunga), non dopo una pausa tolta. */
+        val reframe: Boolean = false,
     )
 
     data class Summary(
@@ -58,6 +113,8 @@ object JumpCuts {
         val flashes: Int,
         val whooshes: Int,
         val subtitles: Int,
+        /** Cambi d'inquadratura nelle frasi lunghe, senza togliere nulla. */
+        val reframes: Int = 0,
         val beforeUs: Long,
         val afterUs: Long,
     )
@@ -93,10 +150,10 @@ object JumpCuts {
      * in ogni ripresa il primo pezzo è normale, poi stretto, normale… Con [style] Dinamico i pezzi detti più forte
      * (dall'audio [pcm]) diventano punch-in. Le foto e le clip mute restano come sono.
      */
-    fun pieces(p: Project, spans: List<Span>, style: JumpStyle, pcm: FloatArray?): List<Piece> {
+    fun pieces(p: Project, spans: List<Span>, style: JumpStyle, pcm: FloatArray?, words: List<SpokenWord> = emptyList()): List<Piece> {
         val cuts = SpeechCuts.merge(spans)
         val starts = p.clipStartsUs()
-        data class Raw(val uri: String, val a: Long, val b: Long, val srcA: Long, val srcB: Long, val shot: Int, val index: Int, val audible: Boolean)
+        data class Raw(val uri: String, val a: Long, val b: Long, val srcA: Long, val srcB: Long, val shot: Int, val index: Int, val audible: Boolean, val reframe: Boolean)
         val raw = mutableListOf<Raw>()
         shots(p).forEachIndexed { s, range ->
             var index = 0
@@ -113,14 +170,20 @@ object JumpCuts {
                     cursor = maxOf(cursor, cut.endUs)
                 }
                 if (cursor < b) parts += cursor to b
+                val audible = !c.muted && c.volume > 0f
                 parts.forEachIndexed { k, (x, y) ->
-                    // Un pezzo continua il precedente se fra loro non c'era un taglio (bordo di clip nella stessa ripresa).
-                    val joined = k == 0 && raw.lastOrNull()?.let { it.shot == s && it.b == x } == true
-                    val curve = c.speedCurve()
-                    val srcA = c.trimStartUs + curve.sourceTimeAt(x - a)
-                    val srcB = c.trimStartUs + curve.sourceTimeAt(y - a)
-                    if (!joined && raw.lastOrNull()?.shot == s) index++
-                    raw += Raw(c.uri, x, y, srcA, srcB, s, index, !c.muted && c.volume > 0f)
+                    // Frasi lunghe senza pause: altri cambi d'inquadratura dentro il pezzo (solo dove si parla).
+                    val bounds = listOf(x) + (if (audible) holdSplits(x, y, words, pcm) else emptyList()) + y
+                    for (q in 0 until bounds.size - 1) {
+                        val x1 = bounds[q]; val y1 = bounds[q + 1]
+                        // Un pezzo continua il precedente se fra loro non c'era un taglio (bordo di clip nella stessa ripresa).
+                        val joined = q == 0 && k == 0 && raw.lastOrNull()?.let { it.shot == s && it.b == x1 } == true
+                        val curve = c.speedCurve()
+                        val srcA = c.trimStartUs + curve.sourceTimeAt(x1 - a)
+                        val srcB = c.trimStartUs + curve.sourceTimeAt(y1 - a)
+                        if (!joined && raw.lastOrNull()?.shot == s) index++
+                        raw += Raw(c.uri, x1, y1, srcA, srcB, s, index, audible, reframe = q > 0)
+                    }
                 }
             }
         }
@@ -134,7 +197,7 @@ object JumpCuts {
             val strong = audible && median != null && levels!![i] >= median + PUNCH_DB && r.b - r.a >= PUNCH_MIN_US &&
                 r.index > 0 && lastPunch != r.index - 1
             if (strong) lastPunch = r.index
-            Piece(r.uri, r.srcA, r.srcB, r.shot, r.index, if (!audible) 1f else if (strong) PUNCH else alt, strong)
+            Piece(r.uri, r.srcA, r.srcB, r.shot, r.index, if (!audible) 1f else if (strong) PUNCH else alt, strong, startUs = r.a, reframe = r.reframe)
         }
     }
 
@@ -190,11 +253,16 @@ object JumpCuts {
         subject: (uri: String, srcUs: Long) -> Pair<Float, Float>? = { _, _ -> null },
     ): Outcome {
         val cuts = SpeechCuts.merge(spans)
-        val list = pieces(p, cuts, style, pcm)
+        val list = pieces(p, cuts, style, pcm, words)
         // Sottotitoli prima del taglio: poi seguono il parlato tagliato da soli (come testi della timeline).
         val subs = if (style == JumpStyle.SOCIAL) Subtitles.build(subtitleWords(words, cuts), SubStyle.SOCIAL, SubPosition.BOTTOM, p.durationUs) else emptyList()
         val withSubs = if (subs.isNotEmpty()) p.copy(texts = p.texts.filterNot { it.subtitle } + subs) else p
-        val q = withSubs.cutTimeline(cuts)
+        var q = withSubs.cutTimeline(cuts)
+        // Cambi d'inquadratura nelle frasi lunghe: si divide la clip (senza togliere nulla) dove comincia il pezzo nuovo.
+        fun removedBefore(t: Long) = cuts.filter { it.endUs <= t }.sumOf { it.lengthUs }
+        list.filter { it.reframe }.map { it.startUs - removedBefore(it.startUs) }.sortedDescending().forEach { t ->
+            q.splitAt(t, 20_000)?.let { q = it }
+        }
         // Ogni clip dopo il taglio si riconosce dal suo tratto nel file: si va in ordine, così anche un video
         // usato due volte nel progetto trova i pezzi giusti.
         var at = 0
@@ -220,7 +288,9 @@ object JumpCuts {
             val a = matched[j - 1]; val b = matched[j]
             a != null && b != null && a.shot == b.shot && a.index != b.index
         }
-        val flashAt = if (style == JumpStyle.SOCIAL) jumpAt.filterIndexed { n, _ -> n % FLASH_EVERY == FLASH_EVERY / 2 } else emptyList()
+        // Lampi e whoosh solo sui tagli veri (dopo una pausa tolta), non sui cambi d'inquadratura nelle frasi lunghe.
+        val realCuts = jumpAt.filter { matched[it]?.reframe != true }
+        val flashAt = if (style == JumpStyle.SOCIAL) realCuts.filterIndexed { n, _ -> n % FLASH_EVERY == FLASH_EVERY / 2 } else emptyList()
         if (flashAt.isNotEmpty()) {
             clips = clips.mapIndexed { i, c ->
                 if (i + 1 in flashAt && c.transitionOut == null) c.copy(transitionOut = TransitionSpec(TransitionType.FLASH, FLASH_US)) else c
@@ -229,7 +299,8 @@ object JumpCuts {
         val whooshAt = if (whoosh) flashAt.map { starts[it] }.filter { it >= WHOOSH_PEAK_US } else emptyList()
         val out = q.copy(clips = clips)
         val summary = Summary(
-            cuts = jumpAt.size,
+            cuts = realCuts.size,
+            reframes = jumpAt.size - realCuts.size,
             removedUs = p.durationUs - out.durationUs,
             zoomed = clips.count { it.jumpCut && it.frame.scale > 1.001f && it.frame.scale < PUNCH - 0.001f },
             punches = clips.count { it.jumpCut && it.frame.scale >= PUNCH - 0.001f },
