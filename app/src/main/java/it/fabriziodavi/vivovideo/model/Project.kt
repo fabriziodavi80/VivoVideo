@@ -807,7 +807,42 @@ data class Project(
     val duckDb: Int = 12,
     /** Mixer: volume, bilanciamento, equalizzatore e compressore per gruppo; volume finale e limitatore. */
     val mix: Mix = Mix(),
+    /** Video e foto come sono stati importati (interi, in ordine di importazione): per "Torna ai video originali". */
+    val originals: List<Clip> = emptyList(),
 ) {
+    /**
+     * I video e le foto di partenza: quelli ricordati all'importazione; per i progetti fatti prima, ricostruiti dalle clip
+     * (ogni file una volta, nel primo ordine in cui compare; al contrario e fermi immagine tornano al video da cui vengono).
+     */
+    fun originalMedia(): List<Clip> {
+        if (originals.isNotEmpty()) return originals
+        val seen = mutableSetOf<String>()
+        return clips.mapNotNull { c ->
+            if (c.baked || c.freeze) return@mapNotNull null
+            val r = c.reversed
+            val base = if (r != null) Clip(uri = r.uri, sourceDurationUs = r.sourceDurationUs, width = r.width, height = r.height, hdr = r.hdr,
+                fps = c.fps, log = c.log)
+            else Clip(uri = c.uri, sourceDurationUs = c.sourceDurationUs, isPhoto = c.isPhoto, width = c.width, height = c.height,
+                fps = c.fps, hdr = c.hdr, log = c.log, fileName = c.fileName, fileSize = c.fileSize)
+            if (!seen.add(base.uri)) return@mapNotNull null
+            if (base.isPhoto) base.copy(trimEndUs = Clip.PHOTO_DEFAULT_US) else base
+        }
+    }
+
+    /**
+     * Torna ai video originali: le clip di [originalMedia] senza nessuna modifica (interi, senza velocità, colore, effetti,
+     * transizioni), e via testi, sottotitoli, musica, voce, livelli, colore del progetto e mixer. Nome e formato restano.
+     */
+    fun restoreOriginals(): Project? {
+        val media = originalMedia()
+        if (media.isEmpty()) return null
+        val fresh = media.map { it.copy(id = UUID.randomUUID().toString()) }
+        return Project(
+            id = id, name = name, createdAt = createdAt, clips = fresh, format = format, sameMode = sameMode, otherMode = otherMode,
+            originals = media,
+        ).applyFramePresets()
+    }
+
     /** Orientamento del video finito. */
     fun outputOrientation(): Orientation = when (format) {
         VideoFormat.VERTICAL -> Orientation.PORTRAIT

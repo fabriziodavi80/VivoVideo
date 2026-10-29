@@ -267,6 +267,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
     val pickVideos = { askAdd = true }
     var projectMenu by remember { mutableStateOf(false) }
     var naming by remember { mutableStateOf(false) }
+    var restoreAsk by remember { mutableStateOf(false) }
     var relinkOpen by remember { mutableStateOf(false) }
     var reportOpen by remember { mutableStateOf(false) }
     var backupWithMedia by remember { mutableStateOf(false) }
@@ -713,6 +714,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
             text = {
                 Column {
                     MenuRow(VVIcons.Copy, "Salva come modello") { projectMenu = false; naming = true }
+                    MenuRow(VVIcons.Undo, "Torna ai video originali") { projectMenu = false; restoreAsk = true }
                     MenuRow(VVIcons.Export, "Copia di sicurezza (leggera)") {
                         projectMenu = false; backupWithMedia = false; backupSaver.launch(project.name.ifBlank { "progetto" } + ".vivo")
                     }
@@ -729,6 +731,24 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
         )
     }
     if (reportOpen) ReportDialog(vm, onDismiss = { reportOpen = false })
+    if (restoreAsk) {
+        val n = vm.originalCount()
+        AlertDialog(
+            onDismissRequest = { restoreAsk = false },
+            containerColor = VV.Raised,
+            title = { Text("Tornare ai video originali?", style = MaterialTheme.typography.titleSmall) },
+            text = {
+                Text(
+                    "Il progetto torna ai $n video e foto come li hai importati: interi e nell'ordine di importazione, senza tagli, " +
+                        "velocità, colore, effetti, transizioni, testi, sottotitoli, musica, voce e livelli. I file sul telefono non si toccano. " +
+                        "Un solo Annulla riporta il progetto a com'è adesso.",
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            },
+            confirmButton = { TextButton(onClick = { restoreAsk = false; vm.restoreOriginals() }, enabled = n > 0) { Text("Torna agli originali", color = VV.Tally) } },
+            dismissButton = { TextButton(onClick = { restoreAsk = false }) { Text("Annulla", color = VV.Dim) } },
+        )
+    }
     if (naming) {
         var name by remember { mutableStateOf(project.name) }
         AlertDialog(

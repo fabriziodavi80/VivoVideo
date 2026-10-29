@@ -22,7 +22,7 @@ data class Template(
 
 object Templates {
     fun fromProject(p: Project, name: String): Template =
-        Template(name = name.ifBlank { p.name }.take(40), project = p.copy(id = "modello", auto = null))
+        Template(name = name.ifBlank { p.name }.take(40), project = p.copy(id = "modello", auto = null, originals = emptyList()))
 
     /**
      * Nuovo progetto dal modello con le clip [media] (in ordine): la clip i va nello spazio i
@@ -30,10 +30,11 @@ object Templates {
      */
     fun apply(t: Template, media: List<Clip>, name: String = t.name, bestStart: (Clip, Long) -> Long? = { _, _ -> null }): Project {
         val slots = t.project.clips
-        if (slots.isEmpty() || media.isEmpty()) return t.project.copy(id = UUID.randomUUID().toString(), name = name, clips = emptyList())
+        if (slots.isEmpty() || media.isEmpty()) return t.project.copy(id = UUID.randomUUID().toString(), name = name, clips = emptyList(), originals = emptyList())
         val n = maxOf(slots.size, media.size)
         val all = ClipAttr.entries.toSet()
-        var p = t.project.copy(id = UUID.randomUUID().toString(), name = name, createdAt = System.currentTimeMillis(), auto = null)
+        // I video originali sono quelli scelti per il modello (non quelli del progetto da cui è nato).
+        var p = t.project.copy(id = UUID.randomUUID().toString(), name = name, createdAt = System.currentTimeMillis(), auto = null, originals = media)
         val clips = (0 until n).map { i ->
             val slot = slots[i % slots.size]
             val src = media[i % media.size]

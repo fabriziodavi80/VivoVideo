@@ -65,6 +65,23 @@ class EditorOpsTest {
         assertNull(vm.selectedMusicId)
     }
 
+    @Test fun restoreOriginalsAndUndo() {
+        val vm = vm()
+        vm.selectedClipId = "a"
+        vm.updateSelected { it.copy(speed = ClipSpeed.SLOW) }
+        vm.addText()
+        val edited = vm.project!!
+        assertEquals(3, vm.originalCount())
+        vm.restoreOriginals()
+        val r = vm.project!!
+        assertEquals(listOf("content://v/a", "content://v/b", "file:///p.jpg"), r.clips.map { it.uri })
+        assertTrue(r.clips.all { it.speed == ClipSpeed.NORMAL && it.trimStartUs == 0L })
+        assertTrue(r.texts.isEmpty())
+        vm.undo()
+        assertEquals(edited.clips, vm.project!!.clips)
+        assertEquals(edited.texts, vm.project!!.texts)
+    }
+
     @Test fun shuffleAgainKeepsASingleUndo() {
         val clips = (0 until 6).map { i -> Clip(id = "c$i", uri = "content://v/$i", sourceDurationUs = 10_000_000, trimEndUs = 2_000_000, width = 1920, height = 1080) }
         val vm = vm(clips)

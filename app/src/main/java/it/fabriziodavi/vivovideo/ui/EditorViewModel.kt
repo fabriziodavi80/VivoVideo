@@ -572,7 +572,8 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             val at = p.clips.indexOfFirst { it.id == selectedClipId }.let { if (it < 0) p.clips.size else it + 1 }
             // Le nuove clip seguono le preimpostazioni di formato (riempi / sfondo sfocato secondo l'orientamento).
             val ids = clips.map { it.id }.toSet()
-            update { it.addClips(clips, at).applyFramePresets(ids) }
+            // Si ricordano come sono stati importati (per "Torna ai video originali"); i progetti vecchi partono da quelli che hanno.
+            update { it.addClips(clips, at).applyFramePresets(ids).copy(originals = it.originalMedia() + clips) }
             selectedClipId = clips.first().id
             // Primo video LOG: un po' di riduzione rumore di base.
             if (p.clips.isEmpty() && clips.any { it.log } && project!!.color.denoise == 0) {
@@ -896,7 +897,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             // Data vera di ogni elemento (per i temi con la data della videocamera), per indirizzo della clip.
             val dates = picked.mapNotNull { s -> imported[s.uri]?.let { it.uri to s.dateMs } }.toMap()
             val built = withContext(Dispatchers.Default) { AutoEdit.build(name, clips, music, o, scans, dates) }
-            var p = built.copy(auto = AutoRecipe(sources, o, music, round = 1, imported = imported))
+            var p = built.copy(auto = AutoRecipe(sources, o, music, round = 1, imported = imported), originals = clips)
             if (clips.any { it.log }) p = p.copy(color = p.color.copy(denoise = 40))
             busy = null
             showAuto = false
@@ -1609,6 +1610,25 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     fun startMultiSelect() { multiIds = setOfNotNull(selectedClipId) }
     fun endMultiSelect() { multiIds = null }
     fun selectAllClips() { multiIds = project?.clips?.map { it.id }?.toSet() }
+
+    // ---------------- Torna ai video originali ----------------
+
+    /** Quanti video e foto ci sono da ripristinare (per la domanda di conferma). */
+    fun originalCount(): Int = project?.originalMedia()?.size ?: 0
+
+    /** Il progetto torna ai video e alle foto come sono stati importati, senza modifiche. Un solo Annulla torna indietro. */
+    fun restoreOriginals() {
+        val p = project ?: return
+        if (busy != null || exportState is ExportState.Running) return
+        val r = p.restoreOriginals() ?: run { message = "Non ci sono video da ripristinare."; return }
+        pause()
+        update { r }
+        selectedClipId = r.clips.firstOrNull()?.id
+        selectedTextId = null; selectedLayerId = null; selectedMusicId = null
+        multiIds = null
+        Diary.log("Torna ai video originali: ${r.clips.size} clip (prima ${p.clips.size}).")
+        message = "Progetto riportato ai ${r.clips.size} video e foto originali, senza modifiche. Annulla per tornare a com'era."
+    }
 
     // ---------------- Rimescola clip ----------------
 
