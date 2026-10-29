@@ -441,8 +441,7 @@ class CompositionFactory(private val context: Context) {
                 }
                 // Testi e immagini: livelli sopra a tutto (dopo inquadratura, keyframe e transizioni).
                 if (!multi) {
-                    val ov = overlaysFor(startUs, startUs + clip.outputUs)
-                    if (ov.isNotEmpty()) add(OverlayEffect(ov))
+                    addAll(overlayEffects(overlaysFor(startUs, startUs + clip.outputUs)))
                 }
             }
             if (clip.isPhoto) {
@@ -494,7 +493,7 @@ class CompositionFactory(private val context: Context) {
             return Composition.Builder(sequences)
                 .setHdrMode(hdrMode)
                 .setVideoCompositorSettings(LayerCompositorSettings(outW, outH, lanes, crossfades))
-                .setEffects(Effects(emptyList(), if (ov.isEmpty()) emptyList() else listOf(OverlayEffect(ov))))
+                .setEffects(Effects(emptyList(), overlayEffects(ov)))
                 .build()
         }
         val items = mainItems(light = false, removeAudio = nativeAudio != null)
@@ -518,3 +517,13 @@ class CompositionFactory(private val context: Context) {
             .build()
     }
 }
+
+/** Media3 disegna al massimo 15 testi o immagini per strato (oltre dà errore: "more than 15 SDR overlays"). */
+internal const val MAX_OVERLAYS_PER_EFFECT = 15
+
+/**
+ * Testi e immagini divisi in strati da [MAX_OVERLAYS_PER_EFFECT], uno sopra l'altro nello stesso ordine:
+ * una clip lunga con i sottotitoli parola per parola ne ha decine.
+ */
+internal fun overlayEffects(ov: List<androidx.media3.effect.TextureOverlay>): List<OverlayEffect> =
+    ov.chunked(MAX_OVERLAYS_PER_EFFECT).map { OverlayEffect(it) }

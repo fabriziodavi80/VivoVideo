@@ -80,6 +80,20 @@ class EngineTest {
         assertEquals(2, exp.sequences.size) // video + colonna sonora già mixata
     }
 
+    @Test fun manySubtitlesOnOneLongClipAreSplitIntoLayersOf15() {
+        // Una clip di 40 s con un sottotitolo al secondo (come dopo i jump cut Social): prima un solo strato con 40 testi,
+        // che Media3 rifiuta oltre i 15.
+        val subs = (0 until 40).map { k -> TextItem(text = "parola $k", startUs = k * 1_000_000L, durationUs = 900_000, subtitle = true) }
+        val p = Project(name = "x", clips = listOf(video("a", src = 40_000_000)), texts = subs)
+        for (preview in listOf(true, false)) {
+            val c = factory.build(p, ExportOptions(), forPreview = preview, nativeAudio = null)
+            val layers = c.sequences.flatMap { it.editedMediaItems }.flatMap { it.effects.videoEffects }.filterIsInstance<OverlayEffect>()
+            assertEquals(3, layers.size)
+        }
+        assertEquals(listOf(15, 15, 10), (0 until 40).toList().chunked(MAX_OVERLAYS_PER_EFFECT).map { it.size })
+        assertTrue(overlayEffects(emptyList()).isEmpty())
+    }
+
     @Test fun crossfadeExportUsesCompositorWithPaddedLane() {
         val x = TransitionSpec(TransitionType.CROSSFADE, 1_000_000)
         val p = Project(

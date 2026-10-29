@@ -3,6 +3,7 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **Corretto: anteprima bloccata con tanti sottotitoli**: se su una clip lunga cadevano più di 15 testi (per esempio dopo i jump cut Social, con i sottotitoli parola per parola), l'anteprima si fermava con l'errore «more than 15 SDR overlays» e l'app si bloccava. Ora testi e immagini si dividono in strati da 15, in anteprima e nel video esportato.
 - **Jump cut pronti** (Audio → Clip → **Jump cut**): per i video parlati. L'app toglie le pause (e, se vuoi, gli ehm) e a ogni taglio cambia l'inquadratura, normale e stretta a turno (+14%), centrata sul volto: così il salto del taglio sembra voluto, come nei video dei creator. Tre stili: **Pulito**; **Dinamico**, che sulle frasi dette con più forza stringe di più (punch-in); **Social**, con un lampo ogni quattro tagli, il whoosh sul lampo e i sottotitoli che compaiono parola per parola. Prima di confermare vedi il riepilogo (quanti tagli, inquadrature strette, punch-in, lampi, sottotitoli e la nuova durata); un solo Annulla toglie tutto. Nel video esportato la voce ha micro-dissolvenze su ogni taglio, niente clic.
 - **VivoVideo 1.0**: la cache si pulisce da sola all'avvio, annullare l'esportazione la ferma subito e cancella il file a metà, anteprima più leggera con i progetti lunghi.
 
