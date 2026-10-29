@@ -43,6 +43,11 @@ import it.fabriziodavi.vivovideo.model.withMode
 import it.fabriziodavi.vivovideo.model.MomentScan
 import it.fabriziodavi.vivovideo.model.MomentSample
 import it.fabriziodavi.vivovideo.model.Moments
+import it.fabriziodavi.vivovideo.model.JumpCuts
+import it.fabriziodavi.vivovideo.model.JumpStyle
+import it.fabriziodavi.vivovideo.model.Reframe
+import it.fabriziodavi.vivovideo.model.SpokenWord
+import it.fabriziodavi.vivovideo.engine.Whoosh
 import it.fabriziodavi.vivovideo.engine.Stabilizer
 import it.fabriziodavi.vivovideo.engine.ExportEstimate
 import it.fabriziodavi.vivovideo.engine.OutputCodec
@@ -1860,6 +1865,11 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     // ---------------- Pulizia del parlato: pause ed "ehm" ----------------
 
     var showSpeechCut by mutableStateOf(false)
+    /** La schermata è aperta per i jump cut (Audio → Clip → Jump cut) invece che per la sola pulizia. */
+    var jumpMode by mutableStateOf(false)
+    /** Parole sentite nell'ultima analisi (tempi della timeline), per i sottotitoli dei jump cut Social. */
+    var speechWords by mutableStateOf<List<SpokenWord>>(emptyList())
+        private set
     /** Ciò che l'analisi propone di togliere (null finché non si analizza). */
     var speechPlan by mutableStateOf<it.fabriziodavi.vivovideo.model.SpeechCuts.Result?>(null)
 
@@ -1867,12 +1877,13 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
      * Ascolta l'audio delle clip: pause più lunghe di [minPauseUs] (0 = non cercarle) e, con [fillers],
      * le parole di riempimento (serve il riconoscimento vocale). Non cambia nulla finché non si conferma.
      */
-    fun analyzeSpeech(model: Whisper.Model, lang: String, minPauseUs: Long, fillers: Boolean) {
+    fun analyzeSpeech(model: Whisper.Model, lang: String, minPauseUs: Long, fillers: Boolean, transcribe: Boolean = fillers) {
         val ctx = getApplication<Application>()
         val p = project ?: return
         if (p.clips.isEmpty() || busy != null) return
         pause()
         speechPlan = null
+        speechWords = emptyList()
         subtitleJob = viewModelScope.launch {
             try {
                 busy = "Preparo l'audio…"
@@ -1882,7 +1893,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                     try { Whisper.wavTo16kMono(wav) } finally { wav.delete() }
                 }
                 var words = emptyList<it.fabriziodavi.vivovideo.model.SpokenWord>()
-                if (fillers) {
+                if (fillers || transcribe) {
                     if (!Whisper.isDownloaded(ctx, model)) {
                         busy = "Scarico il modello ${model.label} (${model.sizeMb} MB, solo la prima volta)…"
                         Whisper.download(ctx, model) { f -> handler.post { busy = "Scarico il modello ${model.label}… ${(f * 100).toInt()}%" } }
@@ -1895,6 +1906,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                 val plan = withContext(Dispatchers.Default) { it.fabriziodavi.vivovideo.model.SpeechCuts.plan(p, pcm, words, minPauseUs, fillers = fillers) }
                 busy = null
                 speechPcm = pcm
+                speechWords = words
                 speechPlan = plan
                 // Per le segnalazioni: cosa ha sentito il riconoscimento vocale e cosa ha trovato il suono.
                 if (fillers) Diary.log(
@@ -1958,8 +1970,10 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     /** Chiude la pulizia del parlato (e libera l'audio analizzato). */
     fun closeSpeechCut() {
         showSpeechCut = false
+        jumpMode = false
         speechPlan = null
         speechPcm = null
+        speechWords = emptyList()
         sampleTrack?.run { runCatching { stop() }; release() }
         sampleTrack = null
     }
@@ -1977,6 +1991,81 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private fun formatSeconds(us: Long): String = String.format(java.util.Locale.ITALIAN, "%.1f s", us / 1e6)
+
+    // ---------------- Jump cut pronti ----------------
+
+    /** Proporzioni del video finale (larghezza/altezza). */
+    private fun outAspect(p: Project): Float = runCatching { factory.outputSize(p, null) }.getOrNull()
+        ?.let { (w, h) -> w.toFloat() / h.coerceAtLeast(1) } ?: (9f / 16f)
+
+    /** Riepilogo dei jump cut prima di confermare (veloce: i volti contano solo per centrare l'inquadratura). */
+    fun jumpPreview(style: JumpStyle, whoosh: Boolean): JumpCuts.Summary? {
+        val p = project ?: return null
+        val plan = speechPlan ?: return null
+        if (plan.isEmpty) return null
+        return runCatching {
+            JumpCuts.apply(p, plan.spans, style, speechPcm, speechWords, whoosh, outAspect(p)).summary
+        }.getOrNull()
+    }
+
+    /**
+     * Jump cut: toglie pause ed ehm trovati e a ogni taglio cambia l'inquadratura (centrata sul volto, che si cerca
+     * con la stessa analisi di "Momento migliore"); con Social anche lampi, whoosh e sottotitoli. Un solo Annulla.
+     */
+    fun applyJumpCuts(style: JumpStyle, whoosh: Boolean) {
+        val plan = speechPlan ?: return
+        val p0 = project ?: return
+        if (plan.isEmpty || busy != null) return
+        val ctx = getApplication<Application>()
+        val pcm = speechPcm
+        val words = speechWords
+        subtitleJob = viewModelScope.launch {
+            try {
+                // Volti: un'analisi per video (si ricorda, la seconda volta è immediata).
+                val videos = p0.clips.filter { !it.isPhoto }.distinctBy { it.uri }
+                val paths = HashMap<String, Reframe>()
+                videos.forEachIndexed { i, c ->
+                    busy = if (videos.size == 1) "Cerco il volto…" else "Cerco i volti… ${i + 1} di ${videos.size}"
+                    val scan = runCatching { SmartAnalyzer.scan(ctx, c.uri, false, c.sourceDurationUs) }
+                        .onFailure { if (it is kotlinx.coroutines.CancellationException) throw it }.getOrNull()
+                    if (scan != null && scan.hasFaces) Moments.subjectPath(scan)?.let { paths[c.uri] = it }
+                }
+                busy = "Preparo i jump cut…"
+                val now = project ?: return@launch
+                val outcome = withContext(Dispatchers.Default) {
+                    JumpCuts.apply(now, plan.spans, style, pcm, words, whoosh, outAspect(now)) { uri, srcUs ->
+                        paths[uri]?.at(srcUs)
+                    }
+                }
+                val sfx = if (outcome.whooshAtUs.isEmpty()) null else withContext(Dispatchers.IO) {
+                    runCatching { android.net.Uri.fromFile(Whoosh.file(ctx)).toString() }.getOrNull()
+                }
+                busy = null
+                val result = if (sfx == null) outcome.project else outcome.project.copy(
+                    music = outcome.project.music + outcome.whooshAtUs.map { t -> JumpCuts.whooshTrack(sfx, t) },
+                )
+                update { result }
+                closeSpeechCut()
+                selectedClipId = null
+                val sm = outcome.summary
+                message = buildString {
+                    append("Jump cut fatti: ${sm.cuts} tagli, tolti ${formatSeconds(sm.removedUs)}")
+                    if (sm.punches > 0) append(", ${sm.punches} punch-in")
+                    if (sm.flashes > 0) append(", ${sm.flashes} lampi")
+                    if (sm.subtitles > 0) append(", ${sm.subtitles} sottotitoli")
+                    append(". ")
+                    append(if (paths.isEmpty()) "Nessun volto trovato: l'inquadratura stretta è al centro. " else "Inquadratura stretta centrata sul volto. ")
+                    append("Annulla per tornare indietro.")
+                }
+                Diary.log("Jump cut ${style.name}: ${sm.cuts} tagli, ${sm.zoomed} stretti, ${sm.punches} punch-in, ${sm.flashes} lampi, ${sm.whooshes} whoosh, ${sm.subtitles} sottotitoli, volti in ${paths.size} video su ${videos.size}.")
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                busy = null; throw e
+            } catch (e: Exception) {
+                busy = null
+                message = "Jump cut non riusciti: ${e.message ?: e.javaClass.simpleName}"
+            }
+        }
+    }
 
     // ---------------- Voce fuori campo, audio staccato, ducking ----------------
 

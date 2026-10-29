@@ -117,8 +117,9 @@ private fun renderTimelineAudioInto(
                     for (ch in 0 until OUT_CH) samples[(frames - 1 - f) * OUT_CH + ch] *= g * g
                 }
             }
-            // Micro-dissolvenze (8 ms) agli estremi di ogni clip: niente "clic" sui tagli.
-            val ramp = minOf(OUT_RATE * 8 / 1000, samples.size / OUT_CH / 2)
+            // Micro-dissolvenze (8 ms, 15 ms sui jump cut) agli estremi di ogni clip: niente "clic" sui tagli
+            // e nei jump cut la voce non scatta da un pezzo di frase al successivo.
+            val ramp = minOf(OUT_RATE * (if (clip.jumpCut) 15 else 8) / 1000, samples.size / OUT_CH / 2)
             for (f in 0 until ramp) {
                 val g = f.toFloat() / ramp
                 for (ch in 0 until OUT_CH) {

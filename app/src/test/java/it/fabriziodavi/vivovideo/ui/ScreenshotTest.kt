@@ -214,6 +214,18 @@ class ScreenshotTest {
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/21_colore_ruote.png")
     }
 
+    /** Jump cut dopo l'analisi: stili e riepilogo (schermata alta, per vederla tutta). */
+    @Config(qualifiers = "w412dp-h1300dp-xxhdpi")
+    @Test fun jumpCut() {
+        val vm = vm()
+        vm.jumpMode = true
+        vm.speechPlan = it.fabriziodavi.vivovideo.model.SpeechCuts.Result(
+            listOf(it.fabriziodavi.vivovideo.model.Span(1_000_000, 1_400_000), it.fabriziodavi.vivovideo.model.Span(2_400_000, 2_800_000)),
+        )
+        compose.setContent { VivoTheme { SpeechCutScreen(vm) } }
+        compose.onRoot().captureRoboImage("build/outputs/roborazzi/22_jump_cut.png")
+    }
+
     @Test fun guide() {
         compose.setContent { VivoTheme { GuideScreen {} } }
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/14_guida.png")

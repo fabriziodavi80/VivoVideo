@@ -68,6 +68,9 @@ object TestPlan {
         Item("aud_cut", "Audio", "Taglia pause e ehm",
             "Un video parlato di 1–2 minuti con pause e qualche \"ehm\" → Audio → Clip → Taglia pause e ehm: 0,7 s, Togli anche ehm → Analizza → nella lista ascolta qualche ehm con ▶ e ✂ ▶ → Taglia.",
             "Ogni voce della lista è davvero un ehm e ✂ ▶ lo toglie senza mozzare le parole vicine; dopo il taglio resta un attimo di respiro e gli ehm sono spariti; Annulla torna com'era."),
+        Item("aud_jump", "Audio", "Jump cut pronti",
+            "Un video parlato di 1–2 minuti girato col telefono fermo → Audio → Clip → Jump cut: prova Pulito, poi Dinamico e Social (pause 0,4 s) → Analizza → leggi il riepilogo → Fai i jump cut → guarda l'anteprima ed esporta.",
+            "A ogni taglio l'inquadratura passa da normale a stretta sul volto (mai bordi neri); Dinamico stringe di più sulle frasi forti; Social ha qualche lampo con whoosh e i sottotitoli parola per parola; nel video esportato la voce non fa clic sui tagli; un solo Annulla torna com'era."),
         // Testo
         Item("txt_styles", "Testo", "Stili e animazioni WOW",
             "Testo → aggiungi → Stili pronti, prova Glitch, Onda, Oro, Cascata.",

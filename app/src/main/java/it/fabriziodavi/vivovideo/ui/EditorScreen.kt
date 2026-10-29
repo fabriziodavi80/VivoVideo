@@ -1356,7 +1356,9 @@ private fun ClipAudioTab(vm: EditorViewModel, running: Boolean) {
     val clip = vm.selectedClip
     if (clip == null) { Hint("Nessuna clip nel progetto."); return }
     // Per i video parlati: toglie silenzi e "ehm" da tutto il progetto.
-    SecondaryButton("Taglia pause e ehm", Modifier.fillMaxWidth(), onClick = { if (!running) { vm.pause(); vm.speechPlan = null; vm.showSpeechCut = true } })
+    SecondaryButton("Taglia pause e ehm", Modifier.fillMaxWidth(), onClick = { if (!running) { vm.pause(); vm.speechPlan = null; vm.jumpMode = false; vm.showSpeechCut = true } })
+    // Jump cut pronti: come sopra, e a ogni taglio cambia l'inquadratura (stili Pulito, Dinamico, Social).
+    SecondaryButton("Jump cut", Modifier.fillMaxWidth(), onClick = { if (!running) { vm.pause(); vm.speechPlan = null; vm.jumpMode = true; vm.showSpeechCut = true } })
     if (clip.isPhoto) { Hint("Le foto non hanno audio."); return }
     ToggleRow("Disattiva l'audio della clip", clip.muted, !running) { v -> vm.updateSelected { it.copy(muted = v) } }
     LabeledSlider(

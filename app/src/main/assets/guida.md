@@ -3,13 +3,8 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
-- **VivoVideo 1.0**: tutte le 37 prove del collaudo sono passate, dall'editor al video automatico, dall'audio all'esportazione fino a 8K. Da qui le versioni si chiamano 1.0.x.
-- **Cache che non si riempie più**: all'avvio l'app toglie da sola i file temporanei rimasti (colonne sonore, video esportati a metà) e le copie leggere dei video che nessun progetto usa più (dopo due settimane, o prima se superano 4 GB). Le copie leggere dei progetti salvati non si toccano mai.
-- **Annulla l'esportazione davvero**: annullando mentre l'app prepara l'audio, si ferma subito (prima finiva comunque il lavoro, minuti con i progetti lunghi); il video a metà, che poteva pesare qualche GB, si cancella subito.
-- **Anteprima più leggera con i progetti lunghi**: la misura del volume dell'anteprima si interrompe appena cambi di nuovo l'audio, invece di finire una misura ormai vecchia mentre ne parte un'altra.
-- **Tagli a ritmo più precisi in anteprima**: le nuove copie leggere dei video 4K e 8K hanno un fotogramma chiave ogni mezzo secondo (prima uno al secondo), così l'anteprima passa da una clip all'altra più in fretta. Quelle già fatte restano come sono.
-- **Timeline più ordinata**: sulle clip con la curva di velocità le etichette (durata, LOG, STAB…) non sono più coperte dai pallini della curva.
-- Le novità delle versioni 0.3 sono descritte nelle pagine dei singoli strumenti di questa guida.
+- **Jump cut pronti** (Audio → Clip → **Jump cut**): per i video parlati. L'app toglie le pause (e, se vuoi, gli ehm) e a ogni taglio cambia l'inquadratura, normale e stretta a turno (+14%), centrata sul volto: così il salto del taglio sembra voluto, come nei video dei creator. Tre stili: **Pulito**; **Dinamico**, che sulle frasi dette con più forza stringe di più (punch-in); **Social**, con un lampo ogni quattro tagli, il whoosh sul lampo e i sottotitoli che compaiono parola per parola. Prima di confermare vedi il riepilogo (quanti tagli, inquadrature strette, punch-in, lampi, sottotitoli e la nuova durata); un solo Annulla toglie tutto. Nel video esportato la voce ha micro-dissolvenze su ogni taglio, niente clic.
+- **VivoVideo 1.0**: la cache si pulisce da sola all'avvio, annullare l'esportazione la ferma subito e cancella il file a metà, anteprima più leggera con i progetti lunghi.
 
 ## Primi passi
 - La Home ha due strade per creare un video: **Video automatico** (lo monta l'app) e **Monta tu** (lo monti tu nell'editor), più **Da un modello**. Sotto ci sono i tuoi progetti; in fondo **Apri una copia** e **Collaudo e segnalazioni**; in alto il punto di domanda apre questa guida.
@@ -155,6 +150,13 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 ## Audio delle clip
 - **Taglia pause e ehm** (Audio → Clip, in alto): l'app ascolta l'audio delle clip e propone di togliere i silenzi più lunghi della soglia scelta (**0,4 s** ritmo serrato, **0,7 s** naturale, **1 s** solo i silenzi lunghi), lasciando 0,15 s di respiro per lato. Con **Togli anche ehm, eh, uhm, mmm** usa il riconoscimento vocale (lo stesso dei sottotitoli) e il suono stesso: ogni ehm sentito viene ritagliato esattamente sulla voce tenuta, e si aggiungono gli ehm isolati che il riconoscimento ha saltato. Dopo **Analizza** compare la lista degli ehm: **▶** com'è, **✂ ▶** come sarà, spunta per scegliere quali togliere. Quelli «da controllare» (il riconoscimento li ha sentiti ma il suono non sembra un ehm, forse è una parola) di serie restano. **Analizza** mostra quante pause e quanti "ehm" ha trovato e la nuova durata; **Taglia** li toglie con stacchi netti. Foto, clip mute, musica e voci fuori campo non si toccano; testi e sottotitoli dopo i tagli si spostano con il video (i sottotitoli di un "ehm" tolto spariscono).
 - **Audio → scheda Clip**: volume (0–200%) o audio disattivato della clip selezionata (o sotto l'indicatore).
+
+## Jump cut
+- **Audio → Clip → Jump cut**: per i video parlati girati di fila (un creator che parla in camera, un tutorial, un vlog). L'app toglie le pause e, se vuoi, gli ehm, come **Taglia pause e ehm** (di serie pause più lunghe di **0,4 s**, ritmo serrato), e a ogni taglio cambia l'inquadratura: normale, stretta (+14%), normale… Ogni ripresa riparte dall'inquadratura normale; foto e clip mute non si toccano.
+- L'inquadratura stretta è **centrata sul volto** (l'app lo cerca con la stessa analisi di Momento migliore; la prima volta su un video lungo richiede qualche secondo) senza mai scoprire i bordi. Se non c'è un volto lo zoom è al centro; se avevi già regolato l'inquadratura a mano, la stringe soltanto.
+- **Stili**: **Pulito** (solo tagli e cambio d'inquadratura); **Dinamico** (in più, sulle frasi dette con più forza l'inquadratura si stringe del 28%: punch-in); **Social** (in più, un lampo ogni quattro tagli con il suo **whoosh**, che si spegne con «Whoosh sui lampi», e i **sottotitoli** in stile Social, parola per parola, senza gli ehm: servono il riconoscimento vocale e sostituiscono i sottotitoli automatici che c'erano).
+- Dopo **Analizza** compare il **riepilogo**: tagli con cambio d'inquadratura, pezzi stretti, punch-in, lampi, sottotitoli, durata prima e dopo. **Fai i jump cut** applica tutto; un solo **Annulla** torna com'era.
+- Nel video esportato la voce ha **micro-dissolvenze** di 15 ms su ogni taglio: niente clic fra un pezzo di frase e il successivo. I whoosh sono righe di audio staccato nella timeline: si spostano, si abbassano o si tolgono come le altre.
 
 ## Musica
 - **Audio → scheda Brano** (o "Aggiungi musica" sotto la timeline): **Libreria online**, **Effetti sonori** o **Dal telefono**: MP3, M4A, WAV, FLAC… e anche **MIDI** (convertiti in audio dal sintetizzatore di Android).
