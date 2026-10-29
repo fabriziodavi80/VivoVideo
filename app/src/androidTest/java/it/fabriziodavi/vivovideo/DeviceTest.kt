@@ -221,6 +221,41 @@ class DeviceTest {
 
         fun chain(t: Throwable): String = generateSequence(t) { it.cause }.take(4).joinToString(" ← ") { "${it.javaClass.simpleName}: ${it.message}" }
 
+        /**
+         * Video di prova a 60 fotogrammi al secondo per misurare la fluidità: sfondo [bg] e una riga bianca orizzontale che
+         * scende di [STEP] pixel a ogni fotogramma (dal fotogramma si ricava la sua posizione nel tempo).
+         */
+        fun makeMotionVideo(name: String, seconds: Int, bg: Int): Uri {
+            val out = File(dir(), name)
+            if (out.exists()) return Uri.fromFile(out)
+            val base = save(frame(bg, "", W, H).also { Canvas(it).drawColor(bg) }, "${name}_fondo.png", png = true)
+            // La riga si disegna dal tempo esatto del fotogramma: il video di prova è fluido per costruzione.
+            val line = object : androidx.media3.effect.BitmapOverlay() {
+                private val bm = Bitmap.createBitmap(W, H, Bitmap.Config.ARGB_8888)
+                private val paint = Paint().apply { color = Color.WHITE }
+                override fun getBitmap(presentationTimeUs: Long): Bitmap {
+                    val k = Math.round(presentationTimeUs * 60 / 1e6).toInt()
+                    val y = (k * STEP) % (H - 8)
+                    bm.eraseColor(Color.TRANSPARENT)
+                    Canvas(bm).drawRect(0f, y.toFloat(), W.toFloat(), (y + 4).toFloat(), paint)
+                    return bm
+                }
+            }
+            val video = EditedMediaItemSequence.Builder(setOf(C.TRACK_TYPE_VIDEO)).addItem(
+                EditedMediaItem.Builder(MediaItem.Builder().setUri(Uri.fromFile(base)).setMimeType(MimeTypes.IMAGE_PNG).setImageDurationMs(seconds * 1000L).build())
+                    .setDurationUs(seconds * 1_000_000L).setFrameRate(60)
+                    .setEffects(androidx.media3.transformer.Effects(emptyList(), listOf(androidx.media3.effect.OverlayEffect(listOf(line)))))
+                    .build()
+            )
+            val wav = sineWav("${name}.wav", seconds.toDouble(), 330.0)
+            val audio = EditedMediaItemSequence.Builder(setOf(C.TRACK_TYPE_AUDIO))
+                .addItem(EditedMediaItem.Builder(MediaItem.fromUri(Uri.fromFile(wav))).setDurationUs(seconds * 1_000_000L).build())
+            transform(Composition.Builder(listOf(video.build(), audio.build())).build(), out, timeoutS = 600)
+            return Uri.fromFile(out)
+        }
+
+        const val STEP = 3
+
         @JvmStatic
         @BeforeClass
         fun media() {
@@ -648,6 +683,74 @@ class DeviceTest {
         }
         // L'anteprima con le dissolvenze pronte scorre.
         playFor(p, seconds = 8)
+    }
+
+    /**
+     * Fluidità delle transizioni a due clip nel video esportato (segnalazione dell'utente: "lampi o scatti, esitazioni").
+     * Due video a 60 fps con una riga che scende di STEP pixel a fotogramma; dopo l'esportazione si rilegge ogni fotogramma:
+     * nella metà sinistra (dove arriva per prima la clip successiva) e in quella destra si cerca la riga, e il suo passo
+     * deve restare STEP (0 = fotogramma ripetuto, 2·STEP = fotogramma saltato); la luminosità non deve fare sbalzi.
+     */
+    @Test fun transitionsAreSmoothInExport() {
+        val a = makeMotionVideo("moto_a.mp4", 4, Color.rgb(150, 20, 20))
+        val b = makeMotionVideo("moto_b.mp4", 4, Color.rgb(20, 20, 150))
+        val report = StringBuilder()
+        var bad = 0
+        for (t in listOf(TransitionType.CROSSFADE, TransitionType.WIPE)) {
+            val clips = listOf(
+                Clip(id = "a", uri = a.toString(), sourceDurationUs = 4_000_000, trimStartUs = 0, trimEndUs = 2_000_000, width = W, height = H, fps = 60f)
+                    .copy(transitionOut = TransitionSpec(t, 1_000_000)),
+                Clip(id = "b", uri = b.toString(), sourceDurationUs = 4_000_000, trimStartUs = 1_000_000, trimEndUs = 3_000_000, width = W, height = H, fps = 60f),
+            )
+            val uri = exportAndCheckUri(Project(name = "fluido ${t.name}", clips = clips))
+            val r = MediaMetadataRetriever()
+            try {
+                r.setDataSource(ctx, uri)
+                val count = r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_FRAME_COUNT)?.toInt() ?: 0
+                // Riga bianca in una colonna (x): la prima riga di pixel chiari dall'alto; -1 se coperta dall'altra clip.
+                fun rowAt(bm: Bitmap, x: Int): Int {
+                    for (y in 0 until bm.height) {
+                        val px = bm.getPixel(x, y)
+                        if (Color.red(px) > 200 && Color.green(px) > 200 && Color.blue(px) > 200) return y
+                    }
+                    return -1
+                }
+                fun luma(bm: Bitmap): Float {
+                    var acc = 0.0; var n = 0
+                    for (y in 0 until bm.height step 8) for (x in 0 until bm.width step 8) { val px = bm.getPixel(x, y); acc += Color.red(px) + Color.green(px) + Color.blue(px); n++ }
+                    return (acc / n / 3).toFloat()
+                }
+                val rows = ArrayList<String>()
+                var prevL = -1; var prevR = -1; var prevLuma = -1f
+                var steps = 0; var repeats = 0; var skips = 0; var jumps = 0
+                for (i in 0 until count) {
+                    val bm = r.getFrameAtIndex(i) ?: continue
+                    val sx = bm.width * 15 / 100; val dx = bm.width * 85 / 100
+                    val yl = rowAt(bm, sx); val yr = rowAt(bm, dx); val lu = luma(bm)
+                    bm.recycle()
+                    fun step(prev: Int, cur: Int): Int? = if (prev < 0 || cur < 0) null else (cur - prev + (H - 8)) % (H - 8)
+                    listOfNotNull(step(prevL, yl), step(prevR, yr)).forEach { d ->
+                        steps++
+                        when {
+                            d == STEP || d == STEP + 1 || d == STEP - 1 -> {}
+                            d == 0 -> repeats++
+                            d in 2 * STEP - 1..2 * STEP + 1 -> skips++
+                            // Cambio di clip sotto la colonna (prima A, poi B): non è un salto del movimento.
+                            else -> {}
+                        }
+                    }
+                    if (prevLuma >= 0 && abs(lu - prevLuma) > 25f) jumps++
+                    rows += "$i:$yl/$yr/${lu.toInt()}"
+                    prevL = yl; prevR = yr; prevLuma = lu
+                }
+                val line = "${t.name}: $count fotogrammi, passi $steps, ripetuti $repeats, saltati $skips, sbalzi di luce $jumps"
+                android.util.Log.i("VivoVideoTest", "$line\n" + rows.joinToString(" "))
+                report.append(line).append('\n')
+                bad += repeats + skips + jumps
+            } finally { r.release() }
+        }
+        android.util.Log.i("VivoVideoTest", "Fluidità transizioni:\n$report")
+        assertTrue("transizioni non fluide:\n$report", bad == 0)
     }
 
     /** Le transizioni dal video dell'utente (tendine, orologio, scalini, sovrapposizione, taglio invisibile): esportazione vera. */

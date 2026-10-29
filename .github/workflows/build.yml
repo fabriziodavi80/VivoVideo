@@ -122,7 +122,7 @@ jobs:
           disable-animations: true
           script: |
             adb logcat -c || true
-            (adb logcat -v time > logcat.txt &) ; gradle connectedDebugAndroidTest --no-daemon > device.log 2>&1
+            (adb logcat -v time > logcat.txt &) ; ONLY=$( [ -f app/src/androidTest/solo.txt ] && echo "-Pandroid.testInstrumentationRunnerArguments.class=$(tr -d '[:space:]' < app/src/androidTest/solo.txt)" ) ; gradle connectedDebugAndroidTest $ONLY --no-daemon > device.log 2>&1
 
       - name: Salva l'esito
         if: always()
