@@ -103,7 +103,10 @@ jobs:
           sudo udevadm trigger --name-match=kvm
 
       - name: Compila le prove
-        run: gradle assembleDebug assembleDebugAndroidTest --no-daemon
+        shell: bash
+        run: |
+          set -o pipefail
+          gradle assembleDebug assembleDebugAndroidTest --no-daemon 2>&1 | tee compile.log
 
       - name: Prove sull'emulatore
         id: device
@@ -129,6 +132,8 @@ jobs:
         run: |
           mkdir -p /tmp/elogs/tests
           cp device.log /tmp/elogs/ 2>/dev/null || echo "nessun registro" > /tmp/elogs/device.log
+          # Se le prove non si compilano, qui c'è il perché.
+          grep -E "^e: |error:|What went wrong|FAILED" -A4 compile.log > /tmp/elogs/compile-errors.txt 2>/dev/null || true
           find app/build -path "*androidTest-results*" -name "*.xml" -exec cp {} /tmp/elogs/tests/ \; 2>/dev/null || true
           # Registro di ogni prova (raccolto da Gradle): solo errori e avvisi, per vedere la causa vera di un fallimento.
           find app/build -path "*androidTest-results*" -name "logcat-*.txt" 2>/dev/null | while read -r f; do
