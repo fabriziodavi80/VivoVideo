@@ -803,6 +803,61 @@ class DeviceTest {
             leftRed >= checked - 1 && rightBlue >= checked - 1)
     }
 
+    /**
+     * Come il progetto del collaudo (29/10): 8 clip intere, lo scontorno fatto prima, poi le transizioni scelte una alla
+     * volta come nell'app (con lo spazio fatto da makeRoomForTransition): il passaggio con maschera deve esserci nel video
+     * esportato (sul telefono risultava un taglio netto).
+     */
+    @Test fun maskPassAmongOtherTransitionsInExport() {
+        val a = makeMotionVideo("moto_a.mp4", 4, Color.rgb(150, 20, 20))
+        val b = makeMotionVideo("moto_b.mp4", 4, Color.rgb(20, 20, 150))
+        val side = 256; val n = 62
+        val maskFile = File(dir(), "maschera_sinistra2.bin")
+        java.io.DataOutputStream(maskFile.outputStream().buffered()).use { o ->
+            o.writeInt(n); o.writeInt(side)
+            val one = ByteArray(side * side) { i -> if (i % side < side / 2) 255.toByte() else 0 }
+            repeat(n) { o.write(one) }
+        }
+        var p = Project(name = "come il collaudo", clips = (0 until 8).map { i ->
+            Clip(id = "c$i", uri = (if (i % 2 == 0) a else b).toString(), sourceDurationUs = 4_000_000, width = W, height = H, fps = 60f)
+        })
+        // Scontorno sulla prima clip intera (maschere per tutto il file), poi le transizioni.
+        p = p.replaceClip(p.clips[0].copy(person = PersonFx(mode = PersonMode.BLUR, maskFile = maskFile.absolutePath, fromUs = 0, rateHz = 15, count = n)))
+        val order = listOf(TransitionType.MASK_PASS, TransitionType.WIPE, TransitionType.WIPE_DIAG, TransitionType.CLOCK, TransitionType.STEPS, TransitionType.OVERLAY)
+        order.forEachIndexed { i, t ->
+            val c = p.clips[i]
+            p = p.replaceClip(c.copy(transitionOut = TransitionSpec(t, t.defaultUs ?: 500_000)))
+            p.makeRoomForTransition(i)?.let { (q, _) -> p = q }
+        }
+        val cfs = p.crossfades()
+        android.util.Log.i("VivoVideoTest", "collaudo: ${cfs.joinToString { "${it.index}:${it.type} ${it.beforeUs}/${it.afterUs}" }}")
+        val mp = cfs.firstOrNull { it.type == TransitionType.MASK_PASS }
+        assertTrue("passaggio con maschera non preparato: $cfs", mp != null)
+        val uri = exportAndCheckUri(p)
+        val cutFrame = (mp!!.cutUs * 60 / 1_000_000).toInt()
+        val r = MediaMetadataRetriever()
+        val rows = ArrayList<String>()
+        var leftRed = 0; var rightBlue = 0; var checked = 0
+        try {
+            r.setDataSource(ctx, uri)
+            fun tone(bm: Bitmap, x: Int): Char {
+                var rr = 0; var bb = 0
+                for (y in bm.height / 4 until bm.height * 3 / 4 step 6) { val px = bm.getPixel(x, y); rr += Color.red(px); bb += Color.blue(px) }
+                return if (rr > bb * 2) 'R' else if (bb > rr * 2) 'B' else '?'
+            }
+            for (i in cutFrame - 10 until cutFrame + 40) {
+                val bm = r.getFrameAtIndex(i) ?: continue
+                val l = tone(bm, bm.width * 15 / 100); val rt = tone(bm, bm.width * 85 / 100)
+                bm.recycle()
+                rows += "$i:$l$rt"
+                if (i in cutFrame + 3..cutFrame + 15) { checked++; if (l == 'R') leftRed++; if (rt == 'B') rightBlue++ }
+            }
+        } finally { r.release() }
+        val msg = "collaudo esportato (taglio al fotogramma $cutFrame): sinistra rossa $leftRed/$checked, destra blu $rightBlue/$checked\n" + rows.joinToString(" ")
+        android.util.Log.i("VivoVideoTest", msg)
+        assertTrue(msg, leftRed >= checked - 1 && rightBlue >= checked - 1)
+    }
+
     /** Le transizioni dal video dell'utente (tendine, orologio, scalini, sovrapposizione, taglio invisibile): esportazione vera. */
     @Test fun exportNewestTransitions() {
         val cuts = TransitionType.entries.filter { it.newest && it != TransitionType.MASK_PASS }

@@ -17,6 +17,8 @@ import androidx.media3.transformer.ProgressHolder
 import androidx.media3.transformer.Transformer
 import androidx.media3.transformer.VideoEncoderSettings
 import it.fabriziodavi.vivovideo.Safety
+import it.fabriziodavi.vivovideo.Diary
+import it.fabriziodavi.vivovideo.model.TransitionType
 import it.fabriziodavi.vivovideo.model.Project
 import it.fabriziodavi.vivovideo.renderTimelineAudio
 import it.fabriziodavi.vivovideo.readVideoInfo
@@ -57,6 +59,8 @@ class Exporter(
         currentOut = null
         currentAudio = null
         startedAt = SystemClock.elapsedRealtime()
+        // Per le segnalazioni: le transizioni a due clip che il video esportato avrà davvero (e, per la maschera, lo scontorno).
+        runCatching { describeTransitions(project) }.getOrNull()?.let { line -> if (line.isNotBlank()) Diary.log(line) }
         scope.launch {
             // Colonna sonora calcolata in proprio se c'è musica (mix con dissolvenze)
             // o se qualche clip cambia velocità (tono naturale).
@@ -91,6 +95,27 @@ class Exporter(
             // Lascia all'anteprima il tempo di liberare il decoder hardware.
             delay(400)
             attempt(project, options, audio, 0, mutableListOf(), allowMulti = Safety.multiExport(context))
+        }
+    }
+
+    /** Riassunto delle transizioni a due clip del progetto, con la copertura dello scontorno per il passaggio con maschera. */
+    internal fun describeTransitions(project: Project): String {
+        val wanted = project.clips.dropLast(1).withIndex().filter { (_, c) -> c.transitionOut?.type?.composite == true }
+        if (wanted.isEmpty()) return ""
+        val made = project.crossfades().associateBy { it.index }
+        return "Transizioni a due clip nell'esportazione: " + wanted.joinToString("; ") { (i, c) ->
+            val t = c.transitionOut!!.type
+            val cf = made[i]
+            val base = "${i + 1}→${i + 2} ${t.label}: " + if (cf == null) "NON fatta" else "prima ${cf.beforeUs / 1000} ms, dopo ${cf.afterUs / 1000} ms"
+            if (t != TransitionType.MASK_PASS) base else {
+                val fx = c.person
+                if (fx == null) "$base, senza scontorno" else {
+                    val file = java.io.File(fx.maskFile)
+                    val lastUs = fx.fromUs + (fx.count - 1).coerceAtLeast(0) * 1_000_000L / fx.rateHz.coerceAtLeast(1)
+                    val needUs = c.trimEndUs + (cf?.afterUs ?: 0)
+                    "$base, maschere ${fx.count} (${if (file.exists()) "file ok" else "FILE MANCANTE"}) fino a ${lastUs / 1000} ms del video, servono fino a ${needUs / 1000} ms"
+                }
+            }
         }
     }
 
