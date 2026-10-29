@@ -930,7 +930,7 @@ class DeviceTest {
 
     /** Scontorno della persona: le maschere si calcolano, la clip (sfondo sfocato) e il video sovrapposto (solo persona) si esportano. */
     @Test fun personMasksAndExport() {
-        val fx = runBlocking { PersonMasks.analyze(ctx, videoA.toString(), 0, 6_000_000, PersonMode.BLUR) {} }
+        val fx = runBlocking { PersonMasks.analyze(ctx, videoA.toString(), 0, 6_000_000, PersonMode.BLUR, onProgress = {}) }
         assertTrue("maschere ${fx.count}", fx.count in 80..95)
         val m = PersonMasks.load(fx.maskFile)!!
         assertTrue(m.count == fx.count && m.side == PersonMasks.SIDE)
