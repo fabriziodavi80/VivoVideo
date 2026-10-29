@@ -1,6 +1,6 @@
 # VivoVideo · note per riprendere il lavoro
 
-Aggiornate al 29/10/2026, ultima versione **v1.0.211** (build 211 riuscita). La 1.0 è la v1.0.201; dalla 202 ci sono i jump cut. Da leggere insieme a `CLAUDE.md`.
+Aggiornate al 29/10/2026, ultima versione **v1.0.213** (build 213 riuscita). La 1.0 è la v1.0.201; dalla 202 ci sono i jump cut. Da leggere insieme a `CLAUDE.md`.
 
 ## 1. Stato attuale dell'app
 
@@ -8,7 +8,7 @@ App Android nativa di montaggio video in stile CapCut, pensata per il vivo X300 
 Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, ML Kit, whisper.cpp e Signalsmith (JNI), minSdk 33, solo arm64-v8a in release.
 
 ### Collaudo
-- Collaudo guidato (Progetto → Collaudo, `model/TestPlan.kt`, **40 prove**): le prime 38 OK al 29/10/2026; da fare `str_shuffle` (Rimescola clip) e `str_trans_new` (transizioni nuove) (`aud_jump` accettata dall'utente con la v1.0.206, "qualcosina da migliorare sul riconoscimento vocale e sottotitoli"; nel rapporto risultava ancora KO, da segnare OK sul telefono).
+- Collaudo guidato (Progetto → Collaudo, `model/TestPlan.kt`, **41 prove**): 39 OK al 29/10/2026; `str_trans_new` KO con la 1.0.211 ("non mi piacciono, per alcune non vedo l'effetto": clip intere senza video oltre il taglio → corretto nella 1.0.212 con `makeRoomForTransition`, durate di serie più lunghe, filo di luce sulle tendine) da rifare; da fare `prog_originals` (`aud_jump` accettata dall'utente con la v1.0.206, "qualcosina da migliorare sul riconoscimento vocale e sottotitoli"; nel rapporto risultava ancora KO, da segnare OK sul telefono).
   L'ultima ("Progetto lungo": 15:57, 368 clip, esportato in 6 minuti, 1,9 GB) segnata OK. Dopo "Dividi i video sui battiti" su tutti i brani, dissolvenze dei brani in anteprima e tratti di anteprima dei progetti lunghi: provati poco dall'utente, risultato "comunque accettabile".
 - Accettate con riserva (da migliorare dopo la 1.0): **riconoscimento vocale e sottotitoli** (29/10, dopo beam e normalizzazione ancora qualche parola sbagliata: idee → correzione rapida delle parole dalla lista, parole/nomi propri suggeriti al modello, provare Massima precisione e confrontare), taglio degli **ehm** (29/10: "le pause vengono riconosciute ma gli ehm necessitano ancora di migliorie"), **scontorno** (bordi e capelli), **stabilizzazione** ("non sensazionale").
 - Il rapporto "Segnala un problema" (diario, esiti, telefono, impostazioni; niente video né chiavi) l'utente lo incolla in chat: è la fonte delle correzioni.
@@ -50,6 +50,10 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, ML Kit, whisper.cpp e Sign
 - Riepilogo prima di confermare (`vm.jumpPreview`), un solo Annulla (`update` unico).
 - Frasi lunghe (v1.0.211, chiesto dall'utente: "i jump cut Social a inizio clip e poi più nulla"): `holdSplits` divide i pezzi oltre `MAX_HOLD_US` 4,5 s (mai sotto 1,5 s) fra due frasi / spazio più lungo fra le parole, altrimenti nel punto più basso della voce; `Piece.reframe`, `Summary.reframes`; lampi e whoosh solo sui tagli veri.
 - HDR con i jump cut: verificato OK dall'utente il 29/10 (v1.0.208+).
+
+### Torna ai video originali (v1.0.213, chiesto dall'utente)
+- `Project.originals` (clip come importate: `addClips` nel ViewModel, video automatico, modelli → i media scelti; i modelli non si portano dietro quelli vecchi), `originalMedia()` ricostruisce per i progetti vecchi, `restoreOriginals()`; Progetto → Torna ai video originali con conferma, un solo Annulla.
+- `makeRoomForTransition` (v1.0.212): scegliendo una transizione a due clip (anche l'incrociata) senza video oltre il taglio, accorcia le clip vicine (mai sotto 1 s) e sposta testi/livelli/musica; messaggio una volta sola.
 
 ### Esportazione
 - Preset YouTube 4K/HD, Reels/TikTok, WhatsApp; H.265/H.264; HDR a 10 bit; fino a 4K120/8K30.
