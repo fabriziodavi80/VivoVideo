@@ -113,7 +113,7 @@ class Exporter(
                     val file = java.io.File(fx.maskFile)
                     val lastUs = fx.fromUs + (fx.count - 1).coerceAtLeast(0) * 1_000_000L / fx.rateHz.coerceAtLeast(1)
                     val needUs = c.trimEndUs + (cf?.afterUs ?: 0)
-                    "$base, maschere ${fx.count} (${if (file.exists()) "file ok" else "FILE MANCANTE"}) fino a ${lastUs / 1000} ms del video, servono fino a ${needUs / 1000} ms"
+                    "$base, maschere ${fx.count}${if (fx.precise) " (precise)" else ""} (${if (file.exists()) "file ok" else "FILE MANCANTE"}) fino a ${lastUs / 1000} ms del video, servono fino a ${needUs / 1000} ms; clip ${c.width}×${c.height}, HDR ${c.hdr}, velocità ${c.speed}"
                 }
             }
         }
