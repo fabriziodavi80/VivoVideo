@@ -109,13 +109,15 @@ class EngineTest {
             texts = listOf(TextItem(text = "Ciao")),
         )
         val c = factory.build(p, ExportOptions(), forPreview = false, nativeAudio = null)
-        // tempi (invisibile) + dissolvenze + principale visibile
-        assertEquals(3, c.sequences.size)
+        // tempi (invisibile) + dissolvenze (teste e code, due righe) + principale visibile
+        assertEquals(4, c.sequences.size)
         assertTrue(c.videoCompositorSettings is LayerCompositorSettings)
         // Testi sopra a tutto: effetto dell'intera composizione.
         assertTrue(c.effects.videoEffects.any { it is OverlayEffect })
         // La riga delle dissolvenze dura almeno quanto il video (niente ripetizioni del lettore).
         assertTrue(seqDuration(c.sequences[1].editedMediaItems) >= p.durationUs)
+        assertTrue(seqDuration(c.sequences[2].editedMediaItems) >= p.durationUs)
+
         assertTrue(abs(seqDuration(c.sequences[0].editedMediaItems) - p.durationUs) < 2_000)
     }
 
@@ -171,11 +173,13 @@ class EngineTest {
         assertEquals(0f, s.getOverlaySettings(1, 500_000).alphaScale, 0f)              // livello non ancora iniziato
         assertEquals(1f, s.getOverlaySettings(1, 2_000_000).alphaScale, 1e-3f)         // livello visibile
         assertEquals(0f, s.getOverlaySettings(2, 4_000_000).alphaScale, 0f)            // prima della dissolvenza
-        assertTrue(s.getOverlaySettings(2, 4_750_000).alphaScale in 0.1f..0.5f)         // la successiva compare
+        assertTrue(s.getOverlaySettings(2, 4_750_000).alphaScale in 0.1f..0.5f)         // la successiva compare (riga delle teste)
         assertEquals(0.5f, s.getOverlaySettings(2, 4_999_999).alphaScale, 0.02f)       // al taglio metà e metà
-        assertEquals(0.5f, s.getOverlaySettings(2, 5_000_000).alphaScale, 0.02f)       // continua dopo il taglio
-        assertTrue(s.getOverlaySettings(2, 5_250_000).alphaScale in 0.1f..0.5f)        // poi la precedente svanisce
-        assertEquals(0f, s.getOverlaySettings(2, 6_000_000).alphaScale, 0f)
+        assertEquals(0f, s.getOverlaySettings(2, 5_000_000).alphaScale, 0f)            // dopo il taglio la riga delle teste non c'è più
+        assertEquals(0f, s.getOverlaySettings(3, 4_999_999).alphaScale, 0f)            // la riga delle code prima del taglio non c'è
+        assertEquals(0.5f, s.getOverlaySettings(3, 5_000_000).alphaScale, 0.02f)       // continua dopo il taglio (riga delle code)
+        assertTrue(s.getOverlaySettings(3, 5_250_000).alphaScale in 0.1f..0.5f)        // poi la precedente svanisce
+        assertEquals(0f, s.getOverlaySettings(3, 6_000_000).alphaScale, 0f)
         assertEquals(1f, s.getOverlaySettings(3, 0).alphaScale, 0f)                    // principale visibile
         assertEquals(androidx.media3.common.util.Size(1080, 1920), s.getOutputSize(emptyList()))
     }

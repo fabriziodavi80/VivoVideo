@@ -270,7 +270,7 @@ class CompositionFactory(private val context: Context) {
      * Seconda traccia per le dissolvenze incrociate: prima del taglio la testa della clip successiva,
      * dopo il taglio la coda della precedente, entrambe a tutto quadro; la trasparenza la regola il compositore.
      */
-    private fun crossfadeSequence(project: Project, cfs: List<Project.Crossfade>, outW: Int, outH: Int, padToUs: Long): EditedMediaItemSequence {
+    private fun crossfadeSequence(project: Project, cfs: List<Project.Crossfade>, outW: Int, outH: Int, padToUs: Long, role: Int): EditedMediaItemSequence {
         val b = EditedMediaItemSequence.Builder(setOf(C.TRACK_TYPE_VIDEO))
         var cursor = 0L
         val starts = project.clipStartsUs()
@@ -316,13 +316,18 @@ class CompositionFactory(private val context: Context) {
             b.addItem(edited.setRemoveAudio(true).setEffects(Effects(emptyList(), effects)).build())
             cursor += lengthUs
         }
+        // Due righe separate: una con le teste delle clip successive (prima del taglio), una con le code delle precedenti
+        // (dopo il taglio). Messe una dopo l'altra nella stessa riga, il secondo pezzo usciva due fotogrammi avanti
+        // (misurato sull'emulatore a 60 fps: uno scatto in ogni transizione); dopo una pausa ogni pezzo è a tempo.
         cfs.forEach { cf ->
             val a = project.clips[cf.index]
             val next = project.clips[cf.index + 1]
-            val from = cf.cutUs - cf.beforeUs
+            val from = if (role == TransitionMaskEffect.NEXT) cf.cutUs - cf.beforeUs else cf.cutUs
+            val len = if (role == TransitionMaskEffect.NEXT) cf.beforeUs else cf.afterUs
+            if (len <= 0) return@forEach
             if (from - cursor > 1_000) { b.addGap(from - cursor); cursor = from }
-            if (cf.beforeUs > 0) piece(next, next.trimStartUs - cf.beforeUs, cf.beforeUs, cf, TransitionMaskEffect.NEXT)
-            if (cf.afterUs > 0) piece(a, a.trimEndUs, cf.afterUs, cf, TransitionMaskEffect.PREV)
+            if (role == TransitionMaskEffect.NEXT) piece(next, next.trimStartUs - cf.beforeUs, cf.beforeUs, cf, TransitionMaskEffect.NEXT)
+            else piece(a, a.trimEndUs, cf.afterUs, cf, TransitionMaskEffect.PREV)
         }
         if (padToUs - cursor > 1_000) b.addGap(padToUs - cursor)
         return b.build()
@@ -493,7 +498,10 @@ class CompositionFactory(private val context: Context) {
             // le ripeterebbe tagliando di nuovo clip già tagliate (caso non gestito dalla libreria).
             val padTo = project.durationUs + 1_000_000
             lanes.forEach { lane -> sequences += videoLayerSequence(lane, outW, outH, keepAudio = audioInMain, padToUs = padTo) }
-            if (crossfades.isNotEmpty()) sequences += crossfadeSequence(project, crossfades, outW, outH, padTo)
+            if (crossfades.isNotEmpty()) {
+                sequences += crossfadeSequence(project, crossfades, outW, outH, padTo, TransitionMaskEffect.NEXT)
+                sequences += crossfadeSequence(project, crossfades, outW, outH, padTo, TransitionMaskEffect.PREV)
+            }
             sequences += EditedMediaItemSequence.Builder(setOf(C.TRACK_TYPE_VIDEO))
                 .addItems(mainItems(light = false, removeAudio = true)).build()
             if (nativeAudio != null) {

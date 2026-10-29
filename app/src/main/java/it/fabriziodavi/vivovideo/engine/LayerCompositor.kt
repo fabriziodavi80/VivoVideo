@@ -20,7 +20,9 @@ class LayerCompositorSettings(
     private val lanes: List<List<Layer>>,
     private val crossfades: List<Project.Crossfade> = emptyList(),
 ) : VideoCompositorSettings {
-    private val crossfadeInput = if (crossfades.isEmpty()) -1 else lanes.size + 1
+    /** Due righe per le transizioni a due clip: teste delle successive (prima del taglio) e code delle precedenti (dopo). */
+    private val nextInput = if (crossfades.isEmpty()) -1 else lanes.size + 1
+    private val prevInput = if (crossfades.isEmpty()) -1 else lanes.size + 2
     private val hidden = StaticOverlaySettings.Builder().setAlphaScale(0f).build()
     private val full = StaticOverlaySettings.Builder().build()
 
@@ -28,9 +30,11 @@ class LayerCompositorSettings(
 
     override fun getOverlaySettings(inputId: Int, presentationTimeUs: Long): OverlaySettings {
         if (inputId == 0) return hidden
-        if (inputId == crossfadeInput) {
+        if (inputId == nextInput || inputId == prevInput) {
             // Peso della clip successiva: da 0 a 1 lungo tutta la dissolvenza.
             val cf = crossfades.firstOrNull { presentationTimeUs >= it.cutUs - it.beforeUs && presentationTimeUs < it.cutUs + it.afterUs } ?: return hidden
+            // Ogni riga si vede solo nella sua metà: prima del taglio la successiva, dopo la precedente.
+            if ((presentationTimeUs < cf.cutUs) != (inputId == nextInput)) return hidden
             // Tendine, orologio, scalini, sovrapposizione, maschera: la trasparenza la dà l'immagine stessa (TransitionMaskEffect).
             if (cf.type != TransitionType.CROSSFADE) return full
             val total = (cf.beforeUs + cf.afterUs).coerceAtLeast(1)
