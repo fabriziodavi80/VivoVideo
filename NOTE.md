@@ -1,6 +1,6 @@
 # VivoVideo · note per riprendere il lavoro
 
-Aggiornate al 28/10/2026, ultima versione **v1.0.201** (build 201 riuscita): prima versione 1.0. Da leggere insieme a `CLAUDE.md`.
+Aggiornate al 29/10/2026, ultima versione **v1.0.203** (build 203 riuscita). La 1.0 è la v1.0.201; dalla 202 ci sono i jump cut. Da leggere insieme a `CLAUDE.md`.
 
 ## 1. Stato attuale dell'app
 
@@ -8,7 +8,7 @@ App Android nativa di montaggio video in stile CapCut, pensata per il vivo X300 
 Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, ML Kit, whisper.cpp e Signalsmith (JNI), minSdk 33, solo arm64-v8a in release.
 
 ### Collaudo
-- Collaudo guidato (Progetto → Collaudo, `model/TestPlan.kt`, **37 prove**): al 28/10/2026 **tutte provate e tutte OK**.
+- Collaudo guidato (Progetto → Collaudo, `model/TestPlan.kt`, **38 prove**): le prime 37 tutte OK al 28/10/2026; la 38ª (`aud_jump`, Jump cut pronti) è da fare.
   L'ultima ("Progetto lungo": 15:57, 368 clip, esportato in 6 minuti, 1,9 GB) segnata OK. Dopo "Dividi i video sui battiti" su tutti i brani, dissolvenze dei brani in anteprima e tratti di anteprima dei progetti lunghi: provati poco dall'utente, risultato "comunque accettabile".
 - Accettate con riserva (da migliorare dopo la 1.0): taglio degli **ehm**, **scontorno** (bordi e capelli), **stabilizzazione** ("non sensazionale").
 - Il rapporto "Segnala un problema" (diario, esiti, telefono, impostazioni; niente video né chiavi) l'utente lo incolla in chat: è la fonte delle correzioni.
@@ -40,6 +40,14 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, ML Kit, whisper.cpp e Sign
 - `renderTimelineAudio(..., isCancelled)`: si ferma (`AudioRenderCancelled`) e non lascia file; `Exporter.cancel` cancella il video a metà e la colonna sonora; la misura di `PreviewLoudness` si interrompe quando l'audio cambia.
 - Copie leggere nuove con fotogramma chiave ogni 0,5 s (`Proxies.KEYFRAME_SECONDS`).
 - Timeline: etichette delle clip più in alto quando c'è la curva di velocità.
+
+### Jump cut pronti (v1.0.202)
+- Audio → Clip → **Jump cut**: `SpeechCutScreen` con `vm.jumpMode`; logica tutta in `model/JumpCuts.kt` (pura, `JumpCutsTest`).
+- `JumpCuts.pieces`: riprese (`shots`: clip consecutive dello stesso file, contigue, senza transizione) meno i tagli; in ogni ripresa i pezzi alternano 1 / `ZOOM` 1,14; Dinamico: `PUNCH` 1,28 sui pezzi ≥ mediana + 3 dB (dal pcm a 16 kHz dell'analisi), mai due di fila.
+- `JumpCuts.apply`: sottotitoli Social prima del taglio (`subtitleWords` senza ehm e parole nei tratti tolti), `cutTimeline`, poi ogni clip nuova si riconosce dal suo tratto nel file (in ordine); `punchFrame` mette `Clip.frame` (zoom + spostamento verso il volto, limitato a ±(zoom−1)/2), `Clip.jumpCut = true`. Social: lampo `FLASH` 240 ms ogni 4 tagli, whoosh (`Whoosh.kt`, rumore filtrato sintetizzato, `filesDir/effetti/whoosh_v1.wav`) come MusicTrack `dialog` che culmina sul taglio.
+- Volti: `SmartAnalyzer.scan` + `Moments.subjectPath` (solo se `hasFaces`), una volta per video.
+- `Clip.jumpCut`: micro-dissolvenze di 15 ms in `renderTimelineAudio` e mix nativo forzato nell'`Exporter`.
+- Riepilogo prima di confermare (`vm.jumpPreview`), un solo Annulla (`update` unico).
 
 ### Esportazione
 - Preset YouTube 4K/HD, Reels/TikTok, WhatsApp; H.265/H.264; HDR a 10 bit; fino a 4K120/8K30.
@@ -90,10 +98,10 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, ML Kit, whisper.cpp e Sign
 ## 3. Prossimi passi
 
 ### Subito
-1. L'utente usa la v1.0.201 e segnala eventuali problemi (rapporto "Segnala un problema"); poi si parte con le novità dopo la 1.0.
+1. L'utente prova i **jump cut** (collaudo `aud_jump`) su un video parlato vero: inquadratura stretta centrata sul volto, punch-in di Dinamico, lampi/whoosh/sottotitoli di Social, niente clic nel video esportato. Da chiedere: zoom 14% e punch-in 28% giusti? lampo ogni 4 tagli troppo o poco?
 
 ### Dopo la 1.0, in quest'ordine
-1. **Jump cut pronti** (deciso il 24/10/2026, prima novità): Audio → Clip → Jump cut, usa `SpeechCuts` (pause ed ehm) e a ogni taglio alterna l'inquadratura (normale / +12–15% centrata sul volto). Stili Pulito, Dinamico (punch-in sulle frasi importanti), Social (lampo o whoosh su qualche taglio, sottotitoli a parole). Micro-dissolvenze audio sui tagli, riepilogo prima di confermare, un solo Annulla.
+1. ~~Jump cut pronti~~: fatti nella v1.0.202 (vedi sopra). Da migliorare se serve: micro-dissolvenze anche in anteprima (ora solo nell'esportato), "frasi importanti" con il testo di Whisper invece del solo volume.
 2. **Rimescola clip** (24/10/2026): da Altro / Seleziona più clip. Se le clip sono tagliate a ritmo si rimescola il contenuto tenendo le durate (i tagli restano sul battito); niente due pezzi dello stesso video vicini; "Rimescola ancora"; un solo Annulla.
 3. **Transizioni dal video dell'utente** (https://youtube.com/watch?v=0putmJCyM1I, "12 Essential Transitions…", DaVinci Resolve): fade, dissolve, iris, wipe, invisible cut, speed ramp, steps, mask passing, whip pan, luma fade, overlay, preset. Già presenti in parte (dissolvenza, iris, luma, whip, speed ramp); da fare invisible cut, mask passing (con lo scontorno), steps, wipe moderni, overlay. Chiedere all'utente quali gli sono piaciute.
 4. **Intervista doppia** (25/10/2026, stile Le Iene): due video con le stesse domande; per ogni domanda formato **alternato** (cartello con la domanda, poi A, poi B) o **schermo diviso** (A e B affiancati o sopra/sotto). Risposte trovate dai sottotitoli automatici, cartelli in stile TV, nome e didascalia, una voce alla volta. Schermo diviso preparato in anticipo per l'anteprima.
