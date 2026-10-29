@@ -136,6 +136,47 @@ class NewTransitionsTest {
         assertTrue(inFx.shift < 0f && at.shift > 0f)
     }
 
+    @Test fun wholeClipsGetRoomForTheTransition() {
+        // Due video interi (come nel collaudo): nessun fotogramma oltre il taglio, quindi la tendina non si vedeva.
+        val a = Clip(id = "a", uri = "content://v/a", sourceDurationUs = 6_000_000, width = 1920, height = 1080)
+            .copy(transitionOut = TransitionSpec(TransitionType.WIPE, 900_000))
+        val b = Clip(id = "b", uri = "content://v/b", sourceDurationUs = 6_000_000, width = 1920, height = 1080)
+        val text = it.fabriziodavi.vivovideo.model.TextItem(text = "dopo", startUs = 8_000_000, durationUs = 1_000_000)
+        val p = Project(name = "x", clips = listOf(a, b), texts = listOf(text))
+        assertTrue(p.crossfades().isEmpty())
+        val (q, removed) = p.makeRoomForTransition(0)!!
+        assertEquals(900_000L, removed)
+        assertEquals(5_550_000L, q.clips[0].trimEndUs)
+        assertEquals(450_000L, q.clips[1].trimStartUs)
+        // Ora la tendina c'è, piena; il testo dopo il taglio si sposta con il video.
+        val cf = q.crossfades().single()
+        assertEquals(450_000L, cf.beforeUs); assertEquals(450_000L, cf.afterUs)
+        assertEquals(7_100_000L, q.texts.single().startUs)
+        // Già abbastanza video oltre il taglio: nulla da fare. Transizione su una clip sola: nulla da fare.
+        assertNull(q.makeRoomForTransition(0))
+        assertNull(p.copy(clips = listOf(a.copy(transitionOut = TransitionSpec(TransitionType.FLASH)), b)).makeRoomForTransition(0))
+        // Passaggio con maschera: tutto dopo il taglio, si accorcia solo la fine della clip prima.
+        val mp = p.copy(clips = listOf(a.copy(transitionOut = TransitionSpec(TransitionType.MASK_PASS, 1_200_000), person = PersonFx(maskFile = "/x", count = 1)), b))
+        val (m, mr) = mp.makeRoomForTransition(0)!!
+        assertEquals(1_200_000L, mr)
+        assertEquals(0L, m.clips[1].trimStartUs)
+        assertEquals(1_200_000L, m.crossfades().single().afterUs)
+        // Clip cortissime: mai sotto 1 s.
+        val tiny = Project(name = "x", clips = listOf(a.copy(sourceDurationUs = 1_100_000, trimEndUs = 1_100_000), b))
+        assertEquals(1_000_000L, tiny.makeRoomForTransition(0)!!.first.clips[0].trimmedUs)
+    }
+
+    @Test fun newTransitionsStartWithAVisibleDuration() {
+        listOf(TransitionType.WIPE, TransitionType.WIPE_DIAG, TransitionType.CLOCK, TransitionType.STEPS).forEach { assertEquals(900_000L, it.defaultUs) }
+        assertEquals(1_200_000L, TransitionType.OVERLAY.defaultUs)
+        assertEquals(350_000L, TransitionType.INVISIBLE.defaultUs)
+        assertNull(TransitionType.CROSSFADE.defaultUs)
+        // Il filo di luce: solo sul bordo (maschera a metà), niente dove la clip è tutta scoperta o coperta.
+        assertEquals(0f, TransitionMaskEffect.edgeGlow(1, 0f), 1e-6f)
+        assertEquals(0f, TransitionMaskEffect.edgeGlow(1, 1f), 1e-6f)
+        assertEquals(0.55f, TransitionMaskEffect.edgeGlow(1, 0.5f), 1e-6f)
+    }
+
     @Test fun newestComeFirstInThePanel() {
         val list = it.fabriziodavi.vivovideo.ui.TRANSITIONS_NEW_FIRST
         assertEquals(TransitionType.CROSSFADE, list.first())

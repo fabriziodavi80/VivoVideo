@@ -1155,7 +1155,8 @@ private fun TransitionPanel(vm: EditorViewModel, running: Boolean) {
     PanelLabel("Verso la clip ${index + 2}")
     val options: List<TransitionType?> = listOf(null) + TRANSITIONS_NEW_FIRST
     PillRow(options, spec?.type, { it?.label ?: "Nessuna" }, !running) { t ->
-        vm.setTransition(t?.let { TransitionSpec(it, spec?.durationUs ?: 500_000L) })
+        // Le transizioni nuove partono con la loro durata (le tendine a 0,5 s passavano in un lampo).
+        vm.setTransition(t?.let { TransitionSpec(it, it.defaultUs ?: spec?.durationUs ?: 500_000L) })
     }
     if (spec != null) {
         val ms = (spec.durationUs / 1000).toInt()

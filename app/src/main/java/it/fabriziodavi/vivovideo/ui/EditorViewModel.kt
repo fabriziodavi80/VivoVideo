@@ -2340,11 +2340,34 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         ))
     }
 
-    fun setTransition(spec: TransitionSpec?) = updateSelected { it.copy(transitionOut = spec) }
+    /**
+     * Transizione verso la clip successiva. Quelle a due clip (incrociata, tendine…) usano il video oltre il taglio:
+     * se manca, si accorciano un poco le due clip vicino al taglio (e lo si dice una volta).
+     */
+    fun setTransition(spec: TransitionSpec?) {
+        val id = selectedClip?.id ?: return
+        val oldType = selectedClip?.transitionOut?.type
+        var removed = 0L
+        update { p ->
+            val i = p.clips.indexOfFirst { it.id == id }
+            if (i < 0) return@update null
+            val q = p.copy(clips = p.clips.mapIndexed { k, c -> if (k == i) c.copy(transitionOut = spec) else c })
+            q.makeRoomForTransition(i)?.let { (r, us) -> removed = us; r } ?: q
+        }
+        // Una volta sola, quando si sceglie la transizione (non a ogni passo del cursore della durata).
+        if (removed > 0 && spec?.type != oldType) message = "Per la transizione «${spec?.type?.label}» serve un po' di video oltre il taglio: ho accorciato le clip vicino al taglio di ${formatSeconds(removed)}. Annulla per tornare com'era."
+    }
 
-    /** Stessa transizione su tutti i tagli del progetto. */
-    fun setTransitionAll(spec: TransitionSpec?) = update { p ->
-        p.copy(clips = p.clips.mapIndexed { i, c -> if (i < p.clips.lastIndex) c.copy(transitionOut = spec) else c })
+    /** Stessa transizione su tutti i tagli del progetto (facendo spazio dove serve, come sopra). */
+    fun setTransitionAll(spec: TransitionSpec?) {
+        var removed = 0L
+        update { p ->
+            var q = p.copy(clips = p.clips.mapIndexed { i, c -> if (i < p.clips.lastIndex) c.copy(transitionOut = spec) else c })
+            // Dall'ultimo taglio al primo: gli indici delle clip non cambiano.
+            for (i in q.clips.lastIndex - 1 downTo 0) q.makeRoomForTransition(i)?.let { (r, us) -> q = r; removed += us }
+            q
+        }
+        if (removed > 0) message = "Per la transizione «${spec?.type?.label}» su tutti i tagli serve video oltre ogni taglio: ho accorciato le clip vicino ai tagli, ${formatSeconds(removed)} in tutto. Annulla per tornare com'era."
     }
 
     fun updateColor(keepUndo: Boolean = true, change: (ColorSettings) -> ColorSettings) =

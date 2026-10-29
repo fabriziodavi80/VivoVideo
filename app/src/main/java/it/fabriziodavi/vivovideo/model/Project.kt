@@ -84,10 +84,18 @@ enum class TransitionType(val label: String) {
      */
     val composite: Boolean get() = this in COMPOSITE
 
+    /** Durata di serie quando la si sceglie (null = si tiene quella che c'era). Le tendine a 0,5 s passavano in un lampo. */
+    val defaultUs: Long? get() = when (this) {
+        WIPE, WIPE_DIAG, CLOCK, STEPS -> 900_000L
+        OVERLAY, MASK_PASS -> 1_200_000L
+        INVISIBLE -> 350_000L
+        else -> null
+    }
+
     /** Spiegazione per il pannello delle transizioni (null = quella di serie). */
     val hint: String? get() = when (this) {
         CROSSFADE -> "Incrociata: le due clip si sovrappongono usando i fotogrammi prima e dopo il taglio, senza cambiare la durata del video."
-        WIPE -> "Tendina: la clip successiva entra da sinistra con un bordo morbido. Usa i fotogrammi oltre il taglio, come l'incrociata."
+        WIPE -> "Tendina: la clip successiva entra da sinistra con un bordo morbido e un filo di luce. Usa i fotogrammi oltre il taglio, come l'incrociata: se mancano, l'app accorcia un poco le clip vicino al taglio."
         WIPE_DIAG -> "Tendina diagonale: la clip successiva entra dall'angolo in alto a sinistra, con un bordo morbido."
         CLOCK -> "Orologio: la clip successiva si scopre come la lancetta di un orologio, dal centro."
         STEPS -> "Scalini: la clip successiva scende a gradini, una colonna dopo l'altra."
@@ -1071,6 +1079,40 @@ data class Project(
             it.fadeColor == c.fadeColor && it.fadeAudio == c.fadeAudio
     }
     fun frameOnAll(c: Clip): Boolean = clips.size > 1 && clips.all { it.frame == c.frame && it.fill == c.fill && it.blurBg == c.blurBg }
+    /**
+     * Transizione a due clip sul taglio dopo la clip [i] senza abbastanza video oltre il taglio (clip intere, non accorciate
+     * con le maniglie): accorcia la fine della clip [i] e l'inizio della successiva di quel che manca, come fanno gli altri
+     * editor. Testi, livelli e musica dopo il taglio si spostano con il video. Le clip non scendono sotto 1 s.
+     * Restituisce il progetto e quanto si è accorciato in tutto, o null se non serviva o non si può.
+     */
+    fun makeRoomForTransition(i: Int): Pair<Project, Long>? {
+        val spec = clips.getOrNull(i)?.transitionOut ?: return null
+        if (!spec.type.composite || i >= clips.lastIndex) return null
+        val a = clips[i]; val b = clips[i + 1]
+        val minClip = 1_000_000L
+        val half = spec.durationUs / 2
+        val afterOnly = spec.type == TransitionType.MASK_PASS
+        val tailRoom = if (a.isPhoto) Long.MAX_VALUE else a.sourceDurationUs - a.trimEndUs
+        val headRoom = if (b.isPhoto) Long.MAX_VALUE else b.trimStartUs
+        // Velocità normale soltanto: con le curve il conto fra file e video non è diretto.
+        val wantTail = (if (afterOnly) spec.durationUs else half) - tailRoom
+        val wantHead = if (afterOnly) 0L else half - headRoom
+        val cutA = if (wantTail > 0 && a.speed == ClipSpeed.NORMAL) wantTail.coerceAtMost((a.trimmedUs - minClip).coerceAtLeast(0)) else 0L
+        val cutB = if (wantHead > 0 && b.speed == ClipSpeed.NORMAL) wantHead.coerceAtMost((b.trimmedUs - minClip).coerceAtLeast(0)) else 0L
+        if (cutA <= 0 && cutB <= 0) return null
+        val cut = clipStartsUs()[i] + a.outputUs
+        var p = this
+        if (cutA > 0) {
+            p = p.replaceClip(a.copy(trimEndUs = a.trimEndUs - cutA)).shiftAfterCut(cut - cutA, cutA)
+        }
+        if (cutB > 0) {
+            val nb = p.clips[i + 1]
+            p = p.replaceClip(nb.copy(trimStartUs = nb.trimStartUs + cutB, keyframes = nb.keyframes.map { it.copy(timeUs = (it.timeUs - cutB).coerceAtLeast(0)) }))
+                .shiftAfterCut(cut - cutA, cutB)
+        }
+        return p to (cutA + cutB)
+    }
+
     fun transitionOnAllCuts(spec: TransitionSpec?): Boolean = clips.size > 2 && clips.dropLast(1).all { it.transitionOut == spec }
     fun textStyleOnAll(t: TextItem): Boolean = texts.size > 1 && texts.all {
         it.font == t.font && it.look == t.look && it.color == t.color && it.size == t.size && it.animIn == t.animIn && it.animOut == t.animOut

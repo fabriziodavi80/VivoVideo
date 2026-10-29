@@ -104,6 +104,13 @@ class TransitionMaskEffect(
             else -> r
         }
 
+        /** Filo di luce sul bordo della tendina (come nello shader): massimo dove la maschera è a metà. */
+        fun edgeGlow(mode: Int, v: Float): Float {
+            val e = 4 * v * (1 - v)
+            val k = if (mode <= 2) 0.55f else if (mode == 3) 0.4f else 0.25f
+            return k * e * e * e * e
+        }
+
         /** Luce della sovrapposizione: cresce fino a metà transizione e poi si spegne. */
         fun glow(p: Float): Float { val k = 1f - abs(2 * p - 1); return 0.8f * k * k }
 
@@ -152,11 +159,18 @@ void main() {
   // Sovrapposizione: le luci si accendono a metà passaggio (su tutte e due le clip, sopra e sotto).
   if (m == 5) { float k = 1.0 - abs(2.0 * uP - 1.0); float g = 0.8 * k * k; c = c + g * c * c; }
   float a = 1.0;
-  if (role == 1) a = reveal(vUv, r, m);
+  if (role >= 1 && m >= 1 && m <= 4) {
+    float v = reveal(vUv, r, m);
+    a = role == 1 ? v : 1.0 - v;
+    // Un filo di luce sul bordo che avanza (look moderno), più deciso sulle tendine, appena accennato sugli scalini.
+    float edge = 4.0 * v * (1.0 - v);
+    edge = edge * edge * edge * edge;
+    float k = m <= 2 ? 0.55 : (m == 3 ? 0.4 : 0.25);
+    c = c + vec3(k * edge);
+  } else if (role == 1) a = r;
   else if (role == 2) {
     // Passaggio con maschera: la persona (già scontornata, trasparenza nell'immagine) resta e poi svanisce.
-    if (m == 6) a = 1.0 - smoothstep(0.5, 1.0, uP);
-    else a = 1.0 - reveal(vUv, r, m);
+    a = m == 6 ? 1.0 - smoothstep(0.5, 1.0, uP) : 1.0 - r;
   }
   gl_FragColor = vec4(c, src.a * a);
 }
