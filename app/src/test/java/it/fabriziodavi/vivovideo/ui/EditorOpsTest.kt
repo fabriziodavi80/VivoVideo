@@ -65,6 +65,28 @@ class EditorOpsTest {
         assertNull(vm.selectedMusicId)
     }
 
+    @Test fun shuffleAgainKeepsASingleUndo() {
+        val clips = (0 until 6).map { i -> Clip(id = "c$i", uri = "content://v/$i", sourceDurationUs = 10_000_000, trimEndUs = 2_000_000, width = 1920, height = 1080) }
+        val vm = vm(clips)
+        val start = vm.project!!.clips.map { it.id }
+        vm.shuffleClips(null)
+        val first = vm.project!!.clips.map { it.id }
+        assertTrue(vm.canShuffleAgain)
+        assertEquals(start.sorted(), first.sorted())
+        // Altri ordini: partono sempre da quello iniziale, e un solo Annulla ci torna.
+        repeat(3) { vm.shuffleClips(null) }
+        assertTrue(vm.canShuffleAgain)
+        vm.undo()
+        assertEquals(start, vm.project!!.clips.map { it.id })
+        assertTrue(!vm.canUndo)
+        // Dopo un'altra modifica "Rimescola ancora" non c'è più: si rimescola da capo.
+        vm.shuffleClips(null)
+        vm.selectedClipId = vm.project!!.clips[0].id
+        vm.updateSelected { it.copy(volume = 0.5f) }
+        assertTrue(!vm.canShuffleAgain)
+
+    }
+
     @Test fun undoRedoRestoreEveryChange() {
         val vm = vm()
         val start = vm.project!!

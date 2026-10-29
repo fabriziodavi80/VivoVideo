@@ -45,6 +45,7 @@ import it.fabriziodavi.vivovideo.model.MomentSample
 import it.fabriziodavi.vivovideo.model.Moments
 import it.fabriziodavi.vivovideo.model.JumpCuts
 import it.fabriziodavi.vivovideo.model.JumpStyle
+import it.fabriziodavi.vivovideo.model.Shuffle
 import it.fabriziodavi.vivovideo.model.Reframe
 import it.fabriziodavi.vivovideo.model.SpokenWord
 import it.fabriziodavi.vivovideo.engine.Whoosh
@@ -1608,6 +1609,44 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     fun startMultiSelect() { multiIds = setOfNotNull(selectedClipId) }
     fun endMultiSelect() { multiIds = null }
     fun selectAllClips() { multiIds = project?.clips?.map { it.id }?.toSet() }
+
+    // ---------------- Rimescola clip ----------------
+
+    /** Progetto prima dell'ultimo rimescolamento e quello uscito: "Rimescola ancora" riparte dal primo (un solo Annulla). */
+    private var shuffleBase: Project? = null
+    private var shuffleResult: Project? = null
+    private var shuffleIds: Set<String>? = null
+
+    /** Il progetto è ancora quello appena rimescolato: si può proporre un altro ordine. */
+    val canShuffleAgain: Boolean get() = shuffleResult != null && project === shuffleResult
+
+    /**
+     * Rimescola le clip [ids] (null = tutte). Con le clip tagliate a ritmo cambia il contenuto e restano le durate.
+     * Se il progetto è quello appena rimescolato, propone un altro ordine partendo da com'era prima.
+     */
+    fun shuffleClips(ids: Set<String>?) {
+        val p = project ?: return
+        if (busy != null || exportState is ExportState.Running) return
+        val again = canShuffleAgain
+        val base = if (again) shuffleBase ?: p else p
+        val useIds = if (again) shuffleIds else ids
+        if (useIds != null && useIds.size < 2) { message = "Scegli almeno due clip da rimescolare."; return }
+        val r = Shuffle.apply(base, useIds, kotlin.random.Random.nextLong())
+            ?: run { message = "Servono almeno due clip da rimescolare."; return }
+        pause()
+        // La seconda volta non si aggiunge un passo di Annulla: si torna sempre all'ordine di partenza.
+        update(keepUndo = !again) { r.project }
+        shuffleBase = base
+        shuffleIds = useIds
+        shuffleResult = project
+        Diary.log("Rimescola: ${r.moved} clip spostate su ${useIds?.size ?: base.clips.size}, a ritmo ${r.onBeat}, video uguali vicini ${r.sameNeighbours}.")
+        if (!again) message = buildString {
+            append("Clip rimescolate (${r.moved} cambiate di posto). ")
+            if (r.onBeat) append("Erano tagliate a ritmo: le durate restano, i tagli sono ancora sul battito. ")
+            if (r.sameNeighbours > 0) append("Qualche pezzo dello stesso video è rimasto vicino: non c'erano abbastanza video diversi. ")
+            append("«Rimescola ancora» per un altro ordine, Annulla per tornare com'era.")
+        }
+    }
 
     /** Tocco su una clip: con la selezione multipla la aggiunge o la toglie. */
     fun toggleMulti(id: String) {

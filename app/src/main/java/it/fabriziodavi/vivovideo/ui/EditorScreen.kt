@@ -694,6 +694,9 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
                         if (vm.copiedStyle != null && vm.copiedStyle?.id != c.id) MenuRow(VVIcons.Copy, "Incolla attributi") { act { pasteDialog = true } }
                         MenuRow(VVIcons.Check, "Seleziona più clip") { act { vm.startMultiSelect() } }
                     }
+                    if (project.clips.size >= 2) {
+                        MenuRow(VVIcons.Shuffle, if (vm.canShuffleAgain) "Rimescola ancora" else "Rimescola tutte le clip") { act { vm.shuffleClips(null) } }
+                    }
                     MenuRow(VVIcons.Add, "Aggiungi video e foto") { act { pickVideos() } }
                     if (c != null) MenuRow(VVIcons.Delete, "Elimina", tint = VV.Danger) { act { vm.deleteSelected() } }
                 }
@@ -2212,6 +2215,11 @@ private fun MultiSelectBar(vm: EditorViewModel, ids: Set<String>, onPaste: () ->
             else SecondaryButton("Copia attributi", Modifier.weight(1f), onClick = vm::copyStyle)
             SecondaryButton("Elimina", Modifier.weight(1f), onClick = vm::deleteMulti)
         }
+        // Rimescola: le clip scelte (almeno due); subito dopo, un altro ordine.
+        if (vm.copiedStyle == null) SecondaryButton(
+            if (vm.canShuffleAgain) "Rimescola ancora" else "Rimescola le clip scelte", Modifier.fillMaxWidth(),
+            onClick = { if (vm.canShuffleAgain || ids.size >= 2) vm.shuffleClips(ids) else vm.message = "Scegli almeno due clip da rimescolare." },
+        )
         if (vm.copiedStyle == null) Hint("Copia gli attributi dalla clip evidenziata, poi scegli le clip su cui incollarli.")
     }
 }
