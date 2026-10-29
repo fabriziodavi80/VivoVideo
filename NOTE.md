@@ -8,9 +8,9 @@ App Android nativa di montaggio video in stile CapCut, pensata per il vivo X300 
 Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, ML Kit, whisper.cpp e Signalsmith (JNI), minSdk 33, solo arm64-v8a in release.
 
 ### Collaudo
-- Collaudo guidato (Progetto → Collaudo, `model/TestPlan.kt`, **38 prove**): le prime 37 tutte OK al 28/10/2026; la 38ª (`aud_jump`, Jump cut pronti) è da fare.
+- Collaudo guidato (Progetto → Collaudo, `model/TestPlan.kt`, **38 prove**): tutte OK al 29/10/2026 (`aud_jump` accettata dall'utente con la v1.0.206, "qualcosina da migliorare sul riconoscimento vocale e sottotitoli"; nel rapporto risultava ancora KO, da segnare OK sul telefono).
   L'ultima ("Progetto lungo": 15:57, 368 clip, esportato in 6 minuti, 1,9 GB) segnata OK. Dopo "Dividi i video sui battiti" su tutti i brani, dissolvenze dei brani in anteprima e tratti di anteprima dei progetti lunghi: provati poco dall'utente, risultato "comunque accettabile".
-- Accettate con riserva (da migliorare dopo la 1.0): taglio degli **ehm** (29/10: "le pause vengono riconosciute ma gli ehm necessitano ancora di migliorie"), **scontorno** (bordi e capelli), **stabilizzazione** ("non sensazionale").
+- Accettate con riserva (da migliorare dopo la 1.0): **riconoscimento vocale e sottotitoli** (29/10, dopo beam e normalizzazione ancora qualche parola sbagliata: idee → correzione rapida delle parole dalla lista, parole/nomi propri suggeriti al modello, provare Massima precisione e confrontare), taglio degli **ehm** (29/10: "le pause vengono riconosciute ma gli ehm necessitano ancora di migliorie"), **scontorno** (bordi e capelli), **stabilizzazione** ("non sensazionale").
 - Il rapporto "Segnala un problema" (diario, esiti, telefono, impostazioni; niente video né chiavi) l'utente lo incolla in chat: è la fonte delle correzioni.
 
 ### Editor
@@ -101,7 +101,8 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, ML Kit, whisper.cpp e Sign
 ## 3. Prossimi passi
 
 ### Subito
-1. Collaudo `aud_jump`: errore dei 15 overlay corretto nella 1.0.204; con la 1.0.204 KO per sottotitoli Social poco precisi ("sbagliano alcune parole") → v1.0.206 con beam, normalizzazione e modello Massima precisione: l'utente riprova. Poi prova i **jump cut** (collaudo `aud_jump`) su un video parlato vero: inquadratura stretta centrata sul volto, punch-in di Dinamico, lampi/whoosh/sottotitoli di Social, niente clic nel video esportato. Da chiedere: zoom 14% e punch-in 28% giusti? lampo ogni 4 tagli troppo o poco?
+1. Da verificare: esportazione **HDR** con testi/sottotitoli (v1.0.205+): la riga Colore deve dire HDR, e i sottotitoli non devono essere troppo scuri o abbaglianti.
+2. Poi si riparte con **Rimescola clip**.
 
 ### Dopo la 1.0, in quest'ordine
 1. ~~Jump cut pronti~~: fatti nella v1.0.202 (vedi sopra). Da migliorare se serve: micro-dissolvenze anche in anteprima (ora solo nell'esportato), "frasi importanti" con il testo di Whisper invece del solo volume.
