@@ -1,6 +1,6 @@
 # VivoVideo · note per riprendere il lavoro
 
-Aggiornate al 29/10/2026, ultima versione **v1.0.206** (build 206 riuscita). La 1.0 è la v1.0.201; dalla 202 ci sono i jump cut. Da leggere insieme a `CLAUDE.md`.
+Aggiornate al 29/10/2026, ultima versione **v1.0.207** (build 207 riuscita). La 1.0 è la v1.0.201; dalla 202 ci sono i jump cut. Da leggere insieme a `CLAUDE.md`.
 
 ## 1. Stato attuale dell'app
 
@@ -8,7 +8,7 @@ App Android nativa di montaggio video in stile CapCut, pensata per il vivo X300 
 Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, ML Kit, whisper.cpp e Signalsmith (JNI), minSdk 33, solo arm64-v8a in release.
 
 ### Collaudo
-- Collaudo guidato (Progetto → Collaudo, `model/TestPlan.kt`, **38 prove**): tutte OK al 29/10/2026 (`aud_jump` accettata dall'utente con la v1.0.206, "qualcosina da migliorare sul riconoscimento vocale e sottotitoli"; nel rapporto risultava ancora KO, da segnare OK sul telefono).
+- Collaudo guidato (Progetto → Collaudo, `model/TestPlan.kt`, **39 prove**): le prime 38 OK al 29/10/2026, la 39ª (`str_shuffle`, Rimescola clip) da fare (`aud_jump` accettata dall'utente con la v1.0.206, "qualcosina da migliorare sul riconoscimento vocale e sottotitoli"; nel rapporto risultava ancora KO, da segnare OK sul telefono).
   L'ultima ("Progetto lungo": 15:57, 368 clip, esportato in 6 minuti, 1,9 GB) segnata OK. Dopo "Dividi i video sui battiti" su tutti i brani, dissolvenze dei brani in anteprima e tratti di anteprima dei progetti lunghi: provati poco dall'utente, risultato "comunque accettabile".
 - Accettate con riserva (da migliorare dopo la 1.0): **riconoscimento vocale e sottotitoli** (29/10, dopo beam e normalizzazione ancora qualche parola sbagliata: idee → correzione rapida delle parole dalla lista, parole/nomi propri suggeriti al modello, provare Massima precisione e confrontare), taglio degli **ehm** (29/10: "le pause vengono riconosciute ma gli ehm necessitano ancora di migliorie"), **scontorno** (bordi e capelli), **stabilizzazione** ("non sensazionale").
 - Il rapporto "Segnala un problema" (diario, esiti, telefono, impostazioni; niente video né chiavi) l'utente lo incolla in chat: è la fonte delle correzioni.
@@ -102,11 +102,11 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, ML Kit, whisper.cpp e Sign
 
 ### Subito
 1. Da verificare: esportazione **HDR** con testi/sottotitoli (v1.0.205+): la riga Colore deve dire HDR, e i sottotitoli non devono essere troppo scuri o abbaglianti.
-2. Poi si riparte con **Rimescola clip**.
+2. L'utente prova **Rimescola clip** (collaudo `str_shuffle`). Poi: **Transizioni dal video dell'utente** (chiedergli quali gli sono piaciute).
 
 ### Dopo la 1.0, in quest'ordine
 1. ~~Jump cut pronti~~: fatti nella v1.0.202 (vedi sopra). Da migliorare se serve: micro-dissolvenze anche in anteprima (ora solo nell'esportato), "frasi importanti" con il testo di Whisper invece del solo volume.
-2. **Rimescola clip** (24/10/2026): da Altro / Seleziona più clip. Se le clip sono tagliate a ritmo si rimescola il contenuto tenendo le durate (i tagli restano sul battito); niente due pezzi dello stesso video vicini; "Rimescola ancora"; un solo Annulla.
+2. ~~Rimescola clip~~ fatto nella v1.0.207 (`model/Shuffle.kt`, `vm.shuffleClips`, `canShuffleAgain`: "Rimescola ancora" riparte da `shuffleBase` senza nuovo passo di Annulla). Spec originale (24/10/2026): da Altro / Seleziona più clip. Se le clip sono tagliate a ritmo si rimescola il contenuto tenendo le durate (i tagli restano sul battito); niente due pezzi dello stesso video vicini; "Rimescola ancora"; un solo Annulla.
 3. **Transizioni dal video dell'utente** (https://youtube.com/watch?v=0putmJCyM1I, "12 Essential Transitions…", DaVinci Resolve): fade, dissolve, iris, wipe, invisible cut, speed ramp, steps, mask passing, whip pan, luma fade, overlay, preset. Già presenti in parte (dissolvenza, iris, luma, whip, speed ramp); da fare invisible cut, mask passing (con lo scontorno), steps, wipe moderni, overlay. Chiedere all'utente quali gli sono piaciute.
 4. **Intervista doppia** (25/10/2026, stile Le Iene): due video con le stesse domande; per ogni domanda formato **alternato** (cartello con la domanda, poi A, poi B) o **schermo diviso** (A e B affiancati o sopra/sotto). Risposte trovate dai sottotitoli automatici, cartelli in stile TV, nome e didascalia, una voce alla volta. Schermo diviso preparato in anticipo per l'anteprima.
 5. **Riconoscitore di ehm** (scelta dell'utente del 25/10/2026): piccolo modello dedicato (classificatore su spettrogramma mel, addestrato fuori dal telefono su un dataset pubblico di filler come PodcastFillers più esempi italiani), al posto o accanto alle regole di `Hesitations.kt`; ehm attaccati alle parole; anteprima del risultato nel lettore. Taratura attuale fatta su una ripresa vera (voce ~90 Hz, microfono ovattato sotto 1,2 kHz, ronzio a 480 Hz).
