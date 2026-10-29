@@ -277,7 +277,7 @@ class CompositionFactory(private val context: Context) {
         val beats = project.beatTimes()
         // Ogni pezzo ha gli stessi colori, inquadratura, keyframe ed effetti della sua clip: niente salti nella dissolvenza.
         // (I keyframe prima dell'inizio o dopo la fine della clip restano fermi sul primo/ultimo valore.)
-        fun piece(clip: Clip, fromUs: Long, lengthUs: Long) {
+        fun piece(clip: Clip, fromUs: Long, lengthUs: Long, cf: Project.Crossfade, role: Int) {
             val clipStart = starts[project.clips.indexOf(clip)]
             val effects = buildList<Effect> {
                 addAll(colorEffects(clip, project))
@@ -292,6 +292,14 @@ class CompositionFactory(private val context: Context) {
                     add(FxEffect(clip.fx, beats, clipStart, clip.outputUs, clip.fadeInUs, clip.fadeOutUs, clip.fadeColor))
                 }
                 if (WowFxEffect.needed(clip.fx)) add(WowFxEffect(clip.fx, beats, clipStart))
+                // Transizioni a due clip diverse dall'incrociata: la forma (tendina, orologio…) la dà la trasparenza.
+                if (cf.type != TransitionType.CROSSFADE) {
+                    // Passaggio con maschera: della clip prima resta solo la persona (tempo nel file: dopo la fine del taglio).
+                    if (cf.type == TransitionType.MASK_PASS && role == TransitionMaskEffect.PREV) clip.person?.let { fx ->
+                        add(PersonEffect(fx.copy(mode = PersonMode.REMOVE)) { t -> clip.trimEndUs + (t - cf.cutUs).coerceAtLeast(0) })
+                    }
+                    add(TransitionMaskEffect(cf.type, role, cf.cutUs - cf.beforeUs, cf.beforeUs + cf.afterUs, outW.toFloat() / outH))
+                }
             }
             val edited = if (clip.isPhoto) {
                 EditedMediaItem.Builder(
@@ -313,8 +321,8 @@ class CompositionFactory(private val context: Context) {
             val next = project.clips[cf.index + 1]
             val from = cf.cutUs - cf.beforeUs
             if (from - cursor > 1_000) { b.addGap(from - cursor); cursor = from }
-            if (cf.beforeUs > 0) piece(next, next.trimStartUs - cf.beforeUs, cf.beforeUs)
-            if (cf.afterUs > 0) piece(a, a.trimEndUs, cf.afterUs)
+            if (cf.beforeUs > 0) piece(next, next.trimStartUs - cf.beforeUs, cf.beforeUs, cf, TransitionMaskEffect.NEXT)
+            if (cf.afterUs > 0) piece(a, a.trimEndUs, cf.afterUs, cf, TransitionMaskEffect.PREV)
         }
         if (padToUs - cursor > 1_000) b.addGap(padToUs - cursor)
         return b.build()
@@ -428,8 +436,11 @@ class CompositionFactory(private val context: Context) {
                 // Transizioni: metà alla fine di questa clip, metà all'inizio della successiva.
                 // (la dissolvenza incrociata la fa il compositore, non questo effetto)
                 fun adapt(t: TransitionSpec?) = when {
-                    t?.type != TransitionType.CROSSFADE -> t
+                    t == null || !t.type.composite -> t
                     multi -> null
+                    // Senza compositore (anteprima non ancora pronta, o ripiego): qualcosa di simile su una clip sola.
+                    t.type == TransitionType.MASK_PASS -> null
+                    t.type == TransitionType.OVERLAY -> t.copy(type = TransitionType.LUMA)
                     else -> t.copy(type = TransitionType.FADE_BLACK)
                 }
                 val inSpec = adapt(project.clips.getOrNull(index - 1)?.transitionOut)
@@ -438,6 +449,10 @@ class CompositionFactory(private val context: Context) {
                 val outUs = project.transitionHalfUs(index)
                 if ((inSpec != null && inUs > 0) || (outSpec != null && outUs > 0)) {
                     add(TransitionEffect(startUs, clip.outputUs, inSpec?.type, inUs, outSpec?.type, outUs))
+                }
+                // Sovrapposizione: anche sotto, sulla traccia principale, le luci si accendono come sopra.
+                if (multi) crossfades.filter { it.type == TransitionType.OVERLAY && (it.index == index || it.index + 1 == index) }.forEach { cf ->
+                    add(TransitionMaskEffect(cf.type, TransitionMaskEffect.MAIN, cf.cutUs - cf.beforeUs, cf.beforeUs + cf.afterUs, outW.toFloat() / outH))
                 }
                 // Testi e immagini: livelli sopra a tutto (dopo inquadratura, keyframe e transizioni).
                 if (!multi) {

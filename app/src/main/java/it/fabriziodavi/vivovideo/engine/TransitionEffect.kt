@@ -115,6 +115,12 @@ class TransitionEffect(
         TransitionType.SOFTZOOM -> Params(zoom = 1f + 0.12f * e * e, blur = 0.022f * e * e, blurMode = 2)
         // Scivolata: l'immagine scorre appena di lato con una scia leggera, e la successiva continua il movimento.
         TransitionType.DRIFT -> Params(shift = (if (entering) -0.1f else 0.1f) * e * e, blur = 0.035f * e, blurMode = 1, zoom = 1f + 0.03f * e)
+        // Taglio invisibile: una frustata di movimento quasi tutta scia (poco spostamento), nello stesso verso da una clip
+        // all'altra: l'occhio legge un movimento della camera, non un taglio.
+        TransitionType.INVISIBLE -> Params(shift = (if (entering) -0.22f else 0.22f) * e * e * e, blur = 0.14f * e * e, blurMode = 1, zoom = 1f + 0.04f * e)
+        // A due clip: le fa il compositore con TransitionMaskEffect.
+        TransitionType.WIPE, TransitionType.WIPE_DIAG, TransitionType.CLOCK, TransitionType.STEPS,
+        TransitionType.OVERLAY, TransitionType.MASK_PASS -> Params()
     }
 }
 

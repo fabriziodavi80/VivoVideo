@@ -6,6 +6,7 @@ import androidx.media3.common.util.Size
 import androidx.media3.effect.StaticOverlaySettings
 import it.fabriziodavi.vivovideo.model.Layer
 import it.fabriziodavi.vivovideo.model.Project
+import it.fabriziodavi.vivovideo.model.TransitionType
 import kotlin.math.max
 import kotlin.math.min
 
@@ -30,6 +31,8 @@ class LayerCompositorSettings(
         if (inputId == crossfadeInput) {
             // Peso della clip successiva: da 0 a 1 lungo tutta la dissolvenza.
             val cf = crossfades.firstOrNull { presentationTimeUs >= it.cutUs - it.beforeUs && presentationTimeUs < it.cutUs + it.afterUs } ?: return hidden
+            // Tendine, orologio, scalini, sovrapposizione, maschera: la trasparenza la dà l'immagine stessa (TransitionMaskEffect).
+            if (cf.type != TransitionType.CROSSFADE) return full
             val total = (cf.beforeUs + cf.afterUs).coerceAtLeast(1)
             val w = ((presentationTimeUs - (cf.cutUs - cf.beforeUs)).toFloat() / total).coerceIn(0f, 1f)
             val smooth = w * w * (3 - 2 * w)

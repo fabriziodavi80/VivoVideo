@@ -67,24 +67,59 @@ enum class TransitionType(val label: String) {
     SNAPZOOM("Zoom secco"),
     // Tendenze 2026, morbide (documentari, viaggi, natura): niente onde né lampi.
     SOFTZOOM("Zoom morbido"),
-    DRIFT("Scivolata");
+    DRIFT("Scivolata"),
+    // Dal video "12 Essential Transitions" scelto dall'utente (29/10/2026): tendine moderne, scalini, sovrapposizione,
+    // taglio invisibile e passaggio con maschera. Tutte a due clip (compositore) tranne il taglio invisibile.
+    WIPE("Tendina"),
+    WIPE_DIAG("Tendina diagonale"),
+    CLOCK("Orologio"),
+    STEPS("Scalini"),
+    OVERLAY("Sovrapposizione"),
+    INVISIBLE("Taglio invisibile"),
+    MASK_PASS("Passaggio con maschera");
+
+    /**
+     * A due clip: le due clip si sovrappongono nel compositore (come la dissolvenza incrociata, con i fotogrammi oltre il
+     * taglio) e una maschera decide dove si vede l'una e dove l'altra.
+     */
+    val composite: Boolean get() = this in COMPOSITE
+
+    /** Spiegazione per il pannello delle transizioni (null = quella di serie). */
+    val hint: String? get() = when (this) {
+        CROSSFADE -> "Incrociata: le due clip si sovrappongono usando i fotogrammi prima e dopo il taglio, senza cambiare la durata del video."
+        WIPE -> "Tendina: la clip successiva entra da sinistra con un bordo morbido. Usa i fotogrammi oltre il taglio, come l'incrociata."
+        WIPE_DIAG -> "Tendina diagonale: la clip successiva entra dall'angolo in alto a sinistra, con un bordo morbido."
+        CLOCK -> "Orologio: la clip successiva si scopre come la lancetta di un orologio, dal centro."
+        STEPS -> "Scalini: la clip successiva scende a gradini, una colonna dopo l'altra."
+        OVERLAY -> "Sovrapposizione: le due clip si fondono e le luci si accendono nel passaggio, come una doppia esposizione."
+        INVISIBLE -> "Taglio invisibile: una scia di movimento veloce nasconde il taglio, come se la camera girasse da una ripresa all'altra. Meglio corta (0,3–0,5 s) e su riprese che si muovono."
+        MASK_PASS -> "Passaggio con maschera: dopo il taglio la persona della clip prima resta davanti mentre dietro arriva già la clip successiva, poi svanisce. Serve lo scontorno della persona sulla clip prima del taglio (Effetti → Persona)."
+        else -> null
+    }
+
+    companion object {
+        private val COMPOSITE = setOf(CROSSFADE, WIPE, WIPE_DIAG, CLOCK, STEPS, OVERLAY, MASK_PASS)
+    }
 
     /** Transizioni adatte a uno slideshow "vario" (quelle più nervose solo se scelte apposta). */
     val soft: Boolean get() = this !in setOf(GLITCH, PIXELATE, SHAKE, RGB, PUNCH, TEAR, STRIPES, SHUTTER, BURST, SPEEDZOOM, SMASH, SQUASH, REWIND,
-        BLACKOUT, EXPOSE, CAMSHAKE, SNAPZOOM)
+        BLACKOUT, EXPOSE, CAMSHAKE, SNAPZOOM, STEPS, INVISIBLE, MASK_PASS)
 
     /** Transizioni d'impatto, da mettere sui colpi forti della musica. */
     val punchy: Boolean get() = this in setOf(PUNCH, FLASH, RGB, GLITCH, SHAKE, WHIP, SPIN, SLIDE_UP, ZOOM, SWIRL, TEAR, BURST, STRIPES, SHUTTER, SPEEDZOOM, SMASH, SQUASH, REWIND,
-        BLACKOUT, EXPOSE, CAMSHAKE, SNAPZOOM)
+        BLACKOUT, EXPOSE, CAMSHAKE, SNAPZOOM, STEPS, INVISIBLE)
 
     /** Di tendenza (2026): da mostrare per prime nel pannello. */
-    val trend: Boolean get() = ordinal >= BLACKOUT.ordinal
+    val trend: Boolean get() = ordinal >= BLACKOUT.ordinal && ordinal < WIPE.ordinal
+
+    /** Le più nuove (dal video scelto dall'utente): in cima al pannello, dopo l'incrociata. */
+    val newest: Boolean get() = ordinal >= WIPE.ordinal
 
     /** Di tendenza e morbide (adatte ai temi calmi). */
     val gentleTrend: Boolean get() = this == SOFTZOOM || this == DRIFT
 
     /** Premium: le novità da far vedere nel pannello in cima. */
-    val premium: Boolean get() = ordinal >= PUNCH.ordinal
+    val premium: Boolean get() = ordinal >= PUNCH.ordinal && ordinal < WIPE.ordinal
 }
 
 @Serializable
@@ -790,13 +825,13 @@ data class Project(
      * l'inizio della clip successiva ([beforeUs], dal materiale prima del suo punto d'ingresso) e quanto
      * dopo si vede ancora la fine della clip precedente ([afterUs], dal materiale oltre il suo punto d'uscita).
      */
-    data class Crossfade(val index: Int, val cutUs: Long, val beforeUs: Long, val afterUs: Long)
+    data class Crossfade(val index: Int, val cutUs: Long, val beforeUs: Long, val afterUs: Long, val type: TransitionType = TransitionType.CROSSFADE)
 
     fun crossfades(): List<Crossfade> {
         val starts = clipStartsUs()
         return clips.indices.mapNotNull { i ->
             val spec = clips[i].transitionOut ?: return@mapNotNull null
-            if (spec.type != TransitionType.CROSSFADE) return@mapNotNull null
+            if (!spec.type.composite) return@mapNotNull null
             val a = clips[i]
             val b = clips.getOrNull(i + 1) ?: return@mapNotNull null
             val half = spec.durationUs / 2
@@ -808,8 +843,14 @@ data class Project(
             // Se manca materiale da un lato, si usa di più l'altro.
             if (before < half) after = minOf(spec.durationUs - before, tailRoom, b.outputUs / 2)
             if (after < half) before = minOf(spec.durationUs - after, headRoom, a.outputUs / 2)
+            // Passaggio con maschera: tutto dopo il taglio (la persona della clip prima resta davanti), e solo se c'è lo scontorno.
+            if (spec.type == TransitionType.MASK_PASS) {
+                if (a.person == null || a.isPhoto) return@mapNotNull null
+                before = 0
+                after = minOf(spec.durationUs, tailRoom, b.outputUs / 2)
+            }
             if (before + after < 100_000) return@mapNotNull null
-            Crossfade(i, starts[i] + a.outputUs, before.coerceAtLeast(0), after.coerceAtLeast(0))
+            Crossfade(i, starts[i] + a.outputUs, before.coerceAtLeast(0), after.coerceAtLeast(0), spec.type)
         }
     }
 

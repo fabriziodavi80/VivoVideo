@@ -58,15 +58,19 @@ object CrossfadePreview {
     private fun crossfadeJobs(p: Project, w: Int, h: Int): List<Job> {
         val starts = p.clipStartsUs()
         return p.crossfades().mapNotNull { cf ->
-            if (cf.beforeUs < MIN_SIDE_US || cf.afterUs < MIN_SIDE_US) return@mapNotNull null
+            // Il passaggio con maschera sta tutto dopo il taglio (prima non c'è nulla sopra).
+            val afterOnly = cf.type == TransitionType.MASK_PASS
+            if ((cf.beforeUs < MIN_SIDE_US && !afterOnly) || cf.afterUs < MIN_SIDE_US) return@mapNotNull null
             val a = p.clips[cf.index]
             val b = p.clips[cf.index + 1]
-            val a2 = part(a, a.outputUs - cf.beforeUs, a.outputUs)?.copy(transitionOut = a.transitionOut) ?: return@mapNotNull null
+            // Della clip prima serve almeno un pezzetto, anche quando la transizione è tutta dopo il taglio.
+            val lead = maxOf(cf.beforeUs, MIN_SIDE_US).coerceAtMost(a.outputUs)
+            val a2 = part(a, a.outputUs - lead, a.outputUs)?.copy(transitionOut = a.transitionOut) ?: return@mapNotNull null
             val b1 = part(b, 0, cf.afterUs)?.copy(transitionOut = null) ?: return@mapNotNull null
             // Niente musica, testi o livelli: restano sopra, nell'anteprima normale.
             // Identificativi fissi: dividere una clip ne crea uno casuale, e la chiave cambierebbe ogni volta.
             val sub = Project(name = "dissolvenza", clips = listOf(a2.copy(id = "a"), b1.copy(id = "b")), color = p.color)
-            val local = Project.Crossfade(0, a2.outputUs, cf.beforeUs.coerceAtMost(a2.outputUs), cf.afterUs.coerceAtMost(b1.outputUs))
+            val local = Project.Crossfade(0, a2.outputUs, cf.beforeUs.coerceAtMost(a2.outputUs), cf.afterUs.coerceAtMost(b1.outputUs), cf.type)
             val cut = starts[cf.index + 1]
             Job(keyOf(sub, local.toString(), w, h), sub, local, a2.outputUs + b1.outputUs, cf, cut - a2.outputUs, cut + b1.outputUs)
         }
@@ -150,7 +154,7 @@ object CrossfadePreview {
             if (job == null) {
                 // La clip subito prima di un tratto pronto non fa più la sua metà di dissolvenza incrociata.
                 val next = ready.firstOrNull { kotlin.math.abs(it.startUs - e) < 2_000 }
-                out += if (next != null && c.transitionOut?.type == TransitionType.CROSSFADE) c.copy(transitionOut = null) else c
+                out += if (next != null && c.transitionOut?.type?.composite == true) c.copy(transitionOut = null) else c
                 return@forEachIndexed
             }
             if (job.key in used) return@forEachIndexed

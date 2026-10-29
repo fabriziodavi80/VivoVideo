@@ -209,8 +209,9 @@ val LAYER_TABS = listOf("Aspetto", "Forma", "Animazione")
 /** Le novità premium in testa alle liste: si vedono subito. */
 // L'incrociata resta la prima (è la più usata), poi le novità.
 // Prima le transizioni di tendenza (stacchi da velocity edit), poi le altre novità e le classiche.
-val TRANSITIONS_NEW_FIRST: List<TransitionType> = listOf(TransitionType.CROSSFADE) + TransitionType.entries.filter { it.trend } +
-    TransitionType.entries.filter { it.premium && !it.trend } + TransitionType.entries.filter { !it.premium && it != TransitionType.CROSSFADE }
+val TRANSITIONS_NEW_FIRST: List<TransitionType> = listOf(TransitionType.CROSSFADE) + TransitionType.entries.filter { it.newest } +
+    TransitionType.entries.filter { it.trend } + TransitionType.entries.filter { it.premium && !it.trend } +
+    TransitionType.entries.filter { !it.premium && !it.trend && !it.newest && it != TransitionType.CROSSFADE }
 val PRESETS_NEW_FIRST: List<TextPreset> = TextPreset.entries.filter { it.trend } +
     TextPreset.entries.filter { !it.trend && it.ordinal >= TextPreset.CINEMA26.ordinal } + TextPreset.entries.filter { it.ordinal < TextPreset.CINEMA26.ordinal }
 val ANIMS_NEW_FIRST: List<TextAnim> = listOf(TextAnim.NONE) + TextAnim.entries.filter { it.ordinal >= TextAnim.BOUNCE.ordinal } +
@@ -1162,10 +1163,12 @@ private fun TransitionPanel(vm: EditorViewModel, running: Boolean) {
             "Durata", null, ms / 100, !running, range = 2..20,
             format = { String.format(java.util.Locale.ITALIAN, "%.1f s", it / 10f) },
         ) { v -> vm.setTransition(spec.copy(durationUs = v * 100_000L)) }
-        val cross = spec.type == TransitionType.CROSSFADE
+        val cross = spec.type.composite
         val real = if (cross) p.crossfades().firstOrNull { it.index == index }?.let { it.beforeUs + it.afterUs } ?: 0L
             else p.transitionHalfUs(index) * 2
-        if (real < spec.durationUs) {
+        if (spec.type == TransitionType.MASK_PASS && clip.person == null) {
+            Hint("Questa clip non ha ancora lo scontorno della persona: fallo in Effetti → Persona (qualsiasi sfondo), poi la persona resterà davanti nel passaggio.")
+        } else if (real < spec.durationUs) {
             Hint(
                 if (cross && real == 0L) "Non c'è video oltre il taglio da usare: allunga le clip con le maniglie (o scegli un'altra transizione)."
                 else String.format(java.util.Locale.ITALIAN, if (cross) "Poco video oltre il taglio: durata effettiva %.1f s." else "Clip corte: durata effettiva %.1f s.", real / 1_000_000f)
@@ -1173,10 +1176,7 @@ private fun TransitionPanel(vm: EditorViewModel, running: Boolean) {
         }
         SecondaryButton("Applica a tutti i tagli", selected = p.transitionOnAllCuts(spec), onClick = { vm.setTransitionAll(spec) })
     }
-    Hint(
-        if (spec?.type == TransitionType.CROSSFADE) "Incrociata: le due clip si sovrappongono usando i fotogrammi prima e dopo il taglio, senza cambiare la durata del video."
-        else "Metà effetto alla fine di questa clip, metà all'inizio della successiva."
-    )
+    Hint(spec?.type?.hint ?: "Metà effetto alla fine di questa clip, metà all'inizio della successiva.")
 }
 
 @Composable

@@ -648,6 +648,16 @@ class DeviceTest {
         playFor(p, seconds = 8)
     }
 
+    /** Le transizioni dal video dell'utente (tendine, orologio, scalini, sovrapposizione, taglio invisibile): esportazione vera. */
+    @Test fun exportNewestTransitions() {
+        val cuts = TransitionType.entries.filter { it.newest && it != TransitionType.MASK_PASS }
+        val srcs = listOf(videoA, videoB, videoC)
+        val clips = (0..cuts.size).map { i ->
+            video("n$i", srcs[i % 3], s = 1_000_000, e = 2_500_000).copy(transitionOut = cuts.getOrNull(i)?.let { TransitionSpec(it, 800_000) })
+        }
+        exportAndCheck(Project(name = "nuove transizioni", clips = clips, texts = listOf(TextItem(text = "Prova", startUs = 0, durationUs = 2_000_000))))
+    }
+
     /** Tendenze 2026: le nuove transizioni, gli effetti combinati nella stessa scena (con i battiti) e i nuovi testi. */
     @Test fun exportTrendKit() {
         val cuts = TransitionType.entries.filter { it.trend }
