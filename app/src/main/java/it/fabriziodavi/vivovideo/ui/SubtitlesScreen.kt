@@ -45,7 +45,7 @@ fun SubtitlesScreen(vm: EditorViewModel) {
     val ctx = LocalContext.current
     val busy = vm.busy
     BackHandler { if (busy != null) vm.cancelSubtitles() else vm.showSubtitles = false }
-    var model by remember { mutableStateOf(if (Whisper.isDownloaded(ctx, Whisper.Model.FAST) && !Whisper.isDownloaded(ctx, Whisper.Model.ACCURATE)) Whisper.Model.FAST else Whisper.Model.ACCURATE) }
+    var model by remember { mutableStateOf(Whisper.defaultModel(ctx)) }
     var lang by remember { mutableStateOf("it") }
     var style by remember { mutableStateOf(SubStyle.SOCIAL) }
     var pos by remember { mutableStateOf(SubPosition.BOTTOM) }
@@ -71,7 +71,7 @@ fun SubtitlesScreen(vm: EditorViewModel) {
                         .clickable(enabled = busy == null) { model = m }.padding(12.dp),
                 ) {
                     Text(m.label + if (ready) "  ·  pronto" else "  ·  ${m.sizeMb} MB da scaricare", style = MaterialTheme.typography.titleSmall, color = if (on) VV.Tally else VV.Text)
-                    Text(if (m == Whisper.Model.FAST) "Più rapido, qualche errore in più." else "Più preciso con l'italiano, un po' più lento.", style = MaterialTheme.typography.bodySmall)
+                    Text(m.hint, style = MaterialTheme.typography.bodySmall)
                 }
             }
             PanelLabel("Lingua del parlato")

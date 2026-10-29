@@ -15,7 +15,6 @@ import android.text.TextPaint
 import android.text.style.ForegroundColorSpan
 import android.util.LruCache
 import androidx.media3.common.OverlaySettings
-import androidx.media3.effect.BitmapOverlay
 import androidx.media3.effect.StaticOverlaySettings
 import it.fabriziodavi.vivovideo.R
 import it.fabriziodavi.vivovideo.model.TextAnim
@@ -543,7 +542,11 @@ class TimedTextOverlay(
     private val item: TextItem,
     private val frameW: Int,
     private val frameH: Int,
-) : BitmapOverlay() {
+) : androidx.media3.effect.TextOverlay() {
+    // Per Media3 è un "testo": così si può disegnare anche sui video HDR (le immagini semplici lì non sono accettate).
+    // L'immagine la fa getBitmap, come prima; getText non si usa.
+    override fun getText(presentationTimeUs: Long): android.text.SpannableString = android.text.SpannableString(item.text)
+
 
     // Due immagini che si alternano per i fotogrammi lettera per lettera (il motore ricarica l'immagine solo se cambia).
     private val spare = arrayOfNulls<Bitmap>(2)

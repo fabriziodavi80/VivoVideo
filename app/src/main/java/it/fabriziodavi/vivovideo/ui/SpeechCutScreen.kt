@@ -46,7 +46,7 @@ fun SpeechCutScreen(vm: EditorViewModel) {
     val ctx = LocalContext.current
     val busy = vm.busy
     BackHandler { if (busy != null) vm.cancelSubtitles() else { vm.closeSpeechCut() } }
-    var model by remember { mutableStateOf(if (Whisper.isDownloaded(ctx, Whisper.Model.FAST) && !Whisper.isDownloaded(ctx, Whisper.Model.ACCURATE)) Whisper.Model.FAST else Whisper.Model.ACCURATE) }
+    var model by remember { mutableStateOf(Whisper.defaultModel(ctx)) }
     var lang by remember { mutableStateOf("it") }
     val jump = vm.jumpMode
     // Jump cut: ritmo serrato di serie (0,4 s), come nei video parlati sui social.
@@ -55,7 +55,8 @@ fun SpeechCutScreen(vm: EditorViewModel) {
     var style by remember { mutableStateOf(JumpStyle.CLEAN) }
     var whoosh by remember { mutableStateOf(true) }
     // Con Social servono le parole (sottotitoli): il riconoscimento vocale si usa anche senza togliere gli ehm.
-    val transcribe = fillers || (jump && style == JumpStyle.SOCIAL)
+    val forSubtitles = jump && style == JumpStyle.SOCIAL
+    val transcribe = fillers || forSubtitles
     val plan = vm.speechPlan
     val total = vm.project?.durationUs ?: 0L
     val summary = remember(plan, style, whoosh, vm.speechWords) { if (jump && plan != null) vm.jumpPreview(style, whoosh) else null }
@@ -111,7 +112,7 @@ fun SpeechCutScreen(vm: EditorViewModel) {
                             .clickable(enabled = busy == null) { model = m; vm.speechPlan = null }.padding(12.dp),
                     ) {
                         Text(m.label + if (ready) "  ·  pronto" else "  ·  ${m.sizeMb} MB da scaricare", style = MaterialTheme.typography.titleSmall, color = if (on) VV.Tally else VV.Text)
-                        Text(if (m == Whisper.Model.FAST) "Più rapido." else "Più preciso con l'italiano.", style = MaterialTheme.typography.bodySmall)
+                        Text(m.hint, style = MaterialTheme.typography.bodySmall)
                     }
                 }
                 Segmented(listOf("it", "en", "auto"), lang, { when (it) { "it" -> "Italiano"; "en" -> "Inglese"; else -> "Automatica" } }, busy == null) { lang = it; vm.speechPlan = null }
@@ -172,9 +173,9 @@ fun SpeechCutScreen(vm: EditorViewModel) {
             } else if (plan != null && !plan.isEmpty) {
                 if (jump) PrimaryButton("Fai i jump cut", Modifier.fillMaxWidth()) { vm.applyJumpCuts(style, whoosh) }
                 else PrimaryButton("Taglia ${sec(plan.totalUs)}", Modifier.fillMaxWidth()) { vm.applySpeechCuts() }
-                SecondaryButton("Rifai l'analisi", Modifier.fillMaxWidth(), onClick = { vm.analyzeSpeech(model, lang, minPause, fillers, transcribe) })
+                SecondaryButton("Rifai l'analisi", Modifier.fillMaxWidth(), onClick = { vm.analyzeSpeech(model, lang, minPause, fillers, forSubtitles) })
             } else {
-                PrimaryButton("Analizza", Modifier.fillMaxWidth(), enabled = minPause > 0 || fillers) { vm.analyzeSpeech(model, lang, minPause, fillers, transcribe) }
+                PrimaryButton("Analizza", Modifier.fillMaxWidth(), enabled = minPause > 0 || fillers) { vm.analyzeSpeech(model, lang, minPause, fillers, forSubtitles) }
             }
         }
     }

@@ -94,6 +94,13 @@ class EngineTest {
         assertTrue(overlayEffects(emptyList()).isEmpty())
     }
 
+    @Test fun textsAndImagesAreAcceptedOnHdrVideo() {
+        // Sui video HDR Media3 accetta solo i "testi" (le immagini semplici vogliono una gainmap): prima ogni esportazione
+        // HDR con un testo o un'immagine falliva e ripiegava in SDR.
+        assertTrue(TimedTextOverlay(app, TextItem(text = "Ciao"), 1080, 1920) is androidx.media3.effect.TextOverlay)
+        assertTrue(LayerOverlay(app, Layer(uri = "file:///l.png"), 1080, 1920) is androidx.media3.effect.TextOverlay)
+    }
+
     @Test fun crossfadeExportUsesCompositorWithPaddedLane() {
         val x = TransitionSpec(TransitionType.CROSSFADE, 1_000_000)
         val p = Project(

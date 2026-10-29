@@ -17,11 +17,13 @@ import java.nio.ByteOrder
  */
 object Whisper {
     /** Modelli: più grande = più preciso ma più lento. Si scaricano una volta sola. */
-    enum class Model(val label: String, val file: String, val sizeMb: Int) {
-        FAST("Veloce", "ggml-base-q5_1.bin", 60),
-        ACCURATE("Preciso", "ggml-small-q5_1.bin", 190),
+    enum class Model(val label: String, val file: String, val sizeMb: Int, val hint: String) {
+        FAST("Veloce", "ggml-base-q5_1.bin", 60, "Più rapido, qualche errore in più."),
+        ACCURATE("Preciso", "ggml-small-q5_1.bin", 190, "Più preciso con l'italiano, un po' più lento."),
+        /** Il più grande che regge il telefono: sbaglia molte meno parole, circa tre volte più lento di Preciso. */
+        BEST("Massima precisione", "ggml-medium-q5_0.bin", 539, "Il migliore per l'italiano e per le voci difficili; più lento."),
         /** Solo per le prove sull'emulatore. */
-        TINY("Minimo", "ggml-tiny-q5_1.bin", 32);
+        TINY("Minimo", "ggml-tiny-q5_1.bin", 32, "Solo per le prove.");
 
         val url: String get() = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/$file"
     }
@@ -30,7 +32,7 @@ object Whisper {
 
     private external fun nativeInit(path: String): Long
     private external fun nativeFree(ctx: Long)
-    private external fun nativeTranscribe(ctx: Long, pcm: FloatArray, lang: String, threads: Int, prompt: String): ByteArray
+    private external fun nativeTranscribe(ctx: Long, pcm: FloatArray, lang: String, threads: Int, prompt: String, beam: Int): ByteArray
     private external fun nativeProgress(): Int
     private external fun nativeAbort()
 
@@ -39,6 +41,10 @@ object Whisper {
 
     fun modelFile(ctx: Context, m: Model) = File(File(ctx.filesDir, "whisper").apply { mkdirs() }, m.file)
     fun isDownloaded(ctx: Context, m: Model) = modelFile(ctx, m).let { it.exists() && it.length() > 1_000_000 }
+
+    /** Il modello proposto: il più preciso già scaricato (se nessuno, Preciso). */
+    fun defaultModel(ctx: Context): Model =
+        listOf(Model.BEST, Model.ACCURATE, Model.FAST).firstOrNull { isDownloaded(ctx, it) } ?: Model.ACCURATE
 
     /** Scarica il modello (con avanzamento 0…1); se c'è già non fa nulla. */
     suspend fun download(ctx: Context, m: Model, onProgress: (Float) -> Unit): File = withContext(Dispatchers.IO) {
@@ -74,14 +80,34 @@ object Whisper {
     /** Suggerimento che fa scrivere anche le parole di riempimento ("ehm", "eh"…). */
     const val FILLER_PROMPT = "Allora, ehm, eh, cioè... uhm, sì, ehm, mmm, ecco."
 
-    /** Trascrive: [pcm] mono 16 kHz, [lang] "it", "en" o "auto"; [prompt] = testo d'esempio che orienta lo stile. */
-    suspend fun transcribe(model: File, pcm: FloatArray, lang: String, prompt: String = ""): List<SpokenWord> = withContext(Dispatchers.Default) {
+    /** Ricerca a fascio per le parole dei sottotitoli: 5 ipotesi per volta, come whisper sul computer. */
+    const val SUBTITLE_BEAM = 5
+
+    /**
+     * Audio portato a un volume chiaro prima di ascoltarlo: le riprese del telefono sono spesso basse e il riconoscimento
+     * sbaglia più parole. Valore efficace verso –20 dBFS (al massimo ×20), picchi sotto –0,5 dBFS. Non cambia [pcm].
+     */
+    fun normalized(pcm: FloatArray): FloatArray {
+        if (pcm.isEmpty()) return pcm
+        var peak = 1e-9f; var en = 0.0
+        for (v in pcm) { val a = kotlin.math.abs(v); if (a > peak) peak = a; en += v * v }
+        val rms = kotlin.math.sqrt(en / pcm.size).toFloat().coerceAtLeast(1e-9f)
+        val g = minOf(0.1f / rms, 0.944f / peak, 20f)
+        if (g <= 1.05f && g >= 0.95f) return pcm
+        return FloatArray(pcm.size) { pcm[it] * g }
+    }
+
+    /**
+     * Trascrive: [pcm] mono 16 kHz, [lang] "it", "en" o "auto"; [prompt] = testo d'esempio che orienta lo stile
+     * (per i sottotitoli meglio nessuno: quello degli ehm fa sbagliare parole); [beam] > 1 = più preciso e più lento.
+     */
+    suspend fun transcribe(model: File, pcm: FloatArray, lang: String, prompt: String = "", beam: Int = SUBTITLE_BEAM): List<SpokenWord> = withContext(Dispatchers.Default) {
         if (!loaded) error("Il riconoscimento vocale non è disponibile su questo telefono.")
         val ctx = nativeInit(model.absolutePath)
         if (ctx == 0L) error("Modello non leggibile: prova a scaricarlo di nuovo.")
         try {
             val threads = Runtime.getRuntime().availableProcessors().coerceIn(2, 6)
-            parseWords(nativeTranscribe(ctx, pcm, lang, threads, prompt))
+            parseWords(nativeTranscribe(ctx, normalized(pcm), lang, threads, prompt, beam))
         } finally { nativeFree(ctx) }
     }
 

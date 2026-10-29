@@ -1877,7 +1877,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
      * Ascolta l'audio delle clip: pause più lunghe di [minPauseUs] (0 = non cercarle) e, con [fillers],
      * le parole di riempimento (serve il riconoscimento vocale). Non cambia nulla finché non si conferma.
      */
-    fun analyzeSpeech(model: Whisper.Model, lang: String, minPauseUs: Long, fillers: Boolean, transcribe: Boolean = fillers) {
+    fun analyzeSpeech(model: Whisper.Model, lang: String, minPauseUs: Long, fillers: Boolean, transcribe: Boolean = false) {
         val ctx = getApplication<Application>()
         val p = project ?: return
         if (p.clips.isEmpty() || busy != null) return
@@ -1892,21 +1892,29 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                     val wav = renderTimelineAudio(ctx, p.copy(music = emptyList()), loudness = false)
                     try { Whisper.wavTo16kMono(wav) } finally { wav.delete() }
                 }
-                var words = emptyList<it.fabriziodavi.vivovideo.model.SpokenWord>()
+                var words = emptyList<SpokenWord>()
+                var subtitleWords = emptyList<SpokenWord>()
                 if (fillers || transcribe) {
                     if (!Whisper.isDownloaded(ctx, model)) {
                         busy = "Scarico il modello ${model.label} (${model.sizeMb} MB, solo la prima volta)…"
                         Whisper.download(ctx, model) { f -> handler.post { busy = "Scarico il modello ${model.label}… ${(f * 100).toInt()}%" } }
                     }
-                    busy = "Ascolto il parlato… 0%"
-                    val poll = launch { while (true) { kotlinx.coroutines.delay(400); busy = "Ascolto il parlato… ${Whisper.progress()}%" } }
-                    words = try { Whisper.transcribe(Whisper.modelFile(ctx, model), pcm, lang, Whisper.FILLER_PROMPT) } finally { poll.cancel() }
+                    // Due ascolti diversi: per gli ehm con l'esempio che li fa scrivere (veloce); per i sottotitoli senza
+                    // esempio e con la ricerca a fascio (l'esempio degli ehm faceva sbagliare parole ai sottotitoli).
+                    suspend fun listen(label: String, prompt: String, beam: Int): List<SpokenWord> {
+                        busy = "$label… 0%"
+                        val poll = launch { while (true) { kotlinx.coroutines.delay(400); busy = "$label… ${Whisper.progress()}%" } }
+                        return try { Whisper.transcribe(Whisper.modelFile(ctx, model), pcm, lang, prompt, beam) } finally { poll.cancel() }
+                    }
+                    val fillerWords = if (fillers) listen("Ascolto gli ehm", Whisper.FILLER_PROMPT, 1) else emptyList()
+                    subtitleWords = if (transcribe) listen("Ascolto le parole per i sottotitoli", "", Whisper.SUBTITLE_BEAM) else emptyList()
+                    words = fillerWords
                 }
                 busy = "Cerco le pause…"
                 val plan = withContext(Dispatchers.Default) { it.fabriziodavi.vivovideo.model.SpeechCuts.plan(p, pcm, words, minPauseUs, fillers = fillers) }
                 busy = null
                 speechPcm = pcm
-                speechWords = words
+                speechWords = subtitleWords
                 speechPlan = plan
                 // Per le segnalazioni: cosa ha sentito il riconoscimento vocale e cosa ha trovato il suono.
                 if (fillers) Diary.log(

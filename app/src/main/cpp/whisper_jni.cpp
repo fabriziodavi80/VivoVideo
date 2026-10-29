@@ -39,7 +39,7 @@ static jbyteArray bytes(JNIEnv *env, const std::string &s) {
 }
 
 extern "C" JNIEXPORT jbyteArray JNICALL
-Java_it_fabriziodavi_vivovideo_engine_Whisper_nativeTranscribe(JNIEnv *env, jobject, jlong ctxPtr, jfloatArray pcm, jstring lang, jint threads, jstring prompt) {
+Java_it_fabriziodavi_vivovideo_engine_Whisper_nativeTranscribe(JNIEnv *env, jobject, jlong ctxPtr, jfloatArray pcm, jstring lang, jint threads, jstring prompt, jint beam) {
     auto *ctx = reinterpret_cast<whisper_context *>(ctxPtr);
     if (ctx == nullptr) return bytes(env, "");
     g_progress.store(0);
@@ -51,7 +51,9 @@ Java_it_fabriziodavi_vivovideo_engine_Whisper_nativeTranscribe(JNIEnv *env, jobj
     std::string initialPrompt(pr);
     env->ReleaseStringUTFChars(prompt, pr);
 
-    whisper_full_params wp = whisper_full_default_params(WHISPER_SAMPLING_GREEDY);
+    // Con beam > 1 il modello valuta più frasi possibili e tiene la migliore: più lento, molto più preciso sulle parole.
+    whisper_full_params wp = whisper_full_default_params(beam > 1 ? WHISPER_SAMPLING_BEAM_SEARCH : WHISPER_SAMPLING_GREEDY);
+    if (beam > 1) wp.beam_search.beam_size = beam;
     wp.n_threads = threads > 0 ? threads : 4;
     wp.language = language == "auto" ? nullptr : language.c_str();
     wp.detect_language = false;

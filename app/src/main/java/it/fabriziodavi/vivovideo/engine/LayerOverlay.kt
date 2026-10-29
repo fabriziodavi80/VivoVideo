@@ -16,7 +16,6 @@ import android.graphics.Shader
 import android.net.Uri
 import android.util.LruCache
 import androidx.media3.common.OverlaySettings
-import androidx.media3.effect.BitmapOverlay
 import it.fabriziodavi.vivovideo.model.Layer
 import it.fabriziodavi.vivovideo.model.KeyColor
 import it.fabriziodavi.vivovideo.model.LayerBorder
@@ -204,7 +203,11 @@ class LayerOverlay(
     private val layer: Layer,
     private val frameW: Int,
     private val frameH: Int,
-) : BitmapOverlay() {
+) : androidx.media3.effect.TextOverlay() {
+    // Per Media3 è un "testo": così si può disegnare anche sui video HDR (le immagini semplici lì non sono accettate).
+    // L'immagine la fa getBitmap, come prima; getText non si usa.
+    override fun getText(presentationTimeUs: Long): android.text.SpannableString = android.text.SpannableString("livello")
+
     private val prepared by lazy { LayerRenderer.prepare(context, layer, frameW, frameH) }
 
     override fun getBitmap(presentationTimeUs: Long): Bitmap = prepared.bitmap
