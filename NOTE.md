@@ -1,6 +1,6 @@
 # VivoVideo · note per riprendere il lavoro
 
-Aggiornate al 29/10/2026, ultima versione **v1.0.203** (build 203 riuscita). La 1.0 è la v1.0.201; dalla 202 ci sono i jump cut. Da leggere insieme a `CLAUDE.md`.
+Aggiornate al 29/10/2026, ultima versione **v1.0.204** (build 204 riuscita). La 1.0 è la v1.0.201; dalla 202 ci sono i jump cut. Da leggere insieme a `CLAUDE.md`.
 
 ## 1. Stato attuale dell'app
 
@@ -10,7 +10,7 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, ML Kit, whisper.cpp e Sign
 ### Collaudo
 - Collaudo guidato (Progetto → Collaudo, `model/TestPlan.kt`, **38 prove**): le prime 37 tutte OK al 28/10/2026; la 38ª (`aud_jump`, Jump cut pronti) è da fare.
   L'ultima ("Progetto lungo": 15:57, 368 clip, esportato in 6 minuti, 1,9 GB) segnata OK. Dopo "Dividi i video sui battiti" su tutti i brani, dissolvenze dei brani in anteprima e tratti di anteprima dei progetti lunghi: provati poco dall'utente, risultato "comunque accettabile".
-- Accettate con riserva (da migliorare dopo la 1.0): taglio degli **ehm**, **scontorno** (bordi e capelli), **stabilizzazione** ("non sensazionale").
+- Accettate con riserva (da migliorare dopo la 1.0): taglio degli **ehm** (29/10: "le pause vengono riconosciute ma gli ehm necessitano ancora di migliorie"), **scontorno** (bordi e capelli), **stabilizzazione** ("non sensazionale").
 - Il rapporto "Segnala un problema" (diario, esiti, telefono, impostazioni; niente video né chiavi) l'utente lo incolla in chat: è la fonte delle correzioni.
 
 ### Editor
@@ -79,6 +79,7 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, ML Kit, whisper.cpp e Sign
 - Prove di logica in locale (senza Gradle): `java -cp "/opt/gradle-8.14.3/lib/*" org.jetbrains.kotlin.cli.jvm.K2JVMCompiler -no-stdlib -cp kotlin-stdlib-2.0.21.jar:junit-4.13.2.jar` su copie dei file nella cartella temporanea (togliendo `@Serializable`).
 
 ### Vincoli tecnici
+- Media3: al massimo **15 overlay per OverlayEffect** (oltre: "more than 15 SDR overlays", anteprima bloccata). Usare sempre `overlayEffects()` in `CompositionFactory` (gruppi da 15). Scoperto il 29/10 con i jump cut Social (35 sottotitoli su una clip di 36 s).
 - Anteprima: niente compositore a più ingressi (CompositionPlayer si blocca sul telefono): dissolvenze preparate con `CrossfadePreview`, video sovrapposti come immagini ferme (veri solo nell'esportato).
 - Anteprima: **niente effetti audio a livello di Composition** (sperimentali in Media3 1.11, hanno distorto in v0.3.173). Guadagni per brano/gruppo con `ChannelMixingAudioProcessor` o con processori per elemento (`DuckAudioProcessor`, posizione da `StreamMetadata.positionOffsetUs`, relativa all'inizio dell'elemento tagliato).
 - Media3 passa agli effetti il tempo del montaggio intero: usare `localTimeUs(t, startUs)`.
@@ -98,7 +99,7 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, ML Kit, whisper.cpp e Sign
 ## 3. Prossimi passi
 
 ### Subito
-1. L'utente prova i **jump cut** (collaudo `aud_jump`) su un video parlato vero: inquadratura stretta centrata sul volto, punch-in di Dinamico, lampi/whoosh/sottotitoli di Social, niente clic nel video esportato. Da chiedere: zoom 14% e punch-in 28% giusti? lampo ogni 4 tagli troppo o poco?
+1. Collaudo `aud_jump` KO con la 1.0.203 (errore dei 15 overlay, corretto nella 1.0.204): l'utente rifà Social. Poi prova i **jump cut** (collaudo `aud_jump`) su un video parlato vero: inquadratura stretta centrata sul volto, punch-in di Dinamico, lampi/whoosh/sottotitoli di Social, niente clic nel video esportato. Da chiedere: zoom 14% e punch-in 28% giusti? lampo ogni 4 tagli troppo o poco?
 
 ### Dopo la 1.0, in quest'ordine
 1. ~~Jump cut pronti~~: fatti nella v1.0.202 (vedi sopra). Da migliorare se serve: micro-dissolvenze anche in anteprima (ora solo nell'esportato), "frasi importanti" con il testo di Whisper invece del solo volume.
