@@ -1,6 +1,6 @@
 # VivoVideo · note per riprendere il lavoro
 
-Aggiornate al 29/10/2026, ultima versione **v1.0.210** (build 210 riuscita). La 1.0 è la v1.0.201; dalla 202 ci sono i jump cut. Da leggere insieme a `CLAUDE.md`.
+Aggiornate al 29/10/2026, ultima versione **v1.0.211** (build 211 riuscita). La 1.0 è la v1.0.201; dalla 202 ci sono i jump cut. Da leggere insieme a `CLAUDE.md`.
 
 ## 1. Stato attuale dell'app
 
@@ -48,6 +48,8 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, ML Kit, whisper.cpp e Sign
 - Volti: `SmartAnalyzer.scan` + `Moments.subjectPath` (solo se `hasFaces`), una volta per video.
 - `Clip.jumpCut`: micro-dissolvenze di 15 ms in `renderTimelineAudio` e mix nativo forzato nell'`Exporter`.
 - Riepilogo prima di confermare (`vm.jumpPreview`), un solo Annulla (`update` unico).
+- Frasi lunghe (v1.0.211, chiesto dall'utente: "i jump cut Social a inizio clip e poi più nulla"): `holdSplits` divide i pezzi oltre `MAX_HOLD_US` 4,5 s (mai sotto 1,5 s) fra due frasi / spazio più lungo fra le parole, altrimenti nel punto più basso della voce; `Piece.reframe`, `Summary.reframes`; lampi e whoosh solo sui tagli veri.
+- HDR con i jump cut: verificato OK dall'utente il 29/10 (v1.0.208+).
 
 ### Esportazione
 - Preset YouTube 4K/HD, Reels/TikTok, WhatsApp; H.265/H.264; HDR a 10 bit; fino a 4K120/8K30.
@@ -115,6 +117,7 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, ML Kit, whisper.cpp e Sign
 
 ### Da tenere d'occhio
 - `PreviewLoudness` misura il mix in secondo piano dopo ogni modifica all'audio: verificare i tempi su progetti lunghi.
+- Emulatore v1.0.210: 37 prove su 39 OK, compresa `exportNewestTransitions` (gli shader delle transizioni nuove funzionano); fallite solo Openverse (rete) e l'anteprima con tutti gli effetti (lenta senza GPU), rese più tolleranti.
 - Prove sull'emulatore: non si compilavano dalla v0.3.19x (argomenti di `PersonMasks.analyze`), per questo il job risultava "skipped"; sistemato nella v1.0.210. Ora gli errori di compilazione finiscono in `compile-errors.txt` del ramo `emulator-logs`. Gli shader nuovi (TransitionMaskEffect) si provano davvero solo lì o sul telefono.
 - `scanDense` legge tutto il video: con molti video lunghi nel video automatico la prima analisi richiede tempo (poi è in cache).
 - Copie leggere con fotogramma chiave ogni secondo: se in anteprima i tagli a ritmo sembrano in ritardo con centinaia di clip, fare le copie con fotogrammi chiave più fitti.
