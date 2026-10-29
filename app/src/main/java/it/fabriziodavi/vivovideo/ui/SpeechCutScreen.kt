@@ -123,18 +123,20 @@ fun SpeechCutScreen(vm: EditorViewModel) {
                     else {
                         if (minPause > 0) Text("${plan.pauses} pause · ${sec(plan.pauseUs)}", style = MaterialTheme.typography.bodyMedium)
                         if (fillers) Text("${plan.fillers} ehm e simili · ${sec(plan.fillerUs)}", style = MaterialTheme.typography.bodyMedium)
-                        Text("Il video passa da ${formatTime(total)} a ${formatTime(total - plan.totalUs)}", style = MaterialTheme.typography.titleSmall, color = VV.Tally)
+                        // Con i jump cut la nuova durata sta nel riepilogo, qui sotto.
+                        if (!jump) Text("Il video passa da ${formatTime(total)} a ${formatTime(total - plan.totalUs)}", style = MaterialTheme.typography.titleSmall, color = VV.Tally)
                     }
                 }
                 if (jump && summary != null) {
                     PanelLabel("Riepilogo dei jump cut")
                     Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(VV.Raised).padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text("${summary.cuts} tagli con cambio d'inquadratura", style = MaterialTheme.typography.bodyMedium)
-                        Text("${summary.zoomed} pezzi stretti (+${((JumpCuts.ZOOM - 1) * 100).toInt()}%) sul volto", style = MaterialTheme.typography.bodyMedium)
+                        val pct = kotlin.math.round((JumpCuts.ZOOM - 1) * 100).toInt()
+                        Text(count(summary.cuts, "taglio", "tagli") + " con cambio d'inquadratura", style = MaterialTheme.typography.bodyMedium)
+                        Text(count(summary.zoomed, "pezzo stretto", "pezzi stretti") + " (+$pct%) sul volto", style = MaterialTheme.typography.bodyMedium)
                         if (style == JumpStyle.DYNAMIC) Text("${summary.punches} punch-in sulle frasi più forti", style = MaterialTheme.typography.bodyMedium)
                         if (style == JumpStyle.SOCIAL) {
-                            Text("${summary.flashes} lampi" + if (summary.whooshes > 0) " con whoosh" else "", style = MaterialTheme.typography.bodyMedium)
-                            Text(if (summary.subtitles > 0) "${summary.subtitles} sottotitoli parola per parola (sostituiscono quelli che ci sono)" else "Nessuna parola sentita: niente sottotitoli", style = MaterialTheme.typography.bodyMedium)
+                            Text(count(summary.flashes, "lampo", "lampi") + if (summary.whooshes > 0) " con whoosh" else "", style = MaterialTheme.typography.bodyMedium)
+                            Text(if (summary.subtitles > 0) count(summary.subtitles, "sottotitolo", "sottotitoli") + " parola per parola (sostituiscono quelli che ci sono)" else "Nessuna parola sentita: niente sottotitoli", style = MaterialTheme.typography.bodyMedium)
                         }
                         Text("Micro-dissolvenze dell'audio su ogni taglio, niente clic.", style = MaterialTheme.typography.bodySmall, color = VV.Dim)
                         Text("Il video passa da ${formatTime(summary.beforeUs)} a ${formatTime(summary.afterUs)}", style = MaterialTheme.typography.titleSmall, color = VV.Tally)
@@ -194,5 +196,8 @@ private fun FillerRow(at: Long, lenUs: Long, label: String, on: Boolean, onToggl
         TextButton(onClick = onPlayAfter) { Text("✂ ▶", color = VV.Tally) }
     }
 }
+
+/** "1 taglio", "3 tagli". */
+private fun count(n: Int, one: String, many: String) = "$n " + if (n == 1) one else many
 
 private fun sec(us: Long) = String.format(java.util.Locale.ITALIAN, "%.1f s", us / 1e6)
