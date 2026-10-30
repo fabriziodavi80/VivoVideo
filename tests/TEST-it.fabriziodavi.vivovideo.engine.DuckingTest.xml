@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.engine.DuckingTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-30T10:53:26.961Z" hostname="runnervmnwato" time="0.137">
+  <properties/>
+  <testcase name="previewGainsNeedVoiceMusicAndDucking" classname="it.fabriziodavi.vivovideo.engine.DuckingTest" time="0.022"/>
+  <testcase name="steadyBackgroundNoiseDoesNotDuck" classname="it.fabriziodavi.vivovideo.engine.DuckingTest" time="0.015"/>
+  <testcase name="quietVoiceIsBroughtToAClearLevel" classname="it.fabriziodavi.vivovideo.engine.DuckingTest" time="0.054"/>
+  <testcase name="previewProcessorFollowsThePositionAfterASeek" classname="it.fabriziodavi.vivovideo.engine.DuckingTest" time="0.027"/>
+  <testcase name="energyLandsInTheRightBlocks" classname="it.fabriziodavi.vivovideo.engine.DuckingTest" time="0.019"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

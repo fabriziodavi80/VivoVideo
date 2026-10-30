@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.engine.TrendTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-10-30T10:53:33.402Z" hostname="runnervmnwato" time="0.022">
+  <properties/>
+  <testcase name="retroThemeKeepsItsVhsHits" classname="it.fabriziodavi.vivovideo.engine.TrendTest" time="0.008"/>
+  <testcase name="trendTransitionsAreBriefAndClean" classname="it.fabriziodavi.vivovideo.engine.TrendTest" time="0.002"/>
+  <testcase name="velocityEditCutsHardOnBeatsAndBlacksOutOnTheDrop" classname="it.fabriziodavi.vivovideo.engine.TrendTest" time="0.008"/>
+  <testcase name="trendPanelCollectsTheNewEffects" classname="it.fabriziodavi.vivovideo.engine.TrendTest" time="0.0"/>
+  <testcase name="actionThemesHaveNoDatedIngredients" classname="it.fabriziodavi.vivovideo.engine.TrendTest" time="0.0"/>
+  <testcase name="gentleTransitionsAreSubtle" classname="it.fabriziodavi.vivovideo.engine.TrendTest" time="0.001"/>
+  <testcase name="grungeIsRawButNotCheesy" classname="it.fabriziodavi.vivovideo.engine.TrendTest" time="0.002"/>
+  <testcase name="beatShapesOfTheNewEffects" classname="it.fabriziodavi.vivovideo.engine.TrendTest" time="0.001"/>
+  <testcase name="trendTextStylesAreClean" classname="it.fabriziodavi.vivovideo.engine.TrendTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

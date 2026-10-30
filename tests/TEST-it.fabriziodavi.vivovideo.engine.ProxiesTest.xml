@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.engine.ProxiesTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-30T10:53:33.321Z" hostname="runnervmnwato" time="0.055">
+  <properties/>
+  <testcase name="sizeKeepsProportionsAt720p" classname="it.fabriziodavi.vivovideo.engine.ProxiesTest" time="0.01"/>
+  <testcase name="previewUsesReadyCopiesOnly" classname="it.fabriziodavi.vivovideo.engine.ProxiesTest" time="0.012"/>
+  <testcase name="overlaidVideoBecomesAPreparedStretch" classname="it.fabriziodavi.vivovideo.engine.ProxiesTest" time="0.013"/>
+  <testcase name="presetsAndEstimate" classname="it.fabriziodavi.vivovideo.engine.ProxiesTest" time="0.011"/>
+  <testcase name="onlyHeavyVideosNeedACopy" classname="it.fabriziodavi.vivovideo.engine.ProxiesTest" time="0.009"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.model.JumpCutsTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-10-30T10:53:34.898Z" hostname="runnervmnwato" time="0.043">
+  <properties/>
+  <testcase name="subjectLookupUsesTheFileTimeOfEachPiece" classname="it.fabriziodavi.vivovideo.model.JumpCutsTest" time="0.004"/>
+  <testcase name="splitClipsOfTheSameTakeKeepAlternating" classname="it.fabriziodavi.vivovideo.model.JumpCutsTest" time="0.002"/>
+  <testcase name="videoUsedTwiceFindsItsOwnPieces" classname="it.fabriziodavi.vivovideo.model.JumpCutsTest" time="0.001"/>
+  <testcase name="withoutWordsTheChangeFallsInTheQuietestMoment" classname="it.fabriziodavi.vivovideo.model.JumpCutsTest" time="0.02"/>
+  <testcase name="dynamicPunchesInOnTheLoudPhrases" classname="it.fabriziodavi.vivovideo.model.JumpCutsTest" time="0.012"/>
+  <testcase name="tightFramingIsCenteredOnTheFaceWithoutShowingEdges" classname="it.fabriziodavi.vivovideo.model.JumpCutsTest" time="0.0"/>
+  <testcase name="eachTakeStartsNormalAndPhotosMutedAndUncutClipsStayUntouched" classname="it.fabriziodavi.vivovideo.model.JumpCutsTest" time="0.0"/>
+  <testcase name="noPausesStillChangesTheFramingInLongPhrases" classname="it.fabriziodavi.vivovideo.model.JumpCutsTest" time="0.001"/>
+  <testcase name="longPhrasesChangeFramingBetweenSentences" classname="it.fabriziodavi.vivovideo.model.JumpCutsTest" time="0.0"/>
+  <testcase name="cutsChangeTheFramingAndShortenTheVideo" classname="it.fabriziodavi.vivovideo.model.JumpCutsTest" time="0.0"/>
+  <testcase name="socialAddsFlashesWhooshesAndWordSubtitles" classname="it.fabriziodavi.vivovideo.model.JumpCutsTest" time="0.002"/>
+  <testcase name="piecesAlternateNormalAndTight" classname="it.fabriziodavi.vivovideo.model.JumpCutsTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

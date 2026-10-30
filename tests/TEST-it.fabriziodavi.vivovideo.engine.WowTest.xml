@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.engine.WowTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-10-30T10:53:33.663Z" hostname="runnervmnwato" time="0.053">
+  <properties/>
+  <testcase name="everyThemeBuilds" classname="it.fabriziodavi.vivovideo.engine.WowTest" time="0.036"/>
+  <testcase name="energyFollowsTheLoudness" classname="it.fabriziodavi.vivovideo.engine.WowTest" time="0.005"/>
+  <testcase name="premiumTransitionsDoSomethingAtTheCut" classname="it.fabriziodavi.vivovideo.engine.WowTest" time="0.001"/>
+  <testcase name="calmStylesUseSlowMotionAndOppositePhotosPan" classname="it.fabriziodavi.vivovideo.engine.WowTest" time="0.001"/>
+  <testcase name="beatEffectsPeakOnTheBeat" classname="it.fabriziodavi.vivovideo.engine.WowTest" time="0.0"/>
+  <testcase name="autoEditFollowsTheSongEnergy" classname="it.fabriziodavi.vivovideo.engine.WowTest" time="0.003"/>
+  <testcase name="trailerStructureIntroHeroEnding" classname="it.fabriziodavi.vivovideo.engine.WowTest" time="0.002"/>
+  <testcase name="neonFlickersThenStaysOnAndBlurFocuses" classname="it.fabriziodavi.vivovideo.engine.WowTest" time="0.002"/>
+  <testcase name="newLetterAnimationsStartHiddenAndEndInPlace" classname="it.fabriziodavi.vivovideo.engine.WowTest" time="0.001"/>
+  <testcase name="vintageThemesStampTheRealDateAndRomanticPhotosBreathe" classname="it.fabriziodavi.vivovideo.engine.WowTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

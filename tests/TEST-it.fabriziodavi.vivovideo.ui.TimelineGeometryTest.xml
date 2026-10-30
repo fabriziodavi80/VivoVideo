@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.ui.TimelineGeometryTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-30T10:53:53.485Z" hostname="runnervmnwato" time="0.004">
+  <properties/>
+  <testcase name="cutsStayUnderTheBeatsAfterHundredsOfClips" classname="it.fabriziodavi.vivovideo.ui.TimelineGeometryTest" time="0.004"/>
+  <testcase name="mixedLengthsHaveNoGapsOrOverlaps" classname="it.fabriziodavi.vivovideo.ui.TimelineGeometryTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

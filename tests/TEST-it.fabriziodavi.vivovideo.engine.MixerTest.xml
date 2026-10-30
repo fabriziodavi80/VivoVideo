@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.engine.MixerTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-10-30T10:53:32.925Z" hostname="runnervmnwato" time="0.084">
+  <properties/>
+  <testcase name="muteSoloAndPanDecideWhatIsHeard" classname="it.fabriziodavi.vivovideo.engine.MixerTest" time="0.001"/>
+  <testcase name="eqShapesLowsMidsAndHighs" classname="it.fabriziodavi.vivovideo.engine.MixerTest" time="0.033"/>
+  <testcase name="gainPanAndMuteAreApplied" classname="it.fabriziodavi.vivovideo.engine.MixerTest" time="0.006"/>
+  <testcase name="tracksGoToTheRightGroup" classname="it.fabriziodavi.vivovideo.engine.MixerTest" time="0.003"/>
+  <testcase name="compressorBringsLoudAndQuietCloser" classname="it.fabriziodavi.vivovideo.engine.MixerTest" time="0.018"/>
+  <testcase name="mixIsSavedWithTheProject" classname="it.fabriziodavi.vivovideo.engine.MixerTest" time="0.004"/>
+  <testcase name="limiterStopsPeaks" classname="it.fabriziodavi.vivovideo.engine.MixerTest" time="0.019"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

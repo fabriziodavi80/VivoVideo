@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.engine.WhisperAudioTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-30T10:53:33.629Z" hostname="runnervmnwato" time="0.01">
+  <properties/>
+  <testcase name="quietPhoneSpeechIsRaised" classname="it.fabriziodavi.vivovideo.engine.WhisperAudioTest" time="0.004"/>
+  <testcase name="peaksAndSilenceAreSafe" classname="it.fabriziodavi.vivovideo.engine.WhisperAudioTest" time="0.005"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

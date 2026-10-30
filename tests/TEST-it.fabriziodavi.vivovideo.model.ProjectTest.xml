@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.model.ProjectTest" tests="19" skipped="0" failures="0" errors="0" timestamp="2026-10-30T10:53:35.012Z" hostname="runnervmnwato" time="0.008">
+  <properties/>
+  <testcase name="constantSpeedDurations" classname="it.fabriziodavi.vivovideo.model.ProjectTest" time="0.001"/>
+  <testcase name="splitConstantClip" classname="it.fabriziodavi.vivovideo.model.ProjectTest" time="0.0"/>
+  <testcase name="transitionHalfIsClamped" classname="it.fabriziodavi.vivovideo.model.ProjectTest" time="0.002"/>
+  <testcase name="musicLanesAndGain" classname="it.fabriziodavi.vivovideo.model.ProjectTest" time="0.0"/>
+  <testcase name="locate" classname="it.fabriziodavi.vivovideo.model.ProjectTest" time="0.0"/>
+  <testcase name="speedPointAtPlayhead" classname="it.fabriziodavi.vivovideo.model.ProjectTest" time="0.001"/>
+  <testcase name="slideshowOnBeats" classname="it.fabriziodavi.vivovideo.model.ProjectTest" time="0.001"/>
+  <testcase name="manualBeats" classname="it.fabriziodavi.vivovideo.model.ProjectTest" time="0.0"/>
+  <testcase name="alignCutsLandOnBeats" classname="it.fabriziodavi.vivovideo.model.ProjectTest" time="0.0"/>
+  <testcase name="valleyDurationIsLonger" classname="it.fabriziodavi.vivovideo.model.ProjectTest" time="0.0"/>
+  <testcase name="keyframeSetSnapsAndSorts" classname="it.fabriziodavi.vivovideo.model.ProjectTest" time="0.001"/>
+  <testcase name="splitCurveKeepsTotalDurationClose" classname="it.fabriziodavi.vivovideo.model.ProjectTest" time="0.0"/>
+  <testcase name="splitKeepsKeyframeValues" classname="it.fabriziodavi.vivovideo.model.ProjectTest" time="0.0"/>
+  <testcase name="jsonRoundTrip" classname="it.fabriziodavi.vivovideo.model.ProjectTest" time="0.001"/>
+  <testcase name="keyframeInterpolation" classname="it.fabriziodavi.vivovideo.model.ProjectTest" time="0.0"/>
+  <testcase name="curvePassesThroughPointsWithoutOvershoot" classname="it.fabriziodavi.vivovideo.model.ProjectTest" time="0.001"/>
+  <testcase name="inverseMapping" classname="it.fabriziodavi.vivovideo.model.ProjectTest" time="0.0"/>
+  <testcase name="moveAndRemove" classname="it.fabriziodavi.vivovideo.model.ProjectTest" time="0.0"/>
+  <testcase name="crossfadeUsesHandles" classname="it.fabriziodavi.vivovideo.model.ProjectTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.model.HesitationsTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-30T10:53:34.228Z" hostname="runnervmnwato" time="0.652">
+  <properties/>
+  <testcase name="realWordsAreNotCut" classname="it.fabriziodavi.vivovideo.model.HesitationsTest" time="0.429"/>
+  <testcase name="worksOnAMuffledPhoneRecordingWithHum" classname="it.fabriziodavi.vivovideo.model.HesitationsTest" time="0.043"/>
+  <testcase name="ehmGluedToAWordTakesOnlyTheHeldSound" classname="it.fabriziodavi.vivovideo.model.HesitationsTest" time="0.022"/>
+  <testcase name="whisperTimesAreCorrectedFromTheSound" classname="it.fabriziodavi.vivovideo.model.HesitationsTest" time="0.023"/>
+  <testcase name="hesitationSoundsAreFound" classname="it.fabriziodavi.vivovideo.model.HesitationsTest" time="0.092"/>
+  <testcase name="planListsFillersToReviewAndToggle" classname="it.fabriziodavi.vivovideo.model.HesitationsTest" time="0.043"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

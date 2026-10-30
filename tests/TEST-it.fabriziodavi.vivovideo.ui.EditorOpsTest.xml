@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.ui.EditorOpsTest" tests="19" skipped="0" failures="0" errors="0" timestamp="2026-10-30T10:53:35.128Z" hostname="runnervmnwato" time="4.374">
+  <properties/>
+  <testcase name="multiSelectPasteAndDelete" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.393"/>
+  <testcase name="aFileThatDisappearsWhileOpenIsReportedOnReturn" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="3.09"/>
+  <testcase name="detachAudioMakesADialogLaneAndDucking" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.097"/>
+  <testcase name="tapToTheBeatAlsoCutsTheClipsOnPause" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.057"/>
+  <testcase name="restoreOriginalsAndUndo" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.048"/>
+  <testcase name="framingAppliesToAll" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.032"/>
+  <testcase name="alignCutsAndSlideshow" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.034"/>
+  <testcase name="transitionsToAllCutsAndEffectsToAllClips" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.041"/>
+  <testcase name="undoRedoRestoreEveryChange" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.035"/>
+  <testcase name="formatPresetsApplyToEveryClip" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.027"/>
+  <testcase name="selectionsAreExclusive" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.02"/>
+  <testcase name="anotherProposalRebuildsAndUndoGoesBack" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.26"/>
+  <testcase name="layerPosesStartAndEnd" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.021"/>
+  <testcase name="fadesOnVideoEndsAndToAll" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.026"/>
+  <testcase name="photoDurationAndMotion" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.021"/>
+  <testcase name="musicSplitBeatsAndSnap" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.037"/>
+  <testcase name="splitDuplicateMoveDelete" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.057"/>
+  <testcase name="textEditingPresetsAndMotion" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.037"/>
+  <testcase name="shuffleAgainKeepsASingleUndo" classname="it.fabriziodavi.vivovideo.ui.EditorOpsTest" time="0.04"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

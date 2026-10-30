@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.ui.ScreenshotTest" tests="23" skipped="0" failures="0" errors="0" timestamp="2026-10-30T10:53:43.870Z" hostname="runnervmnwato" time="9.614">
+  <properties/>
+  <testcase name="editorTextPanel" classname="it.fabriziodavi.vivovideo.ui.ScreenshotTest" time="4.239"/>
+  <testcase name="colorGrading" classname="it.fabriziodavi.vivovideo.ui.ScreenshotTest" time="0.363"/>
+  <testcase name="editorEffectsPanel" classname="it.fabriziodavi.vivovideo.ui.ScreenshotTest" time="0.353"/>
+  <testcase name="editorTransitionPanel" classname="it.fabriziodavi.vivovideo.ui.ScreenshotTest" time="0.31"/>
+  <testcase name="jumpCut" classname="it.fabriziodavi.vivovideo.ui.ScreenshotTest" time="0.246"/>
+  <testcase name="editorMusicPanel" classname="it.fabriziodavi.vivovideo.ui.ScreenshotTest" time="0.356"/>
+  <testcase name="albumPicker" classname="it.fabriziodavi.vivovideo.ui.ScreenshotTest" time="0.164"/>
+  <testcase name="editorPhotoPanel" classname="it.fabriziodavi.vivovideo.ui.ScreenshotTest" time="0.186"/>
+  <testcase name="editorExportPanel" classname="it.fabriziodavi.vivovideo.ui.ScreenshotTest" time="0.19"/>
+  <testcase name="editorLandscapeTools" classname="it.fabriziodavi.vivovideo.ui.ScreenshotTest" time="0.188"/>
+  <testcase name="editorLayerPanel" classname="it.fabriziodavi.vivovideo.ui.ScreenshotTest" time="0.31"/>
+  <testcase name="editorKeyframePanel" classname="it.fabriziodavi.vivovideo.ui.ScreenshotTest" time="0.261"/>
+  <testcase name="home" classname="it.fabriziodavi.vivovideo.ui.ScreenshotTest" time="0.201"/>
+  <testcase name="guide" classname="it.fabriziodavi.vivovideo.ui.ScreenshotTest" time="0.233"/>
+  <testcase name="editorPortrait" classname="it.fabriziodavi.vivovideo.ui.ScreenshotTest" time="0.192"/>
+  <testcase name="editorSpeedPanel" classname="it.fabriziodavi.vivovideo.ui.ScreenshotTest" time="0.205"/>
+  <testcase name="interview" classname="it.fabriziodavi.vivovideo.ui.ScreenshotTest" time="0.281"/>
+  <testcase name="editorLandscape" classname="it.fabriziodavi.vivovideo.ui.ScreenshotTest" time="0.196"/>
+  <testcase name="editorMusicRhythmTab" classname="it.fabriziodavi.vivovideo.ui.ScreenshotTest" time="0.262"/>
+  <testcase name="editorEditRow" classname="it.fabriziodavi.vivovideo.ui.ScreenshotTest" time="0.301"/>
+  <testcase name="autoVideo" classname="it.fabriziodavi.vivovideo.ui.ScreenshotTest" time="0.167"/>
+  <testcase name="autoProposalBar" classname="it.fabriziodavi.vivovideo.ui.ScreenshotTest" time="0.165"/>
+  <testcase name="musicLibrary" classname="it.fabriziodavi.vivovideo.ui.ScreenshotTest" time="0.242"/>
+  <system-out><![CDATA[Roborazzi: It seems that there are multiple windows.We capture all windows using captureScreenRoboImage(). We can add a flag to disable this behavior so please let us know if you need it.
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
