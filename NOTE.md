@@ -1,6 +1,6 @@
 # VivoVideo · note per riprendere il lavoro
 
-Aggiornate al 29/10/2026, ultima versione **v1.0.224** (build 224). La 1.0 è la v1.0.201; dalla 202 ci sono i jump cut. Da leggere insieme a `CLAUDE.md`.
+Aggiornate al 29/10/2026, ultima versione **v1.0.225** (build 225). La 1.0 è la v1.0.201; dalla 202 ci sono i jump cut. Da leggere insieme a `CLAUDE.md`.
 
 ## 1. Stato attuale dell'app
 
@@ -111,13 +111,13 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, ML Kit, whisper.cpp e Sign
 
 ### Subito
 1. Da verificare: esportazione **HDR** con testi/sottotitoli (v1.0.205+): la riga Colore deve dire HDR, e i sottotitoli non devono essere troppo scuri o abbaglianti.
-2. Da provare: **Rimescola clip** (`str_shuffle`). `prog_originals` OK dall'utente il 30/10. Prossimo in lista: **Intervista doppia**.
+2. Collaudo: tutto OK al 30/10 tranne la nuova `int_double` (Intervista doppia, v1.0.225) da provare. Prossimo in lista: **Riconoscitore di ehm**.
 
 ### Dopo la 1.0, in quest'ordine
 1. ~~Jump cut pronti~~: fatti nella v1.0.202 (vedi sopra). Da migliorare se serve: micro-dissolvenze anche in anteprima (ora solo nell'esportato), "frasi importanti" con il testo di Whisper invece del solo volume.
 2. ~~Rimescola clip~~ fatto nella v1.0.207 (`model/Shuffle.kt`, `vm.shuffleClips`, `canShuffleAgain`: "Rimescola ancora" riparte da `shuffleBase` senza nuovo passo di Annulla). Spec originale (24/10/2026): da Altro / Seleziona più clip. Se le clip sono tagliate a ritmo si rimescola il contenuto tenendo le durate (i tagli restano sul battito); niente due pezzi dello stesso video vicini; "Rimescola ancora"; un solo Annulla.
 3. ~~Transizioni dal video dell'utente~~: fatte nella v1.0.208 (all'utente "sono piaciute tutte"): WIPE, WIPE_DIAG, CLOCK, STEPS, OVERLAY, MASK_PASS a due clip (`TransitionType.composite`, `Project.crossfades()` con `type`, `TransitionMaskEffect` con ruoli MAIN/NEXT/PREV, compositore alpha piena per i non-incrociata), INVISIBLE su una clip. MASK_PASS: solo con `person` sulla clip prima, tutto dopo il taglio (before = 0). Spec originale: **Transizioni dal video dell'utente** (https://youtube.com/watch?v=0putmJCyM1I, "12 Essential Transitions…", DaVinci Resolve): fade, dissolve, iris, wipe, invisible cut, speed ramp, steps, mask passing, whip pan, luma fade, overlay, preset. Già presenti in parte (dissolvenza, iris, luma, whip, speed ramp); da fare invisible cut, mask passing (con lo scontorno), steps, wipe moderni, overlay. Chiedere all'utente quali gli sono piaciute.
-4. **Intervista doppia** (25/10/2026, stile Le Iene): due video con le stesse domande; per ogni domanda formato **alternato** (cartello con la domanda, poi A, poi B) o **schermo diviso** (A e B affiancati o sopra/sotto). Risposte trovate dai sottotitoli automatici, cartelli in stile TV, nome e didascalia, una voce alla volta. Schermo diviso preparato in anticipo per l'anteprima.
+4. ~~Intervista doppia~~: fatta nella v1.0.225 (`model/Interview.kt`, `InterviewScreen`, Home). Domande = frasi con "?" (≥3 parole) del video A (o B) o scritte; `find` cerca in ordine, la domanda finisce al suo "?"; risposta fino alla domanda dopo. Alternata: cartello (foto nera + MINIMAL/PULITO), A, B con ETICHETTA+DIDASCALIA. Schermo diviso: foto nera per il tratto, video A/B come livelli video in successione nelle due metà (`Interview.half`), chi ascolta = fotogramma fermo (MediaMetadataRetriever) con opacità 0,45. Spec originale: **Intervista doppia** (25/10/2026, stile Le Iene): due video con le stesse domande; per ogni domanda formato **alternato** (cartello con la domanda, poi A, poi B) o **schermo diviso** (A e B affiancati o sopra/sotto). Risposte trovate dai sottotitoli automatici, cartelli in stile TV, nome e didascalia, una voce alla volta. Schermo diviso preparato in anticipo per l'anteprima.
 5. **Riconoscitore di ehm** (scelta dell'utente del 25/10/2026): piccolo modello dedicato (classificatore su spettrogramma mel, addestrato fuori dal telefono su un dataset pubblico di filler come PodcastFillers più esempi italiani), al posto o accanto alle regole di `Hesitations.kt`; ehm attaccati alle parole; anteprima del risultato nel lettore. Taratura attuale fatta su una ripresa vera (voce ~90 Hz, microfono ovattato sotto 1,2 kHz, ronzio a 480 Hz).
 6. **Scontorno**: bordi e capelli (pennello di ritocco con propagazione, filtro guidato a colori, modello di matting più pesante).
 7. **Stabilizzazione**: correzione rolling shutter, zoom variabile nel tempo, omografia.
