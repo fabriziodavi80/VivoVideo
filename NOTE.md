@@ -1,6 +1,6 @@
 # VivoVideo · note per riprendere il lavoro
 
-Aggiornate al 29/10/2026, ultima versione **v1.0.222** (build 222). La 1.0 è la v1.0.201; dalla 202 ci sono i jump cut. Da leggere insieme a `CLAUDE.md`.
+Aggiornate al 29/10/2026, ultima versione **v1.0.224** (build 224). La 1.0 è la v1.0.201; dalla 202 ci sono i jump cut. Da leggere insieme a `CLAUDE.md`.
 
 ## 1. Stato attuale dell'app
 
@@ -86,7 +86,7 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, ML Kit, whisper.cpp e Sign
 
 ### Vincoli tecnici
 - Media3: due pezzi **uno dopo l'altro nella stessa sequenza secondaria** del compositore → il secondo esce ~2 fotogrammi avanti (misurato con `DeviceTest.transitionsAreSmoothInExport`, 60 fps). Per questo le transizioni a due clip usano **due righe** (teste NEXT e code PREV, ingressi `lanes.size+1` e `+2`), ognuna con una pausa prima di ogni pezzo. Corretto nella v1.0.216 (utente: "lampi o scatti, esitazioni"; i lampi voluti restano, approvato dall'utente).
-- Aperto (29/10 sera): **Passaggio con maschera = taglio netto nel video esportato sul telefono** (in anteprima ok). Sull'emulatore funziona sia da solo (`maskPassInExport`) sia in un progetto come quello del collaudo (`maskPassAmongOtherTransitionsInExport`). Dalla v1.0.222 il diario all'esportazione scrive per ogni transizione a due clip se è fatta e, per la maschera, copertura delle maschere, misure, HDR e velocità della clip: aspettare il rapporto dell'utente. Sospetti: video HDR del telefono (sull'emulatore SDR), maschere vere che non coprono la coda.
+- Passaggio con maschera = taglio netto nell'esportato (29–30/10): il diario della v1.0.222 ha mostrato transizione preparata e scontorno che copre, ma 945 maschere "precise" (≈140 MB) su clip HLG di 62 s. `PersonMasks.load` copiava tutto il file in memoria per ogni `PersonEffect` (≥3 in esportazione) e su errore restituiva null in silenzio → probabile memoria esaurita. v1.0.223: memory map (`Masks` su `ByteBuffer` mappato) ed errore nel diario. Da confermare dall'utente; se resta KO cercare nel diario "Scontorno non leggibile".
 - Emulatore: `app/src/androidTest/solo.txt` con `Classe#metodo` fa girare una prova sola (misure in ~10 minuti); toglierlo dopo.
 - Media3 e HDR: sui video HDR `OverlayShaderProgram` accetta solo `TextOverlay` (un `BitmapOverlay` semplice è trattato come Ultra HDR e vuole la gainmap → IllegalArgumentException, esportazione HDR ripiegata in SDR). Per questo `TimedTextOverlay` e `LayerOverlay` estendono `TextOverlay` (getText inutilizzato, l'immagine la dà getBitmap). Sistemato nella v1.0.205.
 - Whisper: `transcribe(..., prompt, beam)`: sottotitoli con beam 5 e senza prompt; ehm con `FILLER_PROMPT` e beam 1. Audio sempre `normalized` (–20 dBFS, max ×20). Modelli: Veloce (base), Preciso (small), **Massima precisione** (medium q5_0, 539 MB); `Whisper.defaultModel` propone il più preciso scaricato.
