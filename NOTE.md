@@ -8,7 +8,7 @@ App Android nativa di montaggio video in stile CapCut, pensata per il vivo X300 
 Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, ML Kit, whisper.cpp e Signalsmith (JNI), minSdk 33, solo arm64-v8a in release.
 
 ### Collaudo
-- Collaudo guidato (Progetto → Collaudo, `model/TestPlan.kt`, **41 prove**): 39 OK al 29/10/2026; `str_trans_new` KO con la 1.0.211 ("non mi piacciono, per alcune non vedo l'effetto": clip intere senza video oltre il taglio → corretto nella 1.0.212 con `makeRoomForTransition`, durate di serie più lunghe, filo di luce sulle tendine) da rifare; da fare `prog_originals` (`aud_jump` accettata dall'utente con la v1.0.206, "qualcosina da migliorare sul riconoscimento vocale e sottotitoli"; nel rapporto risultava ancora KO, da segnare OK sul telefono).
+- Collaudo guidato (Progetto → Collaudo, `model/TestPlan.kt`, **41 prove**): 39 OK al 29/10/2026; `str_trans_new` funzionante dal 30/10 (v1.0.224, dopo spazio automatico, durate, due righe senza scatti e maschere in memory map); da fare `prog_originals` (`aud_jump` accettata dall'utente con la v1.0.206, "qualcosina da migliorare sul riconoscimento vocale e sottotitoli"; nel rapporto risultava ancora KO, da segnare OK sul telefono).
   L'ultima ("Progetto lungo": 15:57, 368 clip, esportato in 6 minuti, 1,9 GB) segnata OK. Dopo "Dividi i video sui battiti" su tutti i brani, dissolvenze dei brani in anteprima e tratti di anteprima dei progetti lunghi: provati poco dall'utente, risultato "comunque accettabile".
 - Accettate con riserva (da migliorare dopo la 1.0): **riconoscimento vocale e sottotitoli** (29/10, dopo beam e normalizzazione ancora qualche parola sbagliata: idee → correzione rapida delle parole dalla lista, parole/nomi propri suggeriti al modello, provare Massima precisione e confrontare), taglio degli **ehm** (29/10: "le pause vengono riconosciute ma gli ehm necessitano ancora di migliorie"), **scontorno** (bordi e capelli), **stabilizzazione** ("non sensazionale").
 - Il rapporto "Segnala un problema" (diario, esiti, telefono, impostazioni; niente video né chiavi) l'utente lo incolla in chat: è la fonte delle correzioni.
@@ -86,7 +86,7 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, ML Kit, whisper.cpp e Sign
 
 ### Vincoli tecnici
 - Media3: due pezzi **uno dopo l'altro nella stessa sequenza secondaria** del compositore → il secondo esce ~2 fotogrammi avanti (misurato con `DeviceTest.transitionsAreSmoothInExport`, 60 fps). Per questo le transizioni a due clip usano **due righe** (teste NEXT e code PREV, ingressi `lanes.size+1` e `+2`), ognuna con una pausa prima di ogni pezzo. Corretto nella v1.0.216 (utente: "lampi o scatti, esitazioni"; i lampi voluti restano, approvato dall'utente).
-- Passaggio con maschera = taglio netto nell'esportato (29–30/10): il diario della v1.0.222 ha mostrato transizione preparata e scontorno che copre, ma 945 maschere "precise" (≈140 MB) su clip HLG di 62 s. `PersonMasks.load` copiava tutto il file in memoria per ogni `PersonEffect` (≥3 in esportazione) e su errore restituiva null in silenzio → probabile memoria esaurita. v1.0.223: memory map (`Masks` su `ByteBuffer` mappato) ed errore nel diario. Da confermare dall'utente; se resta KO cercare nel diario "Scontorno non leggibile".
+- Passaggio con maschera nell'esportato: risolto nella v1.0.223 (maschere in memory map, prima ≈140 MB copiati per ogni PersonEffect → memoria esaurita e scontorno saltato in silenzio). Confermato dall'utente il 30/10.
 - Emulatore: `app/src/androidTest/solo.txt` con `Classe#metodo` fa girare una prova sola (misure in ~10 minuti); toglierlo dopo.
 - Media3 e HDR: sui video HDR `OverlayShaderProgram` accetta solo `TextOverlay` (un `BitmapOverlay` semplice è trattato come Ultra HDR e vuole la gainmap → IllegalArgumentException, esportazione HDR ripiegata in SDR). Per questo `TimedTextOverlay` e `LayerOverlay` estendono `TextOverlay` (getText inutilizzato, l'immagine la dà getBitmap). Sistemato nella v1.0.205.
 - Whisper: `transcribe(..., prompt, beam)`: sottotitoli con beam 5 e senza prompt; ehm con `FILLER_PROMPT` e beam 1. Audio sempre `normalized` (–20 dBFS, max ×20). Modelli: Veloce (base), Preciso (small), **Massima precisione** (medium q5_0, 539 MB); `Whisper.defaultModel` propone il più preciso scaricato.
@@ -111,7 +111,7 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, ML Kit, whisper.cpp e Sign
 
 ### Subito
 1. Da verificare: esportazione **HDR** con testi/sottotitoli (v1.0.205+): la riga Colore deve dire HDR, e i sottotitoli non devono essere troppo scuri o abbaglianti.
-2. L'utente prova **Rimescola clip** (`str_shuffle`) e le **transizioni nuove** (`str_trans_new`). Prossimo in lista: **Intervista doppia**.
+2. Da provare: **Rimescola clip** (`str_shuffle`) e **Torna ai video originali** (`prog_originals`). Prossimo in lista: **Intervista doppia**.
 
 ### Dopo la 1.0, in quest'ordine
 1. ~~Jump cut pronti~~: fatti nella v1.0.202 (vedi sopra). Da migliorare se serve: micro-dissolvenze anche in anteprima (ora solo nell'esportato), "frasi importanti" con il testo di Whisper invece del solo volume.
