@@ -111,7 +111,7 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, ML Kit, whisper.cpp e Sign
 
 ### Subito
 1. Da verificare: esportazione **HDR** con testi/sottotitoli (v1.0.205+): la riga Colore deve dire HDR, e i sottotitoli non devono essere troppo scuri o abbaglianti.
-2. Da provare: **Rimescola clip** (`str_shuffle`) e **Torna ai video originali** (`prog_originals`). Prossimo in lista: **Intervista doppia**.
+2. Da provare: **Rimescola clip** (`str_shuffle`). `prog_originals` OK dall'utente il 30/10. Prossimo in lista: **Intervista doppia**.
 
 ### Dopo la 1.0, in quest'ordine
 1. ~~Jump cut pronti~~: fatti nella v1.0.202 (vedi sopra). Da migliorare se serve: micro-dissolvenze anche in anteprima (ora solo nell'esportato), "frasi importanti" con il testo di Whisper invece del solo volume.
