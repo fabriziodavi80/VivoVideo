@@ -1,0 +1,22 @@
+10-30 11:23:38.808  4570 11004 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+10-30 11:23:38.809  4570 11004 E EGL_emulation: tid 11004: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+10-30 11:23:38.832  4570 11006 W ColorUtils: expected specified color aspects (0:0:0:0)
+10-30 11:23:38.837  4570 11006 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:23:38.837  4570 11006 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:23:38.838   474  3535 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:23:39.147   480 11008 E C2SoftAvcEnc: Unable to set air params = 0x1ad
+10-30 11:23:43.200  4570 11004 E Surface : freeAllBuffers: 1 buffers were freed while being dequeued!
+10-30 11:23:43.202  4570 11004 W GraphicBufferSource: released unpopulated slots: [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63]
+10-30 11:23:43.202  4570 11004 E Surface : getSlotFromBufferLocked: unknown buffer: 0x0
+10-30 11:23:43.208  4570 11005 W MediaCodec: no metrics handle found
+10-30 11:23:43.237  4570 11203 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:23:43.240  4570 11203 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:23:43.240  4570 11203 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:23:43.240  4570 11203 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:23:43.241  4570 11203 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:23:43.241  4570 11203 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:23:43.241  4570 11203 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:23:43.242  4570 11203 W Codec2Client: query -- param skipped: index = 2684356609.
+10-30 11:23:43.243   474  3635 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:23:44.234  4570 11205 W StreamingFormatChecker: ML Kit has detected that you seem to pass camera frames to the detector as a Bitmap object. This is inefficient. Please use YUV_420_888 format for camera2 API or NV21 format for (legacy) camera API and directly pass down the byte array to ML Kit.
+10-30 11:23:45.302  4570 11202 W MediaCodec: no metrics handle found

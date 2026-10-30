@@ -1,0 +1,7 @@
+10-30 11:49:42.064   397   413 W ServiceManagerCppClient: Permission failure: android.permission.CALL_AUDIO_INTERCEPTION from uid=10192 pid=4570
+10-30 11:49:42.068   846   846 W PageIndicator: Total number of pages invalid: 0. Assuming 1 page.
+10-30 11:49:42.090   341   359 E android.hardware.audio@7.1-impl.ranchu: updateSinkMetadata:364 failure: Result::NOT_SUPPORTED
+10-30 11:49:43.601   341   359 E android.hardware.audio@7.1-impl.ranchu: updateSinkMetadata:364 failure: Result::NOT_SUPPORTED
+10-30 11:49:43.826  4570 13956 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:49:43.826  4570 13956 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:49:43.826  4570 13956 W Codec2Client: query -- param skipped: index = 2415921170.

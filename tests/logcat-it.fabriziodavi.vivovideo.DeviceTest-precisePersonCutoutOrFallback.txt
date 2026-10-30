@@ -1,0 +1,66 @@
+10-30 11:26:09.267  4570  8392 W LibraryVersion: Failed to get app version for libraryName: subject-segmentation
+10-30 11:26:09.301  4570  4570 E MobileVisionBase: Error preloading model resource
+10-30 11:26:09.301  4570  4570 E MobileVisionBase: com.google.mlkit.common.MlKitException: Waiting for the subject segmentation optional module to be downloaded. Please wait.
+10-30 11:26:09.301  4570  4570 E MobileVisionBase: 	at com.google.mlkit.vision.segmentation.subject.internal.zzj.load(com.google.android.gms:play-services-mlkit-subject-segmentation@@16.0.0-beta1:5)
+10-30 11:26:09.301  4570  4570 E MobileVisionBase: 	at com.google.mlkit.common.sdkinternal.ModelResource.zza(com.google.mlkit:common@@18.11.0:4)
+10-30 11:26:09.301  4570  4570 E MobileVisionBase: 	at com.google.mlkit.common.sdkinternal.zzn.run(Unknown Source:10)
+10-30 11:26:09.301  4570  4570 E MobileVisionBase: 	at com.google.mlkit.common.sdkinternal.zzt.run(com.google.mlkit:common@@18.11.0:2)
+10-30 11:26:09.301  4570  4570 E MobileVisionBase: 	at com.google.mlkit.common.sdkinternal.MlKitThreadPool.zze(com.google.mlkit:common@@18.11.0:4)
+10-30 11:26:09.301  4570  4570 E MobileVisionBase: 	at com.google.mlkit.common.sdkinternal.MlKitThreadPool.zzc(com.google.mlkit:common@@18.11.0:1)
+10-30 11:26:09.301  4570  4570 E MobileVisionBase: 	at com.google.mlkit.common.sdkinternal.zzi.run(Unknown Source:2)
+10-30 11:26:09.301  4570  4570 E MobileVisionBase: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+10-30 11:26:09.301  4570  4570 E MobileVisionBase: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+10-30 11:26:09.301  4570  4570 E MobileVisionBase: 	at com.google.mlkit.common.sdkinternal.MlKitThreadPool.zzd(com.google.mlkit:common@@18.11.0:2)
+10-30 11:26:09.301  4570  4570 E MobileVisionBase: 	at com.google.mlkit.common.sdkinternal.zzk.run(Unknown Source:2)
+10-30 11:26:09.301  4570  4570 E MobileVisionBase: 	at java.lang.Thread.run(Thread.java:1012)
+10-30 11:27:00.021   846   846 W PageIndicator: Total number of pages invalid: 0. Assuming 1 page.
+10-30 11:27:09.380  6358 11304 E WakeLock: GCM_HB_ALARM release without a matched acquire!
+10-30 11:28:00.050   846   846 W PageIndicator: Total number of pages invalid: 0. Assuming 1 page.
+10-30 11:28:09.381  6358 10682 W GCM     : Heartbeat timeout, GCM connection reset -2
+10-30 11:28:09.384  6358 10682 E WakeLock: GCM_HB_ALARM release without a matched acquire!
+10-30 11:28:09.384  6358 10682 W WakeLock: GCM_HB_ALARM counter does not exist
+10-30 11:28:09.499  6358 11539 E WakeLock: GCM_CONN_ALARM release without a matched acquire!
+10-30 11:29:00.050   846   846 W PageIndicator: Total number of pages invalid: 0. Assuming 1 page.
+10-30 11:29:09.625  4570 11550 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:29:09.630  4570 11550 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:29:09.630  4570 11550 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:29:09.630  4570 11550 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:29:09.631  4570 11550 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:29:09.632  4570 11550 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:29:09.632  4570 11550 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:29:09.632  4570 11550 W Codec2Client: query -- param skipped: index = 2684356609.
+10-30 11:29:09.634   474  3635 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:29:11.002  4570 11549 W MediaCodec: no metrics handle found
+10-30 11:29:11.039  4570 11554 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:29:11.039  4570 11554 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:29:11.045  4570 11554 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:29:11.045  4570 11554 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:29:11.045  4570 11554 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:29:11.128  4570 11554 W MediaCodec: no metrics handle found
+10-30 11:29:11.632  4570 11563 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+10-30 11:29:11.632  4570 11563 E EGL_emulation: tid 11563: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+10-30 11:29:11.655  4570 11565 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:29:11.657  4570 11565 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:29:11.657  4570 11565 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:29:11.658  4570 11565 W Codec2Client: query -- param skipped: index = 3254792206.
+10-30 11:29:11.659  4570 11565 W Codec2Client: query -- param skipped: index = 3254792194.
+10-30 11:29:11.663  4570 11566 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:29:11.674  4570 11566 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:29:11.675  4570 11566 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:29:11.678  4570 11566 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:29:11.679  4570 11566 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:29:11.679  4570 11566 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:29:11.680  4570 11566 W Codec2Client: query -- param skipped: index = 2684356609.
+10-30 11:29:11.687   474  7643 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:29:12.404  4570 11570 W ColorUtils: expected specified color aspects (0:0:0:0)
+10-30 11:29:12.457  4570 11570 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:29:12.457  4570 11570 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:29:12.458   474  7643 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:29:16.688   348 11568 W C2BqBuffer: last successful dequeue was 67105 us ago, 6 consecutive failures
+10-30 11:29:20.282  4570 11563 E Surface : freeAllBuffers: 1 buffers were freed while being dequeued!
+10-30 11:29:20.283  4570 11563 W GraphicBufferSource: released unpopulated slots: [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63]
+10-30 11:29:20.283  4570 11563 E Surface : getSlotFromBufferLocked: unknown buffer: 0x0
+10-30 11:29:20.290  4570 11565 W MediaCodec: no metrics handle found
+10-30 11:29:20.300  4570 11564 W MediaCodec: no metrics handle found
+10-30 11:29:20.304  4570 11569 W MediaCodec: no metrics handle found
+10-30 11:29:20.322  1784  1856 W MediaProvider: isAppCloneUserPair for user 0: false

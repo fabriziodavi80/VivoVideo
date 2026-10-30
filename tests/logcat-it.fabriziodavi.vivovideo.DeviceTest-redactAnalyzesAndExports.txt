@@ -1,0 +1,115 @@
+10-30 11:30:15.251  4570 11921 W MLKit RemoteConfigRestC: Cached remote config was null!
+10-30 11:30:15.273  4570 11924 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:30:15.277  4570 11924 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:30:15.277  4570 11924 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:30:15.277  4570 11924 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:30:15.280  4570 11924 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:30:15.280  4570 11924 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:30:15.280  4570 11924 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:30:15.280  4570 11924 W Codec2Client: query -- param skipped: index = 2684356609.
+10-30 11:30:15.283   474   889 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:30:15.354  4570 11919 W ServerFlag: Failed to parse result of GetServerConfigurableFlag, errno=34
+10-30 11:30:15.356  4570 11922 W odavi.vivovideo: Accessing hidden method Lcom/android/org/conscrypt/ConscryptEngineSocket;->setUseSessionTickets(Z)V (max-target-q,core-platform-api, reflection, denied)
+10-30 11:30:15.356  4570 11922 W odavi.vivovideo: Accessing hidden method Lcom/android/org/conscrypt/OpenSSLSocketImpl;->setUseSessionTickets(Z)V (max-target-q,core-platform-api, reflection, denied)
+10-30 11:30:15.357  4570 11922 W odavi.vivovideo: Accessing hidden method Lcom/android/org/conscrypt/AbstractConscryptSocket;->setUseSessionTickets(Z)V (max-target-q, reflection, denied)
+10-30 11:30:15.358  4570 11922 W odavi.vivovideo: Accessing hidden method Lcom/android/org/conscrypt/ConscryptEngineSocket;->setHostname(Ljava/lang/String;)V (max-target-q,core-platform-api, reflection, denied)
+10-30 11:30:15.358  4570 11922 W odavi.vivovideo: Accessing hidden method Lcom/android/org/conscrypt/OpenSSLSocketImpl;->setHostname(Ljava/lang/String;)V (max-target-q,core-platform-api, reflection, denied)
+10-30 11:30:15.358  4570 11922 W odavi.vivovideo: Accessing hidden method Lcom/android/org/conscrypt/AbstractConscryptSocket;->setHostname(Ljava/lang/String;)V (max-target-q, reflection, denied)
+10-30 11:30:15.358  4570 11922 W odavi.vivovideo: Accessing hidden method Lcom/android/org/conscrypt/OpenSSLSocketImpl;->setAlpnProtocols([B)V (max-target-q,core-platform-api, reflection, denied)
+10-30 11:30:15.358  4570 11922 W odavi.vivovideo: Accessing hidden method Lcom/android/org/conscrypt/AbstractConscryptSocket;->setAlpnProtocols([B)V (max-target-q, reflection, denied)
+10-30 11:30:15.376  4570 11919 E native  : E0000 00:00:1793359815.376513   11919 proto_data_store.cc:36] Could not open file /data/user/0/it.fabriziodavi.vivovideo/files/com.google.mlkit.acceleration/com.google.perception.acceleration_analytics_storage_v2.: No such file or directory
+10-30 11:30:15.391  4570 11934 W native  : W0000 00:00:1793359815.391167   11934 motion_analysis_calculator.cc:387] No input video header found. Downstream calculators expecting video headers are likely to fail.
+10-30 11:30:15.455  4570  8392 W LibraryVersion: Failed to get app version for libraryName: shared-installation-id
+10-30 11:30:15.456  4570  8392 W LibraryVersion: Failed to get app version for libraryName: shared-remote-config
+10-30 11:30:15.469  4570  8392 W LibraryVersion: Failed to get app version for libraryName: shared-acceleration-allowlist
+10-30 11:30:15.899  4570 11922 W odavi.vivovideo: Accessing hidden method Lcom/android/org/conscrypt/OpenSSLSocketImpl;->getAlpnSelectedProtocol()[B (max-target-q,core-platform-api, reflection, denied)
+10-30 11:30:15.899  4570 11922 W odavi.vivovideo: Accessing hidden method Lcom/android/org/conscrypt/AbstractConscryptSocket;->getAlpnSelectedProtocol()[B (max-target-q, reflection, denied)
+10-30 11:30:16.134  4570 11922 W System  : Ignoring header If-None-Match because its value was null.
+10-30 11:30:18.422  4570 11935 W native  : W0000 00:00:1793359818.422042   11935 motion_analysis_calculator.cc:830] Requested image format in RegionFlowComputation does not match video stream format. Overriding.
+10-30 11:30:18.426  4570 11935 W native  : W0000 00:00:1793359818.426627   11935 parallel_invoker.h:322] Unsupported invoker mode selected on Android. Falling back to ThreadPool
+10-30 11:30:18.659  4570  4581 W System  : A resource failed to call end.
+10-30 11:30:21.369  4570 11920 W PipelineManager: Pipeline is reset.
+10-30 11:30:21.378  4570 11977 W native  : W0000 00:00:1793359821.378243   11977 motion_analysis_calculator.cc:387] No input video header found. Downstream calculators expecting video headers are likely to fail.
+10-30 11:30:21.386  4570 11980 W native  : W0000 00:00:1793359821.386921   11980 motion_analysis_calculator.cc:830] Requested image format in RegionFlowComputation does not match video stream format. Overriding.
+10-30 11:30:24.390  4570 11919 W PipelineManager: Pipeline is reset.
+10-30 11:30:24.399  4570 11983 W native  : W0000 00:00:1793359824.399121   11983 motion_analysis_calculator.cc:387] No input video header found. Downstream calculators expecting video headers are likely to fail.
+10-30 11:30:24.405  4570 11986 W native  : W0000 00:00:1793359824.405609   11986 motion_analysis_calculator.cc:830] Requested image format in RegionFlowComputation does not match video stream format. Overriding.
+10-30 11:30:27.358  4570 11920 W PipelineManager: Pipeline is reset.
+10-30 11:30:27.368  4570 11989 W native  : W0000 00:00:1793359827.368285   11989 motion_analysis_calculator.cc:387] No input video header found. Downstream calculators expecting video headers are likely to fail.
+10-30 11:30:27.393  4570 11992 W native  : W0000 00:00:1793359827.380198   11992 motion_analysis_calculator.cc:830] Requested image format in RegionFlowComputation does not match video stream format. Overriding.
+10-30 11:30:30.425  4570 11919 W PipelineManager: Pipeline is reset.
+10-30 11:30:30.433  4570 11995 W native  : W0000 00:00:1793359830.433740   11995 motion_analysis_calculator.cc:387] No input video header found. Downstream calculators expecting video headers are likely to fail.
+10-30 11:30:30.440  4570 11998 W native  : W0000 00:00:1793359830.440022   11998 motion_analysis_calculator.cc:830] Requested image format in RegionFlowComputation does not match video stream format. Overriding.
+10-30 11:30:33.566  4570 11920 W PipelineManager: Pipeline is reset.
+10-30 11:30:33.576  4570 12001 W native  : W0000 00:00:1793359833.576159   12001 motion_analysis_calculator.cc:387] No input video header found. Downstream calculators expecting video headers are likely to fail.
+10-30 11:30:33.579  4570 12002 W native  : W0000 00:00:1793359833.579878   12002 motion_analysis_calculator.cc:830] Requested image format in RegionFlowComputation does not match video stream format. Overriding.
+10-30 11:30:36.578  4570 11919 W PipelineManager: Pipeline is reset.
+10-30 11:30:36.585  4570 12007 W native  : W0000 00:00:1793359836.585647   12007 motion_analysis_calculator.cc:387] No input video header found. Downstream calculators expecting video headers are likely to fail.
+10-30 11:30:36.594  4570 12010 W native  : W0000 00:00:1793359836.594737   12010 motion_analysis_calculator.cc:830] Requested image format in RegionFlowComputation does not match video stream format. Overriding.
+10-30 11:30:39.730  4570 11920 W PipelineManager: Pipeline is reset.
+10-30 11:30:39.737  4570 12013 W native  : W0000 00:00:1793359839.737707   12013 motion_analysis_calculator.cc:387] No input video header found. Downstream calculators expecting video headers are likely to fail.
+10-30 11:30:39.743  4570 12016 W native  : W0000 00:00:1793359839.743122   12016 motion_analysis_calculator.cc:830] Requested image format in RegionFlowComputation does not match video stream format. Overriding.
+10-30 11:30:42.765  4570 11919 W PipelineManager: Pipeline is reset.
+10-30 11:30:42.773  4570 12019 W native  : W0000 00:00:1793359842.773635   12019 motion_analysis_calculator.cc:387] No input video header found. Downstream calculators expecting video headers are likely to fail.
+10-30 11:30:42.781  4570 12022 W native  : W0000 00:00:1793359842.781384   12022 motion_analysis_calculator.cc:830] Requested image format in RegionFlowComputation does not match video stream format. Overriding.
+10-30 11:30:45.789  4570 11920 W PipelineManager: Pipeline is reset.
+10-30 11:30:45.798  4570 12027 W native  : W0000 00:00:1793359845.797999   12027 motion_analysis_calculator.cc:387] No input video header found. Downstream calculators expecting video headers are likely to fail.
+10-30 11:30:45.802  4570 12026 W native  : W0000 00:00:1793359845.802826   12026 motion_analysis_calculator.cc:830] Requested image format in RegionFlowComputation does not match video stream format. Overriding.
+10-30 11:30:48.934  4570 11919 W PipelineManager: Pipeline is reset.
+10-30 11:30:48.956  4570 12032 W native  : W0000 00:00:1793359848.956408   12032 motion_analysis_calculator.cc:387] No input video header found. Downstream calculators expecting video headers are likely to fail.
+10-30 11:30:48.958  4570 12034 W native  : W0000 00:00:1793359848.958710   12034 motion_analysis_calculator.cc:830] Requested image format in RegionFlowComputation does not match video stream format. Overriding.
+10-30 11:30:52.075  4570 11920 W PipelineManager: Pipeline is reset.
+10-30 11:30:52.083  4570 12037 W native  : W0000 00:00:1793359852.083808   12037 motion_analysis_calculator.cc:387] No input video header found. Downstream calculators expecting video headers are likely to fail.
+10-30 11:30:52.090  4570 12040 W native  : W0000 00:00:1793359852.090508   12040 motion_analysis_calculator.cc:830] Requested image format in RegionFlowComputation does not match video stream format. Overriding.
+10-30 11:30:55.070  4570 11919 W PipelineManager: Pipeline is reset.
+10-30 11:30:55.078  4570 12043 W native  : W0000 00:00:1793359855.078781   12043 motion_analysis_calculator.cc:387] No input video header found. Downstream calculators expecting video headers are likely to fail.
+10-30 11:30:55.085  4570 12046 W native  : W0000 00:00:1793359855.085370   12046 motion_analysis_calculator.cc:830] Requested image format in RegionFlowComputation does not match video stream format. Overriding.
+10-30 11:30:58.117  4570 11920 W PipelineManager: Pipeline is reset.
+10-30 11:30:58.125  4570 12049 W native  : W0000 00:00:1793359858.125036   12049 motion_analysis_calculator.cc:387] No input video header found. Downstream calculators expecting video headers are likely to fail.
+10-30 11:30:58.131  4570 12052 W native  : W0000 00:00:1793359858.131366   12052 motion_analysis_calculator.cc:830] Requested image format in RegionFlowComputation does not match video stream format. Overriding.
+10-30 11:31:00.055   846   846 W PageIndicator: Total number of pages invalid: 0. Assuming 1 page.
+10-30 11:31:01.198  4570 11919 W PipelineManager: Pipeline is reset.
+10-30 11:31:01.205  4570 12055 W native  : W0000 00:00:1793359861.205660   12055 motion_analysis_calculator.cc:387] No input video header found. Downstream calculators expecting video headers are likely to fail.
+10-30 11:31:01.210  4570 12058 W native  : W0000 00:00:1793359861.210890   12058 motion_analysis_calculator.cc:830] Requested image format in RegionFlowComputation does not match video stream format. Overriding.
+10-30 11:31:04.229  4570 11920 W PipelineManager: Pipeline is reset.
+10-30 11:31:04.236  4570 12061 W native  : W0000 00:00:1793359864.236545   12061 motion_analysis_calculator.cc:387] No input video header found. Downstream calculators expecting video headers are likely to fail.
+10-30 11:31:04.241  4570 12064 W native  : W0000 00:00:1793359864.241968   12064 motion_analysis_calculator.cc:830] Requested image format in RegionFlowComputation does not match video stream format. Overriding.
+10-30 11:31:07.207  4570 11919 W PipelineManager: Pipeline is reset.
+10-30 11:31:07.215  4570 12067 W native  : W0000 00:00:1793359867.215675   12067 motion_analysis_calculator.cc:387] No input video header found. Downstream calculators expecting video headers are likely to fail.
+10-30 11:31:07.220  4570 12070 W native  : W0000 00:00:1793359867.220947   12070 motion_analysis_calculator.cc:830] Requested image format in RegionFlowComputation does not match video stream format. Overriding.
+10-30 11:31:10.130  4570 11920 W PipelineManager: Pipeline is reset.
+10-30 11:31:10.142  4570 12073 W native  : W0000 00:00:1793359870.142033   12073 motion_analysis_calculator.cc:387] No input video header found. Downstream calculators expecting video headers are likely to fail.
+10-30 11:31:10.144  4570 12076 W native  : W0000 00:00:1793359870.144508   12076 motion_analysis_calculator.cc:830] Requested image format in RegionFlowComputation does not match video stream format. Overriding.
+10-30 11:31:10.279  4570 11923 W MediaCodec: no metrics handle found
+10-30 11:31:10.320  4570 12078 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:31:10.320  4570 12078 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:31:10.322  4570 12078 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:31:10.322  4570 12078 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:31:10.322  4570 12078 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:31:10.447  4570 12078 W MediaCodec: no metrics handle found
+10-30 11:31:11.133  4570 12087 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+10-30 11:31:11.133  4570 12087 E EGL_emulation: tid 12087: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+10-30 11:31:11.145  4570 12090 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:31:11.152  4570 12090 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:31:11.152  4570 12090 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:31:11.155  4570 12090 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:31:11.155  4570 12090 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:31:11.156  4570 12090 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:31:11.156  4570 12090 W Codec2Client: query -- param skipped: index = 2684356609.
+10-30 11:31:11.162   474   889 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:31:11.179  4570 12089 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:31:11.180  4570 12089 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:31:11.180  4570 12089 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:31:11.180  4570 12089 W Codec2Client: query -- param skipped: index = 3254792206.
+10-30 11:31:11.180  4570 12089 W Codec2Client: query -- param skipped: index = 3254792194.
+10-30 11:31:12.127  4570 12094 W ColorUtils: expected specified color aspects (0:0:0:0)
+10-30 11:31:12.131  4570 12094 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:31:12.131  4570 12094 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:31:12.132   474   889 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:31:15.516  4570 12088 W MediaCodec: no metrics handle found
+10-30 11:31:27.758  4570 12087 E Surface : freeAllBuffers: 1 buffers were freed while being dequeued!
+10-30 11:31:27.760  4570 12087 W GraphicBufferSource: released unpopulated slots: [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63]
+10-30 11:31:27.760  4570 12087 E Surface : getSlotFromBufferLocked: unknown buffer: 0x0
+10-30 11:31:27.770  4570 12093 W MediaCodec: no metrics handle found
+10-30 11:31:27.782  4570 12089 W MediaCodec: no metrics handle found
+10-30 11:31:27.797  1784  4359 W MediaProvider: isAppCloneUserPair for user 0: false

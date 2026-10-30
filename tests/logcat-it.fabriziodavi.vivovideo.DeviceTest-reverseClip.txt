@@ -1,0 +1,300 @@
+10-30 11:35:44.210   474 12936 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:35:44.213   474 12935 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:35:44.253   474 12947 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:35:44.256   474 12947 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:35:44.257   474 12947 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:35:44.257   474 12947 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:35:44.260   474 12947 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:35:44.260   474 12947 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:35:44.260   474 12947 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:35:44.262   474 12946 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:35:44.314   474 12958 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:35:44.316   474 12958 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:35:44.316   474 12958 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:35:44.316   474 12958 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:35:44.320   474 12958 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:35:44.321   474 12958 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:35:44.321   474 12958 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:35:44.324   474 12957 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:35:44.411  4570 12990 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:35:44.411  4570 12990 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:35:44.412  4570 12990 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:35:44.412  4570 12990 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:35:44.412  4570 12990 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:35:44.645  4570 12990 W MediaCodec: no metrics handle found
+10-30 11:35:44.714  4570 12993 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:35:44.714  4570 12993 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:35:44.715  4570 12993 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:35:44.715  4570 12993 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:35:44.715  4570 12993 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:35:44.915  4570 12993 W MediaCodec: no metrics handle found
+10-30 11:35:45.632  4570 13002 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+10-30 11:35:45.632  4570 13002 E EGL_emulation: tid 13002: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+10-30 11:35:45.647  4570 13005 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:35:45.654  4570 13005 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:35:45.654  4570 13005 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:35:45.656  4570 13005 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:35:45.656  4570 13005 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:35:45.656  4570 13005 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:35:45.656  4570 13005 W Codec2Client: query -- param skipped: index = 2684356609.
+10-30 11:35:45.660   474  3535 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:35:45.667  4570 13004 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:35:45.724  4570 13004 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:35:45.724  4570 13004 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:35:45.726  4570 13004 W Codec2Client: query -- param skipped: index = 3254792206.
+10-30 11:35:45.726  4570 13004 W Codec2Client: query -- param skipped: index = 3254792194.
+10-30 11:35:45.991  4570 13009 W ColorUtils: expected specified color aspects (0:0:0:0)
+10-30 11:35:46.043  4570 13009 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:35:46.043  4570 13009 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:35:46.043   474  3535 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:35:50.779  4570 13003 W MediaCodec: no metrics handle found
+10-30 11:35:50.852  4570 13022 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:35:50.856  4570 13022 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:35:50.856  4570 13022 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:35:50.858  4570 13022 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:35:50.858  4570 13022 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:35:50.858  4570 13022 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:35:50.858  4570 13022 W Codec2Client: query -- param skipped: index = 2684356609.
+10-30 11:35:50.867   474  3535 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:35:56.581  4570 13002 E Surface : freeAllBuffers: 1 buffers were freed while being dequeued!
+10-30 11:35:56.582  4570 13002 W GraphicBufferSource: released unpopulated slots: [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63]
+10-30 11:35:56.583  4570 13002 E Surface : getSlotFromBufferLocked: unknown buffer: 0x0
+10-30 11:35:56.590  4570 13008 W MediaCodec: no metrics handle found
+10-30 11:35:56.591  4570 13004 W MediaCodec: no metrics handle found
+10-30 11:35:56.610  4570 13021 W MediaCodec: no metrics handle found
+10-30 11:35:56.626  1784  4359 W MediaProvider: isAppCloneUserPair for user 0: false
+10-30 11:35:56.727  4570 13032 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+10-30 11:35:56.728  4570 13032 E EGL_emulation: tid 13032: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+10-30 11:35:56.739  4570 13034 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:35:56.745  4570 13034 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:35:56.746  4570 13034 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:35:56.747  4570 13034 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:35:56.747  4570 13034 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:35:56.747  4570 13034 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:35:56.747  4570 13034 W Codec2Client: query -- param skipped: index = 2684356609.
+10-30 11:35:56.750   474  3535 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:35:57.223  4570 13037 W ColorUtils: expected specified color aspects (0:0:0:0)
+10-30 11:35:57.226  4570 13037 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:35:57.227  4570 13037 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:35:57.229   474  3535 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:35:57.852   480 13038 E C2SoftAvcEnc: Unable to set air params = 0x1ad
+10-30 11:36:00.056   846   846 W PageIndicator: Total number of pages invalid: 0. Assuming 1 page.
+10-30 11:36:00.076   846   864 W ndroid.systemui: Reducing the number of considered missed Gc histogram windows from 126 to 100
+10-30 11:36:00.173  4570 13032 E Surface : freeAllBuffers: 1 buffers were freed while being dequeued!
+10-30 11:36:00.176  4570 13032 W GraphicBufferSource: released unpopulated slots: [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63]
+10-30 11:36:00.176  4570 13032 E Surface : getSlotFromBufferLocked: unknown buffer: 0x0
+10-30 11:36:00.189  4570 13036 W MediaCodec: no metrics handle found
+10-30 11:36:00.196  4570 13033 W MediaCodec: no metrics handle found
+10-30 11:36:00.239  4570 13104 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:36:00.239  4570 13104 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:36:00.240  4570 13104 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:00.241  4570 13104 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:00.241  4570 13104 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:00.331  4570 13104 W MediaCodec: no metrics handle found
+10-30 11:36:00.342  4570 13107 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:36:00.343  4570 13107 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:00.343  4570 13107 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:00.343  4570 13107 W Codec2Client: query -- param skipped: index = 3254792206.
+10-30 11:36:00.343  4570 13107 W Codec2Client: query -- param skipped: index = 3254792194.
+10-30 11:36:01.093  4570 13107 W MediaCodec: no metrics handle found
+10-30 11:36:01.102  4570 13111 W ColorUtils: expected specified color aspects (0:0:0:0)
+10-30 11:36:01.107  4570 13111 W ColorUtils: expected specified color aspects (0:0:0:0)
+10-30 11:36:01.109  4570 13111 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.110  4570 13111 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.113   474  3535 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:36:01.127  4570 13115 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:36:01.131  4570 13114 W GraphicBufferSource: released unpopulated slots: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63]
+10-30 11:36:01.137  4570 13115 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:36:01.137  4570 13115 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:36:01.139  4570 13115 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.139  4570 13115 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.139  4570 13115 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.140  4570 13115 W Codec2Client: query -- param skipped: index = 2684356609.
+10-30 11:36:01.145  4570 13115 W GraphicBufferSource: released unpopulated slots: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63]
+10-30 11:36:01.147   474  3535 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:36:01.151  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.152  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.152  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.170  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.170  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.170  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.193  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.193  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.193  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.204   480 13112 E C2SoftAvcEnc: Unable to set air params = 0x1ad
+10-30 11:36:01.223  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.223  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.223  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.247  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.248  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.248  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.260  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.260  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.261  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.278  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.278  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.278  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.290  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.290  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.290  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.308  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.308  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.308  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.319  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.319  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.319  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.333  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.333  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.334  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.344  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.345  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.345  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.356  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.357  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.357  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.374  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.374  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.374  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.395  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.395  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.395  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.406  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.406  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.406  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.427  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.427  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.427  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.448  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.449  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.449  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.460  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.460  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.461  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.480  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.480  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.480  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.501  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.502  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.502  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.528  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.528  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.528  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.557  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.557  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.557  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.581  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.581  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.581  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.602  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.602  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.602  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.622  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.622  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.622  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.644  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.644  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.644  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.656  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.656  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.656  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.666  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.667  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.667  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.677  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.678  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.678  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.698  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.699  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.699  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.722  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.722  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.722  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.733  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.734  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.734  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.754  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.754  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.754  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.768  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.769  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.769  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.783  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.783  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.783  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.806  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.807  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.807  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.823  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.824  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.824  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.835  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.835  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.836  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.848  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.848  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.848  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.860  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.860  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.861  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.872  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.872  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.872  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.882  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.882  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.882  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.892  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.892  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.892  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.903  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.903  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.903  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.914  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.914  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.914  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.927  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.927  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.927  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.940  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.940  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.940  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.954  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.954  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.954  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.964  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.965  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.965  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.974  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.974  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.974  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.984  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.984  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.984  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:01.996  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:01.996  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:01.996  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:02.006  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:02.006  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:02.006  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:02.016  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:02.016  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:02.016  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:02.028  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:02.028  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:02.028  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:02.049  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:02.049  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:02.049  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:02.060  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:02.060  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:02.060  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:02.088  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:02.088  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:02.088  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:02.113  4570 13114 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:36:02.113  4570 13114 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:36:02.113  4570 13114 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:36:02.236  4570 13114 W GraphicBufferSource: released unpopulated slots: [23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63]
+10-30 11:36:02.241  4570 13114 W MediaCodec: no metrics handle found
+10-30 11:36:02.248  4570  5367 E MPEG4Writer: Stop() called but track is not started or stopped
+10-30 11:36:02.248  4570  5367 E MPEG4Writer: Stop() called but track is not started or stopped
+10-30 11:36:02.253  4570 13110 W MediaCodec: no metrics handle found

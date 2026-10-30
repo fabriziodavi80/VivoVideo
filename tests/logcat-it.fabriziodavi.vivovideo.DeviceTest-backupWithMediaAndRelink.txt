@@ -1,0 +1,300 @@
+10-30 10:56:23.958  1706  2323 W CorpusConfigHelper: 	at java.lang.Thread.run(Thread.java:1012)
+10-30 10:56:24.004  1457  1508 W Icing   : No valid account for uploading user actions
+10-30 10:56:24.010  4124  4267 W Bugle   : TextClassifierLibManagerImpl: Reclaiming memory at level: 40
+10-30 10:56:24.011  4124  4207 W Bugle   : TextClassifierLibManagerImpl: Reclaiming memory at level: 40
+10-30 10:56:24.084  1457  1508 W Icing   : No valid account for uploading user actions
+10-30 10:56:24.103  1409  1481 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+10-30 10:56:24.169  1409  1481 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+10-30 10:56:24.175  1409  1481 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+10-30 10:56:24.261  1706  2749 W TimedProcessReaper: Scheduling killing of process to refresh configuration
+10-30 10:56:24.297  4124  4240 W Bugle   : TextClassifierLibManagerImpl: Reclaiming memory at level: 40
+10-30 10:56:24.396  1409  1471 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+10-30 10:56:24.501  1409  1471 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+10-30 10:56:24.510  1409  1471 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+10-30 10:56:24.540  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_birthdaydoodle_jar__name to integer.
+10-30 10:56:24.540  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_call_jar__name to integer.
+10-30 10:56:24.541  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_canvas_jar__name to integer.
+10-30 10:56:24.541  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_chkpkg_jar__name to integer.
+10-30 10:56:24.542  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_crashtest_jar__name to integer.
+10-30 10:56:24.542  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_dining_jar__name to integer.
+10-30 10:56:24.542  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_doodle_notifications_jar__name to integer.
+10-30 10:56:24.542  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_imageviewer_jar__name to integer.
+10-30 10:56:24.542  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_ipa_jar__name to integer.
+10-30 10:56:24.542  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_jslocation_jar__name to integer.
+10-30 10:56:24.543  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_localintent_jar__name to integer.
+10-30 10:56:24.544  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_messaging_jar__name to integer.
+10-30 10:56:24.544  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_nativesrp_activity_jar__name to integer.
+10-30 10:56:24.544  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_nativesrp_presenter_jar__name to integer.
+10-30 10:56:24.544  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_nowcontent_jar__name to integer.
+10-30 10:56:24.544  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_recents_activity_jar__name to integer.
+10-30 10:56:24.544  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_save_jar__name to integer.
+10-30 10:56:24.545  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_searchresults_activity_jar__name to integer.
+10-30 10:56:24.545  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_test_jar__name to integer.
+10-30 10:56:24.545  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_weather_jar__name to integer.
+10-30 10:56:24.546  1706  2303 W A       : Can't format flag bindle_flags__bloblobber_blob to integer.
+10-30 10:56:24.546  1706  2303 W A       : Can't format flag bindle_flags__velour_jar to integer.
+10-30 10:56:24.550  1409  5410 W BpBinder: Large outgoing transaction of 329856 bytes, interface descriptor , code 4
+10-30 10:56:24.565  1706  2323 W CorpusConfigHelper: Invalid input from icing corpus JSON flag.
+10-30 10:56:24.565  1706  2323 W CorpusConfigHelper: android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+10-30 10:56:24.565  1706  2323 W CorpusConfigHelper: 	at android.util.JsonReader.syntaxError(JsonReader.java:1162)
+10-30 10:56:24.565  1706  2323 W CorpusConfigHelper: 	at android.util.JsonReader.checkLenient(JsonReader.java:840)
+10-30 10:56:24.565  1706  2323 W CorpusConfigHelper: 	at android.util.JsonReader.nextInArray(JsonReader.java:615)
+10-30 10:56:24.565  1706  2323 W CorpusConfigHelper: 	at android.util.JsonReader.peek(JsonReader.java:345)
+10-30 10:56:24.565  1706  2323 W CorpusConfigHelper: 	at android.util.JsonReader.hasNext(JsonReader.java:321)
+10-30 10:56:24.565  1706  2323 W CorpusConfigHelper: 	at com.google.android.apps.gsa.searchbox.c.b.b.k.c(PG:7)
+10-30 10:56:24.565  1706  2323 W CorpusConfigHelper: 	at com.google.android.apps.gsa.searchbox.c.b.b.j.a(Unknown Source:2)
+10-30 10:56:24.565  1706  2323 W CorpusConfigHelper: 	at com.google.android.apps.gsa.search.core.i.r.run(PG:5)
+10-30 10:56:24.565  1706  2323 W CorpusConfigHelper: 	at com.google.android.libraries.gsa.k.a.h.run(PG:2)
+10-30 10:56:24.565  1706  2323 W CorpusConfigHelper: 	at com.google.android.apps.gsa.shared.util.c.a.cf.b(PG:1)
+10-30 10:56:24.565  1706  2323 W CorpusConfigHelper: 	at com.google.android.apps.gsa.shared.util.c.a.ci.run(PG:1)
+10-30 10:56:24.565  1706  2323 W CorpusConfigHelper: 	at com.google.android.libraries.i.ae.run(PG:1)
+10-30 10:56:24.565  1706  2323 W CorpusConfigHelper: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+10-30 10:56:24.565  1706  2323 W CorpusConfigHelper: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+10-30 10:56:24.565  1706  2323 W CorpusConfigHelper: 	at com.google.android.libraries.i.k.run(PG:2)
+10-30 10:56:24.565  1706  2323 W CorpusConfigHelper: 	at com.google.android.libraries.i.p.run(PG:4)
+10-30 10:56:24.565  1706  2323 W CorpusConfigHelper: 	at java.lang.Thread.run(Thread.java:1012)
+10-30 10:56:24.700  1457  5375 W Icing   : No valid account for uploading user actions
+10-30 10:56:24.725  1409  1484 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+10-30 10:56:24.736  1409  1484 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+10-30 10:56:24.742  1409  1484 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+10-30 10:56:24.794  1409  5403 W BpBinder: Large outgoing transaction of 329856 bytes, interface descriptor , code 4
+10-30 10:56:24.798  1706  2315 W A       : Can't format flag AndroidGsaVelourJars__velour_birthdaydoodle_jar__name to integer.
+10-30 10:56:24.799  1706  2315 W A       : Can't format flag AndroidGsaVelourJars__velour_call_jar__name to integer.
+10-30 10:56:24.799  1706  2315 W A       : Can't format flag AndroidGsaVelourJars__velour_canvas_jar__name to integer.
+10-30 10:56:24.799  1706  2315 W A       : Can't format flag AndroidGsaVelourJars__velour_chkpkg_jar__name to integer.
+10-30 10:56:24.800  1706  2315 W A       : Can't format flag AndroidGsaVelourJars__velour_crashtest_jar__name to integer.
+10-30 10:56:24.800  1706  2315 W A       : Can't format flag AndroidGsaVelourJars__velour_dining_jar__name to integer.
+10-30 10:56:24.800  1706  2315 W A       : Can't format flag AndroidGsaVelourJars__velour_doodle_notifications_jar__name to integer.
+10-30 10:56:24.800  1706  2315 W A       : Can't format flag AndroidGsaVelourJars__velour_imageviewer_jar__name to integer.
+10-30 10:56:24.800  1706  2315 W A       : Can't format flag AndroidGsaVelourJars__velour_ipa_jar__name to integer.
+10-30 10:56:24.800  1706  2315 W A       : Can't format flag AndroidGsaVelourJars__velour_jslocation_jar__name to integer.
+10-30 10:56:24.801  1706  2315 W A       : Can't format flag AndroidGsaVelourJars__velour_localintent_jar__name to integer.
+10-30 10:56:24.801  1706  2315 W A       : Can't format flag AndroidGsaVelourJars__velour_messaging_jar__name to integer.
+10-30 10:56:24.801  1706  2315 W A       : Can't format flag AndroidGsaVelourJars__velour_nativesrp_activity_jar__name to integer.
+10-30 10:56:24.801  1706  2315 W A       : Can't format flag AndroidGsaVelourJars__velour_nativesrp_presenter_jar__name to integer.
+10-30 10:56:24.801  1706  2315 W A       : Can't format flag AndroidGsaVelourJars__velour_nowcontent_jar__name to integer.
+10-30 10:56:24.802  1706  2315 W A       : Can't format flag AndroidGsaVelourJars__velour_recents_activity_jar__name to integer.
+10-30 10:56:24.802  1706  2315 W A       : Can't format flag AndroidGsaVelourJars__velour_save_jar__name to integer.
+10-30 10:56:24.803  1706  2315 W A       : Can't format flag AndroidGsaVelourJars__velour_searchresults_activity_jar__name to integer.
+10-30 10:56:24.803  1706  2315 W A       : Can't format flag AndroidGsaVelourJars__velour_test_jar__name to integer.
+10-30 10:56:24.804  1706  2315 W A       : Can't format flag AndroidGsaVelourJars__velour_weather_jar__name to integer.
+10-30 10:56:24.804  1706  2315 W A       : Can't format flag bindle_flags__bloblobber_blob to integer.
+10-30 10:56:24.804  1706  2315 W A       : Can't format flag bindle_flags__velour_jar to integer.
+10-30 10:56:24.833  1706  2323 W CorpusConfigHelper: Invalid input from icing corpus JSON flag.
+10-30 10:56:24.833  1706  2323 W CorpusConfigHelper: android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+10-30 10:56:24.833  1706  2323 W CorpusConfigHelper: 	at android.util.JsonReader.syntaxError(JsonReader.java:1162)
+10-30 10:56:24.833  1706  2323 W CorpusConfigHelper: 	at android.util.JsonReader.checkLenient(JsonReader.java:840)
+10-30 10:56:24.833  1706  2323 W CorpusConfigHelper: 	at android.util.JsonReader.nextInArray(JsonReader.java:615)
+10-30 10:56:24.833  1706  2323 W CorpusConfigHelper: 	at android.util.JsonReader.peek(JsonReader.java:345)
+10-30 10:56:24.833  1706  2323 W CorpusConfigHelper: 	at android.util.JsonReader.hasNext(JsonReader.java:321)
+10-30 10:56:24.833  1706  2323 W CorpusConfigHelper: 	at com.google.android.apps.gsa.searchbox.c.b.b.k.c(PG:7)
+10-30 10:56:24.833  1706  2323 W CorpusConfigHelper: 	at com.google.android.apps.gsa.searchbox.c.b.b.j.a(Unknown Source:2)
+10-30 10:56:24.833  1706  2323 W CorpusConfigHelper: 	at com.google.android.apps.gsa.search.core.i.r.run(PG:5)
+10-30 10:56:24.833  1706  2323 W CorpusConfigHelper: 	at com.google.android.libraries.gsa.k.a.h.run(PG:2)
+10-30 10:56:24.833  1706  2323 W CorpusConfigHelper: 	at com.google.android.apps.gsa.shared.util.c.a.cf.b(PG:1)
+10-30 10:56:24.833  1706  2323 W CorpusConfigHelper: 	at com.google.android.apps.gsa.shared.util.c.a.ci.run(PG:1)
+10-30 10:56:24.833  1706  2323 W CorpusConfigHelper: 	at com.google.android.libraries.i.ae.run(PG:1)
+10-30 10:56:24.833  1706  2323 W CorpusConfigHelper: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+10-30 10:56:24.833  1706  2323 W CorpusConfigHelper: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+10-30 10:56:24.833  1706  2323 W CorpusConfigHelper: 	at com.google.android.libraries.i.k.run(PG:2)
+10-30 10:56:24.833  1706  2323 W CorpusConfigHelper: 	at com.google.android.libraries.i.p.run(PG:4)
+10-30 10:56:24.833  1706  2323 W CorpusConfigHelper: 	at java.lang.Thread.run(Thread.java:1012)
+10-30 10:56:24.847  1457  5375 W Icing   : No valid account for uploading user actions
+10-30 10:56:25.146  1457  5375 W Icing   : No valid account for uploading user actions
+10-30 10:56:25.262  1457  5375 W Icing   : No valid account for uploading user actions
+10-30 10:56:25.482   522  2550 W system_server: Long monitor contention with owner binder:522_1F (2553) at int com.android.server.am.ActivityManagerService.bindServiceInstance(android.app.IApplicationThread, android.os.IBinder, android.content.Intent, java.lang.String, android.app.IServiceConnection, long, java.lang.String, boolean, int, java.lang.String, android.app.IApplicationThread, java.lang.String, int)(ActivityManagerService.java:13404) waiters=3 in boolean com.android.server.am.ActivityManagerService.stopServiceToken(android.content.ComponentName, android.os.IBinder, int) for 213ms
+10-30 10:56:25.483   522  2428 W system_server: Long monitor contention with owner binder:522_1F (2553) at int com.android.server.am.ActivityManagerService.bindServiceInstance(android.app.IApplicationThread, android.os.IBinder, android.content.Intent, java.lang.String, android.app.IServiceConnection, long, java.lang.String, boolean, int, java.lang.String, android.app.IApplicationThread, java.lang.String, int)(ActivityManagerService.java:13404) waiters=0 in android.content.ComponentName com.android.server.am.ActivityManagerService.startService(android.app.IApplicationThread, android.content.Intent, java.lang.String, boolean, java.lang.String, java.lang.String, int, boolean, int, java.lang.String, java.lang.String) for 216ms
+10-30 10:56:25.749  1409  5403 W .gms.persistent: Long monitor contention with owner lowpool[16] (5547) at void acea.execute(java.lang.Runnable)(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0) waiters=0 in void acea.execute(java.lang.Runnable) for 265ms
+10-30 10:56:25.753  1706  5723 W TimedProcessReaper: Scheduling killing of process to refresh configuration
+10-30 10:56:25.864  1706  2749 W TimedProcessReaper: Scheduling killing of process to refresh configuration
+10-30 10:56:25.909  1409  1481 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+10-30 10:56:25.949  1409  5410 W BpBinder: Large outgoing transaction of 329856 bytes, interface descriptor , code 4
+10-30 10:56:25.959  1706  2749 W TimedProcessReaper: Scheduling killing of process to refresh configuration
+10-30 10:56:25.967  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_birthdaydoodle_jar__name to integer.
+10-30 10:56:25.969  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_call_jar__name to integer.
+10-30 10:56:25.970  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_canvas_jar__name to integer.
+10-30 10:56:25.971  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_chkpkg_jar__name to integer.
+10-30 10:56:25.972  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_crashtest_jar__name to integer.
+10-30 10:56:25.973  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_dining_jar__name to integer.
+10-30 10:56:25.974  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_doodle_notifications_jar__name to integer.
+10-30 10:56:25.975  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_imageviewer_jar__name to integer.
+10-30 10:56:25.975  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_ipa_jar__name to integer.
+10-30 10:56:25.976  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_jslocation_jar__name to integer.
+10-30 10:56:25.977  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_localintent_jar__name to integer.
+10-30 10:56:25.977  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_messaging_jar__name to integer.
+10-30 10:56:25.978  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_nativesrp_activity_jar__name to integer.
+10-30 10:56:25.978  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_nativesrp_presenter_jar__name to integer.
+10-30 10:56:25.979  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_nowcontent_jar__name to integer.
+10-30 10:56:25.979  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_recents_activity_jar__name to integer.
+10-30 10:56:25.980  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_save_jar__name to integer.
+10-30 10:56:25.980  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_searchresults_activity_jar__name to integer.
+10-30 10:56:25.981  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_test_jar__name to integer.
+10-30 10:56:25.982  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_weather_jar__name to integer.
+10-30 10:56:25.982  1706  2303 W A       : Can't format flag bindle_flags__bloblobber_blob to integer.
+10-30 10:56:25.982  1706  2303 W A       : Can't format flag bindle_flags__velour_jar to integer.
+10-30 10:56:26.019  1706  2322 W CorpusConfigHelper: Invalid input from icing corpus JSON flag.
+10-30 10:56:26.019  1706  2322 W CorpusConfigHelper: android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+10-30 10:56:26.019  1706  2322 W CorpusConfigHelper: 	at android.util.JsonReader.syntaxError(JsonReader.java:1162)
+10-30 10:56:26.019  1706  2322 W CorpusConfigHelper: 	at android.util.JsonReader.checkLenient(JsonReader.java:840)
+10-30 10:56:26.019  1706  2322 W CorpusConfigHelper: 	at android.util.JsonReader.nextInArray(JsonReader.java:615)
+10-30 10:56:26.019  1706  2322 W CorpusConfigHelper: 	at android.util.JsonReader.peek(JsonReader.java:345)
+10-30 10:56:26.019  1706  2322 W CorpusConfigHelper: 	at android.util.JsonReader.hasNext(JsonReader.java:321)
+10-30 10:56:26.019  1706  2322 W CorpusConfigHelper: 	at com.google.android.apps.gsa.searchbox.c.b.b.k.c(PG:7)
+10-30 10:56:26.019  1706  2322 W CorpusConfigHelper: 	at com.google.android.apps.gsa.searchbox.c.b.b.j.a(Unknown Source:2)
+10-30 10:56:26.019  1706  2322 W CorpusConfigHelper: 	at com.google.android.apps.gsa.search.core.i.r.run(PG:5)
+10-30 10:56:26.019  1706  2322 W CorpusConfigHelper: 	at com.google.android.libraries.gsa.k.a.h.run(PG:2)
+10-30 10:56:26.019  1706  2322 W CorpusConfigHelper: 	at com.google.android.apps.gsa.shared.util.c.a.cf.b(PG:1)
+10-30 10:56:26.019  1706  2322 W CorpusConfigHelper: 	at com.google.android.apps.gsa.shared.util.c.a.ci.run(PG:1)
+10-30 10:56:26.019  1706  2322 W CorpusConfigHelper: 	at com.google.android.libraries.i.ae.run(PG:1)
+10-30 10:56:26.019  1706  2322 W CorpusConfigHelper: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+10-30 10:56:26.019  1706  2322 W CorpusConfigHelper: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+10-30 10:56:26.019  1706  2322 W CorpusConfigHelper: 	at com.google.android.libraries.i.k.run(PG:2)
+10-30 10:56:26.019  1706  2322 W CorpusConfigHelper: 	at com.google.android.libraries.i.p.run(PG:4)
+10-30 10:56:26.019  1706  2322 W CorpusConfigHelper: 	at java.lang.Thread.run(Thread.java:1012)
+10-30 10:56:26.062  1457  5375 W Icing   : No valid account for uploading user actions
+10-30 10:56:26.239  1409  1481 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+10-30 10:56:26.244  1457  3327 W ZappDownloader: No successful module downloads for requested features [vision.ocr].
+10-30 10:56:26.245  1457  5375 W Icing   : No valid account for uploading user actions
+10-30 10:56:26.250  1457  3327 W ChimeraConfigService: Retry attempt was throttled. [CONTEXT service_id=264 ]
+10-30 10:56:26.325  1457  3853 W gle.android.gms: Long monitor contention with owner [com.google.android.gms.chimera.container.intentoperation.GmsIntentOperationChimeraService-Executor] processing com.google.android.gms.droidguard.DroidGuardModuleInitIntentOperation for action com.google.android.chimera.IntentOperation.NEW_MODULE (3690) at void hjm.run()(:com.google.android.gms@231818047@23.18.18 (190800-535401451):3) waiters=0 in void hjm.run() for 54.091s
+10-30 10:56:26.359   335   369 E BpfHandler: Unsupported protocol: 1
+10-30 10:56:26.466  1409  1481 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+10-30 10:56:26.566  1524  1672 W TimedProcessReaper: Scheduling killing of process to refresh configuration
+10-30 10:56:26.602  1409  1484 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+10-30 10:56:26.603  1457  5741 W Vision  : Request for optional module download of ocr failed. Request again.
+10-30 10:56:26.604  1457  5741 W Vision  : Would have logged:
+10-30 10:56:26.604  1457  5741 W Vision  : # dsae@37884fe7
+10-30 10:56:26.608  1409  1484 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+10-30 10:56:26.619  1409  1484 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+10-30 10:56:26.819  1409  5410 W BpBinder: Large outgoing transaction of 329856 bytes, interface descriptor , code 4
+10-30 10:56:26.821  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_birthdaydoodle_jar__name to integer.
+10-30 10:56:26.821  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_call_jar__name to integer.
+10-30 10:56:26.821  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_canvas_jar__name to integer.
+10-30 10:56:26.821  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_chkpkg_jar__name to integer.
+10-30 10:56:26.821  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_crashtest_jar__name to integer.
+10-30 10:56:26.821  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_dining_jar__name to integer.
+10-30 10:56:26.821  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_doodle_notifications_jar__name to integer.
+10-30 10:56:26.821  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_imageviewer_jar__name to integer.
+10-30 10:56:26.821  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_ipa_jar__name to integer.
+10-30 10:56:26.821  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_jslocation_jar__name to integer.
+10-30 10:56:26.821  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_localintent_jar__name to integer.
+10-30 10:56:26.821  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_messaging_jar__name to integer.
+10-30 10:56:26.821  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_nativesrp_activity_jar__name to integer.
+10-30 10:56:26.821  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_nativesrp_presenter_jar__name to integer.
+10-30 10:56:26.821  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_nowcontent_jar__name to integer.
+10-30 10:56:26.822  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_recents_activity_jar__name to integer.
+10-30 10:56:26.822  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_save_jar__name to integer.
+10-30 10:56:26.822  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_searchresults_activity_jar__name to integer.
+10-30 10:56:26.822  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_test_jar__name to integer.
+10-30 10:56:26.822  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_weather_jar__name to integer.
+10-30 10:56:26.822  1706  2323 W A       : Can't format flag bindle_flags__bloblobber_blob to integer.
+10-30 10:56:26.822  1706  2323 W A       : Can't format flag bindle_flags__velour_jar to integer.
+10-30 10:56:26.833  1706  2322 W CorpusConfigHelper: Invalid input from icing corpus JSON flag.
+10-30 10:56:26.833  1706  2322 W CorpusConfigHelper: android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+10-30 10:56:26.833  1706  2322 W CorpusConfigHelper: 	at android.util.JsonReader.syntaxError(JsonReader.java:1162)
+10-30 10:56:26.833  1706  2322 W CorpusConfigHelper: 	at android.util.JsonReader.checkLenient(JsonReader.java:840)
+10-30 10:56:26.833  1706  2322 W CorpusConfigHelper: 	at android.util.JsonReader.nextInArray(JsonReader.java:615)
+10-30 10:56:26.833  1706  2322 W CorpusConfigHelper: 	at android.util.JsonReader.peek(JsonReader.java:345)
+10-30 10:56:26.833  1706  2322 W CorpusConfigHelper: 	at android.util.JsonReader.hasNext(JsonReader.java:321)
+10-30 10:56:26.833  1706  2322 W CorpusConfigHelper: 	at com.google.android.apps.gsa.searchbox.c.b.b.k.c(PG:7)
+10-30 10:56:26.833  1706  2322 W CorpusConfigHelper: 	at com.google.android.apps.gsa.searchbox.c.b.b.j.a(Unknown Source:2)
+10-30 10:56:26.833  1706  2322 W CorpusConfigHelper: 	at com.google.android.apps.gsa.search.core.i.r.run(PG:5)
+10-30 10:56:26.833  1706  2322 W CorpusConfigHelper: 	at com.google.android.libraries.gsa.k.a.h.run(PG:2)
+10-30 10:56:26.833  1706  2322 W CorpusConfigHelper: 	at com.google.android.apps.gsa.shared.util.c.a.cf.b(PG:1)
+10-30 10:56:26.833  1706  2322 W CorpusConfigHelper: 	at com.google.android.apps.gsa.shared.util.c.a.ci.run(PG:1)
+10-30 10:56:26.833  1706  2322 W CorpusConfigHelper: 	at com.google.android.libraries.i.ae.run(PG:1)
+10-30 10:56:26.833  1706  2322 W CorpusConfigHelper: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+10-30 10:56:26.833  1706  2322 W CorpusConfigHelper: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+10-30 10:56:26.833  1706  2322 W CorpusConfigHelper: 	at com.google.android.libraries.i.k.run(PG:2)
+10-30 10:56:26.833  1706  2322 W CorpusConfigHelper: 	at com.google.android.libraries.i.p.run(PG:4)
+10-30 10:56:26.833  1706  2322 W CorpusConfigHelper: 	at java.lang.Thread.run(Thread.java:1012)
+10-30 10:56:26.845  1457  1508 W Icing   : No valid account for uploading user actions
+10-30 10:56:26.887  1524  1672 W TimedProcessReaper: Scheduling killing of process to refresh configuration
+10-30 10:56:26.956  1457  1508 W Icing   : No valid account for uploading user actions
+10-30 10:56:27.039  1524  5630 W TimedProcessReaper: Scheduling killing of process to refresh configuration
+10-30 10:56:27.127  1409  1471 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+10-30 10:56:27.259  1409  1471 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+10-30 10:56:27.265  1409  1471 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+10-30 10:56:27.296  4124  4267 W Bugle   : TextClassifierLibManagerImpl: Reclaiming memory at level: 40
+10-30 10:56:27.297  4124  4267 W Bugle   : TextClassifierLibManagerImpl: Reclaiming memory at level: 40
+10-30 10:56:27.313  4124  4279 W TimedProcessReaper: Scheduling killing of process to refresh configuration
+10-30 10:56:27.367  1524  1672 W TimedProcessReaper: Scheduling killing of process to refresh configuration
+10-30 10:56:27.477  4124  4207 W Bugle   : TextClassifierLibManagerImpl: Reclaiming memory at level: 40
+10-30 10:56:27.477  4124  4207 W Bugle   : TextClassifierLibManagerImpl: Reclaiming memory at level: 40
+10-30 10:56:27.477  4124  4207 W Bugle   : TextClassifierLibManagerImpl: Reclaiming memory at level: 40
+10-30 10:56:27.528  4124  4280 W TimedProcessReaper: Scheduling killing of process to refresh configuration
+10-30 10:56:27.565  1409  5403 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+10-30 10:56:27.584  4124  4280 W TimedProcessReaper: Scheduling killing of process to refresh configuration
+10-30 10:56:27.613  1409  5403 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+10-30 10:56:27.682  1409  5403 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+10-30 10:56:27.739  4124  4278 W BugleRcsEngine: [54] brcu.d: [SR]: Single Registration is disabled. Skipping Single Registration capability check for subId: 1, OS.isAtLeastS:[true], enableSingleRegistrationProvisioning:[false]
+10-30 10:56:27.740  4124  4280 W BugleRcsEngine: [57] brcu.d: [SR]: Single Registration is disabled. Skipping Single Registration capability check for subId: 1, OS.isAtLeastS:[true], enableSingleRegistrationProvisioning:[false]
+10-30 10:56:27.753  4124  4240 W Bugle   : TextClassifierLibManagerImpl: Reclaiming memory at level: 40
+10-30 10:56:27.756  4124  4279 W TimedProcessReaper: Scheduling killing of process to refresh configuration
+10-30 10:56:27.801  1706  2749 W TimedProcessReaper: Scheduling killing of process to refresh configuration
+10-30 10:56:27.819  4570  5490 E Surface : freeAllBuffers: 1 buffers were freed while being dequeued!
+10-30 10:56:27.829  1409  1481 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+10-30 10:56:27.831  4570  5490 W GraphicBufferSource: released unpopulated slots: [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63]
+10-30 10:56:27.831  4570  5490 E Surface : getSlotFromBufferLocked: unknown buffer: 0x0
+10-30 10:56:27.850  4570  5491 W MediaCodec: no metrics handle found
+10-30 10:56:27.855  4570  5510 W MediaCodec: no metrics handle found
+10-30 10:56:27.870  4570  5713 W MediaCodec: no metrics handle found
+10-30 10:56:27.876  1409  1481 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+10-30 10:56:27.879  1409  1481 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+10-30 10:56:27.989  1409  5403 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+10-30 10:56:28.127  1409  5403 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+10-30 10:56:28.171  1409  5403 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+10-30 10:56:28.220  1784  4359 W MediaProvider: isAppCloneUserPair for user 0: false
+10-30 10:56:28.221  1784  4359 W MediaProvider: isAppCloneUserPair for user 0: false
+10-30 10:56:28.233  1409  5410 W BpBinder: Large outgoing transaction of 329856 bytes, interface descriptor , code 4
+10-30 10:56:28.237  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_birthdaydoodle_jar__name to integer.
+10-30 10:56:28.237  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_call_jar__name to integer.
+10-30 10:56:28.237  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_canvas_jar__name to integer.
+10-30 10:56:28.237  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_chkpkg_jar__name to integer.
+10-30 10:56:28.239  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_crashtest_jar__name to integer.
+10-30 10:56:28.239  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_dining_jar__name to integer.
+10-30 10:56:28.240  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_doodle_notifications_jar__name to integer.
+10-30 10:56:28.240  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_imageviewer_jar__name to integer.
+10-30 10:56:28.240  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_ipa_jar__name to integer.
+10-30 10:56:28.240  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_jslocation_jar__name to integer.
+10-30 10:56:28.240  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_localintent_jar__name to integer.
+10-30 10:56:28.240  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_messaging_jar__name to integer.
+10-30 10:56:28.240  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_nativesrp_activity_jar__name to integer.
+10-30 10:56:28.240  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_nativesrp_presenter_jar__name to integer.
+10-30 10:56:28.240  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_nowcontent_jar__name to integer.
+10-30 10:56:28.241  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_recents_activity_jar__name to integer.
+10-30 10:56:28.241  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_save_jar__name to integer.
+10-30 10:56:28.241  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_searchresults_activity_jar__name to integer.
+10-30 10:56:28.241  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_test_jar__name to integer.
+10-30 10:56:28.241  1706  2303 W A       : Can't format flag AndroidGsaVelourJars__velour_weather_jar__name to integer.
+10-30 10:56:28.241  1706  2303 W A       : Can't format flag bindle_flags__bloblobber_blob to integer.
+10-30 10:56:28.241  1706  2303 W A       : Can't format flag bindle_flags__velour_jar to integer.
+10-30 10:56:28.259  1706  2322 W CorpusConfigHelper: Invalid input from icing corpus JSON flag.
+10-30 10:56:28.259  1706  2322 W CorpusConfigHelper: android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+10-30 10:56:28.259  1706  2322 W CorpusConfigHelper: 	at android.util.JsonReader.syntaxError(JsonReader.java:1162)
+10-30 10:56:28.259  1706  2322 W CorpusConfigHelper: 	at android.util.JsonReader.checkLenient(JsonReader.java:840)
+10-30 10:56:28.259  1706  2322 W CorpusConfigHelper: 	at android.util.JsonReader.nextInArray(JsonReader.java:615)
+10-30 10:56:28.259  1706  2322 W CorpusConfigHelper: 	at android.util.JsonReader.peek(JsonReader.java:345)
+10-30 10:56:28.259  1706  2322 W CorpusConfigHelper: 	at android.util.JsonReader.hasNext(JsonReader.java:321)
+10-30 10:56:28.259  1706  2322 W CorpusConfigHelper: 	at com.google.android.apps.gsa.searchbox.c.b.b.k.c(PG:7)
+10-30 10:56:28.259  1706  2322 W CorpusConfigHelper: 	at com.google.android.apps.gsa.searchbox.c.b.b.j.a(Unknown Source:2)
+10-30 10:56:28.259  1706  2322 W CorpusConfigHelper: 	at com.google.android.apps.gsa.search.core.i.r.run(PG:5)
+10-30 10:56:28.259  1706  2322 W CorpusConfigHelper: 	at com.google.android.libraries.gsa.k.a.h.run(PG:2)
+10-30 10:56:28.259  1706  2322 W CorpusConfigHelper: 	at com.google.android.apps.gsa.shared.util.c.a.cf.b(PG:1)
+10-30 10:56:28.259  1706  2322 W CorpusConfigHelper: 	at com.google.android.apps.gsa.shared.util.c.a.ci.run(PG:1)
+10-30 10:56:28.259  1706  2322 W CorpusConfigHelper: 	at com.google.android.libraries.i.ae.run(PG:1)
+10-30 10:56:28.259  1706  2322 W CorpusConfigHelper: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+10-30 10:56:28.259  1706  2322 W CorpusConfigHelper: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+10-30 10:56:28.259  1706  2322 W CorpusConfigHelper: 	at com.google.android.libraries.i.k.run(PG:2)
+10-30 10:56:28.259  1706  2322 W CorpusConfigHelper: 	at com.google.android.libraries.i.p.run(PG:4)
+10-30 10:56:28.259  1706  2322 W CorpusConfigHelper: 	at java.lang.Thread.run(Thread.java:1012)
+10-30 10:56:28.270  2869  3167 W TimedProcessReaper: Scheduling killing of process to refresh configuration
+10-30 10:56:28.298  1457  1508 W Icing   : No valid account for uploading user actions
+10-30 10:56:28.313  1409  1484 W BpBinder: Large outgoing transaction of 388296 bytes, interface descriptor , code 4
+10-30 10:56:28.344  1457  1508 W Icing   : No valid account for uploading user actions
+10-30 10:56:28.400  1784  1853 W MediaProvider: isAppCloneUserPair for user 0: false
+10-30 10:56:28.400  1784  1853 W MediaProvider: isAppCloneUserPair for user 0: false
+10-30 10:56:28.410  1706  2749 W TimedProcessReaper: Scheduling killing of process to refresh configuration
+10-30 10:56:28.424  1706  5723 W TimedProcessReaper: Scheduling killing of process to refresh configuration
+10-30 10:56:28.451  1409  1471 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+10-30 10:56:28.458  1409  1471 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)

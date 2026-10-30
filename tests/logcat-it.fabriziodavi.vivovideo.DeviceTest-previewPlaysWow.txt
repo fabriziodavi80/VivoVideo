@@ -1,0 +1,155 @@
+10-30 11:44:29.846  4570 13537 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:44:29.846  4570 13537 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:44:29.848  4570 13537 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:44:29.848  4570 13537 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:44:29.848  4570 13537 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:44:29.867  4570 13541 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+10-30 11:44:29.867  4570 13541 E EGL_emulation: tid 13541: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+10-30 11:44:29.876  4570 13543 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:44:29.880  4570 13543 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:44:29.880  4570 13543 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:44:29.881  4570 13543 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:44:29.881  4570 13543 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:44:29.881  4570 13543 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:44:29.882  4570 13543 W Codec2Client: query -- param skipped: index = 2684356609.
+10-30 11:44:29.885   474   889 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:44:29.962  4570 13535 W SpeakerLayoutUtil: Built-in speaker's getSpeakerLayoutChannelMask not usable, defaulting to stereo.
+10-30 11:44:29.968   397   993 W AudioFlinger: createTrack_l(): mismatch between requested flags (00000008) and output flags (00000002)
+10-30 11:44:30.083  4570 13535 W SpeakerLayoutUtil: Built-in speaker's getSpeakerLayoutChannelMask not usable, defaulting to stereo.
+10-30 11:44:30.311  4570 13551 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+10-30 11:44:30.311  4570 13551 E EGL_emulation: tid 13551: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+10-30 11:44:30.322  4570 13553 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:44:30.328  4570 13553 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:44:30.328  4570 13553 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:44:30.331  4570 13553 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:44:30.331  4570 13553 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:44:30.331  4570 13553 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:44:30.331  4570 13553 W Codec2Client: query -- param skipped: index = 2684356609.
+10-30 11:44:30.336   474   889 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:44:34.898   348 13544 W C2BqBuffer: last successful dequeue was 3812654 us ago, 329 consecutive failures
+10-30 11:44:35.156  4570 13535 W SpeakerLayoutUtil: Built-in speaker's getSpeakerLayoutChannelMask not usable, defaulting to stereo.
+10-30 11:44:35.409   348 13554 W C2BqBuffer: last successful dequeue was 3823280 us ago, 368 consecutive failures
+10-30 11:44:35.818  4570 13537 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:44:35.818  4570 13537 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:44:35.818  4570 13537 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:44:36.612  4570 13542 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:44:36.613  4570 13542 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:44:36.613  4570 13542 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:44:36.620  4570 13561 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+10-30 11:44:36.621  4570 13561 E EGL_emulation: tid 13561: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+10-30 11:44:36.640  4570 13542 W MediaCodec: no metrics handle found
+10-30 11:44:36.646   348  9034 W C2BqBuffer: get generationNumber failed 19628000543195
+10-30 11:44:36.670  4570 13564 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:44:36.676  4570 13564 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:44:36.676  4570 13564 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:44:36.682  4570 13564 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:44:36.682  4570 13564 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:44:36.682  4570 13564 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:44:36.682  4570 13564 W Codec2Client: query -- param skipped: index = 2684356609.
+10-30 11:44:36.686   474   889 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:44:40.419   348 13554 W C2BqBuffer: last successful dequeue was 8833188 us ago, 787 consecutive failures
+10-30 11:44:41.570  4570 13535 W AudioTrack: restartIfDisabled(22): releaseBuffer() track 0x7cd66870b4a0 disabled due to previous underrun, restarting
+10-30 11:44:41.576  4570 13537 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:44:41.577  4570 13537 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:44:41.577  4570 13537 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:44:41.696   348 13565 W C2BqBuffer: last successful dequeue was 4219268 us ago, 406 consecutive failures
+10-30 11:44:42.003  4570 13552 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:44:42.003  4570 13552 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:44:42.003  4570 13552 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:44:42.016   348  9034 W C2BqBuffer: get generationNumber failed 19628000543195
+10-30 11:44:42.029  4570 13535 W MediaCodec: no metrics handle found
+10-30 11:44:42.042  4570 13572 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:44:42.050  4570 13572 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:44:42.050  4570 13572 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:44:42.054  4570 13572 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:44:42.054  4570 13572 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:44:42.054  4570 13572 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:44:42.055  4570 13572 W Codec2Client: query -- param skipped: index = 2684356609.
+10-30 11:44:42.059   474   889 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:44:43.262  4570 13537 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:44:43.263  4570 13537 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:44:43.263  4570 13537 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:44:43.269  4570 13563 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:44:43.269  4570 13563 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:44:43.269  4570 13563 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:44:43.304  4570  4645 W Codec2-OutputBufferQueue: receiving stale buffer: generation 4680292 , diff 2 : slot 6
+10-30 11:44:43.765  4570  4570 E CompositionPlayer-0: playerFailed [eventTime=13.97, mediaPos=4.63, window=0, period=2, errorCode=ERROR_CODE_TIMEOUT
+10-30 11:44:43.765  4570  4570 E CompositionPlayer-0:   androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+10-30 11:44:43.765  4570  4570 E CompositionPlayer-0:       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1161)
+10-30 11:44:43.765  4570  4570 E CompositionPlayer-0:       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+10-30 11:44:43.765  4570  4570 E CompositionPlayer-0:       at androidx.media3.common.util.ListenerSet$ListenerHolder.invoke(ListenerSet.java:466)
+10-30 11:44:43.765  4570  4570 E CompositionPlayer-0:       at androidx.media3.common.util.ListenerSet.lambda$queueEvent$0(ListenerSet.java:334)
+10-30 11:44:43.765  4570  4570 E CompositionPlayer-0:       at androidx.media3.common.util.ListenerSet$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+10-30 11:44:43.765  4570  4570 E CompositionPlayer-0:       at androidx.media3.common.util.ListenerSet.flushEvents(ListenerSet.java:358)
+10-30 11:44:43.765  4570  4570 E CompositionPlayer-0:       at androidx.media3.common.util.ListenerSet.sendEvent(ListenerSet.java:386)
+10-30 11:44:43.765  4570  4570 E CompositionPlayer-0:       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1157)
+10-30 11:44:43.765  4570  4570 E CompositionPlayer-0:       at androidx.media3.transformer.CompositionPlayer$SequencePlayerHolder.release(CompositionPlayer.java:2400)
+10-30 11:44:43.765  4570  4570 E CompositionPlayer-0:       at androidx.media3.transformer.CompositionPlayer$SequencePlayerHolder.access$2300(CompositionPlayer.java:2352)
+10-30 11:44:43.765  4570  4570 E CompositionPlayer-0:       at androidx.media3.transformer.CompositionPlayer.handleRelease(CompositionPlayer.java:1091)
+10-30 11:44:43.765  4570  4570 E CompositionPlayer-0:       at androidx.media3.common.SimpleBasePlayer.release(SimpleBasePlayer.java:2656)
+10-30 11:44:43.765  4570  4570 E CompositionPlayer-0:       at it.fabriziodavi.vivovideo.DeviceTest.playFor$lambda$5(DeviceTest.kt:660)
+10-30 11:44:43.765  4570  4570 E CompositionPlayer-0:       at it.fabriziodavi.vivovideo.DeviceTest.$r8$lambda$JG3Pa8ySzUtBzE_ZlBfqfHf_daA(Unknown Source:0)
+10-30 11:44:43.765  4570  4570 E CompositionPlayer-0:       at it.fabriziodavi.vivovideo.DeviceTest$$ExternalSyntheticLambda15.run(D8$$SyntheticClass:0)
+10-30 11:44:43.765  4570  4570 E CompositionPlayer-0:       at android.os.Handler.handleCallback(Handler.java:958)
+10-30 11:44:43.765  4570  4570 E CompositionPlayer-0:       at android.os.Handler.dispatchMessage(Handler.java:99)
+10-30 11:44:43.765  4570  4570 E CompositionPlayer-0:       at android.os.Looper.loopOnce(Looper.java:205)
+10-30 11:44:43.765  4570  4570 E CompositionPlayer-0:       at android.os.Looper.loop(Looper.java:294)
+10-30 11:44:43.765  4570  4570 E CompositionPlayer-0:       at android.app.ActivityThread.main(ActivityThread.java:8177)
+10-30 11:44:43.765  4570  4570 E CompositionPlayer-0:       at java.lang.reflect.Method.invoke(Native Method)
+10-30 11:44:43.765  4570  4570 E CompositionPlayer-0:       at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:552)
+10-30 11:44:43.765  4570  4570 E CompositionPlayer-0:       at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:971)
+10-30 11:44:43.765  4570  4570 E CompositionPlayer-0:   Caused by: androidx.media3.exoplayer.ExoTimeoutException: Player release timed out.
+10-30 11:44:43.765  4570  4570 E CompositionPlayer-0:       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+10-30 11:44:43.765  4570  4570 E CompositionPlayer-0:       ... 22 more
+10-30 11:44:43.765  4570  4570 E CompositionPlayer-0: ]
+10-30 11:44:43.783  4570  4570 E CompositionPlayer: playerFailed [eventTime=13.98, mediaPos=4.63, window=0, errorCode=ERROR_CODE_TIMEOUT
+10-30 11:44:43.783  4570  4570 E CompositionPlayer:   androidx.media3.common.PlaybackException: error from player 0
+10-30 11:44:43.783  4570  4570 E CompositionPlayer:       at androidx.media3.transformer.CompositionPlayer.maybeUpdatePlaybackError(CompositionPlayer.java:2040)
+10-30 11:44:43.783  4570  4570 E CompositionPlayer:       at androidx.media3.transformer.CompositionPlayer.access$3300(CompositionPlayer.java:165)
+10-30 11:44:43.783  4570  4570 E CompositionPlayer:       at androidx.media3.transformer.CompositionPlayer$PlayerListener.onPlayerError(CompositionPlayer.java:2319)
+10-30 11:44:43.783  4570  4570 E CompositionPlayer:       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+10-30 11:44:43.783  4570  4570 E CompositionPlayer:       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+10-30 11:44:43.783  4570  4570 E CompositionPlayer:       at androidx.media3.common.util.ListenerSet$ListenerHolder.invoke(ListenerSet.java:466)
+10-30 11:44:43.783  4570  4570 E CompositionPlayer:       at androidx.media3.common.util.ListenerSet.lambda$queueEvent$0(ListenerSet.java:334)
+10-30 11:44:43.783  4570  4570 E CompositionPlayer:       at androidx.media3.common.util.ListenerSet$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+10-30 11:44:43.783  4570  4570 E CompositionPlayer:       at androidx.media3.common.util.ListenerSet.flushEvents(ListenerSet.java:358)
+10-30 11:44:43.783  4570  4570 E CompositionPlayer:       at androidx.media3.common.util.ListenerSet.sendEvent(ListenerSet.java:386)
+10-30 11:44:43.783  4570  4570 E CompositionPlayer:       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1157)
+10-30 11:44:43.783  4570  4570 E CompositionPlayer:       at androidx.media3.transformer.CompositionPlayer$SequencePlayerHolder.release(CompositionPlayer.java:2400)
+10-30 11:44:43.783  4570  4570 E CompositionPlayer:       at androidx.media3.transformer.CompositionPlayer$SequencePlayerHolder.access$2300(CompositionPlayer.java:2352)
+10-30 11:44:43.783  4570  4570 E CompositionPlayer:       at androidx.media3.transformer.CompositionPlayer.handleRelease(CompositionPlayer.java:1091)
+10-30 11:44:43.783  4570  4570 E CompositionPlayer:       at androidx.media3.common.SimpleBasePlayer.release(SimpleBasePlayer.java:2656)
+10-30 11:44:43.783  4570  4570 E CompositionPlayer:       at it.fabriziodavi.vivovideo.DeviceTest.playFor$lambda$5(DeviceTest.kt:660)
+10-30 11:44:43.783  4570  4570 E CompositionPlayer:       at it.fabriziodavi.vivovideo.DeviceTest.$r8$lambda$JG3Pa8ySzUtBzE_ZlBfqfHf_daA(Unknown Source:0)
+10-30 11:44:43.783  4570  4570 E CompositionPlayer:       at it.fabriziodavi.vivovideo.DeviceTest$$ExternalSyntheticLambda15.run(D8$$SyntheticClass:0)
+10-30 11:44:43.783  4570  4570 E CompositionPlayer:       at android.os.Handler.handleCallback(Handler.java:958)
+10-30 11:44:43.783  4570  4570 E CompositionPlayer:       at android.os.Handler.dispatchMessage(Handler.java:99)
+10-30 11:44:43.783  4570  4570 E CompositionPlayer:       at android.os.Looper.loopOnce(Looper.java:205)
+10-30 11:44:43.783  4570  4570 E CompositionPlayer:       at android.os.Looper.loop(Looper.java:294)
+10-30 11:44:43.783  4570  4570 E CompositionPlayer:       at android.app.ActivityThread.main(ActivityThread.java:8177)
+10-30 11:44:43.783  4570  4570 E CompositionPlayer:       at java.lang.reflect.Method.invoke(Native Method)
+10-30 11:44:43.783  4570  4570 E CompositionPlayer:       at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:552)
+10-30 11:44:43.783  4570  4570 E CompositionPlayer:       at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:971)
+10-30 11:44:43.783  4570  4570 E CompositionPlayer:   Caused by: androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+10-30 11:44:43.783  4570  4570 E CompositionPlayer:       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1161)
+10-30 11:44:43.783  4570  4570 E CompositionPlayer:       ... 22 more
+10-30 11:44:43.783  4570  4570 E CompositionPlayer:   Caused by: androidx.media3.exoplayer.ExoTimeoutException: Player release timed out.
+10-30 11:44:43.783  4570  4570 E CompositionPlayer:       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+10-30 11:44:43.783  4570  4570 E CompositionPlayer:       ... 22 more
+10-30 11:44:43.783  4570  4570 E CompositionPlayer: ]
+10-30 11:44:44.298  4570  4570 E CompositionPlayer: playerFailed [eventTime=14.51, mediaPos=0.00, window=0, errorCode=ERROR_CODE_TIMEOUT
+10-30 11:44:44.298  4570  4570 E CompositionPlayer:   androidx.media3.common.PlaybackException: InternalPlayer release timeout
+10-30 11:44:44.298  4570  4570 E CompositionPlayer:       at androidx.media3.transformer.CompositionPlayer.handleRelease(CompositionPlayer.java:1125)
+10-30 11:44:44.298  4570  4570 E CompositionPlayer:       at androidx.media3.common.SimpleBasePlayer.release(SimpleBasePlayer.java:2656)
+10-30 11:44:44.298  4570  4570 E CompositionPlayer:       at it.fabriziodavi.vivovideo.DeviceTest.playFor$lambda$5(DeviceTest.kt:660)
+10-30 11:44:44.298  4570  4570 E CompositionPlayer:       at it.fabriziodavi.vivovideo.DeviceTest.$r8$lambda$JG3Pa8ySzUtBzE_ZlBfqfHf_daA(Unknown Source:0)
+10-30 11:44:44.298  4570  4570 E CompositionPlayer:       at it.fabriziodavi.vivovideo.DeviceTest$$ExternalSyntheticLambda15.run(D8$$SyntheticClass:0)
+10-30 11:44:44.298  4570  4570 E CompositionPlayer:       at android.os.Handler.handleCallback(Handler.java:958)
+10-30 11:44:44.298  4570  4570 E CompositionPlayer:       at android.os.Handler.dispatchMessage(Handler.java:99)
+10-30 11:44:44.298  4570  4570 E CompositionPlayer:       at android.os.Looper.loopOnce(Looper.java:205)
+10-30 11:44:44.298  4570  4570 E CompositionPlayer:       at android.os.Looper.loop(Looper.java:294)
+10-30 11:44:44.298  4570  4570 E CompositionPlayer:       at android.app.ActivityThread.main(ActivityThread.java:8177)
+10-30 11:44:44.298  4570  4570 E CompositionPlayer:       at java.lang.reflect.Method.invoke(Native Method)
+10-30 11:44:44.298  4570  4570 E CompositionPlayer:       at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:552)
+10-30 11:44:44.298  4570  4570 E CompositionPlayer:       at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:971)
+10-30 11:44:44.298  4570  4570 E CompositionPlayer: ]

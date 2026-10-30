@@ -1,0 +1,300 @@
+10-30 11:01:43.707  1706  2322 W A       : 	at com.google.android.libraries.gsa.k.a.f.a(PG:2)
+10-30 11:01:43.707  1706  2322 W A       : 	at com.google.common.util.concurrent.dx.a(PG:1)
+10-30 11:01:43.707  1706  2322 W A       : 	at com.google.common.util.concurrent.cv.run(PG:4)
+10-30 11:01:43.707  1706  2322 W A       : 	at com.google.common.util.concurrent.dz.run(PG:1)
+10-30 11:01:43.707  1706  2322 W A       : 	at com.google.android.libraries.i.ae.run(PG:1)
+10-30 11:01:43.707  1706  2322 W A       : 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+10-30 11:01:43.707  1706  2322 W A       : 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+10-30 11:01:43.707  1706  2322 W A       : 	at com.google.android.libraries.i.k.run(PG:2)
+10-30 11:01:43.707  1706  2322 W A       : 	at com.google.android.libraries.i.p.run(PG:4)
+10-30 11:01:43.707  1706  2322 W A       : 	at java.lang.Thread.run(Thread.java:1012)
+10-30 11:01:43.707  1706  2322 W A       : Failed to fetch versionCode for package[com.google.android.apps.tv.launcherx].
+10-30 11:01:43.803  6428  8032 W ZappDownloader: No successful module downloads for requested features [vision.ocr].
+10-30 11:01:43.810  6428  8032 W ChimeraConfigService: Retry attempt was throttled. [CONTEXT service_id=264 ]
+10-30 11:01:43.816  6428  8034 W Vision  : Request for optional module download of ocr failed. Request again.
+10-30 11:01:43.817  6428  8034 W Vision  : Would have logged:
+10-30 11:01:43.817  6428  8034 W Vision  : # dsae@37884fe7
+10-30 11:01:45.266   348  8029 W C2BqBuffer: last successful dequeue was 1042617 us ago, 102 consecutive failures
+10-30 11:01:45.616  6358  7133 W BpBinder: Large outgoing transaction of 329812 bytes, interface descriptor , code 4
+10-30 11:01:45.629  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_birthdaydoodle_jar__name to integer.
+10-30 11:01:45.630  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_call_jar__name to integer.
+10-30 11:01:45.630  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_canvas_jar__name to integer.
+10-30 11:01:45.630  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_chkpkg_jar__name to integer.
+10-30 11:01:45.630  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_crashtest_jar__name to integer.
+10-30 11:01:45.630  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_dining_jar__name to integer.
+10-30 11:01:45.630  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_doodle_notifications_jar__name to integer.
+10-30 11:01:45.630  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_imageviewer_jar__name to integer.
+10-30 11:01:45.630  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_ipa_jar__name to integer.
+10-30 11:01:45.630  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_jslocation_jar__name to integer.
+10-30 11:01:45.630  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_localintent_jar__name to integer.
+10-30 11:01:45.630  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_messaging_jar__name to integer.
+10-30 11:01:45.630  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_nativesrp_activity_jar__name to integer.
+10-30 11:01:45.630  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_nativesrp_presenter_jar__name to integer.
+10-30 11:01:45.630  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_nowcontent_jar__name to integer.
+10-30 11:01:45.630  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_recents_activity_jar__name to integer.
+10-30 11:01:45.630  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_save_jar__name to integer.
+10-30 11:01:45.630  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_searchresults_activity_jar__name to integer.
+10-30 11:01:45.630  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_test_jar__name to integer.
+10-30 11:01:45.630  1706  2323 W A       : Can't format flag AndroidGsaVelourJars__velour_weather_jar__name to integer.
+10-30 11:01:45.630  1706  2323 W A       : Can't format flag bindle_flags__bloblobber_blob to integer.
+10-30 11:01:45.630  1706  2323 W A       : Can't format flag bindle_flags__velour_jar to integer.
+10-30 11:01:45.631  1706  8047 W A       : Can't format flag AndroidGsaVelourJars__velour_birthdaydoodle_jar__name to integer.
+10-30 11:01:45.632  1706  8047 W A       : Can't format flag AndroidGsaVelourJars__velour_call_jar__name to integer.
+10-30 11:01:45.632  1706  8047 W A       : Can't format flag AndroidGsaVelourJars__velour_canvas_jar__name to integer.
+10-30 11:01:45.632  1706  8047 W A       : Can't format flag AndroidGsaVelourJars__velour_chkpkg_jar__name to integer.
+10-30 11:01:45.632  1706  8047 W A       : Can't format flag AndroidGsaVelourJars__velour_crashtest_jar__name to integer.
+10-30 11:01:45.632  1706  8047 W A       : Can't format flag AndroidGsaVelourJars__velour_dining_jar__name to integer.
+10-30 11:01:45.632  1706  8047 W A       : Can't format flag AndroidGsaVelourJars__velour_doodle_notifications_jar__name to integer.
+10-30 11:01:45.632  1706  8047 W A       : Can't format flag AndroidGsaVelourJars__velour_imageviewer_jar__name to integer.
+10-30 11:01:45.632  1706  8047 W A       : Can't format flag AndroidGsaVelourJars__velour_ipa_jar__name to integer.
+10-30 11:01:45.632  1706  8047 W A       : Can't format flag AndroidGsaVelourJars__velour_jslocation_jar__name to integer.
+10-30 11:01:45.632  1706  8047 W A       : Can't format flag AndroidGsaVelourJars__velour_localintent_jar__name to integer.
+10-30 11:01:45.632  1706  8047 W A       : Can't format flag AndroidGsaVelourJars__velour_messaging_jar__name to integer.
+10-30 11:01:45.632  1706  8047 W A       : Can't format flag AndroidGsaVelourJars__velour_nativesrp_activity_jar__name to integer.
+10-30 11:01:45.632  1706  8047 W A       : Can't format flag AndroidGsaVelourJars__velour_nativesrp_presenter_jar__name to integer.
+10-30 11:01:45.632  1706  8047 W A       : Can't format flag AndroidGsaVelourJars__velour_nowcontent_jar__name to integer.
+10-30 11:01:45.632  1706  8047 W A       : Can't format flag AndroidGsaVelourJars__velour_recents_activity_jar__name to integer.
+10-30 11:01:45.632  1706  8047 W A       : Can't format flag AndroidGsaVelourJars__velour_save_jar__name to integer.
+10-30 11:01:45.632  1706  8047 W A       : Can't format flag AndroidGsaVelourJars__velour_searchresults_activity_jar__name to integer.
+10-30 11:01:45.632  1706  8047 W A       : Can't format flag AndroidGsaVelourJars__velour_test_jar__name to integer.
+10-30 11:01:45.632  1706  8047 W A       : Can't format flag AndroidGsaVelourJars__velour_weather_jar__name to integer.
+10-30 11:01:45.632  1706  8047 W A       : Can't format flag bindle_flags__bloblobber_blob to integer.
+10-30 11:01:45.632  1706  8047 W A       : Can't format flag bindle_flags__velour_jar to integer.
+10-30 11:01:45.639  6358  7131 W BpBinder: Large outgoing transaction of 329812 bytes, interface descriptor , code 4
+10-30 11:01:45.676  1706  2303 W CorpusConfigHelper: Invalid input from icing corpus JSON flag.
+10-30 11:01:45.676  1706  2303 W CorpusConfigHelper: android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+10-30 11:01:45.676  1706  2303 W CorpusConfigHelper: 	at android.util.JsonReader.syntaxError(JsonReader.java:1162)
+10-30 11:01:45.676  1706  2303 W CorpusConfigHelper: 	at android.util.JsonReader.checkLenient(JsonReader.java:840)
+10-30 11:01:45.676  1706  2303 W CorpusConfigHelper: 	at android.util.JsonReader.nextInArray(JsonReader.java:615)
+10-30 11:01:45.676  1706  2303 W CorpusConfigHelper: 	at android.util.JsonReader.peek(JsonReader.java:345)
+10-30 11:01:45.676  1706  2303 W CorpusConfigHelper: 	at android.util.JsonReader.hasNext(JsonReader.java:321)
+10-30 11:01:45.676  1706  2303 W CorpusConfigHelper: 	at com.google.android.apps.gsa.searchbox.c.b.b.k.c(PG:7)
+10-30 11:01:45.676  1706  2303 W CorpusConfigHelper: 	at com.google.android.apps.gsa.searchbox.c.b.b.j.a(Unknown Source:2)
+10-30 11:01:45.676  1706  2303 W CorpusConfigHelper: 	at com.google.android.apps.gsa.search.core.i.r.run(PG:5)
+10-30 11:01:45.676  1706  2303 W CorpusConfigHelper: 	at com.google.android.libraries.gsa.k.a.h.run(PG:2)
+10-30 11:01:45.676  1706  2303 W CorpusConfigHelper: 	at com.google.android.apps.gsa.shared.util.c.a.cf.b(PG:1)
+10-30 11:01:45.676  1706  2303 W CorpusConfigHelper: 	at com.google.android.apps.gsa.shared.util.c.a.ci.run(PG:1)
+10-30 11:01:45.676  1706  2303 W CorpusConfigHelper: 	at com.google.android.libraries.i.ae.run(PG:1)
+10-30 11:01:45.676  1706  2303 W CorpusConfigHelper: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+10-30 11:01:45.676  1706  2303 W CorpusConfigHelper: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+10-30 11:01:45.676  1706  2303 W CorpusConfigHelper: 	at com.google.android.libraries.i.k.run(PG:2)
+10-30 11:01:45.676  1706  2303 W CorpusConfigHelper: 	at com.google.android.libraries.i.p.run(PG:4)
+10-30 11:01:45.676  1706  2303 W CorpusConfigHelper: 	at java.lang.Thread.run(Thread.java:1012)
+10-30 11:01:45.717  1706  2315 W CorpusConfigHelper: Invalid input from icing corpus JSON flag.
+10-30 11:01:45.717  1706  2315 W CorpusConfigHelper: android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+10-30 11:01:45.717  1706  2315 W CorpusConfigHelper: 	at android.util.JsonReader.syntaxError(JsonReader.java:1162)
+10-30 11:01:45.717  1706  2315 W CorpusConfigHelper: 	at android.util.JsonReader.checkLenient(JsonReader.java:840)
+10-30 11:01:45.717  1706  2315 W CorpusConfigHelper: 	at android.util.JsonReader.nextInArray(JsonReader.java:615)
+10-30 11:01:45.717  1706  2315 W CorpusConfigHelper: 	at android.util.JsonReader.peek(JsonReader.java:345)
+10-30 11:01:45.717  1706  2315 W CorpusConfigHelper: 	at android.util.JsonReader.hasNext(JsonReader.java:321)
+10-30 11:01:45.717  1706  2315 W CorpusConfigHelper: 	at com.google.android.apps.gsa.searchbox.c.b.b.k.c(PG:7)
+10-30 11:01:45.717  1706  2315 W CorpusConfigHelper: 	at com.google.android.apps.gsa.searchbox.c.b.b.j.a(Unknown Source:2)
+10-30 11:01:45.717  1706  2315 W CorpusConfigHelper: 	at com.google.android.apps.gsa.search.core.i.r.run(PG:5)
+10-30 11:01:45.717  1706  2315 W CorpusConfigHelper: 	at com.google.android.libraries.gsa.k.a.h.run(PG:2)
+10-30 11:01:45.717  1706  2315 W CorpusConfigHelper: 	at com.google.android.apps.gsa.shared.util.c.a.cf.b(PG:1)
+10-30 11:01:45.717  1706  2315 W CorpusConfigHelper: 	at com.google.android.apps.gsa.shared.util.c.a.ci.run(PG:1)
+10-30 11:01:45.717  1706  2315 W CorpusConfigHelper: 	at com.google.android.libraries.i.ae.run(PG:1)
+10-30 11:01:45.717  1706  2315 W CorpusConfigHelper: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+10-30 11:01:45.717  1706  2315 W CorpusConfigHelper: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+10-30 11:01:45.717  1706  2315 W CorpusConfigHelper: 	at com.google.android.libraries.i.k.run(PG:2)
+10-30 11:01:45.717  1706  2315 W CorpusConfigHelper: 	at com.google.android.libraries.i.p.run(PG:4)
+10-30 11:01:45.717  1706  2315 W CorpusConfigHelper: 	at java.lang.Thread.run(Thread.java:1012)
+10-30 11:01:50.269   348  8029 W C2BqBuffer: last successful dequeue was 6045482 us ago, 592 consecutive failures
+10-30 11:01:57.100  4570  8027 W MediaCodec: no metrics handle found
+10-30 11:01:57.953  4570  8065 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:01:57.959  4570  8065 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:01:57.959  4570  8065 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:01:57.961  4570  8065 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:01:57.961  4570  8065 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:01:57.961  4570  8065 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:01:57.962  4570  8065 W Codec2Client: query -- param skipped: index = 2684356609.
+10-30 11:01:58.155   474  3535 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:02:00.082   846   846 W PageIndicator: Total number of pages invalid: 0. Assuming 1 page.
+10-30 11:02:12.242   522   768 E WifiStaIfaceAidlImpl: installApfPacketFilter failed with service-specific exception: android.os.ServiceSpecificException:  (code 4)
+10-30 11:02:15.913   348  8066 W C2BqBuffer: last successful dequeue was 1612367 us ago, 157 consecutive failures
+10-30 11:02:20.914   348  8066 W C2BqBuffer: last successful dequeue was 6614072 us ago, 646 consecutive failures
+10-30 11:02:24.343  4570  8064 W MediaCodec: no metrics handle found
+10-30 11:02:24.422  4570  8071 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:02:24.430  4570  8071 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:02:24.430  4570  8071 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:02:24.436  4570  8071 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:02:24.436  4570  8071 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:02:24.436  4570  8071 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:02:24.436  4570  8071 W Codec2Client: query -- param skipped: index = 2684356609.
+10-30 11:02:24.634   474  3535 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:02:26.874  6358  6425 W TapAndPay: NfcAdapter is null while obtaining CardEmulation instance. [CONTEXT service_id=79 ]
+10-30 11:02:26.874  6358  6425 W TapAndPay: java.lang.NullPointerException: NfcAdapter is null
+10-30 11:02:26.874  6358  6425 W TapAndPay: 	at android.nfc.cardemulation.CardEmulation.getInstance(CardEmulation.java:152)
+10-30 11:02:26.874  6358  6425 W TapAndPay: 	at cdoy.<init>(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+10-30 11:02:26.874  6358  6425 W TapAndPay: 	at com.google.android.gms.tapandpay.hce.task.TapAndPayAidRegistrationTaskOperation.a(:com.google.android.gms@231818047@23.18.18 (190800-535401451):5)
+10-30 11:02:26.874  6358  6425 W TapAndPay: 	at com.google.android.gms.tapandpay.gcmtask.TapAndPayGcmTaskChimeraService.a(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+10-30 11:02:26.874  6358  6425 W TapAndPay: 	at avzs.call(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+10-30 11:02:26.874  6358  6425 W TapAndPay: 	at java.util.concurrent.FutureTask.run(FutureTask.java:264)
+10-30 11:02:26.874  6358  6425 W TapAndPay: 	at aced.c(:com.google.android.gms@231818047@23.18.18 (190800-535401451):6)
+10-30 11:02:26.874  6358  6425 W TapAndPay: 	at aced.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):7)
+10-30 11:02:26.874  6358  6425 W TapAndPay: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+10-30 11:02:26.874  6358  6425 W TapAndPay: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+10-30 11:02:26.874  6358  6425 W TapAndPay: 	at acjn.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+10-30 11:02:26.874  6358  6425 W TapAndPay: 	at java.lang.Thread.run(Thread.java:1012)
+10-30 11:02:29.664   348  8072 W C2BqBuffer: last successful dequeue was 3424645 us ago, 334 consecutive failures
+10-30 11:02:34.673   348  8072 W C2BqBuffer: last successful dequeue was 8433137 us ago, 826 consecutive failures
+10-30 11:02:40.645  4570  8070 W MediaCodec: no metrics handle found
+10-30 11:02:41.382  4570  8079 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:02:41.394  4570  8079 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:02:41.394  4570  8079 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:02:41.396  4570  8079 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:02:41.396  4570  8079 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:02:41.396  4570  8079 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:02:41.397  4570  8079 W Codec2Client: query -- param skipped: index = 2684356609.
+10-30 11:02:41.566   474  3535 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:02:46.763   348  8080 W C2BqBuffer: last successful dequeue was 4713220 us ago, 0 consecutive failures
+10-30 11:02:46.774  4570  4645 E Codec2-types: Failed to receive buffer from bufferpool -- resultStatus = 4.
+10-30 11:02:46.775  4570  4645 E Codec2-types: Invalid WorkBundle::baseBlocks[0].
+10-30 11:02:47.020  4570  4645 W BufferPoolAccessor2.0: buffer status message processing failure - message : 4 connection : 19629793900554
+10-30 11:02:51.768   348  8080 W C2BqBuffer: last successful dequeue was 886527 us ago, 79 consecutive failures
+10-30 11:02:56.768   348  8080 W C2BqBuffer: last successful dequeue was 3031215 us ago, 297 consecutive failures
+10-30 11:03:00.054   846   846 W PageIndicator: Total number of pages invalid: 0. Assuming 1 page.
+10-30 11:03:01.772   348  8080 W C2BqBuffer: last successful dequeue was 8034860 us ago, 784 consecutive failures
+10-30 11:03:06.868   348  8080 W C2BqBuffer: last successful dequeue was 13130780 us ago, 1245 consecutive failures
+10-30 11:03:07.181   522   768 W LastMileLogger: Failed to read event trace: /sys/kernel/debug/tracing/instances/wifi/trace
+10-30 11:03:07.183   522   768 E WifiStaIfaceAidlImpl: stopRssiMonitoring failed with service-specific exception: android.os.ServiceSpecificException:  (code 5)
+10-30 11:03:07.193   522   768 E WifiScoringParams: Invalid frequency(-1), using 5G as default rssi array
+10-30 11:03:07.209   522   768 E WifiStaIfaceAidlImpl: setDtimMultiplier failed with service-specific exception: android.os.ServiceSpecificException:  (code 4)
+10-30 11:03:07.253  6358  7963 E WakeLock: GCM_HB_ALARM release without a matched acquire!
+10-30 11:03:07.253  6358  7963 W WakeLock: GCM_HB_ALARM counter does not exist
+10-30 11:03:07.264  6358  7963 E WakeLock: GCM_CONN_ALARM release without a matched acquire!
+10-30 11:03:07.264  6358  7963 W WakeLock: GCM_CONN_ALARM counter does not exist
+10-30 11:03:07.511   335   368 W resolv  : resolv_stats_set_addrs: Network 100 not found for PROTO_DOT
+10-30 11:03:07.512   335   368 W resolv  : resolv_stats_set_addrs: Network 100 not found for PROTO_DOH
+10-30 11:03:07.632  6428  6486 E constellation: [api_verify_phone_operation] Failed to generate Client Signature
+10-30 11:03:07.632  6428  6486 E constellation: acwp: Stored private key deleted
+10-30 11:03:07.632  6428  6486 E constellation: 	at acos.e(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+10-30 11:03:07.632  6428  6486 E constellation: 	at acos.d(:com.google.android.gms@231818047@23.18.18 (190800-535401451):1)
+10-30 11:03:07.632  6428  6486 E constellation: 	at acoa.c(:com.google.android.gms@231818047@23.18.18 (190800-535401451):22)
+10-30 11:03:07.632  6428  6486 E constellation: 	at acoa.f(:com.google.android.gms@231818047@23.18.18 (190800-535401451):12)
+10-30 11:03:07.632  6428  6486 E constellation: 	at avsy.eo(:com.google.android.gms@231818047@23.18.18 (190800-535401451):1)
+10-30 11:03:07.632  6428  6486 E constellation: 	at avtf.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):14)
+10-30 11:03:07.632  6428  6486 E constellation: 	at dfhf.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+10-30 11:03:07.632  6428  6486 E constellation: 	at aced.c(:com.google.android.gms@231818047@23.18.18 (190800-535401451):6)
+10-30 11:03:07.632  6428  6486 E constellation: 	at aced.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):7)
+10-30 11:03:07.632  6428  6486 E constellation: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+10-30 11:03:07.632  6428  6486 E constellation: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+10-30 11:03:07.632  6428  6486 E constellation: 	at acjn.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+10-30 11:03:07.632  6428  6486 E constellation: 	at java.lang.Thread.run(Thread.java:1012)
+10-30 11:03:07.632  2869  3150 W DialerVerifiedNumberProvider: com.android.dialer.businessvoice.verifiedcall.impl.constellation.VerifiedNumberProvider.lambda$getConstellationResponse$1:155 Failed to get constellation token.
+10-30 11:03:07.632  2869  3150 W DialerVerifiedNumberProvider: nkq: 5004:
+10-30 11:03:07.632  2869  3150 W DialerVerifiedNumberProvider: 	at nov.au(PG:1)
+10-30 11:03:07.632  2869  3150 W DialerVerifiedNumberProvider: 	at nnf.g(PG:2)
+10-30 11:03:07.632  2869  3150 W DialerVerifiedNumberProvider: 	at npo.a(Unknown Source:2)
+10-30 11:03:07.632  2869  3150 W DialerVerifiedNumberProvider: 	at npy.dm(PG:9)
+10-30 11:03:07.632  2869  3150 W DialerVerifiedNumberProvider: 	at ncz.onTransact(PG:4)
+10-30 11:03:07.632  2869  3150 W DialerVerifiedNumberProvider: 	at android.os.Binder.execTransactInternal(Binder.java:1344)
+10-30 11:03:07.632  2869  3150 W DialerVerifiedNumberProvider: 	at android.os.Binder.execTransact(Binder.java:1275)
+10-30 11:03:07.638  2869  3150 W DialerConstellationSyncWorker: com.android.dialer.businessvoice.control.worker.ConstellationSyncWorker.lambda$syncConstellation$2:110 Constellation api request failed, status code: 5004
+10-30 11:03:09.338  4570  8078 W MediaCodec: no metrics handle found
+10-30 11:03:09.877  4570  8100 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:03:09.889  4570  8100 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:03:09.889  4570  8100 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:03:09.893  4570  8100 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:03:09.893  4570  8100 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:03:09.893  4570  8100 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:03:09.894  4570  8100 W Codec2Client: query -- param skipped: index = 2684356609.
+10-30 11:03:09.966   474  3535 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:03:15.449   348  8101 W C2BqBuffer: last successful dequeue was 4463454 us ago, 0 consecutive failures
+10-30 11:03:15.532   522   768 W LastMileLogger: Failed to open free_buffer pseudo-file: /sys/kernel/debug/tracing/instances/wifi/free_buffer: open failed: ENOENT (No such file or directory)
+10-30 11:03:15.533   522   768 W LastMileLogger: Failed to arm fail-safe.
+10-30 11:03:15.591   522   768 E WifiStaIfaceAidlImpl: installApfPacketFilter failed with service-specific exception: android.os.ServiceSpecificException:  (code 4)
+10-30 11:03:15.591   522   768 E WifiStaIfaceAidlImpl: installApfPacketFilter failed with service-specific exception: android.os.ServiceSpecificException:  (code 4)
+10-30 11:03:15.616   335   368 E Netd    : no such netId 102
+10-30 11:03:15.616   335   368 I netd    : networkAddRouteParcel(102, RouteInfoParcel{destination: fe80::/64, ifName: wlan0, nextHop: , mtu: 0}) -> ServiceSpecificException(64, "Machine is not on the network") <0.02ms>
+10-30 11:03:15.617   522   768 E WifiStaIfaceAidlImpl: setDtimMultiplier failed with service-specific exception: android.os.ServiceSpecificException:  (code 4)
+10-30 11:03:15.634   335   368 E Netd    : no such netId 102
+10-30 11:03:15.634   335   368 I netd    : networkAddRouteParcel(102, RouteInfoParcel{destination: 10.0.2.0/24, ifName: wlan0, nextHop: , mtu: 0}) -> ServiceSpecificException(64, "Machine is not on the network") <0.02ms>
+10-30 11:03:15.634   522   775 E ConnectivityService: Exception in networkAddRouteParcel for non-gateway: android.os.ServiceSpecificException: Machine is not on the network (code 64)
+10-30 11:03:15.634   335   368 E Netd    : no such netId 102
+10-30 11:03:15.634   335   368 I netd    : networkAddRouteParcel(102, RouteInfoParcel{destination: 0.0.0.0/0, ifName: wlan0, nextHop: 10.0.2.2, mtu: 0}) -> ServiceSpecificException(64, "Machine is not on the network") <0.02ms>
+10-30 11:03:15.635   522   775 E ConnectivityService: Exception in networkAddRouteParcel for gateway: android.os.ServiceSpecificException: Machine is not on the network (code 64)
+10-30 11:03:15.640   522   768 E WifiStaIfaceAidlImpl: installApfPacketFilter failed with service-specific exception: android.os.ServiceSpecificException:  (code 4)
+10-30 11:03:15.648   522   775 W DnsManager: updatePrivateDns(102, PrivateDnsConfig{true:/[]})
+10-30 11:03:15.651   335  8107 W resolv  : Validating DnsTlsServer 10.0.2.3 with mark 0xf0066
+10-30 11:03:15.651   335  8107 W resolv  : Socket failed to connect: Network is unreachable
+10-30 11:03:15.652   335  8107 W resolv  : TCP Handshake failed: 101
+10-30 11:03:15.652   335  8107 W resolv  : query failed
+10-30 11:03:15.652   335  8107 W resolv  : validateDnsTlsServer returned 0 for 10.0.2.3
+10-30 11:03:15.652   335  8107 W resolv  : Validation failed
+10-30 11:03:15.656   522   768 W WifiScoreReport: Cannot start external scoring netId=102 currentNetId=102 currentNetCapabilities=[ Transports: WIFI Capabilities: NOT_METERED&INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN&NOT_ROAMING&NOT_CONGESTED&NOT_SUSPENDED&NOT_VCN_MANAGED LinkUpBandwidth>=12000Kbps LinkDnBandwidth>=30000Kbps Specifier: <WifiNetworkAgentSpecifier [WifiConfiguration=, SSID="AndroidWifi", BSSID=02:15:b2:00:00:01, band=1, mMatchLocalOnlySpecifiers=false]> TransportInfo: <SSID: "AndroidWifi", BSSID: 02:15:b2:00:00:01, MAC: 02:15:b2:00:00:00, IP: /10.0.2.16, Security type: 0, Supplicant state: COMPLETED, Wi-Fi standard: 1, RSSI: -50, Link speed: 1Mbps, Tx Link speed: 1Mbps, Max Supported Tx Link speed: 54Mbps, Rx Link speed: -1Mbps, Max Supported Rx Link speed: 54Mbps, Frequency: 2437MHz, Net ID: 0, Metered hint: false, score: 60, isUsable: true, CarrierMerged: false, SubscriptionId: -1, IsPrimary: 1, Trusted: true, Restricted: false, Ephemeral: false, OEM paid: false, OEM private: false, OSU AP: false, FQDN: <none>, Provider friendly name: <none>, Requesting package name: <none>"AndroidWifi"openMLO Information: , Is TID-To-Link negotiation supported by the AP: false, AP MLD Address: <none>, AP MLO Link Id: <none>, AP MLO Affiliated links: <none>> SignalStrength: -50 AllowedUids: <{10157}> OwnerUid: 10157 AdminUids: [10157] SSID: "AndroidWifi" UnderlyingNetworks: Null] sessionId=1026
+10-30 11:03:15.667   335  8108 W resolv  : Validating DnsTlsServer 10.0.2.3 with mark 0xf0066
+10-30 11:03:15.684   522   768 E WifiStaIfaceAidlImpl: stopRssiMonitoring failed with service-specific exception: android.os.ServiceSpecificException:  (code 5)
+10-30 11:03:15.746  6358  6498 I ChimeraSrvcProxy: NullBinder for android.net.action.RECOMMEND_NETWORKS triggering remote TransactionTooLargeException due to Service without Chimera impl
+10-30 11:03:15.748  6358  6498 W .gms.persistent: Large reply transaction of 1056768 bytes, interface descriptor , code 1
+10-30 11:03:15.811  6358  8120 E WakeLock: GCM_CONN_ALARM release without a matched acquire!
+10-30 11:03:16.256  6358  6498 I ChimeraSrvcProxy: NullBinder for android.net.action.RECOMMEND_NETWORKS triggering remote TransactionTooLargeException due to Service without Chimera impl
+10-30 11:03:16.258  6358  6498 W .gms.persistent: Large reply transaction of 1056768 bytes, interface descriptor , code 1
+10-30 11:03:16.270   522   768 W LastMileLogger: Failed to stop event tracing: /sys/kernel/debug/tracing/instances/wifi/tracing_on: open failed: ENOENT (No such file or directory)
+10-30 11:03:16.393   522   768 E WifiStaIfaceAidlImpl: installApfPacketFilter failed with service-specific exception: android.os.ServiceSpecificException:  (code 4)
+10-30 11:03:16.395   335   368 E netd    : Error adding route ::/0 -> fe80::2 wlan0 to table 1016: File exists
+10-30 11:03:16.398   522   768 E WifiStaIfaceAidlImpl: setDtimMultiplier failed with service-specific exception: android.os.ServiceSpecificException:  (code 4)
+10-30 11:03:16.717  6358  6398 E WakeLock: GCM_HB_ALARM release without a matched acquire!
+10-30 11:03:16.722  6358  6398 W WakeLock: GCM_HB_ALARM counter does not exist
+10-30 11:03:16.741  1507  1552 W SP      : File ref is being finalized but wasn't closed, file: main_en_us_2022101700_1[6]
+10-30 11:03:16.741  1507  1552 W SP      : File ref is being finalized but wasn't closed, file: main_en_840_2022102600_1[2]
+10-30 11:03:17.549  6358  8126 E WakeLock: GCM_CONN_ALARM release without a matched acquire!
+10-30 11:03:18.602  6358  6498 I ChimeraSrvcProxy: NullBinder for android.net.action.RECOMMEND_NETWORKS triggering remote TransactionTooLargeException due to Service without Chimera impl
+10-30 11:03:18.602  6358  6498 W .gms.persistent: Large reply transaction of 1056768 bytes, interface descriptor , code 1
+10-30 11:03:20.449   348  8101 W C2BqBuffer: last successful dequeue was 4998766 us ago, 485 consecutive failures
+10-30 11:03:25.457   348  8101 W C2BqBuffer: last successful dequeue was 1456969 us ago, 142 consecutive failures
+10-30 11:03:30.466   348  8101 W C2BqBuffer: last successful dequeue was 6465367 us ago, 634 consecutive failures
+10-30 11:03:35.467   348  8101 W C2BqBuffer: last successful dequeue was 11467175 us ago, 1125 consecutive failures
+10-30 11:03:38.623  4570  8099 W MediaCodec: no metrics handle found
+10-30 11:03:38.898  4570  8131 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:03:38.914  4570  8131 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:03:38.914  4570  8131 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:03:38.917  4570  8131 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:03:38.917  4570  8131 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:03:38.917  4570  8131 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:03:38.917  4570  8131 W Codec2Client: query -- param skipped: index = 2684356609.
+10-30 11:03:38.955   474  3204 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:03:43.182  1706  2821 W LocationOracle: getBestLocation(): no location is available
+10-30 11:03:43.186  1706  2322 W CronetNetworkRqstWrppr: Upload request without a content type.
+10-30 11:03:43.187  1706  2315 W LocationOracle: No location returned by GMS core getLastLocation()
+10-30 11:03:43.188  1706  1706 E A       : onError
+10-30 11:03:43.188  1706  1706 E A       : com.google.android.apps.gsa.shared.speech.a.m: errorCode: 65561, engine: 2
+10-30 11:03:43.188  1706  1706 E A       : 	at com.google.android.apps.gsa.staticplugins.dc.a.e.a(PG:3)
+10-30 11:03:43.188  1706  1706 E A       : 	at com.google.android.apps.gsa.s3.n.hh(PG:1)
+10-30 11:03:43.188  1706  1706 E A       : 	at com.google.cd.g.a.f.e(PG:2)
+10-30 11:03:43.188  1706  1706 E A       : 	at com.google.android.apps.gsa.speech.k.a.g.d(PG:22)
+10-30 11:03:43.188  1706  1706 E A       : 	at com.google.android.apps.gsa.speech.k.a.g.ks(PG:6)
+10-30 11:03:43.188  1706  1706 E A       : 	at com.google.android.apps.gsa.s3.o.e(PG:14)
+10-30 11:03:43.188  1706  1706 E A       : 	at com.google.android.apps.gsa.s3.p.run(PG:1)
+10-30 11:03:43.188  1706  1706 E A       : 	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:487)
+10-30 11:03:43.188  1706  1706 E A       : 	at java.util.concurrent.FutureTask.run(FutureTask.java:264)
+10-30 11:03:43.188  1706  1706 E A       : 	at com.google.android.apps.gsa.shared.util.c.a.e.run(PG:2)
+10-30 11:03:43.188  1706  1706 E A       : 	at com.google.android.apps.gsa.shared.util.c.a.bi.run(PG:1)
+10-30 11:03:43.188  1706  1706 E A       : 	at com.google.android.apps.gsa.shared.util.c.a.bi.run(PG:1)
+10-30 11:03:43.188  1706  1706 E A       : 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+10-30 11:03:43.188  1706  1706 E A       : 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+10-30 11:03:43.188  1706  1706 E A       : 	at java.lang.Thread.run(Thread.java:1012)
+10-30 11:03:43.188  1706  1706 E A       : 	at com.google.android.apps.gsa.shared.util.c.a.l.run(PG:5)
+10-30 11:03:43.188  1706  1706 E A       : Caused by: com.google.android.apps.gsa.shared.speech.a.o: errorCode: 65586, engine: 2
+10-30 11:03:43.188  1706  1706 E A       : 	... 15 more
+10-30 11:03:43.188  1706  1706 E A       : Caused by: com.google.android.apps.gsa.shared.speech.a.k: errorCode: 401, engine: 2
+10-30 11:03:43.188  1706  1706 E A       : 	at com.google.android.apps.gsa.assistant.shared.n.h.a(PG:5)
+10-30 11:03:43.188  1706  1706 E A       : 	at com.google.android.apps.gsa.s3.producers.j.hE(PG:2)
+10-30 11:03:43.188  1706  1706 E A       : 	at com.google.android.apps.gsa.speech.k.a.g.d(PG:16)
+10-30 11:03:43.188  1706  1706 E A       : 	... 12 more
+10-30 11:03:43.191  1706  1706 W A       : Failed to sync device settings.
+10-30 11:03:43.966   348  8132 W C2BqBuffer: last successful dequeue was 3512384 us ago, 344 consecutive failures
+10-30 11:03:45.698   335  8108 W resolv  : SSL_connect write error 0, mark 0xf0066: Try again
+10-30 11:03:45.698   335  8108 W resolv  : TLS Handshake failed
+10-30 11:03:45.698   335  8108 W resolv  : query failed
+10-30 11:03:45.698   335  8108 W resolv  : validateDnsTlsServer returned 0 for 10.0.2.3
+10-30 11:03:45.698   335  8108 W resolv  : Validation failed
+10-30 11:03:46.781  1706  2821 W A       : [Download] response code: 400
+10-30 11:03:50.209  4570  8130 W MediaCodec: no metrics handle found
+10-30 11:04:00.050   846   846 W PageIndicator: Total number of pages invalid: 0. Assuming 1 page.
+10-30 11:04:08.183  4570  8002 E Surface : freeAllBuffers: 1 buffers were freed while being dequeued!
+10-30 11:04:08.186  4570  8002 W GraphicBufferSource: released unpopulated slots: [14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63]
+10-30 11:04:08.186  4570  8002 E Surface : getSlotFromBufferLocked: unknown buffer: 0x0
+10-30 11:04:08.196  4570  8011 W MediaCodec: no metrics handle found
+10-30 11:04:08.202  4570  8004 W MediaCodec: no metrics handle found
+10-30 11:04:08.234  1784  5823 W MediaProvider: isAppCloneUserPair for user 0: false

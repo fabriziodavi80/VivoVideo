@@ -1,0 +1,300 @@
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctdd.execute(PG:1)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctbc.o(PG:1)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctbc.b(PG:5)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cteg.r(PG:2)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cnsl.k(PG:1)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ccdy.a(PG:15)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at atyv.a(PG:2)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cbeo.o(PG:3)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cbeb.a(PG:1)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cnpq.a(PG:3)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctbg.d(PG:2)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctbi.run(PG:9)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctfm.run(PG:4)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at bxfd.run(PG:1)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at bxef.run(PG:2)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at java.lang.Thread.run(Thread.java:1012)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at bxfj.run(PG:5)
+10-30 11:06:35.223  8446  8529 E ctbc    : RuntimeException while executing runnable ctdz{cnpz@ce75544} with executor MoreExecutors.directExecutor()
+10-30 11:06:35.223  8446  8529 E ctbc    : java.lang.NullPointerException: Attempt to read from field 'java.lang.String cayk.b' on a null object reference in method 'void ccdw.b(java.lang.Object)'
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ccdw.b(PG:2)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cnpz.b(PG:3)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctdz.run(PG:6)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctdd.execute(PG:1)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctbc.o(PG:1)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctbc.b(PG:5)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cteg.r(PG:2)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cnsl.k(PG:1)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ccdy.a(PG:15)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at atyv.a(PG:2)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cbeo.o(PG:3)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cbeb.a(PG:1)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cnpq.a(PG:3)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctbg.d(PG:2)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctbi.run(PG:9)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctfm.run(PG:4)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at bxfd.run(PG:1)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at bxef.run(PG:2)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at java.lang.Thread.run(Thread.java:1012)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at bxfj.run(PG:5)
+10-30 11:06:35.223  8446  8529 E PhFileGroupPop: Failed to add file group
+10-30 11:06:35.223  8446  8529 E PhFileGroupPop: Failed to add file group
+10-30 11:06:35.223  8446  8529 E ctbc    : RuntimeException while executing runnable ctdz{cnpz@510f762} with executor MoreExecutors.directExecutor()
+10-30 11:06:35.223  8446  8529 E ctbc    : java.lang.NullPointerException: Attempt to read from field 'java.lang.String cayk.b' on a null object reference in method 'void ccdw.b(java.lang.Object)'
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ccdw.b(PG:2)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cnpz.b(PG:3)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctdz.run(PG:6)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctdd.execute(PG:1)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctbc.o(PG:1)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctbc.b(PG:5)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cteg.r(PG:2)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cnsl.k(PG:1)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ccdy.a(PG:15)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at atyv.a(PG:2)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cbeo.o(PG:3)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cbeb.a(PG:1)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cnpq.a(PG:3)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctbg.d(PG:2)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctbi.run(PG:9)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctfm.run(PG:4)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at bxfd.run(PG:1)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at bxef.run(PG:2)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at java.lang.Thread.run(Thread.java:1012)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at bxfj.run(PG:5)
+10-30 11:06:35.223  8446  8529 E PhFileGroupPop: Failed to add file group
+10-30 11:06:35.223  8446  8529 E ctbc    : RuntimeException while executing runnable ctdz{cnpz@ca681b0} with executor MoreExecutors.directExecutor()
+10-30 11:06:35.223  8446  8529 E ctbc    : java.lang.NullPointerException: Attempt to read from field 'java.lang.String cayk.b' on a null object reference in method 'void ccdw.b(java.lang.Object)'
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ccdw.b(PG:2)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cnpz.b(PG:3)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctdz.run(PG:6)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctdd.execute(PG:1)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctbc.o(PG:1)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctbc.b(PG:5)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cteg.r(PG:2)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cnsl.k(PG:1)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ccdy.a(PG:15)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at atyv.a(PG:2)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cbeo.o(PG:3)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cbeb.a(PG:1)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cnpq.a(PG:3)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctbg.d(PG:2)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctbi.run(PG:9)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctfm.run(PG:4)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at bxfd.run(PG:1)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at bxef.run(PG:2)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at java.lang.Thread.run(Thread.java:1012)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at bxfj.run(PG:5)
+10-30 11:06:35.223  8446  8529 E ctbc    : RuntimeException while executing runnable ctdz{cnpz@f8b27ae} with executor MoreExecutors.directExecutor()
+10-30 11:06:35.223  8446  8529 E ctbc    : java.lang.NullPointerException: Attempt to read from field 'java.lang.String cayk.b' on a null object reference in method 'void ccdw.b(java.lang.Object)'
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ccdw.b(PG:2)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cnpz.b(PG:3)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctdz.run(PG:6)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctdd.execute(PG:1)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctbc.o(PG:1)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctbc.b(PG:5)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cteg.r(PG:2)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cnsl.k(PG:1)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ccdy.a(PG:15)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at atyv.a(PG:2)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cbeo.o(PG:3)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cbeb.a(PG:1)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cnpq.a(PG:3)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctbg.d(PG:2)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctbi.run(PG:9)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctfm.run(PG:4)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at bxfd.run(PG:1)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at bxef.run(PG:2)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at java.lang.Thread.run(Thread.java:1012)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at bxfj.run(PG:5)
+10-30 11:06:35.223  8446  8529 E ctbc    : RuntimeException while executing runnable ctdz{cnpz@1ea08dc} with executor MoreExecutors.directExecutor()
+10-30 11:06:35.223  8446  8529 E ctbc    : java.lang.NullPointerException: Attempt to read from field 'java.lang.String cayk.b' on a null object reference in method 'void ccdw.b(java.lang.Object)'
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ccdw.b(PG:2)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cnpz.b(PG:3)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctdz.run(PG:6)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctdd.execute(PG:1)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctbc.o(PG:1)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctbc.b(PG:5)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cteg.r(PG:2)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cnsl.k(PG:1)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ccdy.a(PG:15)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at atyv.a(PG:2)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cbeo.o(PG:3)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cbeb.a(PG:1)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at cnpq.a(PG:3)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctbg.d(PG:2)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctbi.run(PG:9)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at ctfm.run(PG:4)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at bxfd.run(PG:1)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at bxef.run(PG:2)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at java.lang.Thread.run(Thread.java:1012)
+10-30 11:06:35.223  8446  8529 E ctbc    : 	at bxfj.run(PG:5)
+10-30 11:06:35.226  8446  8529 E MDD     : FileGroupManager: Trying to add expired group webref-model-local-index.
+10-30 11:06:35.226  8446  8529 W MDD     : MDDManager class cbkc
+10-30 11:06:35.226  8446  8529 E PhFileGroupPop: Failed to add file group
+10-30 11:06:35.226  8446  8529 E PhFileGroupPop: cbkc
+10-30 11:06:35.226  8446  8529 E PhFileGroupPop: 	at cbqx.a(PG:90)
+10-30 11:06:35.226  8446  8529 E PhFileGroupPop: 	at cnpq.a(PG:3)
+10-30 11:06:35.226  8446  8529 E PhFileGroupPop: 	at ctbg.d(PG:2)
+10-30 11:06:35.226  8446  8529 E PhFileGroupPop: 	at ctbi.run(PG:9)
+10-30 11:06:35.226  8446  8529 E PhFileGroupPop: 	at ctfm.run(PG:4)
+10-30 11:06:35.226  8446  8529 E PhFileGroupPop: 	at bxfd.run(PG:1)
+10-30 11:06:35.226  8446  8529 E PhFileGroupPop: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+10-30 11:06:35.226  8446  8529 E PhFileGroupPop: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+10-30 11:06:35.226  8446  8529 E PhFileGroupPop: 	at bxef.run(PG:2)
+10-30 11:06:35.226  8446  8529 E PhFileGroupPop: 	at java.lang.Thread.run(Thread.java:1012)
+10-30 11:06:35.226  8446  8529 E PhFileGroupPop: 	at bxfj.run(PG:5)
+10-30 11:06:35.768  8446  8472 W Bugle   : TextClassifierLibManagerImpl: Reclaiming memory at level: 40
+10-30 11:06:37.376  4570  8662 W MediaCodec: no metrics handle found
+10-30 11:06:37.429  4570  8667 W MediaCodec: no metrics handle found
+10-30 11:06:37.431  4570  8675 W MediaCodec: no metrics handle found
+10-30 11:06:37.572  4570  8706 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:06:37.581  4570  8706 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:06:37.581  4570  8706 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:06:37.583  4570  8706 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:06:37.583  4570  8706 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:06:37.583  4570  8706 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:06:37.584  4570  8706 W Codec2Client: query -- param skipped: index = 2684356609.
+10-30 11:06:37.599   474  7643 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:06:37.720  4570  8704 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:06:37.778  4570  8704 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:06:37.778  4570  8704 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:06:37.780  4570  8704 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:06:37.780  4570  8704 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:06:37.781  4570  8704 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:06:37.781  4570  8704 W Codec2Client: query -- param skipped: index = 2684356609.
+10-30 11:06:37.868   474  7643 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:06:37.876   348  8674 W C2BqBuffer: last successful dequeue was 7358420 us ago, 634 consecutive failures
+10-30 11:06:41.108  4570  8672 W MediaCodec: no metrics handle found
+10-30 11:06:45.059  4570  8659 W MediaCodec: no metrics handle found
+10-30 11:06:45.062  4570  8661 E Surface : freeAllBuffers: 1 buffers were freed while being dequeued!
+10-30 11:06:45.065  4570  8661 W GraphicBufferSource: released unpopulated slots: [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63]
+10-30 11:06:45.065  4570  8661 E Surface : getSlotFromBufferLocked: unknown buffer: 0x0
+10-30 11:06:45.076  4570  8678 W MediaCodec: no metrics handle found
+10-30 11:06:45.087  4570  8703 W MediaCodec: no metrics handle found
+10-30 11:06:45.092  4570  8705 W MediaCodec: no metrics handle found
+10-30 11:06:45.120  1784  1842 W MediaProvider: isAppCloneUserPair for user 0: false
+10-30 11:06:45.177   474  8723 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:06:45.181   474  8723 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:06:45.181   474  8723 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:06:45.182   474  8723 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:06:45.188   474  8723 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:06:45.188   474  8723 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:06:45.188   474  8723 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:06:45.190   474  8722 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:06:46.417  4570  8966 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:06:46.417  4570  8966 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:06:46.418  4570  8966 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:06:46.418  4570  8966 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:06:46.418  4570  8966 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:06:46.534  4570  8966 W MediaCodec: no metrics handle found
+10-30 11:06:46.577  4570  8969 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:06:46.577  4570  8969 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:06:46.577  4570  8969 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:06:46.578  4570  8969 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:06:46.578  4570  8969 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:06:46.670  4570  8969 W MediaCodec: no metrics handle found
+10-30 11:06:47.236  4570  8980 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+10-30 11:06:47.236  4570  8980 E EGL_emulation: tid 8980: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+10-30 11:06:47.238  4570  8980 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+10-30 11:06:47.238  4570  8980 E EGL_emulation: tid 8980: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+10-30 11:06:47.260  4570  8983 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:06:47.266  4570  8982 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:06:47.270  4570  8983 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:06:47.271  4570  8983 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:06:47.276  4570  8983 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:06:47.276  4570  8983 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:06:47.277  4570  8983 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:06:47.277  4570  8983 W Codec2Client: query -- param skipped: index = 2684356609.
+10-30 11:06:47.278  4570  8982 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:06:47.279  4570  8982 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:06:47.281  4570  8982 W Codec2Client: query -- param skipped: index = 3254792206.
+10-30 11:06:47.282  4570  8982 W Codec2Client: query -- param skipped: index = 3254792194.
+10-30 11:06:47.286   474  7643 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:06:47.502  4570  8980 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+10-30 11:06:47.503  4570  8980 E EGL_emulation: tid 8980: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+10-30 11:06:47.553  4570  8975 W odavi.vivovideo: Long monitor contention with owner ExoPlayer:Playback (8974) at androidx.media3.transformer.SampleConsumer androidx.media3.transformer.TransformerInternal$SequenceAssetLoaderListener.onOutputFormat(androidx.media3.common.Format)(TransformerInternal.java:709) waiters=2 in androidx.media3.transformer.SampleConsumer androidx.media3.transformer.TransformerInternal$SequenceAssetLoaderListener.onOutputFormat(androidx.media3.common.Format) for 324ms
+10-30 11:06:48.276  4570  8980 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+10-30 11:06:48.276  4570  8980 E EGL_emulation: tid 8980: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+10-30 11:06:48.293  4570  8987 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:06:48.300  4570  8987 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:06:48.301  4570  8987 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:06:48.304  4570  8987 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:06:48.304  4570  8987 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:06:48.304  4570  8987 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:06:48.305  4570  8987 W Codec2Client: query -- param skipped: index = 2684356609.
+10-30 11:06:48.350   474  7643 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:06:48.351  4570  8980 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+10-30 11:06:48.351  4570  8980 E EGL_emulation: tid 8980: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+10-30 11:06:48.794  4570  8994 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:06:48.802  4570  8994 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:06:48.802  4570  8994 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:06:48.805  4570  8994 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:06:48.805  4570  8994 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:06:48.805  4570  8994 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:06:48.806  4570  8994 W Codec2Client: query -- param skipped: index = 2684356609.
+10-30 11:06:48.820  4570  8997 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:06:48.828  4570  8997 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:06:48.828  4570  8997 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:06:48.832  4570  8997 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:06:48.832  4570  8997 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:06:48.832  4570  8997 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:06:48.832  4570  8997 W Codec2Client: query -- param skipped: index = 2684356609.
+10-30 11:06:49.050   474  3635 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:06:49.052   474  3635 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:06:52.020  4570  9004 W ColorUtils: expected specified color aspects (0:0:0:0)
+10-30 11:06:52.027  4570  9004 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:06:52.027  4570  9004 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:06:52.030   474  3635 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:06:54.059   348  8995 W C2BqBuffer: last successful dequeue was 2483779 us ago, 215 consecutive failures
+10-30 11:06:54.079   348  8998 W C2BqBuffer: last successful dequeue was 2317404 us ago, 215 consecutive failures
+10-30 11:06:56.838  4570  8993 W MediaCodec: no metrics handle found
+10-30 11:06:56.883  4570  8986 W MediaCodec: no metrics handle found
+10-30 11:06:56.933  4570  8981 W MediaCodec: no metrics handle found
+10-30 11:06:56.986  4570  9022 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:06:57.153  4570  9022 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:06:57.153  4570  9022 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:06:57.198  4570  9022 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:06:57.198  4570  9022 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:06:57.199  4570  9022 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:06:57.199  4570  9022 W Codec2Client: query -- param skipped: index = 2684356609.
+10-30 11:06:57.235   474  7643 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:06:57.290  4570  9026 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:06:57.494  4570  9026 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:06:57.494  4570  9026 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:06:57.496  4570  9026 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:06:57.496  4570  9026 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:06:57.496  4570  9026 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:06:57.497  4570  9026 W Codec2Client: query -- param skipped: index = 2684356609.
+10-30 11:06:57.500   474  3635 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:06:59.107   348  8998 W C2BqBuffer: last successful dequeue was 1379998 us ago, 18 consecutive failures
+10-30 11:07:00.054   846   846 W PageIndicator: Total number of pages invalid: 0. Assuming 1 page.
+10-30 11:07:00.820  4570  8996 W MediaCodec: no metrics handle found
+10-30 11:07:02.244   348  9024 W C2BqBuffer: last successful dequeue was 82387 us ago, 8 consecutive failures
+10-30 11:07:04.777  4570  8982 W MediaCodec: no metrics handle found
+10-30 11:07:04.778  4570  8980 E Surface : freeAllBuffers: 1 buffers were freed while being dequeued!
+10-30 11:07:04.780  4570  8980 W GraphicBufferSource: released unpopulated slots: [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63]
+10-30 11:07:04.780  4570  8980 E Surface : getSlotFromBufferLocked: unknown buffer: 0x0
+10-30 11:07:04.792  4570  9003 W MediaCodec: no metrics handle found
+10-30 11:07:04.809  4570  9025 W MediaCodec: no metrics handle found
+10-30 11:07:04.814  4570  9021 W MediaCodec: no metrics handle found
+10-30 11:07:04.838  1784  4359 W MediaProvider: isAppCloneUserPair for user 0: false
+10-30 11:07:04.904   474  9039 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:07:04.906   474  9039 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:07:04.907   474  9039 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:07:04.907   474  9039 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:07:04.913   474  9039 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:07:04.913   474  9039 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:07:04.913   474  9039 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:07:04.915   474  9038 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0

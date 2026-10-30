@@ -1,0 +1,55 @@
+10-30 11:48:41.947  4570  4570 W CompositionPlayer: Setting multi-sequence Composition with single input video graph.
+10-30 11:48:42.009  4570 13818 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:48:42.009  4570 13818 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:48:42.011  4570 13818 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:48:42.011  4570 13818 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:48:42.011  4570 13818 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:48:42.035  4570 13822 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+10-30 11:48:42.035  4570 13822 E EGL_emulation: tid 13822: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+10-30 11:48:42.046  4570 13824 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:48:42.051  4570 13824 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:48:42.051  4570 13824 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:48:42.052  4570 13824 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:48:42.053  4570 13824 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:48:42.053  4570 13824 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:48:42.053  4570 13824 W Codec2Client: query -- param skipped: index = 2684356609.
+10-30 11:48:42.058   474  3535 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:48:42.350  4570 13829 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+10-30 11:48:42.351  4570 13829 E EGL_emulation: tid 13829: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+10-30 11:48:42.357  4570 13831 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:48:42.363  4570 13831 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:48:42.363  4570 13831 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:48:42.366  4570 13831 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:48:42.366  4570 13831 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:48:42.367  4570 13831 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:48:42.367  4570 13831 W Codec2Client: query -- param skipped: index = 2684356609.
+10-30 11:48:42.373   474  3535 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:48:42.398  4570 13814 W SpeakerLayoutUtil: Built-in speaker's getSpeakerLayoutChannelMask not usable, defaulting to stereo.
+10-30 11:48:42.410  4570 13814 W SpeakerLayoutUtil: Built-in speaker's getSpeakerLayoutChannelMask not usable, defaulting to stereo.
+10-30 11:48:42.470   397   413 W AudioFlinger: createTrack_l(): mismatch between requested flags (00000008) and output flags (00000002)
+10-30 11:48:47.066   348 13825 W C2BqBuffer: last successful dequeue was 3320736 us ago, 310 consecutive failures
+10-30 11:48:47.383   348 13832 W C2BqBuffer: last successful dequeue was 3534789 us ago, 340 consecutive failures
+10-30 11:48:52.072   348 13825 W C2BqBuffer: last successful dequeue was 2940402 us ago, 288 consecutive failures
+10-30 11:48:52.392   348 13832 W C2BqBuffer: last successful dequeue was 8543848 us ago, 831 consecutive failures
+10-30 11:48:52.648  4570 13814 W SpeakerLayoutUtil: Built-in speaker's getSpeakerLayoutChannelMask not usable, defaulting to stereo.
+10-30 11:48:55.453  4570 13818 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:48:55.453  4570 13818 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:48:55.453  4570 13818 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:48:56.058  4570 13823 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:48:56.058  4570 13823 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:48:56.058  4570 13823 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:48:56.095  4570 13855 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+10-30 11:48:56.095  4570 13855 E EGL_emulation: tid 13855: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+10-30 11:48:56.110  4570 13823 W MediaCodec: no metrics handle found
+10-30 11:48:56.155   348  9034 W C2BqBuffer: get generationNumber failed 19628000543229
+10-30 11:48:57.399   348 13832 W C2BqBuffer: last successful dequeue was 13550682 us ago, 1286 consecutive failures
+10-30 11:49:00.050   846   846 W PageIndicator: Total number of pages invalid: 0. Assuming 1 page.
+10-30 11:49:00.657  4570 13818 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:49:00.657  4570 13818 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:49:00.658  4570 13818 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:49:00.664  4570 13830 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:49:00.664  4570 13830 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:49:00.664  4570 13830 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:49:00.672  4570  4645 W Codec2-OutputBufferQueue: receiving stale buffer: generation 4680340 , diff 1 : slot 13
+10-30 11:49:00.705  4570 13830 W MediaCodec: no metrics handle found
+10-30 11:49:00.709  4570 13818 W MediaCodec: no metrics handle found

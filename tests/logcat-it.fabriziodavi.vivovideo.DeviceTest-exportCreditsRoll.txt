@@ -1,0 +1,102 @@
+10-30 11:04:54.474  4570  8313 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:04:54.474  4570  8313 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:04:54.475  4570  8313 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:04:54.475  4570  8313 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:04:54.475  4570  8313 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:04:54.596  1034  1034 W MediaControlGattService: Feature PLAYER_NAME(BIT 1) support: true
+10-30 11:04:54.598  1034  1034 W MediaControlGattService: Feature PLAYER_NAME(BIT 1) support: true
+10-30 11:04:54.598  1034  1034 W MediaControlGattService: Feature MEDIA_STATE(BIT 17) support: true
+10-30 11:04:54.648  3098  7145 W libc    : Access denied finding property "persist.adb.tls_server.enable"
+10-30 11:04:54.649  3098  7145 W libc    : Access denied finding property "service.adb.tls.port"
+10-30 11:04:54.645  3098  3098 W binder:3098_7: type=1400 audit(0.0:207): avc:  denied  { read } for  name="u:object_r:system_adbd_prop:s0" dev="tmpfs" ino=292 scontext=u:r:gmscore_app:s0:c512,c768 tcontext=u:object_r:system_adbd_prop:s0 tclass=file permissive=0 app=com.google.android.gms
+10-30 11:04:54.645  3098  3098 W binder:3098_7: type=1400 audit(0.0:208): avc:  denied  { read } for  name="u:object_r:adbd_prop:s0" dev="tmpfs" ino=60 scontext=u:r:gmscore_app:s0:c512,c768 tcontext=u:object_r:adbd_prop:s0 tclass=file permissive=0 app=com.google.android.gms
+10-30 11:04:54.664  6358  7131 W GmsUrlRequestImpl: Content-Type header is overwritten.
+10-30 11:04:54.731  4570  8313 W MediaCodec: no metrics handle found
+10-30 11:04:54.742  6358  7131 W GLSUser : [AppCertManager] Exception while requesting key:
+10-30 11:04:54.742  6358  7131 W GLSUser : java.util.concurrent.ExecutionException: avvw: Parse Proto Exception.
+10-30 11:04:54.742  6358  7131 W GLSUser : 	at dlnv.s(:com.google.android.gms@231818047@23.18.18 (190800-535401451):3)
+10-30 11:04:54.742  6358  7131 W GLSUser : 	at dlnv.get(:com.google.android.gms@231818047@23.18.18 (190800-535401451):7)
+10-30 11:04:54.742  6358  7131 W GLSUser : 	at oub.b(:com.google.android.gms@231818047@23.18.18 (190800-535401451):78)
+10-30 11:04:54.742  6358  7131 W GLSUser : 	at otz.b(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+10-30 11:04:54.742  6358  7131 W GLSUser : 	at otu.a(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+10-30 11:04:54.742  6358  7131 W GLSUser : 	at otx.a(:com.google.android.gms@231818047@23.18.18 (190800-535401451):6)
+10-30 11:04:54.742  6358  7131 W GLSUser : 	at lzq.call(:com.google.android.gms@231818047@23.18.18 (190800-535401451):14)
+10-30 11:04:54.742  6358  7131 W GLSUser : 	at java.util.concurrent.FutureTask.run(FutureTask.java:264)
+10-30 11:04:54.742  6358  7131 W GLSUser : 	at aced.c(:com.google.android.gms@231818047@23.18.18 (190800-535401451):6)
+10-30 11:04:54.742  6358  7131 W GLSUser : 	at aced.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):7)
+10-30 11:04:54.742  6358  7131 W GLSUser : 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+10-30 11:04:54.742  6358  7131 W GLSUser : 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+10-30 11:04:54.742  6358  7131 W GLSUser : 	at acjn.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+10-30 11:04:54.742  6358  7131 W GLSUser : 	at java.lang.Thread.run(Thread.java:1012)
+10-30 11:04:54.742  6358  7131 W GLSUser : Caused by: avvw: Parse Proto Exception.
+10-30 11:04:54.742  6358  7131 W GLSUser : 	at avwn.f(:com.google.android.gms@231818047@23.18.18 (190800-535401451):5)
+10-30 11:04:54.742  6358  7131 W GLSUser : 	at avxk.onSucceeded(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+10-30 11:04:54.742  6358  7131 W GLSUser : 	at jf.onSucceeded(:com.google.android.gms.dynamite_cronetdynamite@231818047@23.18.18 (190800-0):0)
+10-30 11:04:54.742  6358  7131 W GLSUser : 	at ie.run(:com.google.android.gms.dynamite_cronetdynamite@231818047@23.18.18 (190800-0):4)
+10-30 11:04:54.742  6358  7131 W GLSUser : 	... 6 more
+10-30 11:04:54.742  6358  7131 W GLSUser : Caused by: dzfz: Protocol message contained an invalid tag (zero).
+10-30 11:04:54.742  6358  7131 W GLSUser : 	at dzdb.k(:com.google.android.gms@231818047@23.18.18 (190800-535401451):13)
+10-30 11:04:54.742  6358  7131 W GLSUser : 	at dzha.c(:com.google.android.gms@231818047@23.18.18 (190800-535401451):47)
+10-30 11:04:54.742  6358  7131 W GLSUser : 	at dzha.h(:com.google.android.gms@231818047@23.18.18 (190800-535401451):45)
+10-30 11:04:54.742  6358  7131 W GLSUser : 	at dzfd.A(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+10-30 11:04:54.742  6358  7131 W GLSUser : 	at dzex.f(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+10-30 11:04:54.742  6358  7131 W GLSUser : 	at dzcx.d(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+10-30 11:04:54.742  6358  7131 W GLSUser : 	at dzcx.c(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+10-30 11:04:54.742  6358  7131 W GLSUser : 	at dzcx.n(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+10-30 11:04:54.742  6358  7131 W GLSUser : 	at avwn.h(:com.google.android.gms@231818047@23.18.18 (190800-535401451):7)
+10-30 11:04:54.742  6358  7131 W GLSUser : 	at avwn.f(:com.google.android.gms@231818047@23.18.18 (190800-535401451):1)
+10-30 11:04:54.742  6358  7131 W GLSUser : 	... 9 more
+10-30 11:04:54.770  4570  8322 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:04:54.770  4570  8322 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:04:54.771  4570  8322 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:04:54.771  4570  8322 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:04:54.771  4570  8322 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:04:54.900  4570  5367 W MediaCodec: no metrics handle found
+10-30 11:04:55.576  8325  8325 W .android.chrome: Unexpected CPU variant for x86: x86_64.
+10-30 11:04:55.576  8325  8325 W .android.chrome: Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, tremont, kabylake, default
+10-30 11:04:55.578  8325  8325 E .android.chrome: Not starting debugger since process cannot load the jdwp agent.
+10-30 11:04:55.610  8325  8325 W ziparchive: Unable to open '/data/app/~~8x2Bb-hNBgXM5yCGpPHzsg==/com.google.android.trichromelibrary_567263637-MnOwI9p3nlXEKfHrGnCTBw==/TrichromeLibrary.dm': No such file or directory
+10-30 11:04:55.610  8325  8325 W ziparchive: Unable to open '/data/app/~~8x2Bb-hNBgXM5yCGpPHzsg==/com.google.android.trichromelibrary_567263637-MnOwI9p3nlXEKfHrGnCTBw==/TrichromeLibrary.dm': No such file or directory
+10-30 11:04:55.611  8325  8325 W .android.chrome: Entry not found
+10-30 11:04:55.660  8325  8341 W DynamiteModule: Local module descriptor class for com.google.android.gms.googlecertificates not found.
+10-30 11:04:55.664  8325  8341 W ziparchive: Unable to open '/data/user_de/0/com.google.android.gms/app_chimera/m/00000002/DynamiteLoader.dm': No such file or directory
+10-30 11:04:55.664  8325  8341 W ziparchive: Unable to open '/data/user_de/0/com.google.android.gms/app_chimera/m/00000002/DynamiteLoader.dm': No such file or directory
+10-30 11:04:55.684  8325  8341 W ziparchive: Unable to open '/data/user_de/0/com.google.android.gms/app_chimera/m/00000005/GoogleCertificates.dm': No such file or directory
+10-30 11:04:55.684  8325  8341 W ziparchive: Unable to open '/data/user_de/0/com.google.android.gms/app_chimera/m/00000005/GoogleCertificates.dm': No such file or directory
+10-30 11:04:55.709  4570  8359 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+10-30 11:04:55.709  4570  8359 E EGL_emulation: tid 8359: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+10-30 11:04:55.724  4570  8362 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:04:55.728  4570  8362 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:04:55.728  4570  8362 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:04:55.729  4570  8362 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:04:55.729  4570  8362 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:04:55.729  4570  8362 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:04:55.729  4570  8362 W Codec2Client: query -- param skipped: index = 2684356609.
+10-30 11:04:55.737  4570  8361 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:04:55.739   474  3204 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:04:55.750  4570  8361 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:04:55.750  4570  8361 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:04:55.750  4570  8361 W Codec2Client: query -- param skipped: index = 3254792206.
+10-30 11:04:55.750  4570  8361 W Codec2Client: query -- param skipped: index = 3254792194.
+10-30 11:04:56.008  4570  8366 W ColorUtils: expected specified color aspects (0:0:0:0)
+10-30 11:04:56.012  4570  8366 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:04:56.012  4570  8366 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:04:56.013   474  3204 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:04:58.437  4570  8360 W MediaCodec: no metrics handle found
+10-30 11:04:58.488  4570  8379 W ColorUtils: expected specified color aspects (2:0:0:0)
+10-30 11:04:58.509  4570  8379 W Codec2Client: query -- param skipped: index = 1107298332.
+10-30 11:04:58.509  4570  8379 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-30 11:04:58.510  4570  8379 W Codec2Client: query -- param skipped: index = 1342179345.
+10-30 11:04:58.511  4570  8379 W Codec2Client: query -- param skipped: index = 2415921170.
+10-30 11:04:58.511  4570  8379 W Codec2Client: query -- param skipped: index = 1610614798.
+10-30 11:04:58.511  4570  8379 W Codec2Client: query -- param skipped: index = 2684356609.
+10-30 11:04:58.520   474  3204 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+10-30 11:05:00.056   846   846 W PageIndicator: Total number of pages invalid: 0. Assuming 1 page.
+10-30 11:05:03.532   348  8380 W C2BqBuffer: last successful dequeue was 4206258 us ago, 407 consecutive failures
+10-30 11:05:07.986  4570  8378 W MediaCodec: no metrics handle found
+10-30 11:05:20.945  4570  8359 E Surface : freeAllBuffers: 1 buffers were freed while being dequeued!
+10-30 11:05:20.947  4570  8359 W GraphicBufferSource: released unpopulated slots: [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63]
+10-30 11:05:20.947  4570  8359 E Surface : getSlotFromBufferLocked: unknown buffer: 0x0
+10-30 11:05:20.958  4570  8365 W MediaCodec: no metrics handle found
+10-30 11:05:20.967  4570  8361 W MediaCodec: no metrics handle found
+10-30 11:05:20.995  1784  5823 W MediaProvider: isAppCloneUserPair for user 0: false

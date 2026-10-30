@@ -1,0 +1,53 @@
+10-30 11:31:27.862  6358 12113 W TapAndPay: NfcAdapter is null while obtaining CardEmulation instance. [CONTEXT service_id=79 ]
+10-30 11:31:27.862  6358 12113 W TapAndPay: java.lang.NullPointerException: NfcAdapter is null
+10-30 11:31:27.862  6358 12113 W TapAndPay: 	at android.nfc.cardemulation.CardEmulation.getInstance(CardEmulation.java:152)
+10-30 11:31:27.862  6358 12113 W TapAndPay: 	at cdoy.<init>(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+10-30 11:31:27.862  6358 12113 W TapAndPay: 	at com.google.android.gms.tapandpay.hce.task.TapAndPayAidRegistrationTaskOperation.a(:com.google.android.gms@231818047@23.18.18 (190800-535401451):5)
+10-30 11:31:27.862  6358 12113 W TapAndPay: 	at com.google.android.gms.tapandpay.gcmtask.TapAndPayGcmTaskChimeraService.a(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+10-30 11:31:27.862  6358 12113 W TapAndPay: 	at avzs.call(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+10-30 11:31:27.862  6358 12113 W TapAndPay: 	at java.util.concurrent.FutureTask.run(FutureTask.java:264)
+10-30 11:31:27.862  6358 12113 W TapAndPay: 	at aced.c(:com.google.android.gms@231818047@23.18.18 (190800-535401451):6)
+10-30 11:31:27.862  6358 12113 W TapAndPay: 	at aced.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):7)
+10-30 11:31:27.862  6358 12113 W TapAndPay: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+10-30 11:31:27.862  6358 12113 W TapAndPay: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+10-30 11:31:27.862  6358 12113 W TapAndPay: 	at acjn.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+10-30 11:31:27.862  6358 12113 W TapAndPay: 	at java.lang.Thread.run(Thread.java:1012)
+10-30 11:31:27.954  3098 12119 W libc    : Access denied finding property "persist.adb.tls_server.enable"
+10-30 11:31:27.954  3098 12119 W libc    : Access denied finding property "service.adb.tls.port"
+10-30 11:31:27.949  3098  3098 W binder:3098_E: type=1400 audit(0.0:213): avc:  denied  { read } for  name="u:object_r:system_adbd_prop:s0" dev="tmpfs" ino=292 scontext=u:r:gmscore_app:s0:c512,c768 tcontext=u:object_r:system_adbd_prop:s0 tclass=file permissive=0 app=com.google.android.gms
+10-30 11:31:27.962  6358  7131 W GmsUrlRequestImpl: Content-Type header is overwritten.
+10-30 11:31:27.949  3098  3098 W binder:3098_E: type=1400 audit(0.0:214): avc:  denied  { read } for  name="u:object_r:adbd_prop:s0" dev="tmpfs" ino=60 scontext=u:r:gmscore_app:s0:c512,c768 tcontext=u:object_r:adbd_prop:s0 tclass=file permissive=0 app=com.google.android.gms
+10-30 11:31:28.058  6358  7131 W GLSUser : [AppCertManager] Exception while requesting key:
+10-30 11:31:28.058  6358  7131 W GLSUser : java.util.concurrent.ExecutionException: avvw: Parse Proto Exception.
+10-30 11:31:28.058  6358  7131 W GLSUser : 	at dlnv.s(:com.google.android.gms@231818047@23.18.18 (190800-535401451):3)
+10-30 11:31:28.058  6358  7131 W GLSUser : 	at dlnv.get(:com.google.android.gms@231818047@23.18.18 (190800-535401451):7)
+10-30 11:31:28.058  6358  7131 W GLSUser : 	at oub.b(:com.google.android.gms@231818047@23.18.18 (190800-535401451):78)
+10-30 11:31:28.058  6358  7131 W GLSUser : 	at otz.b(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+10-30 11:31:28.058  6358  7131 W GLSUser : 	at otu.a(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+10-30 11:31:28.058  6358  7131 W GLSUser : 	at otx.a(:com.google.android.gms@231818047@23.18.18 (190800-535401451):6)
+10-30 11:31:28.058  6358  7131 W GLSUser : 	at lzq.call(:com.google.android.gms@231818047@23.18.18 (190800-535401451):14)
+10-30 11:31:28.058  6358  7131 W GLSUser : 	at java.util.concurrent.FutureTask.run(FutureTask.java:264)
+10-30 11:31:28.058  6358  7131 W GLSUser : 	at aced.c(:com.google.android.gms@231818047@23.18.18 (190800-535401451):6)
+10-30 11:31:28.058  6358  7131 W GLSUser : 	at aced.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):7)
+10-30 11:31:28.058  6358  7131 W GLSUser : 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+10-30 11:31:28.058  6358  7131 W GLSUser : 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+10-30 11:31:28.058  6358  7131 W GLSUser : 	at acjn.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+10-30 11:31:28.058  6358  7131 W GLSUser : 	at java.lang.Thread.run(Thread.java:1012)
+10-30 11:31:28.058  6358  7131 W GLSUser : Caused by: avvw: Parse Proto Exception.
+10-30 11:31:28.058  6358  7131 W GLSUser : 	at avwn.f(:com.google.android.gms@231818047@23.18.18 (190800-535401451):5)
+10-30 11:31:28.058  6358  7131 W GLSUser : 	at avxk.onSucceeded(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+10-30 11:31:28.058  6358  7131 W GLSUser : 	at jf.onSucceeded(:com.google.android.gms.dynamite_cronetdynamite@231818047@23.18.18 (190800-0):0)
+10-30 11:31:28.058  6358  7131 W GLSUser : 	at ie.run(:com.google.android.gms.dynamite_cronetdynamite@231818047@23.18.18 (190800-0):4)
+10-30 11:31:28.058  6358  7131 W GLSUser : 	... 6 more
+10-30 11:31:28.058  6358  7131 W GLSUser : Caused by: dzfz: Protocol message contained an invalid tag (zero).
+10-30 11:31:28.058  6358  7131 W GLSUser : 	at dzdb.k(:com.google.android.gms@231818047@23.18.18 (190800-535401451):13)
+10-30 11:31:28.058  6358  7131 W GLSUser : 	at dzha.c(:com.google.android.gms@231818047@23.18.18 (190800-535401451):47)
+10-30 11:31:28.058  6358  7131 W GLSUser : 	at dzha.h(:com.google.android.gms@231818047@23.18.18 (190800-535401451):45)
+10-30 11:31:28.058  6358  7131 W GLSUser : 	at dzfd.A(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+10-30 11:31:28.058  6358  7131 W GLSUser : 	at dzex.f(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+10-30 11:31:28.058  6358  7131 W GLSUser : 	at dzcx.d(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+10-30 11:31:28.058  6358  7131 W GLSUser : 	at dzcx.c(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+10-30 11:31:28.058  6358  7131 W GLSUser : 	at dzcx.n(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+10-30 11:31:28.058  6358  7131 W GLSUser : 	at avwn.h(:com.google.android.gms@231818047@23.18.18 (190800-535401451):7)
+10-30 11:31:28.058  6358  7131 W GLSUser : 	at avwn.f(:com.google.android.gms@231818047@23.18.18 (190800-535401451):1)
+10-30 11:31:28.058  6358  7131 W GLSUser : 	... 9 more
