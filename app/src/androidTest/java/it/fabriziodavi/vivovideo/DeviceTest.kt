@@ -822,8 +822,9 @@ class DeviceTest {
             Clip(id = "c$i", uri = (if (i % 2 == 0) a else b).toString(), sourceDurationUs = 4_000_000, width = W, height = H, fps = 60f)
         })
         // Scontorno sulla prima clip intera (maschere per tutto il file), poi le transizioni.
-        p = p.replaceClip(p.clips[0].copy(person = PersonFx(mode = PersonMode.BLUR, maskFile = maskFile.absolutePath, fromUs = 0, rateHz = 15, count = n)))
-        val order = listOf(TransitionType.MASK_PASS, TransitionType.WIPE, TransitionType.WIPE_DIAG, TransitionType.CLOCK, TransitionType.STEPS, TransitionType.OVERLAY)
+        // Stesso ordine del progetto del collaudo (30/10): la maschera è la quinta transizione, dopo quattro a due clip.
+        p = p.replaceClip(p.clips[4].copy(person = PersonFx(mode = PersonMode.BLUR, maskFile = maskFile.absolutePath, fromUs = 0, rateHz = 15, count = n, precise = true)))
+        val order = listOf(TransitionType.WIPE, TransitionType.WIPE_DIAG, TransitionType.CLOCK, TransitionType.STEPS, TransitionType.MASK_PASS, TransitionType.OVERLAY)
         order.forEachIndexed { i, t ->
             val c = p.clips[i]
             p = p.replaceClip(c.copy(transitionOut = TransitionSpec(t, t.defaultUs ?: 500_000)))

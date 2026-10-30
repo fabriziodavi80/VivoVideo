@@ -35,7 +35,7 @@ import it.fabriziodavi.vivovideo.model.PersonMode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
-import java.io.DataInputStream
+import it.fabriziodavi.vivovideo.Diary
 import java.io.DataOutputStream
 import java.io.File
 import java.nio.ByteBuffer
@@ -88,17 +88,32 @@ object PersonMasks {
 
     fun dir(ctx: Context) = File(ctx.filesDir, "maschere").apply { mkdirs() }
 
-    class Masks(val count: Int, val side: Int, val data: ByteArray) {
-        fun slice(i: Int): ByteBuffer = ByteBuffer.wrap(data, i.coerceIn(0, count - 1) * side * side, side * side)
+    /**
+     * Maschere lette direttamente dal file (memory map): nessuna copia in memoria. Prima il file intero finiva nella memoria
+     * dell'app per ogni effetto che lo usava: con una clip lunga e lo scontorno "Preciso" (945 maschere, 140 MB) l'esportazione,
+     * che ne crea più d'uno, restava senza memoria e lo scontorno spariva in silenzio (passaggio con maschera = taglio netto).
+     */
+    class Masks(val count: Int, val side: Int, private val data: ByteBuffer) {
+        fun slice(i: Int): ByteBuffer {
+            val b = data.duplicate()
+            val from = i.coerceIn(0, count - 1) * side * side
+            b.position(from); b.limit(from + side * side)
+            return b.slice()
+        }
     }
 
-    fun load(path: String): Masks? = runCatching {
-        DataInputStream(File(path).inputStream().buffered()).use { s ->
-            val n = s.readInt(); val side = s.readInt()
-            val d = ByteArray(n * side * side); s.readFully(d)
-            Masks(n, side, d)
+    fun load(path: String): Masks? = try {
+        java.io.RandomAccessFile(path, "r").use { f ->
+            val n = f.readInt(); val side = f.readInt()
+            val len = n.toLong() * side * side
+            if (n <= 0 || side <= 0 || 8 + len > f.length()) error("file delle maschere incompleto ($n × $side, ${f.length()} byte)")
+            // La mappa resta valida anche dopo la chiusura del file.
+            Masks(n, side, f.channel.map(java.nio.channels.FileChannel.MapMode.READ_ONLY, 8, len))
         }
-    }.getOrNull()
+    } catch (t: Throwable) {
+        Diary.log("Scontorno non leggibile ($path): ${t.javaClass.simpleName}: ${t.message}")
+        null
+    }
 
     /** Modello "Preciso": immagine più grande e maschera più fine. */
     const val PRECISE_IN = 640
