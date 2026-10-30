@@ -45,6 +45,10 @@ import it.fabriziodavi.vivovideo.model.MomentSample
 import it.fabriziodavi.vivovideo.model.Moments
 import it.fabriziodavi.vivovideo.model.JumpCuts
 import it.fabriziodavi.vivovideo.model.JumpStyle
+import it.fabriziodavi.vivovideo.model.Interview
+import it.fabriziodavi.vivovideo.model.InterviewFormat
+import it.fabriziodavi.vivovideo.model.InterviewOptions
+import it.fabriziodavi.vivovideo.model.InterviewQA
 import it.fabriziodavi.vivovideo.model.Shuffle
 import it.fabriziodavi.vivovideo.model.Reframe
 import it.fabriziodavi.vivovideo.model.SpokenWord
@@ -1628,6 +1632,131 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         multiIds = null
         Diary.log("Torna ai video originali: ${r.clips.size} clip (prima ${p.clips.size}).")
         message = "Progetto riportato ai ${r.clips.size} video e foto originali, senza modifiche. Annulla per tornare a com'era."
+    }
+
+    // ---------------- Intervista doppia ----------------
+
+    var showInterview by mutableStateOf(false)
+    var interviewA by mutableStateOf<Clip?>(null)
+        private set
+    var interviewB by mutableStateOf<Clip?>(null)
+        private set
+    /** Domande e risposte trovate (null finché non si analizza). */
+    var interviewQas by mutableStateOf<List<InterviewQA>?>(null)
+        private set
+
+    /** Sceglie il video [first] = A (altrimenti B). */
+    fun pickInterviewVideo(first: Boolean, uri: Uri) {
+        val ctx = getApplication<Application>()
+        viewModelScope.launch {
+            busy = "Lettura del video…"
+            val c = withContext(Dispatchers.IO) { importClip(ctx, uri) }
+            busy = null
+            if (c == null || c.isPhoto) { message = "Serve un video, non una foto."; return@launch }
+            if (first) interviewA = c else interviewB = c
+            interviewQas = null
+        }
+    }
+
+    fun closeInterview() {
+        showInterview = false
+        interviewA = null; interviewB = null; interviewQas = null
+    }
+
+    /** Cambiano le domande da cercare: l'analisi va rifatta. */
+    fun resetInterviewAnalysis() { interviewQas = null }
+
+    fun removeInterviewQuestion(i: Int) { interviewQas = interviewQas?.filterIndexed { k, _ -> k != i } }
+
+    /**
+     * Ascolta i due video (riconoscimento vocale sul telefono) e trova domande e risposte: quelle scritte in [typed]
+     * o, se è vuoto, le frasi con il punto di domanda.
+     */
+    fun analyzeInterview(model: Whisper.Model, lang: String, typed: List<String>) {
+        val a = interviewA ?: return
+        val b = interviewB ?: return
+        if (busy != null) return
+        val ctx = getApplication<Application>()
+        interviewQas = null
+        subtitleJob = viewModelScope.launch {
+            try {
+                if (!Whisper.isDownloaded(ctx, model)) {
+                    busy = "Scarico il modello ${model.label} (${model.sizeMb} MB, solo la prima volta)…"
+                    Whisper.download(ctx, model) { f -> handler.post { busy = "Scarico il modello ${model.label}… ${(f * 100).toInt()}%" } }
+                }
+                suspend fun listen(c: Clip, who: String): List<SpokenWord> {
+                    busy = "Preparo l'audio di $who…"
+                    val pcm = withContext(Dispatchers.Default) {
+                        val wav = renderTimelineAudio(ctx, Project(name = "intervista", clips = listOf(c)), loudness = false)
+                        try { Whisper.wavTo16kMono(wav) } finally { wav.delete() }
+                    }
+                    busy = "Ascolto $who… 0%"
+                    val poll = launch { while (true) { kotlinx.coroutines.delay(400); busy = "Ascolto $who… ${Whisper.progress()}%" } }
+                    return try { Whisper.transcribe(Whisper.modelFile(ctx, model), pcm, lang, "", Whisper.SUBTITLE_BEAM) } finally { poll.cancel() }
+                }
+                val wa = listen(a, "il video A")
+                val wb = listen(b, "il video B")
+                busy = null
+                val qas = withContext(Dispatchers.Default) { Interview.match(wa, wb, a.sourceDurationUs, b.sourceDurationUs, typed) }
+                interviewQas = qas
+                Diary.log("Intervista doppia: ${wa.size} + ${wb.size} parole, ${qas.size} domande, risposte trovate A ${qas.count { it.a != null }} e B ${qas.count { it.b != null }}.")
+                if (qas.isEmpty()) message = "Non ho trovato domande nei video: scrivile tu, una per riga, come le ha dette chi intervista."
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                busy = null; throw e
+            } catch (e: Exception) {
+                busy = null
+                message = "Analisi non riuscita: ${e.message ?: e.javaClass.simpleName}"
+            }
+        }
+    }
+
+    /** Fotogramma fermo del video [c] all'istante [srcUs] del file, come livello immagine (per chi ascolta). */
+    private fun stillLayer(ctx: Application, c: Clip, srcUs: Long): Layer? = runCatching {
+        val r = android.media.MediaMetadataRetriever()
+        val bmp = try {
+            r.setDataSource(ctx, Uri.parse(c.uri))
+            r.getFrameAtTime(srcUs.coerceIn(0, (c.sourceDurationUs - 1).coerceAtLeast(0)), android.media.MediaMetadataRetriever.OPTION_CLOSEST)
+        } finally { r.release() } ?: return@runCatching null
+        val f = File(File(ctx.filesDir, "fermi").apply { mkdirs() }, "intervista_${System.nanoTime()}.jpg")
+        f.outputStream().use { bmp.compress(android.graphics.Bitmap.CompressFormat.JPEG, 92, it) }
+        Layer(uri = Uri.fromFile(f).toString(), name = "Ascolta", width = bmp.width, height = bmp.height).also { bmp.recycle() }
+    }.getOrNull()
+
+    /** Monta l'intervista e la apre nell'editor (un progetto nuovo, da ritoccare come gli altri). */
+    fun createInterview(o: InterviewOptions) {
+        val a = interviewA ?: return
+        val b = interviewB ?: return
+        val qas = interviewQas?.filter { it.usable } ?: return
+        if (qas.isEmpty()) { message = "Nessuna risposta trovata da montare."; return }
+        val ctx = getApplication<Application>()
+        viewModelScope.launch {
+            busy = "Monto l'intervista…"
+            val built = withContext(Dispatchers.IO) {
+                runCatching {
+                    // Misura del video finale: quella del video A (nello schermo diviso il fondo nero la fissa).
+                    val (w0, h0) = factory.outputSize(Project(name = "x", clips = listOf(a)), null)
+                    val k = minOf(1f, 2160f / minOf(w0, h0))
+                    val w = (w0 * k).toInt() / 2 * 2; val h = (h0 * k).toInt() / 2 * 2
+                    val f = File(File(ctx.filesDir, "titoli").apply { mkdirs() }, "nero_${w}x$h.jpg")
+                    if (!f.exists()) {
+                        val bmp = android.graphics.Bitmap.createBitmap(w, h, android.graphics.Bitmap.Config.ARGB_8888).apply { eraseColor(android.graphics.Color.BLACK) }
+                        f.outputStream().use { bmp.compress(android.graphics.Bitmap.CompressFormat.JPEG, 90, it) }
+                        bmp.recycle()
+                    }
+                    val black = Clip(uri = Uri.fromFile(f).toString(), sourceDurationUs = Clip.PHOTO_MAX_US, trimEndUs = 5_000_000, isPhoto = true, width = w, height = h, fill = true)
+                    val name = listOf(o.nameA, o.nameB).filter { it.isNotBlank() }.joinToString(" e ").ifBlank { "Intervista doppia" }.take(40)
+                    Interview.build(name, a, b, qas, o, black, w, h) { who, at -> stillLayer(ctx, who, at) }
+                }
+            }
+            busy = null
+            built.onSuccess { p ->
+                store.save(p)
+                closeInterview()
+                openProject(p)
+                message = "Intervista pronta: ${qas.size} domande, ${formatTime(p.durationUs)}. Ritocca quello che vuoi ed esporta." +
+                    if (o.format == InterviewFormat.SPLIT) " Nello schermo diviso l'anteprima prepara i tratti con i due video dopo qualche secondo." else ""
+            }.onFailure { message = "Intervista non riuscita: ${it.message ?: it.javaClass.simpleName}" }
+        }
     }
 
     // ---------------- Rimescola clip ----------------

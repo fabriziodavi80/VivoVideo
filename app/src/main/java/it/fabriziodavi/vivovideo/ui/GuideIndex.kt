@@ -15,7 +15,7 @@ data class GuideHit(val index: Int, val count: Int, val snippet: String)
 object GuideIndex {
     private val GROUPS: List<Pair<String, List<String>>> = listOf(
         "Per iniziare" to listOf("Novità", "Primi passi", "Selezionare", "Tagliare e ordinare", "Progetto"),
-        "Creare un video" to listOf("Video automatico", "Slideshow automatico", "Fare un tutorial"),
+        "Creare un video" to listOf("Video automatico", "Slideshow automatico", "Fare un tutorial", "Intervista doppia"),
         "Montare" to listOf("Fermo immagine", "Velocità", "Inquadra", "Keyframe", "Foto", "Transizioni", "Effetti", "Colore",
             "Funzioni intelligenti", "Privacy", "Livelli"),
         "Audio" to listOf("Musica", "Taglio a ritmo", "Voce fuori campo", "Mixer", "Audio delle clip", "Jump cut"),

@@ -84,12 +84,14 @@ fun HomeScreen(vm: EditorViewModel) {
             VVIcons.Effects, "Video automatico", "Scegli le foto o un album: musica, tagli a ritmo e transizioni li fa l'app.",
             primary = true, modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
         ) { vm.showAuto = true }
-        Row(Modifier.fillMaxWidth().height(androidx.compose.foundation.layout.IntrinsicSize.Min).padding(bottom = 18.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(Modifier.fillMaxWidth().height(androidx.compose.foundation.layout.IntrinsicSize.Min).padding(bottom = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             CreateCard(VVIcons.Edit, "Monta tu", "Scegli video e foto e monta come vuoi.", primary = false,
                 modifier = Modifier.weight(1f).fillMaxHeight()) { askNew = true }
             CreateCard(VVIcons.Copy, "Da un modello", "Un montaggio salvato, con foto nuove.", primary = false,
                 modifier = Modifier.weight(1f).fillMaxHeight()) { askTemplate = true }
         }
+        CreateCard(VVIcons.Movie, "Intervista doppia", "Due persone, le stesse domande: risposte alternate o a schermo diviso.",
+            primary = false, modifier = Modifier.fillMaxWidth().padding(bottom = 18.dp)) { vm.showInterview = true }
         if (vm.projects.isEmpty()) {
             Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
                 Text(

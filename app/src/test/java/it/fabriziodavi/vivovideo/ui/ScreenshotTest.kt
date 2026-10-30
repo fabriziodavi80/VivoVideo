@@ -226,6 +226,14 @@ class ScreenshotTest {
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/22_jump_cut.png")
     }
 
+    @Config(qualifiers = "w412dp-h1500dp-xxhdpi")
+    @Test fun interview() {
+        val vm = EditorViewModel(ApplicationProvider.getApplicationContext<Application>())
+        vm.showInterview = true
+        compose.setContent { VivoTheme { InterviewScreen(vm) } }
+        compose.onRoot().captureRoboImage("build/outputs/roborazzi/23_intervista.png")
+    }
+
     @Test fun guide() {
         compose.setContent { VivoTheme { GuideScreen {} } }
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/14_guida.png")

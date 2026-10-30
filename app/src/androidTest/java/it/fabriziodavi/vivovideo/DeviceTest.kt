@@ -55,6 +55,11 @@ import it.fabriziodavi.vivovideo.engine.PersonMasks
 import it.fabriziodavi.vivovideo.model.Moments
 import it.fabriziodavi.vivovideo.model.PersonMode
 import it.fabriziodavi.vivovideo.model.PersonFx
+import it.fabriziodavi.vivovideo.model.Interview
+import it.fabriziodavi.vivovideo.model.InterviewFormat
+import it.fabriziodavi.vivovideo.model.InterviewOptions
+import it.fabriziodavi.vivovideo.model.InterviewQA
+import it.fabriziodavi.vivovideo.model.Span
 import it.fabriziodavi.vivovideo.model.Reframe
 import it.fabriziodavi.vivovideo.model.VideoFormat
 import it.fabriziodavi.vivovideo.engine.Stabilizer
@@ -857,6 +862,22 @@ class DeviceTest {
         val msg = "collaudo esportato (taglio al fotogramma $cutFrame): sinistra rossa $leftRed/$checked, destra blu $rightBlue/$checked\n" + rows.joinToString(" ")
         android.util.Log.i("VivoVideoTest", msg)
         assertTrue(msg, leftRed >= checked - 1 && rightBlue >= checked - 1)
+    }
+
+    /** Intervista doppia a schermo diviso: due video sovrapposti uno dopo l'altro, chi ascolta fermo, cartelli: esportazione vera. */
+    @Test fun exportInterviewSplit() {
+        val a = video("A", videoA)
+        val b = video("B", videoB)
+        val qas = listOf(
+            InterviewQA("Come ti chiami?", Span(500_000, 2_000_000), Span(1_000_000, 2_200_000)),
+            InterviewQA("Che lavoro fai?", Span(3_000_000, 4_500_000), null),
+        )
+        val blackFile = save(frame(Color.BLACK, "", W, H).also { Canvas(it).drawColor(Color.BLACK) }, "nero.jpg", png = false)
+        val black = Clip(uri = Uri.fromFile(blackFile).toString(), sourceDurationUs = Clip.PHOTO_MAX_US, trimEndUs = 5_000_000, isPhoto = true, width = W, height = H, fill = true)
+        val still = Layer(uri = photo.toString(), width = 800, height = 600)
+        val p = Interview.build("intervista", a, b, qas, InterviewOptions(format = InterviewFormat.SPLIT, nameA = "Anna", nameB = "Bruno", cardUs = 1_000_000), black, W, H) { _, _ -> still }
+        assertEquals(3, p.layers.count { it.isVideo })
+        exportAndCheck(p)
     }
 
     /** Le transizioni dal video dell'utente (tendine, orologio, scalini, sovrapposizione, taglio invisibile): esportazione vera. */

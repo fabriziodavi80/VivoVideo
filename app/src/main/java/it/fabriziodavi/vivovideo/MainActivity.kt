@@ -11,6 +11,7 @@ import androidx.compose.runtime.LaunchedEffect
 import it.fabriziodavi.vivovideo.engine.ExportState
 import it.fabriziodavi.vivovideo.ui.EditorScreen
 import it.fabriziodavi.vivovideo.ui.AutoScreen
+import it.fabriziodavi.vivovideo.ui.InterviewScreen
 import it.fabriziodavi.vivovideo.ui.LibraryScreen
 import it.fabriziodavi.vivovideo.ui.AlbumPickerScreen
 import it.fabriziodavi.vivovideo.ui.SubtitlesScreen
@@ -73,6 +74,7 @@ class MainActivity : ComponentActivity() {
                         vm.showGuide -> GuideScreen(vm.guideTopic) { vm.showGuide = false; vm.guideTopic = null }
                         vm.showTestPlan -> TestPlanScreen(vm)
                         vm.project == null && vm.showAuto -> AutoScreen(vm)
+                        vm.project == null && vm.showInterview -> InterviewScreen(vm)
                         vm.project == null -> HomeScreen(vm)
                         else -> EditorScreen(vm)
                     }
