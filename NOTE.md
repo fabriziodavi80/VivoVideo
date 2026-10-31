@@ -121,6 +121,8 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, ML Kit, whisper.cpp e Sign
 5. **Riconoscitore di ehm** (scelta dell'utente del 25/10/2026): piccolo modello dedicato (classificatore su spettrogramma mel, addestrato fuori dal telefono su un dataset pubblico di filler come PodcastFillers più esempi italiani), al posto o accanto alle regole di `Hesitations.kt`; ehm attaccati alle parole; anteprima del risultato nel lettore. Taratura attuale fatta su una ripresa vera (voce ~90 Hz, microfono ovattato sotto 1,2 kHz, ronzio a 480 Hz).
 6. **Scontorno**: bordi e capelli (pennello di ritocco con propagazione, filtro guidato a colori, modello di matting più pesante).
 7. **Stabilizzazione**: correzione rolling shutter, zoom variabile nel tempo, omografia.
+8. **Stories per Instagram** (richiesta dell'utente del 31/10/2026): creazione di stories (9:16, segmenti brevi). Dettagli da definire con l'utente.
+9. **Collage di foto** (richiesta dell'utente del 31/10/2026): più foto insieme in un unico quadro. Dettagli da definire con l'utente.
 
 ### Da tenere d'occhio
 - `PreviewLoudness` misura il mix in secondo piano dopo ogni modifica all'audio: verificare i tempi su progetti lunghi.
