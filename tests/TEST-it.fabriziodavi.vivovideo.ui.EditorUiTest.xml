@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.ui.EditorUiTest" tests="14" skipped="0" failures="0" errors="0" timestamp="2026-11-01T20:11:46.552Z" hostname="runnervmnwato" time="4.118">
+  <properties/>
+  <testcase name="addOffersWholeAlbums" classname="it.fabriziodavi.vivovideo.ui.EditorUiTest" time="1.842"/>
+  <testcase name="holdWithoutMovingStillOpensTheClipMenu" classname="it.fabriziodavi.vivovideo.ui.EditorUiTest" time="0.176"/>
+  <testcase name="moreOpensClipMenu" classname="it.fabriziodavi.vivovideo.ui.EditorUiTest" time="0.299"/>
+  <testcase name="editOpensSecondRowAndClipToolsUseClipAtPlayhead" classname="it.fabriziodavi.vivovideo.ui.EditorUiTest" time="0.105"/>
+  <testcase name="tappingSameEntryClosesPanel" classname="it.fabriziodavi.vivovideo.ui.EditorUiTest" time="0.184"/>
+  <testcase name="dragAClipWithTheFingerToANewPlace" classname="it.fabriziodavi.vivovideo.ui.EditorUiTest" time="0.481"/>
+  <testcase name="audioOpensTheOnlineLibrary" classname="it.fabriziodavi.vivovideo.ui.EditorUiTest" time="0.09"/>
+  <testcase name="mixerOpensAndMutesAGroup" classname="it.fabriziodavi.vivovideo.ui.EditorUiTest" time="0.101"/>
+  <testcase name="mainBarHasSixEntries" classname="it.fabriziodavi.vivovideo.ui.EditorUiTest" time="0.065"/>
+  <testcase name="textPanelHasTabs" classname="it.fabriziodavi.vivovideo.ui.EditorUiTest" time="0.359"/>
+  <testcase name="fullscreenHasSeekBar" classname="it.fabriziodavi.vivovideo.ui.EditorUiTest" time="0.082"/>
+  <testcase name="audioPanelHasTabs" classname="it.fabriziodavi.vivovideo.ui.EditorUiTest" time="0.126"/>
+  <testcase name="effectsPanelHasTabs" classname="it.fabriziodavi.vivovideo.ui.EditorUiTest" time="0.095"/>
+  <testcase name="cutButtonOpensTransition" classname="it.fabriziodavi.vivovideo.ui.EditorUiTest" time="0.112"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.ui.GuideIndexTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-01T20:11:50.672Z" hostname="runnervmnwato" time="0.044">
+  <properties/>
+  <testcase name="searchFindsWordsIgnoringAccentsAndCase" classname="it.fabriziodavi.vivovideo.ui.GuideIndexTest" time="0.037"/>
+  <testcase name="editorToolsOpenTheirTopic" classname="it.fabriziodavi.vivovideo.ui.GuideIndexTest" time="0.004"/>
+  <testcase name="everyTopicHasAGroupAndText" classname="it.fabriziodavi.vivovideo.ui.GuideIndexTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

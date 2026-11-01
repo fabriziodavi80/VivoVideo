@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.model.AutoEditTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-11-01T20:11:40.812Z" hostname="runnervmnwato" time="0.088">
+  <properties/>
+  <testcase name="shortVideosAreUsedWholeAndNeverStretched" classname="it.fabriziodavi.vivovideo.model.AutoEditTest" time="0.0"/>
+  <testcase name="otherProposalsChangeScenesButKeepThePeriod" classname="it.fabriziodavi.vivovideo.model.AutoEditTest" time="0.002"/>
+  <testcase name="recipeIsSavedWithTheProject" classname="it.fabriziodavi.vivovideo.model.AutoEditTest" time="0.005"/>
+  <testcase name="formatFollowsTheMajorityAndOppositeOnesGetABlurredBackground" classname="it.fabriziodavi.vivovideo.model.AutoEditTest" time="0.0"/>
+  <testcase name="buildsAFinishedVideoWithoutMusic" classname="it.fabriziodavi.vivovideo.model.AutoEditTest" time="0.007"/>
+  <testcase name="withMusicCutsLandOnTheBeats" classname="it.fabriziodavi.vivovideo.model.AutoEditTest" time="0.02"/>
+  <testcase name="fitsTheWholeSong" classname="it.fabriziodavi.vivovideo.model.AutoEditTest" time="0.04"/>
+  <testcase name="pickSpreadsOverTheWholePeriodInDateOrder" classname="it.fabriziodavi.vivovideo.model.AutoEditTest" time="0.001"/>
+  <testcase name="dateRanges" classname="it.fabriziodavi.vivovideo.model.AutoEditTest" time="0.013"/>
+  <testcase name="everyThemeIsInExactlyOneGroup" classname="it.fabriziodavi.vivovideo.model.AutoEditTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
