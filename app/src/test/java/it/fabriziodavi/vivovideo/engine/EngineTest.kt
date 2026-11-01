@@ -207,7 +207,7 @@ class EngineTest {
     }
 
     @Test fun everyEffectHasItsUniformInTheShader() {
-        assertEquals(FxType.entries.toSet(), FX_UNIFORMS.keys + WowFxEffect.UNIFORMS.keys)
+        assertEquals(FxType.entries.toSet(), FX_UNIFORMS.keys + WowFxEffect.UNIFORMS.keys + SocialFxEffect.UNIFORMS.keys)
         assertTrue(FX_UNIFORMS.keys.none { it.wow2 } && WowFxEffect.UNIFORMS.keys.all { it.wow2 })
         FX_UNIFORMS.values.forEach { u -> assertTrue("$u manca nello shader", Regex("\\b$u\\b").findAll(FX_FRAGMENT).count() >= 2) }
         WowFxEffect.UNIFORMS.values.forEach { u -> assertTrue("$u manca nello shader", Regex("\\b$u\\b").findAll(WowFxEffect.FRAGMENT).count() >= 2) }

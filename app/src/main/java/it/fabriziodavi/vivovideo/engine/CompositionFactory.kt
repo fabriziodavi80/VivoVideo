@@ -292,6 +292,7 @@ class CompositionFactory(private val context: Context) {
                     add(FxEffect(clip.fx, beats, clipStart, clip.outputUs, clip.fadeInUs, clip.fadeOutUs, clip.fadeColor))
                 }
                 if (WowFxEffect.needed(clip.fx)) add(WowFxEffect(clip.fx, beats, clipStart))
+                if (SocialFxEffect.needed(clip.fx)) add(SocialFxEffect(clip.fx, beats, clipStart))
                 // Transizioni a due clip diverse dall'incrociata: la forma (tendina, orologio…) la dà la trasparenza.
                 if (cf.type != TransitionType.CROSSFADE) {
                     // Passaggio con maschera: della clip prima resta solo la persona (tempo nel file: dopo la fine del taglio).
@@ -441,6 +442,7 @@ class CompositionFactory(private val context: Context) {
                     add(FxEffect(clip.fx, if (needsBeats) beats else emptyList(), startUs, clip.outputUs, clip.fadeInUs, clip.fadeOutUs, clip.fadeColor))
                 }
                 if (WowFxEffect.needed(clip.fx)) add(WowFxEffect(clip.fx, beats, startUs))
+                if (SocialFxEffect.needed(clip.fx)) add(SocialFxEffect(clip.fx, beats, startUs))
                 // Transizioni: metà alla fine di questa clip, metà all'inizio della successiva.
                 // (la dissolvenza incrociata la fa il compositore, non questo effetto)
                 fun adapt(t: TransitionSpec?) = when {

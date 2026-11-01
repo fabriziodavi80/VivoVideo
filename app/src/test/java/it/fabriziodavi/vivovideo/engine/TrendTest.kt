@@ -61,7 +61,8 @@ class TrendTest {
         assertTrue(listOf(FxType.HALATION, FxType.DIGICAM, FxType.GRAIN, FxType.MUTED, FxType.FLASHBEAT, FxType.BWBEAT, FxType.BOUNCE).all { it in trendy })
         assertTrue(FxType.FLASHBEAT.onBeats && FxType.BWBEAT.onBeats && FxType.BOUNCE.onBeats && !FxType.HALATION.onBeats)
         assertTrue(listOf(FxType.HALATION, FxType.DIGICAM, FxType.GRAIN, FxType.MUTED).all { it.category == FxCategory.TREND && it.wow2 })
-        assertEquals(FxCategory.TREND, FxCategory.entries.first())
+        assertEquals(FxCategory.SOCIAL, FxCategory.entries.first())
+        assertEquals(FxCategory.TREND, FxCategory.entries[1])
         assertTrue(TransitionType.entries.filter { it.trend }.containsAll(listOf(TransitionType.BLACKOUT, TransitionType.EXPOSE, TransitionType.CAMSHAKE, TransitionType.SNAPZOOM)))
         // Gli stacchi di tendenza sono d'impatto; zoom morbido e scivolata sono morbidi (per i temi calmi).
         assertTrue(TransitionType.entries.filter { it.trend && !it.gentleTrend }.all { it.punchy && !it.soft })

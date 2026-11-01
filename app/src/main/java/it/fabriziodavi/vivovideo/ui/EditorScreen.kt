@@ -1910,7 +1910,7 @@ private fun EffectsPanel(vm: EditorViewModel, running: Boolean, tab: Int) {
 
 @Composable
 private fun FxTab(vm: EditorViewModel, clip: it.fabriziodavi.vivovideo.model.Clip, p: it.fabriziodavi.vivovideo.model.Project, enabled: Boolean) {
-    var category by remember { mutableStateOf(FxCategory.TREND) }
+    var category by remember { mutableStateOf(FxCategory.SOCIAL) }
     Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         FxCategory.entries.forEach { cat ->
             val on = cat == category

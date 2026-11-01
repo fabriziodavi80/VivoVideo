@@ -93,7 +93,7 @@ enum class AutoStyle(
         transitions = listOf(TransitionType.WHIP, TransitionType.SLIDE_UP, TransitionType.SNAPZOOM, TransitionType.SWIPE),
         transitionUs = 220_000,
         fx = listOf(ClipFx(FxType.GRAIN, 0.25f)),
-        accents = listOf(ClipFx(FxType.BWBEAT, 1f), ClipFx(FxType.DIGICAM, 0.5f)),
+        accents = listOf(ClipFx(FxType.BWBEAT, 1f), ClipFx(FxType.DIGICAM, 0.5f), ClipFx(FxType.SLICEGLITCH, 0.5f), ClipFx(FxType.ECHOBEAT, 0.7f)),
         title = TextPreset.SOCIAL,
         impact = listOf(TransitionType.STROBE, TransitionType.BLACKOUT, TransitionType.EXPOSE, TransitionType.CAMSHAKE, TransitionType.RGB),
         beatFx = listOf(ClipFx(FxType.BOUNCE, 0.6f), ClipFx(FxType.FLASHBEAT, 0.4f)),

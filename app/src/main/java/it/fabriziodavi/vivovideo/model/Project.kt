@@ -334,7 +334,7 @@ data class ColorSettings(
 )
 
 /** Categorie degli effetti (per il pannello). */
-enum class FxCategory(val label: String) { TREND("Di tendenza"), WOW("Wow"), BEAT("A ritmo"), COLOR("Colore"), STYLE("Stile"), OPTICS("Ottica"), SHAPE("Forma"), MOTION("Movimento") }
+enum class FxCategory(val label: String) { SOCIAL("Social"), TREND("Di tendenza"), WOW("Wow"), BEAT("A ritmo"), COLOR("Colore"), STYLE("Stile"), OPTICS("Ottica"), SHAPE("Forma"), MOTION("Movimento") }
 
 /** Effetti video per clip; [toggle] = acceso/spento senza intensità. L'ordine non conta (salvati per nome). */
 enum class FxType(val label: String, val category: FxCategory, val toggle: Boolean = false, val defaultAmount: Float = 0.6f) {
@@ -415,10 +415,21 @@ enum class FxType(val label: String, val category: FxCategory, val toggle: Boole
     HALATION("Pellicola moderna", FxCategory.TREND, defaultAmount = 0.6f),
     DIGICAM("Fotocamera digitale", FxCategory.TREND, defaultAmount = 0.7f),
     GRAIN("Grana fine", FxCategory.TREND, defaultAmount = 0.5f),
-    MUTED("Toni smorzati", FxCategory.TREND, defaultAmount = 0.7f);
+    MUTED("Toni smorzati", FxCategory.TREND, defaultAmount = 0.7f),
+    // Social 2026 (01/11/2026): per reel e stories, quasi tutti a tempo di musica (shader a parte: SocialFxEffect).
+    STEPZOOM("Zoom a scatti", FxCategory.SOCIAL, defaultAmount = 0.8f),
+    ECHOBEAT("Eco a ritmo", FxCategory.SOCIAL, defaultAmount = 0.8f),
+    QUADBEAT("Griglia a ritmo", FxCategory.SOCIAL, toggle = true, defaultAmount = 1f),
+    SLICEGLITCH("Glitch a fette", FxCategory.SOCIAL, defaultAmount = 0.7f),
+    MELT("Colata di pixel", FxCategory.SOCIAL, defaultAmount = 0.6f),
+    HYPER("Iper-saturo", FxCategory.SOCIAL, defaultAmount = 0.6f),
+    AURA("Aura", FxCategory.SOCIAL, defaultAmount = 0.6f),
+    THERMAL("Termocamera", FxCategory.SOCIAL, defaultAmount = 1f),
+    CHROME("Cromo Y2K", FxCategory.SOCIAL, defaultAmount = 0.9f);
 
     /** Effetti che seguono i battiti della musica. */
-    val onBeats: Boolean get() = this == PULSE || this == STROBE || this == HIT || category == FxCategory.BEAT
+    val onBeats: Boolean get() = this == PULSE || this == STROBE || this == HIT || category == FxCategory.BEAT ||
+        this in setOf(STEPZOOM, ECHOBEAT, QUADBEAT, SLICEGLITCH, MELT, HYPER)
 
     /**
      * Nella scheda "Di tendenza": i look del 2026 più gli effetti a ritmo e ottici che si usano oggi nelle velocity edit
@@ -428,7 +439,7 @@ enum class FxType(val label: String, val category: FxCategory, val toggle: Boole
         this in setOf(FLASHBEAT, BWBEAT, BOUNCE, SHAKEBEAT, RGBBEAT, ZOOMBLUR, CHROMA, LETTERBOX)
 
     /** Effetti del secondo shader (premium). */
-    val wow2: Boolean get() = ordinal >= DREAMY.ordinal
+    val wow2: Boolean get() = ordinal >= DREAMY.ordinal && category != FxCategory.SOCIAL
 }
 
 /** Colore delle dissolvenze in entrata/uscita della clip. */

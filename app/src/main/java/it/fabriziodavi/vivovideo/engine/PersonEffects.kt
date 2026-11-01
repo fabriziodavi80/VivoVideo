@@ -435,7 +435,23 @@ void main() {
   } else {
     bg = src.rgb;
   }
-  float alpha = uMode > 2.5 ? m * src.a : src.a;
-  gl_FragColor = vec4(mix(bg, src.rgb, m), alpha);
+  float alpha = (uMode > 2.5 && uMode < 3.5) ? m * src.a : src.a;
+  vec3 outc = mix(bg, src.rgb, m);
+  // Contorno sticker: un bordo bianco pieno attorno alla persona, come un adesivo ritagliato (con un'ombra leggera).
+  if (uMode > 3.5) {
+    float dil = 0.0; float sh = 0.0;
+    for (int i = 0; i < 16; i++) {
+      float a = float(i) * 0.3927;
+      vec2 o = vec2(cos(a), sin(a)) * 0.014 / asp;
+      vec2 q = clamp(vUv + o, 0.0, 1.0);
+      dil = max(dil, mix(texture2D (uMaskA, vec2(q.x, 1.0 - q.y)).r, texture2D (uMaskB, vec2(q.x, 1.0 - q.y)).r, uMix));
+      vec2 qs = clamp(vUv + o * 1.6 + vec2(-0.006, 0.01), 0.0, 1.0);
+      sh = max(sh, mix(texture2D (uMaskA, vec2(qs.x, 1.0 - qs.y)).r, texture2D (uMaskB, vec2(qs.x, 1.0 - qs.y)).r, uMix));
+    }
+    float ring = smoothstep(0.35, 0.6, dil) * (1.0 - m);
+    float shadow = smoothstep(0.35, 0.6, sh) * (1.0 - m) * (1.0 - ring);
+    outc = mix(outc * (1.0 - 0.35 * shadow), vec3(1.0), ring);
+  }
+  gl_FragColor = vec4(outc, alpha);
 }
 """

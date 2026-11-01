@@ -82,6 +82,7 @@ import it.fabriziodavi.vivovideo.model.Clip
 import it.fabriziodavi.vivovideo.model.ClipFx
 import it.fabriziodavi.vivovideo.model.ClipSpeed
 import it.fabriziodavi.vivovideo.model.FadeColor
+import it.fabriziodavi.vivovideo.model.FxCategory
 import it.fabriziodavi.vivovideo.model.FxType
 import it.fabriziodavi.vivovideo.model.KeyColor
 import it.fabriziodavi.vivovideo.model.Keyframe
@@ -888,6 +889,17 @@ class DeviceTest {
             video("n$i", srcs[i % 3], s = 1_000_000, e = 2_500_000).copy(transitionOut = cuts.getOrNull(i)?.let { TransitionSpec(it, 800_000) })
         }
         exportAndCheck(Project(name = "nuove transizioni", clips = clips, texts = listOf(TextItem(text = "Prova", startUs = 0, durationUs = 2_000_000))))
+    }
+
+    /** Social 2026: ogni effetto da solo, poi tutti insieme (anche dentro una dissolvenza incrociata) */
+    @Test fun exportSocialEffects() {
+        val social = FxType.entries.filter { it.category == FxCategory.SOCIAL }
+        val srcs = listOf(videoA, videoB, videoC)
+        val clips = social.mapIndexed { i, t ->
+            video("s$i", srcs[i % 3], s = 1_000_000, e = 2_200_000).copy(fx = listOf(ClipFx(t)))
+        } + video("tutti", videoA, s = 500_000, e = 3_000_000).copy(fx = social.map { ClipFx(it) }, transitionOut = TransitionSpec(TransitionType.CROSSFADE, 600_000)) +
+            video("dopo", videoB, s = 0, e = 2_000_000).copy(fx = listOf(ClipFx(FxType.CHROME), ClipFx(FxType.STEPZOOM)))
+        exportAndCheck(Project(name = "social", clips = clips))
     }
 
     /** Tendenze 2026: le nuove transizioni, gli effetti combinati nella stessa scena (con i battiti) e i nuovi testi. */
