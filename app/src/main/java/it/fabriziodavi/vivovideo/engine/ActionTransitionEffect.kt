@@ -100,8 +100,11 @@ class ActionTransitionEffect(
                 if (bx in 0f..1f) 1f else 0f
             }
             3 -> {
-                val e = if (p <= 0f) 0f else if (p >= 1f) 1f else backOut(p, 1.2f)
-                if (aspect < 1f) inside(x, y + (1f - e)) else inside(x - (1f - e), y)
+                // Agli estremi tutta vecchia o tutta nuova (niente riga di pixel della nuova sul bordo all'inizio).
+                if (p <= 0f) 0f else if (p >= 1f) 1f else {
+                    val e = backOut(p, 1.2f)
+                    if (aspect < 1f) inside(x, y + (1f - e)) else inside(x - (1f - e), y)
+                }
             }
             4 -> {
                 val cols = if (aspect < 1f) 5f else 8f
@@ -202,7 +205,7 @@ void main() {
     vec2 dv = uAspect < 1.0 ? vec2(0.0, 1.0) : vec2(-1.0, 0.0);
     vec2 sB = uv + (1.0 - e) * dv;
     vec2 sA = uv - e * dv;
-    cov = inside(sB);
+    cov = p <= 0.0 ? 0.0 : (p >= 1.0 ? 1.0 : inside(sB));
     vec2 bl = dv * 0.01 * vel;
     c = isB ? blur5(sB, bl) : blur5(sA, bl);
   } else if (m == 4) {

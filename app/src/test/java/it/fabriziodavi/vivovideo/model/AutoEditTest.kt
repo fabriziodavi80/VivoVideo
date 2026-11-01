@@ -47,7 +47,8 @@ class AutoEditTest {
                 assertEquals(FrameMode.FILL, c.frameMode) // tutte orizzontali come il video
                 s.fx.forEach { f -> assertTrue("$s effetto ${f.type}", c.fx.any { it.type == f.type }) }
                 if (i < p.clips.lastIndex) assertNotNull("$s transizione $i", c.transitionOut) else assertNull(c.transitionOut)
-                c.transitionOut?.let { assertTrue(it.type in s.transitions && it.durationUs <= s.transitionUs) }
+                // Le transizioni d'azione hanno la loro durata (più lunga di quella del tema, se no non si vedono).
+                c.transitionOut?.let { assertTrue(it.type in s.transitions && it.durationUs <= maxOf(s.transitionUs, it.type.defaultUs?.takeIf { _ -> it.type.action } ?: 0L)) }
             }
             if (s.accents.isNotEmpty()) assertTrue("$s accenti", p.clips[1].fx.size > s.fx.size)
             assertTrue(p.clips.first().fadeInUs > 0 && p.clips.last().fadeOutUs > 0)

@@ -52,8 +52,8 @@ class ActionTransitionsTest {
         assertEquals(1f, ActionTransitionEffect.coverage(3, 0.95f, 0.5f, 0.4f, 16f / 9f), 0f)
         assertEquals(0f, ActionTransitionEffect.coverage(3, 0.05f, 0.5f, 0.4f, 16f / 9f), 0f)
         // Tagli a fette: a metà fette vicine arrivano da lati opposti (una copre la sinistra, l'altra la destra).
-        val f0 = (0..20).map { ActionTransitionEffect.coverage(2, it / 20f, 0.07f, 0.35f, v) }
-        val f1 = (0..20).map { ActionTransitionEffect.coverage(2, it / 20f, 0.21f, 0.35f, v) }
+        val f0 = (0..20).map { ActionTransitionEffect.coverage(2, it / 20f, 0.07f, 0.15f, v) }
+        val f1 = (0..20).map { ActionTransitionEffect.coverage(2, it / 20f, 0.21f, 0.15f, v) }
         assertTrue(f0.last() == 1f && f0.first() == 0f)
         assertTrue(f1.first() == 1f && f1.last() == 0f)
         // Strobo: si alterna (vecchia, nuova, vecchia, nuova…) prima di fermarsi sulla nuova.
