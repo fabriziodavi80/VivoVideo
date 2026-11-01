@@ -1,0 +1,300 @@
+11-01 20:16:38.165  6635  7345 W PhenotypeConfigurationU: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-01 20:16:38.165  6635  7345 W PhenotypeConfigurationU: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-01 20:16:38.165  6635  7345 W PhenotypeConfigurationU: 	at java.lang.Thread.run(Thread.java:1012)
+11-01 20:16:38.182  6635  7258 W PhenotypeConfigurationU: Update for unknown DeviceConfig package com.google.android.gms.kids#com.google.android.gms [CONTEXT service_id=204 ]
+11-01 20:16:38.182  6635  7258 W PhenotypeConfigurationU: bwix: No package exists for config package: com.google.android.gms.kids#com.google.android.gms
+11-01 20:16:38.182  6635  7258 W PhenotypeConfigurationU: 	at com.google.android.gms.platformconfigurator.PhenotypeConfigurationUpdateListener.b(:com.google.android.gms@231818047@23.18.18 (190800-535401451):6)
+11-01 20:16:38.182  6635  7258 W PhenotypeConfigurationU: 	at com.google.android.gms.platformconfigurator.PhenotypeConfigurationUpdateListener.a(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-01 20:16:38.182  6635  7258 W PhenotypeConfigurationU: 	at com.google.android.gms.platformconfigurator.PhenotypeConfigurationUpdateListener.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):21)
+11-01 20:16:38.182  6635  7258 W PhenotypeConfigurationU: 	at com.google.android.chimera.IntentOperation.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-01 20:16:38.182  6635  7258 W PhenotypeConfigurationU: 	at zhv.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-01 20:16:38.182  6635  7258 W PhenotypeConfigurationU: 	at hjm.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):3)
+11-01 20:16:38.182  6635  7258 W PhenotypeConfigurationU: 	at hjl.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):11)
+11-01 20:16:38.182  6635  7258 W PhenotypeConfigurationU: 	at dfhf.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-01 20:16:38.182  6635  7258 W PhenotypeConfigurationU: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-01 20:16:38.182  6635  7258 W PhenotypeConfigurationU: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-01 20:16:38.182  6635  7258 W PhenotypeConfigurationU: 	at java.lang.Thread.run(Thread.java:1012)
+11-01 20:16:38.189  6635  7259 W PhenotypeConfigurationU: Update for unknown DeviceConfig package com.google.android.gms.icing.mdd#com.google.android.gms [CONTEXT service_id=204 ]
+11-01 20:16:38.189  6635  7259 W PhenotypeConfigurationU: bwix: No package exists for config package: com.google.android.gms.icing.mdd#com.google.android.gms
+11-01 20:16:38.189  6635  7259 W PhenotypeConfigurationU: 	at com.google.android.gms.platformconfigurator.PhenotypeConfigurationUpdateListener.b(:com.google.android.gms@231818047@23.18.18 (190800-535401451):6)
+11-01 20:16:38.189  6635  7259 W PhenotypeConfigurationU: 	at com.google.android.gms.platformconfigurator.PhenotypeConfigurationUpdateListener.a(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-01 20:16:38.189  6635  7259 W PhenotypeConfigurationU: 	at com.google.android.gms.platformconfigurator.PhenotypeConfigurationUpdateListener.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):21)
+11-01 20:16:38.189  6635  7259 W PhenotypeConfigurationU: 	at com.google.android.chimera.IntentOperation.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-01 20:16:38.189  6635  7259 W PhenotypeConfigurationU: 	at zhv.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-01 20:16:38.189  6635  7259 W PhenotypeConfigurationU: 	at hjm.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):3)
+11-01 20:16:38.189  6635  7259 W PhenotypeConfigurationU: 	at hjl.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):11)
+11-01 20:16:38.189  6635  7259 W PhenotypeConfigurationU: 	at dfhf.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-01 20:16:38.189  6635  7259 W PhenotypeConfigurationU: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-01 20:16:38.189  6635  7259 W PhenotypeConfigurationU: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-01 20:16:38.189  6635  7259 W PhenotypeConfigurationU: 	at java.lang.Thread.run(Thread.java:1012)
+11-01 20:16:38.215  6698  7355 W ModuleInitIntentOp: Dropping unexpected action com.google.android.gms.phenotype.COMMITTED
+11-01 20:16:38.217  6698  7357 W ModuleInitIntentOp: Dropping unexpected action com.google.android.gms.phenotype.COMMITTED
+11-01 20:16:38.218  6698  7354 W ModuleInitIntentOp: Dropping unexpected action com.google.android.gms.phenotype.COMMITTED
+11-01 20:16:38.220  6698  7357 W ModuleInitIntentOp: Dropping unexpected action com.google.android.gms.phenotype.COMMITTED
+11-01 20:16:38.427  6635  7345 W PhenotypeConfigurationU: Update for unknown DeviceConfig package com.google.android.gms [CONTEXT service_id=204 ]
+11-01 20:16:38.427  6635  7345 W PhenotypeConfigurationU: bwix: No package exists for config package: com.google.android.gms
+11-01 20:16:38.427  6635  7345 W PhenotypeConfigurationU: 	at com.google.android.gms.platformconfigurator.PhenotypeConfigurationUpdateListener.b(:com.google.android.gms@231818047@23.18.18 (190800-535401451):6)
+11-01 20:16:38.427  6635  7345 W PhenotypeConfigurationU: 	at com.google.android.gms.platformconfigurator.PhenotypeConfigurationUpdateListener.a(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-01 20:16:38.427  6635  7345 W PhenotypeConfigurationU: 	at com.google.android.gms.platformconfigurator.PhenotypeConfigurationUpdateListener.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):21)
+11-01 20:16:38.427  6635  7345 W PhenotypeConfigurationU: 	at com.google.android.chimera.IntentOperation.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-01 20:16:38.427  6635  7345 W PhenotypeConfigurationU: 	at zhv.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-01 20:16:38.427  6635  7345 W PhenotypeConfigurationU: 	at hjm.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):3)
+11-01 20:16:38.427  6635  7345 W PhenotypeConfigurationU: 	at hjl.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):11)
+11-01 20:16:38.427  6635  7345 W PhenotypeConfigurationU: 	at dfhf.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-01 20:16:38.427  6635  7345 W PhenotypeConfigurationU: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-01 20:16:38.427  6635  7345 W PhenotypeConfigurationU: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-01 20:16:38.427  6635  7345 W PhenotypeConfigurationU: 	at java.lang.Thread.run(Thread.java:1012)
+11-01 20:16:38.646   350  7229 W C2BqBuffer: last successful dequeue was 152700 us ago, 14 consecutive failures
+11-01 20:16:38.646  6635  7364 W PhenotypeConfigurationU: Update for unknown DeviceConfig package com.google.lighter.android#com.google.android.gms [CONTEXT service_id=204 ]
+11-01 20:16:38.646  6635  7364 W PhenotypeConfigurationU: bwix: No package exists for config package: com.google.lighter.android#com.google.android.gms
+11-01 20:16:38.646  6635  7364 W PhenotypeConfigurationU: 	at com.google.android.gms.platformconfigurator.PhenotypeConfigurationUpdateListener.b(:com.google.android.gms@231818047@23.18.18 (190800-535401451):6)
+11-01 20:16:38.646  6635  7364 W PhenotypeConfigurationU: 	at com.google.android.gms.platformconfigurator.PhenotypeConfigurationUpdateListener.a(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-01 20:16:38.646  6635  7364 W PhenotypeConfigurationU: 	at com.google.android.gms.platformconfigurator.PhenotypeConfigurationUpdateListener.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):21)
+11-01 20:16:38.646  6635  7364 W PhenotypeConfigurationU: 	at com.google.android.chimera.IntentOperation.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-01 20:16:38.646  6635  7364 W PhenotypeConfigurationU: 	at zhv.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-01 20:16:38.646  6635  7364 W PhenotypeConfigurationU: 	at hjm.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):3)
+11-01 20:16:38.646  6635  7364 W PhenotypeConfigurationU: 	at hjl.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):11)
+11-01 20:16:38.646  6635  7364 W PhenotypeConfigurationU: 	at dfhf.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-01 20:16:38.646  6635  7364 W PhenotypeConfigurationU: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-01 20:16:38.646  6635  7364 W PhenotypeConfigurationU: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-01 20:16:38.646  6635  7364 W PhenotypeConfigurationU: 	at java.lang.Thread.run(Thread.java:1012)
+11-01 20:16:38.664  6635  7365 W PhenotypeConfigurationU: Update for unknown DeviceConfig package com.google.android.westworld [CONTEXT service_id=204 ]
+11-01 20:16:38.664  6635  7365 W PhenotypeConfigurationU: bwix: No package exists for config package: com.google.android.westworld
+11-01 20:16:38.664  6635  7365 W PhenotypeConfigurationU: 	at com.google.android.gms.platformconfigurator.PhenotypeConfigurationUpdateListener.b(:com.google.android.gms@231818047@23.18.18 (190800-535401451):6)
+11-01 20:16:38.664  6635  7365 W PhenotypeConfigurationU: 	at com.google.android.gms.platformconfigurator.PhenotypeConfigurationUpdateListener.a(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-01 20:16:38.664  6635  7365 W PhenotypeConfigurationU: 	at com.google.android.gms.platformconfigurator.PhenotypeConfigurationUpdateListener.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):21)
+11-01 20:16:38.664  6635  7365 W PhenotypeConfigurationU: 	at com.google.android.chimera.IntentOperation.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-01 20:16:38.664  6635  7365 W PhenotypeConfigurationU: 	at zhv.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-01 20:16:38.664  6635  7365 W PhenotypeConfigurationU: 	at hjm.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):3)
+11-01 20:16:38.664  6635  7365 W PhenotypeConfigurationU: 	at hjl.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):11)
+11-01 20:16:38.664  6635  7365 W PhenotypeConfigurationU: 	at dfhf.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-01 20:16:38.664  6635  7365 W PhenotypeConfigurationU: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-01 20:16:38.664  6635  7365 W PhenotypeConfigurationU: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-01 20:16:38.664  6635  7365 W PhenotypeConfigurationU: 	at java.lang.Thread.run(Thread.java:1012)
+11-01 20:16:38.766   350  7232 W C2BqBuffer: last successful dequeue was 73135 us ago, 7 consecutive failures
+11-01 20:16:38.780  6698  6771 W ZappDownloader: No successful module downloads for requested features [].
+11-01 20:16:38.904  6635  7363 W PhenotypeConfigurationU: Update for unknown DeviceConfig package com.google.android.gms.phenotype [CONTEXT service_id=204 ]
+11-01 20:16:38.904  6635  7363 W PhenotypeConfigurationU: bwix: No package exists for config package: com.google.android.gms.phenotype
+11-01 20:16:38.904  6635  7363 W PhenotypeConfigurationU: 	at com.google.android.gms.platformconfigurator.PhenotypeConfigurationUpdateListener.b(:com.google.android.gms@231818047@23.18.18 (190800-535401451):6)
+11-01 20:16:38.904  6635  7363 W PhenotypeConfigurationU: 	at com.google.android.gms.platformconfigurator.PhenotypeConfigurationUpdateListener.a(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-01 20:16:38.904  6635  7363 W PhenotypeConfigurationU: 	at com.google.android.gms.platformconfigurator.PhenotypeConfigurationUpdateListener.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):21)
+11-01 20:16:38.904  6635  7363 W PhenotypeConfigurationU: 	at com.google.android.chimera.IntentOperation.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-01 20:16:38.904  6635  7363 W PhenotypeConfigurationU: 	at zhv.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-01 20:16:38.904  6635  7363 W PhenotypeConfigurationU: 	at hjm.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):3)
+11-01 20:16:38.904  6635  7363 W PhenotypeConfigurationU: 	at hjl.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):11)
+11-01 20:16:38.904  6635  7363 W PhenotypeConfigurationU: 	at dfhf.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-01 20:16:38.904  6635  7363 W PhenotypeConfigurationU: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-01 20:16:38.904  6635  7363 W PhenotypeConfigurationU: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-01 20:16:38.904  6635  7363 W PhenotypeConfigurationU: 	at java.lang.Thread.run(Thread.java:1012)
+11-01 20:16:39.290  3141  3141 W binder:3141_C: type=1400 audit(0.0:201): avc:  denied  { read } for  name="u:object_r:system_adbd_prop:s0" dev="tmpfs" ino=292 scontext=u:r:gmscore_app:s0:c512,c768 tcontext=u:object_r:system_adbd_prop:s0 tclass=file permissive=0 app=com.google.android.gms
+11-01 20:16:39.301  3141  7371 W libc    : Access denied finding property "persist.adb.tls_server.enable"
+11-01 20:16:39.319  3141  7371 W libc    : Access denied finding property "service.adb.tls.port"
+11-01 20:16:39.298  3141  3141 W binder:3141_C: type=1400 audit(0.0:202): avc:  denied  { read } for  name="u:object_r:adbd_prop:s0" dev="tmpfs" ino=60 scontext=u:r:gmscore_app:s0:c512,c768 tcontext=u:object_r:adbd_prop:s0 tclass=file permissive=0 app=com.google.android.gms
+11-01 20:16:39.524  6635  6809 W GmsUrlRequestImpl: Content-Type header is overwritten.
+11-01 20:16:39.623   350  7237 W C2BqBuffer: last successful dequeue was 18016540 us ago, 1578 consecutive failures
+11-01 20:16:39.927  6635  6809 W GLSUser : [AppCertManager] Exception while requesting key:
+11-01 20:16:39.927  6635  6809 W GLSUser : java.util.concurrent.ExecutionException: avvw: Parse Proto Exception.
+11-01 20:16:39.927  6635  6809 W GLSUser : 	at dlnv.s(:com.google.android.gms@231818047@23.18.18 (190800-535401451):3)
+11-01 20:16:39.927  6635  6809 W GLSUser : 	at dlnv.get(:com.google.android.gms@231818047@23.18.18 (190800-535401451):7)
+11-01 20:16:39.927  6635  6809 W GLSUser : 	at oub.b(:com.google.android.gms@231818047@23.18.18 (190800-535401451):78)
+11-01 20:16:39.927  6635  6809 W GLSUser : 	at otz.b(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-01 20:16:39.927  6635  6809 W GLSUser : 	at otu.a(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+11-01 20:16:39.927  6635  6809 W GLSUser : 	at otx.a(:com.google.android.gms@231818047@23.18.18 (190800-535401451):6)
+11-01 20:16:39.927  6635  6809 W GLSUser : 	at lzq.call(:com.google.android.gms@231818047@23.18.18 (190800-535401451):14)
+11-01 20:16:39.927  6635  6809 W GLSUser : 	at java.util.concurrent.FutureTask.run(FutureTask.java:264)
+11-01 20:16:39.927  6635  6809 W GLSUser : 	at aced.c(:com.google.android.gms@231818047@23.18.18 (190800-535401451):6)
+11-01 20:16:39.927  6635  6809 W GLSUser : 	at aced.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):7)
+11-01 20:16:39.927  6635  6809 W GLSUser : 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-01 20:16:39.927  6635  6809 W GLSUser : 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-01 20:16:39.927  6635  6809 W GLSUser : 	at acjn.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+11-01 20:16:39.927  6635  6809 W GLSUser : 	at java.lang.Thread.run(Thread.java:1012)
+11-01 20:16:39.927  6635  6809 W GLSUser : Caused by: avvw: Parse Proto Exception.
+11-01 20:16:39.927  6635  6809 W GLSUser : 	at avwn.f(:com.google.android.gms@231818047@23.18.18 (190800-535401451):5)
+11-01 20:16:39.927  6635  6809 W GLSUser : 	at avxk.onSucceeded(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+11-01 20:16:39.927  6635  6809 W GLSUser : 	at jf.onSucceeded(:com.google.android.gms.dynamite_cronetdynamite@231818047@23.18.18 (190800-0):0)
+11-01 20:16:39.927  6635  6809 W GLSUser : 	at ie.run(:com.google.android.gms.dynamite_cronetdynamite@231818047@23.18.18 (190800-0):4)
+11-01 20:16:39.927  6635  6809 W GLSUser : 	... 6 more
+11-01 20:16:39.927  6635  6809 W GLSUser : Caused by: dzfz: Protocol message contained an invalid tag (zero).
+11-01 20:16:39.927  6635  6809 W GLSUser : 	at dzdb.k(:com.google.android.gms@231818047@23.18.18 (190800-535401451):13)
+11-01 20:16:39.927  6635  6809 W GLSUser : 	at dzha.c(:com.google.android.gms@231818047@23.18.18 (190800-535401451):47)
+11-01 20:16:39.927  6635  6809 W GLSUser : 	at dzha.h(:com.google.android.gms@231818047@23.18.18 (190800-535401451):45)
+11-01 20:16:39.927  6635  6809 W GLSUser : 	at dzfd.A(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-01 20:16:39.927  6635  6809 W GLSUser : 	at dzex.f(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+11-01 20:16:39.927  6635  6809 W GLSUser : 	at dzcx.d(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+11-01 20:16:39.927  6635  6809 W GLSUser : 	at dzcx.c(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+11-01 20:16:39.927  6635  6809 W GLSUser : 	at dzcx.n(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+11-01 20:16:39.927  6635  6809 W GLSUser : 	at avwn.h(:com.google.android.gms@231818047@23.18.18 (190800-535401451):7)
+11-01 20:16:39.927  6635  6809 W GLSUser : 	at avwn.f(:com.google.android.gms@231818047@23.18.18 (190800-535401451):1)
+11-01 20:16:39.927  6635  6809 W GLSUser : 	... 9 more
+11-01 20:16:41.391  6635  7260 W PhenotypeConfigurationU: Update for unknown DeviceConfig package com.google.android.gms [CONTEXT service_id=204 ]
+11-01 20:16:41.391  6635  7260 W PhenotypeConfigurationU: bwix: No package exists for config package: com.google.android.gms
+11-01 20:16:41.391  6635  7260 W PhenotypeConfigurationU: 	at com.google.android.gms.platformconfigurator.PhenotypeConfigurationUpdateListener.b(:com.google.android.gms@231818047@23.18.18 (190800-535401451):6)
+11-01 20:16:41.391  6635  7260 W PhenotypeConfigurationU: 	at com.google.android.gms.platformconfigurator.PhenotypeConfigurationUpdateListener.a(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-01 20:16:41.391  6635  7260 W PhenotypeConfigurationU: 	at com.google.android.gms.platformconfigurator.PhenotypeConfigurationUpdateListener.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):21)
+11-01 20:16:41.391  6635  7260 W PhenotypeConfigurationU: 	at com.google.android.chimera.IntentOperation.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-01 20:16:41.391  6635  7260 W PhenotypeConfigurationU: 	at zhv.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-01 20:16:41.391  6635  7260 W PhenotypeConfigurationU: 	at hjm.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):3)
+11-01 20:16:41.391  6635  7260 W PhenotypeConfigurationU: 	at hjl.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):11)
+11-01 20:16:41.391  6635  7260 W PhenotypeConfigurationU: 	at dfhf.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-01 20:16:41.391  6635  7260 W PhenotypeConfigurationU: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-01 20:16:41.391  6635  7260 W PhenotypeConfigurationU: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-01 20:16:41.391  6635  7260 W PhenotypeConfigurationU: 	at java.lang.Thread.run(Thread.java:1012)
+11-01 20:16:42.825   350  7248 W C2BqBuffer: last successful dequeue was 14114912 us ago, 1276 consecutive failures
+11-01 20:16:43.647   350  7229 W C2BqBuffer: last successful dequeue was 126944 us ago, 12 consecutive failures
+11-01 20:16:43.770   350  7232 W C2BqBuffer: last successful dequeue was 109081 us ago, 8 consecutive failures
+11-01 20:16:44.623   350  7237 W C2BqBuffer: last successful dequeue was 23016891 us ago, 2034 consecutive failures
+11-01 20:16:47.150  4741  7230 W MediaCodec: no metrics handle found
+11-01 20:16:47.220  4741  7387 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-01 20:16:47.226  4741  7387 W Codec2Client: query -- param skipped: index = 1107298332.
+11-01 20:16:47.226  4741  7387 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-01 20:16:47.227  4741  7387 W Codec2Client: query -- param skipped: index = 1342179345.
+11-01 20:16:47.227  4741  7387 W Codec2Client: query -- param skipped: index = 2415921170.
+11-01 20:16:47.227  4741  7387 W Codec2Client: query -- param skipped: index = 1610614798.
+11-01 20:16:47.227  4741  7387 W Codec2Client: query -- param skipped: index = 2684356609.
+11-01 20:16:47.284   472  2838 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-01 20:16:47.734  4741  7227 W MediaCodec: no metrics handle found
+11-01 20:16:47.840   350  7248 W C2BqBuffer: last successful dequeue was 548045 us ago, 15 consecutive failures
+11-01 20:16:47.973  4741  7393 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-01 20:16:48.176  4741  7393 W Codec2Client: query -- param skipped: index = 1107298332.
+11-01 20:16:48.178  4741  7393 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-01 20:16:48.201  4741  7393 W Codec2Client: query -- param skipped: index = 1342179345.
+11-01 20:16:48.201  4741  7393 W Codec2Client: query -- param skipped: index = 2415921170.
+11-01 20:16:48.201  4741  7393 W Codec2Client: query -- param skipped: index = 1610614798.
+11-01 20:16:48.205  4741  7393 W Codec2Client: query -- param skipped: index = 2684356609.
+11-01 20:16:48.345   472  2838 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-01 20:16:49.623   350  7237 W C2BqBuffer: last successful dequeue was 28016952 us ago, 2337 consecutive failures
+11-01 20:16:52.291   350  7388 W C2BqBuffer: last successful dequeue was 61485 us ago, 6 consecutive failures
+11-01 20:16:52.849   350  7248 W C2BqBuffer: last successful dequeue was 178310 us ago, 17 consecutive failures
+11-01 20:16:53.459   350  7394 W C2BqBuffer: last successful dequeue was 117894 us ago, 11 consecutive failures
+11-01 20:16:54.628   350  7237 W C2BqBuffer: last successful dequeue was 33021961 us ago, 2803 consecutive failures
+11-01 20:16:55.266  6698  7398 W ZappDownloader: No successful module downloads for requested features [vision.ocr].
+11-01 20:16:55.269  6698  7398 W ChimeraConfigService: Retry attempt was throttled. [CONTEXT service_id=264 ]
+11-01 20:16:55.274  6698  7395 W Vision  : Request for optional module download of ocr failed. Request again.
+11-01 20:16:55.274  6698  7395 W Vision  : Would have logged:
+11-01 20:16:55.274  6698  7395 W Vision  : # dsae@37884fe7
+11-01 20:16:57.300   350  7388 W C2BqBuffer: last successful dequeue was 144098 us ago, 13 consecutive failures
+11-01 20:16:58.468   350  7394 W C2BqBuffer: last successful dequeue was 177526 us ago, 17 consecutive failures
+11-01 20:16:59.636   350  7237 W C2BqBuffer: last successful dequeue was 38029459 us ago, 3263 consecutive failures
+11-01 20:17:00.053   841   841 W PageIndicator: Total number of pages invalid: 0. Assuming 1 page.
+11-01 20:17:00.377  3141  7402 W SystemServiceRegistry: No service published for: persistent_data_block
+11-01 20:17:00.818  3141  3141 W IntentService[D: type=1400 audit(0.0:203): avc:  denied  { read } for  name="u:object_r:system_adbd_prop:s0" dev="tmpfs" ino=292 scontext=u:r:gmscore_app:s0:c512,c768 tcontext=u:object_r:system_adbd_prop:s0 tclass=file permissive=0 app=com.google.android.gms
+11-01 20:17:00.857  6698  6779 E WakeLock: DG:service ** IS FORCE-RELEASED ON TIMEOUT **
+11-01 20:17:00.858  3141  7402 W libc    : Access denied finding property "persist.adb.tls_server.enable"
+11-01 20:17:00.858  3141  7402 W libc    : Access denied finding property "service.adb.tls.port"
+11-01 20:17:00.854  3141  3141 W IntentService[D: type=1400 audit(0.0:204): avc:  denied  { read } for  name="u:object_r:adbd_prop:s0" dev="tmpfs" ino=60 scontext=u:r:gmscore_app:s0:c512,c768 tcontext=u:object_r:adbd_prop:s0 tclass=file permissive=0 app=com.google.android.gms
+11-01 20:17:02.304   350  7388 W C2BqBuffer: last successful dequeue was 136505 us ago, 13 consecutive failures
+11-01 20:17:03.474   350  7394 W C2BqBuffer: last successful dequeue was 215518 us ago, 21 consecutive failures
+11-01 20:17:03.762  4741  7246 W MediaCodec: no metrics handle found
+11-01 20:17:04.638   350  7237 W C2BqBuffer: last successful dequeue was 43032167 us ago, 3716 consecutive failures
+11-01 20:17:05.348  4741  7410 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-01 20:17:05.352  4741  7410 W Codec2Client: query -- param skipped: index = 1107298332.
+11-01 20:17:05.352  4741  7410 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-01 20:17:05.353  4741  7410 W Codec2Client: query -- param skipped: index = 1342179345.
+11-01 20:17:05.353  4741  7410 W Codec2Client: query -- param skipped: index = 2415921170.
+11-01 20:17:05.353  4741  7410 W Codec2Client: query -- param skipped: index = 1610614798.
+11-01 20:17:05.353  4741  7410 W Codec2Client: query -- param skipped: index = 2684356609.
+11-01 20:17:05.589   472  2853 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-01 20:17:07.083  2924  7413 W Settings: Setting airplane_mode_on has moved from android.provider.Settings.System to android.provider.Settings.Global, returning read-only value.
+11-01 20:17:07.301  2924  7413 W Settings: Setting airplane_mode_on has moved from android.provider.Settings.System to android.provider.Settings.Global, returning read-only value.
+11-01 20:17:09.164  6698  6769 E constellation: [api_verify_phone_operation] Failed to generate Client Signature
+11-01 20:17:09.164  6698  6769 E constellation: acwp: Stored private key deleted
+11-01 20:17:09.164  6698  6769 E constellation: 	at acos.e(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-01 20:17:09.164  6698  6769 E constellation: 	at acos.d(:com.google.android.gms@231818047@23.18.18 (190800-535401451):1)
+11-01 20:17:09.164  6698  6769 E constellation: 	at acoa.c(:com.google.android.gms@231818047@23.18.18 (190800-535401451):22)
+11-01 20:17:09.164  6698  6769 E constellation: 	at acoa.f(:com.google.android.gms@231818047@23.18.18 (190800-535401451):12)
+11-01 20:17:09.164  6698  6769 E constellation: 	at avsy.eo(:com.google.android.gms@231818047@23.18.18 (190800-535401451):1)
+11-01 20:17:09.164  6698  6769 E constellation: 	at avtf.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):14)
+11-01 20:17:09.164  6698  6769 E constellation: 	at dfhf.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-01 20:17:09.164  6698  6769 E constellation: 	at aced.c(:com.google.android.gms@231818047@23.18.18 (190800-535401451):6)
+11-01 20:17:09.164  6698  6769 E constellation: 	at aced.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):7)
+11-01 20:17:09.164  6698  6769 E constellation: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-01 20:17:09.164  6698  6769 E constellation: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-01 20:17:09.164  6698  6769 E constellation: 	at acjn.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+11-01 20:17:09.164  6698  6769 E constellation: 	at java.lang.Thread.run(Thread.java:1012)
+11-01 20:17:09.166  2924  3116 W DialerVerifiedNumberProvider: com.android.dialer.businessvoice.verifiedcall.impl.constellation.VerifiedNumberProvider.lambda$getConstellationResponse$1:155 Failed to get constellation token.
+11-01 20:17:09.166  2924  3116 W DialerVerifiedNumberProvider: nkq: 5004:
+11-01 20:17:09.166  2924  3116 W DialerVerifiedNumberProvider: 	at nov.au(PG:1)
+11-01 20:17:09.166  2924  3116 W DialerVerifiedNumberProvider: 	at nnf.g(PG:2)
+11-01 20:17:09.166  2924  3116 W DialerVerifiedNumberProvider: 	at npo.a(Unknown Source:2)
+11-01 20:17:09.166  2924  3116 W DialerVerifiedNumberProvider: 	at npy.dm(PG:9)
+11-01 20:17:09.166  2924  3116 W DialerVerifiedNumberProvider: 	at ncz.onTransact(PG:4)
+11-01 20:17:09.166  2924  3116 W DialerVerifiedNumberProvider: 	at android.os.Binder.execTransactInternal(Binder.java:1344)
+11-01 20:17:09.166  2924  3116 W DialerVerifiedNumberProvider: 	at android.os.Binder.execTransact(Binder.java:1275)
+11-01 20:17:09.170  2924  3134 W DialerConstellationSyncWorker: com.android.dialer.businessvoice.control.worker.ConstellationSyncWorker.lambda$syncConstellation$2:110 Constellation api request failed, status code: 5004
+11-01 20:17:09.646   350  7237 W C2BqBuffer: last successful dequeue was 48040125 us ago, 4128 consecutive failures
+11-01 20:17:10.594   350  7411 W C2BqBuffer: last successful dequeue was 4117308 us ago, 382 consecutive failures
+11-01 20:17:11.830  4741  7235 W MediaCodec: no metrics handle found
+11-01 20:17:12.736  4741  7386 W MediaCodec: no metrics handle found
+11-01 20:17:12.896  4741  7392 W MediaCodec: no metrics handle found
+11-01 20:17:12.953  4741  7423 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-01 20:17:12.958  4741  7423 W Codec2Client: query -- param skipped: index = 1107298332.
+11-01 20:17:12.958  4741  7423 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-01 20:17:12.960  4741  7423 W Codec2Client: query -- param skipped: index = 1342179345.
+11-01 20:17:12.960  4741  7423 W Codec2Client: query -- param skipped: index = 2415921170.
+11-01 20:17:12.960  4741  7423 W Codec2Client: query -- param skipped: index = 1610614798.
+11-01 20:17:12.960  4741  7423 W Codec2Client: query -- param skipped: index = 2684356609.
+11-01 20:17:13.021   472  2853 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-01 20:17:13.223  4741  7426 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-01 20:17:13.241  4741  7426 W Codec2Client: query -- param skipped: index = 1107298332.
+11-01 20:17:13.241  4741  7426 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-01 20:17:13.243  4741  7426 W Codec2Client: query -- param skipped: index = 1342179345.
+11-01 20:17:13.244  4741  7426 W Codec2Client: query -- param skipped: index = 2415921170.
+11-01 20:17:13.244  4741  7426 W Codec2Client: query -- param skipped: index = 1610614798.
+11-01 20:17:13.244  4741  7426 W Codec2Client: query -- param skipped: index = 2684356609.
+11-01 20:17:13.299   472  2853 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-01 20:17:15.072  6635  7428 W TapAndPay: NfcAdapter is null while obtaining CardEmulation instance. [CONTEXT service_id=79 ]
+11-01 20:17:15.072  6635  7428 W TapAndPay: java.lang.NullPointerException: NfcAdapter is null
+11-01 20:17:15.072  6635  7428 W TapAndPay: 	at android.nfc.cardemulation.CardEmulation.getInstance(CardEmulation.java:152)
+11-01 20:17:15.072  6635  7428 W TapAndPay: 	at cdoy.<init>(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+11-01 20:17:15.072  6635  7428 W TapAndPay: 	at com.google.android.gms.tapandpay.hce.task.TapAndPayAidRegistrationTaskOperation.a(:com.google.android.gms@231818047@23.18.18 (190800-535401451):5)
+11-01 20:17:15.072  6635  7428 W TapAndPay: 	at com.google.android.gms.tapandpay.gcmtask.TapAndPayGcmTaskChimeraService.a(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-01 20:17:15.072  6635  7428 W TapAndPay: 	at avzs.call(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-01 20:17:15.072  6635  7428 W TapAndPay: 	at java.util.concurrent.FutureTask.run(FutureTask.java:264)
+11-01 20:17:15.072  6635  7428 W TapAndPay: 	at aced.c(:com.google.android.gms@231818047@23.18.18 (190800-535401451):6)
+11-01 20:17:15.072  6635  7428 W TapAndPay: 	at aced.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):7)
+11-01 20:17:15.072  6635  7428 W TapAndPay: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-01 20:17:15.072  6635  7428 W TapAndPay: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-01 20:17:15.072  6635  7428 W TapAndPay: 	at acjn.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+11-01 20:17:15.072  6635  7428 W TapAndPay: 	at java.lang.Thread.run(Thread.java:1012)
+11-01 20:17:15.599   350  7411 W C2BqBuffer: last successful dequeue was 1307666 us ago, 95 consecutive failures
+11-01 20:17:16.544  4741  7409 W MediaCodec: no metrics handle found
+11-01 20:17:23.523  4741  7422 W MediaCodec: no metrics handle found
+11-01 20:17:23.601  4741  7425 W MediaCodec: no metrics handle found
+11-01 20:17:23.745  4741  7438 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-01 20:17:23.752  4741  7438 W Codec2Client: query -- param skipped: index = 1107298332.
+11-01 20:17:23.752  4741  7438 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-01 20:17:23.761  4741  7438 W Codec2Client: query -- param skipped: index = 1342179345.
+11-01 20:17:23.762  4741  7438 W Codec2Client: query -- param skipped: index = 2415921170.
+11-01 20:17:23.762  4741  7438 W Codec2Client: query -- param skipped: index = 1610614798.
+11-01 20:17:23.762  4741  7438 W Codec2Client: query -- param skipped: index = 2684356609.
+11-01 20:17:23.788   472  2853 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-01 20:17:24.309  4741  7441 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-01 20:17:24.522  4741  7441 W Codec2Client: query -- param skipped: index = 1107298332.
+11-01 20:17:24.522  4741  7441 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-01 20:17:24.526  4741  7441 W Codec2Client: query -- param skipped: index = 1342179345.
+11-01 20:17:24.527  4741  7441 W Codec2Client: query -- param skipped: index = 2415921170.
+11-01 20:17:24.527  4741  7441 W Codec2Client: query -- param skipped: index = 1610614798.
+11-01 20:17:24.527  4741  7441 W Codec2Client: query -- param skipped: index = 2684356609.
+11-01 20:17:24.577   472  2853 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-01 20:17:30.489  6698  7447 W ZappDownloader: No successful module downloads for requested features [vision.ocr].
+11-01 20:17:30.495  6698  7447 W ChimeraConfigService: Retry attempt was throttled. [CONTEXT service_id=264 ]
+11-01 20:17:30.500  6698  7443 W Vision  : Request for optional module download of ocr failed. Request again.
+11-01 20:17:30.500  6698  7443 W Vision  : Would have logged:
+11-01 20:17:30.500  6698  7443 W Vision  : # dsae@37884fe7
+11-01 20:17:30.516  6698  6704 W gle.android.gms: Cleared Reference was only reachable from finalizer (only reported once)
+11-01 20:17:34.446  4741  6438 W MediaCodec: no metrics handle found
+11-01 20:17:34.449  4741  6440 E Surface : freeAllBuffers: 1 buffers were freed while being dequeued!
+11-01 20:17:34.451  4741  6440 W GraphicBufferSource: released unpopulated slots: [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63]
+11-01 20:17:34.451  4741  6440 E Surface : getSlotFromBufferLocked: unknown buffer: 0x738840d56050
+11-01 20:17:34.460  4741  6486 W MediaCodec: no metrics handle found
+11-01 20:17:34.472  4741  7437 W MediaCodec: no metrics handle found
+11-01 20:17:34.481  4741  7440 W MediaCodec: no metrics handle found
+11-01 20:17:34.531  1608  5885 W MediaProvider: isAppCloneUserPair for user 0: false
+11-01 20:17:34.583   472  7461 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-01 20:17:34.586   472  7461 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-01 20:17:34.587   472  7461 W Codec2Client: query -- param skipped: index = 1107298332.
+11-01 20:17:34.587   472  7461 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-01 20:17:34.592   472  7461 W Codec2Client: query -- param skipped: index = 1342179345.
+11-01 20:17:34.592   472  7461 W Codec2Client: query -- param skipped: index = 2415921170.
+11-01 20:17:34.592   472  7461 W Codec2Client: query -- param skipped: index = 1610614798.
+11-01 20:17:34.594   472  7460 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0

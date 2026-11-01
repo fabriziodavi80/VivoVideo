@@ -1,0 +1,165 @@
+11-01 21:03:56.734  4741  4741 W CompositionPlayer: Setting multi-sequence Composition with single input video graph.
+11-01 21:03:56.860  4741 13541 W Codec2Client: query -- param skipped: index = 1107298332.
+11-01 21:03:56.861  4741 13541 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-01 21:03:56.872  4741 13541 W Codec2Client: query -- param skipped: index = 1342179345.
+11-01 21:03:56.873  4741 13541 W Codec2Client: query -- param skipped: index = 2415921170.
+11-01 21:03:56.873  4741 13541 W Codec2Client: query -- param skipped: index = 1610614798.
+11-01 21:03:58.654  4741 13545 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+11-01 21:03:58.654  4741 13545 E EGL_emulation: tid 13545: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+11-01 21:03:58.663  4741 13533 W Codec2Client: query -- param skipped: index = 1342179345.
+11-01 21:03:58.663  4741 13533 W Codec2Client: query -- param skipped: index = 2415921170.
+11-01 21:03:58.663  4741 13533 W Codec2Client: query -- param skipped: index = 1610614798.
+11-01 21:03:58.665  4741 13533 W MessageQueue: Handler (android.media.MediaCodec$EventHandler) {5afdeae} sending message to a Handler on a dead thread
+11-01 21:03:58.665  4741 13533 W MessageQueue: java.lang.IllegalStateException: Handler (android.media.MediaCodec$EventHandler) {5afdeae} sending message to a Handler on a dead thread
+11-01 21:03:58.665  4741 13533 W MessageQueue: 	at android.os.MessageQueue.enqueueMessage(MessageQueue.java:560)
+11-01 21:03:58.665  4741 13533 W MessageQueue: 	at android.os.Handler.enqueueMessage(Handler.java:786)
+11-01 21:03:58.665  4741 13533 W MessageQueue: 	at android.os.Handler.sendMessageAtTime(Handler.java:735)
+11-01 21:03:58.665  4741 13533 W MessageQueue: 	at android.os.Handler.sendMessageDelayed(Handler.java:705)
+11-01 21:03:58.665  4741 13533 W MessageQueue: 	at android.os.Handler.sendMessage(Handler.java:643)
+11-01 21:03:58.665  4741 13533 W MessageQueue: 	at android.media.MediaCodec.postEventFromNative(MediaCodec.java:5222)
+11-01 21:03:58.666  4741 13533 W MessageQueue: Handler (android.media.MediaCodec$EventHandler) {5afdeae} sending message to a Handler on a dead thread
+11-01 21:03:58.666  4741 13533 W MessageQueue: java.lang.IllegalStateException: Handler (android.media.MediaCodec$EventHandler) {5afdeae} sending message to a Handler on a dead thread
+11-01 21:03:58.666  4741 13533 W MessageQueue: 	at android.os.MessageQueue.enqueueMessage(MessageQueue.java:560)
+11-01 21:03:58.666  4741 13533 W MessageQueue: 	at android.os.Handler.enqueueMessage(Handler.java:786)
+11-01 21:03:58.666  4741 13533 W MessageQueue: 	at android.os.Handler.sendMessageAtTime(Handler.java:735)
+11-01 21:03:58.666  4741 13533 W MessageQueue: 	at android.os.Handler.sendMessageDelayed(Handler.java:705)
+11-01 21:03:58.666  4741 13533 W MessageQueue: 	at android.os.Handler.sendMessage(Handler.java:643)
+11-01 21:03:58.666  4741 13533 W MessageQueue: 	at android.media.MediaCodec.postEventFromNative(MediaCodec.java:5222)
+11-01 21:03:58.666  4741 13533 W MessageQueue: Handler (android.media.MediaCodec$EventHandler) {5afdeae} sending message to a Handler on a dead thread
+11-01 21:03:58.666  4741 13533 W MessageQueue: java.lang.IllegalStateException: Handler (android.media.MediaCodec$EventHandler) {5afdeae} sending message to a Handler on a dead thread
+11-01 21:03:58.666  4741 13533 W MessageQueue: 	at android.os.MessageQueue.enqueueMessage(MessageQueue.java:560)
+11-01 21:03:58.666  4741 13533 W MessageQueue: 	at android.os.Handler.enqueueMessage(Handler.java:786)
+11-01 21:03:58.666  4741 13533 W MessageQueue: 	at android.os.Handler.sendMessageAtTime(Handler.java:735)
+11-01 21:03:58.666  4741 13533 W MessageQueue: 	at android.os.Handler.sendMessageDelayed(Handler.java:705)
+11-01 21:03:58.666  4741 13533 W MessageQueue: 	at android.os.Handler.sendMessage(Handler.java:643)
+11-01 21:03:58.666  4741 13533 W MessageQueue: 	at android.media.MediaCodec.postEventFromNative(MediaCodec.java:5222)
+11-01 21:03:58.668  4741 13533 W MessageQueue: Handler (android.media.MediaCodec$EventHandler) {5afdeae} sending message to a Handler on a dead thread
+11-01 21:03:58.668  4741 13533 W MessageQueue: java.lang.IllegalStateException: Handler (android.media.MediaCodec$EventHandler) {5afdeae} sending message to a Handler on a dead thread
+11-01 21:03:58.668  4741 13533 W MessageQueue: 	at android.os.MessageQueue.enqueueMessage(MessageQueue.java:560)
+11-01 21:03:58.668  4741 13533 W MessageQueue: 	at android.os.Handler.enqueueMessage(Handler.java:786)
+11-01 21:03:58.668  4741 13533 W MessageQueue: 	at android.os.Handler.sendMessageAtTime(Handler.java:735)
+11-01 21:03:58.668  4741 13533 W MessageQueue: 	at android.os.Handler.sendMessageDelayed(Handler.java:705)
+11-01 21:03:58.668  4741 13533 W MessageQueue: 	at android.os.Handler.sendMessage(Handler.java:643)
+11-01 21:03:58.668  4741 13533 W MessageQueue: 	at android.media.MediaCodec.postEventFromNative(MediaCodec.java:5222)
+11-01 21:03:58.677  4741 13547 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-01 21:03:58.677  4741 13506 W MessageQueue: Handler (android.os.Handler) {eda60e5} sending message to a Handler on a dead thread
+11-01 21:03:58.677  4741 13506 W MessageQueue: java.lang.IllegalStateException: Handler (android.os.Handler) {eda60e5} sending message to a Handler on a dead thread
+11-01 21:03:58.677  4741 13506 W MessageQueue: 	at android.os.MessageQueue.enqueueMessage(MessageQueue.java:560)
+11-01 21:03:58.677  4741 13506 W MessageQueue: 	at android.os.Handler.enqueueMessage(Handler.java:786)
+11-01 21:03:58.677  4741 13506 W MessageQueue: 	at android.os.Handler.sendMessageAtTime(Handler.java:735)
+11-01 21:03:58.677  4741 13506 W MessageQueue: 	at android.os.Handler.sendMessageDelayed(Handler.java:705)
+11-01 21:03:58.677  4741 13506 W MessageQueue: 	at android.os.Handler.post(Handler.java:435)
+11-01 21:03:58.677  4741 13506 W MessageQueue: 	at androidx.media3.common.util.SystemHandlerWrapper.post(SystemHandlerWrapper.java:116)
+11-01 21:03:58.677  4741 13506 W MessageQueue: 	at androidx.media3.exoplayer.ExoPlayerImpl$VirtualDeviceIdChangeListener$$ExternalSyntheticLambda1.execute(D8$$SyntheticClass:0)
+11-01 21:03:58.677  4741 13506 W MessageQueue: 	at androidx.media3.effect.SingleInputVideoGraph$1.onOutputFrameAvailableForRendering(SingleInputVideoGraph.java:173)
+11-01 21:03:58.677  4741 13506 W MessageQueue: 	at androidx.media3.effect.FinalShaderProgramWrapper.lambda$queueInputFrame$1$androidx-media3-effect-FinalShaderProgramWrapper(FinalShaderProgramWrapper.java:227)
+11-01 21:03:58.677  4741 13506 W MessageQueue: 	at androidx.media3.effect.FinalShaderProgramWrapper$$ExternalSyntheticLambda4.run(D8$$SyntheticClass:0)
+11-01 21:03:58.677  4741 13506 W MessageQueue: 	at com.google.common.util.concurrent.DirectExecutor.execute(DirectExecutor.java:31)
+11-01 21:03:58.677  4741 13506 W MessageQueue: 	at androidx.media3.effect.FinalShaderProgramWrapper.queueInputFrame(FinalShaderProgramWrapper.java:225)
+11-01 21:03:58.677  4741 13506 W MessageQueue: 	at androidx.media3.effect.FrameConsumptionManager.lambda$queueInputFrame$1$androidx-media3-effect-FrameConsumptionManager(FrameConsumptionManager.java:93)
+11-01 21:03:58.677  4741 13506 W MessageQueue: 	at androidx.media3.effect.FrameConsumptionManager$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+11-01 21:03:58.677  4741 13506 W MessageQueue: 	at androidx.media3.effect.VideoFrameProcessingTaskExecutor.lambda$wrapTaskAndSubmitToExecutorService$3$androidx-media3-effect-VideoFrameProcessingTaskExecutor(VideoFrameProcessingTaskExecutor.java:291)
+11-01 21:03:58.677  4741 13506 W MessageQueue: 	at androidx.media3.effect.VideoFrameProcessingTaskExecutor$$ExternalSyntheticLambda0.run(D8$$SyntheticClass:0)
+11-01 21:03:58.677  4741 13506 W MessageQueue: 	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:487)
+11-01 21:03:58.677  4741 13506 W MessageQueue: 	at java.util.concurrent.FutureTask.run(FutureTask.java:264)
+11-01 21:03:58.677  4741 13506 W MessageQueue: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-01 21:03:58.677  4741 13506 W MessageQueue: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-01 21:03:58.677  4741 13506 W MessageQueue: 	at java.lang.Thread.run(Thread.java:1012)
+11-01 21:03:58.698  4741 13547 W Codec2Client: query -- param skipped: index = 1107298332.
+11-01 21:03:58.698  4741 13547 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-01 21:03:58.702  4741 13547 W Codec2Client: query -- param skipped: index = 1342179345.
+11-01 21:03:58.702  4741 13547 W Codec2Client: query -- param skipped: index = 2415921170.
+11-01 21:03:58.702  4741 13547 W Codec2Client: query -- param skipped: index = 1610614798.
+11-01 21:03:58.702  4741 13547 W Codec2Client: query -- param skipped: index = 2684356609.
+11-01 21:03:59.116  4741 13533 W MediaCodec: no metrics handle found
+11-01 21:03:59.133  4741 13502 W MediaCodec: no metrics handle found
+11-01 21:03:59.141   472  3039 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-01 21:03:59.147  4741 13498 W MessageQueue: Handler (android.os.Handler) {4552661} sending message to a Handler on a dead thread
+11-01 21:03:59.147  4741 13498 W MessageQueue: java.lang.IllegalStateException: Handler (android.os.Handler) {4552661} sending message to a Handler on a dead thread
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at android.os.MessageQueue.enqueueMessage(MessageQueue.java:560)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at android.os.Handler.enqueueMessage(Handler.java:786)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at android.os.Handler.sendMessageAtTime(Handler.java:735)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at android.os.Handler.sendMessageDelayed(Handler.java:705)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at android.os.Handler.sendMessage(Handler.java:643)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at android.os.Message.sendToTarget(Message.java:468)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at androidx.media3.exoplayer.source.ConcatenatingMediaSource2.scheduleTimelineUpdate(ConcatenatingMediaSource2.java:381)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at androidx.media3.exoplayer.source.ConcatenatingMediaSource2.onChildSourceInfoRefreshed(ConcatenatingMediaSource2.java:328)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at androidx.media3.exoplayer.source.ConcatenatingMediaSource2.onChildSourceInfoRefreshed(ConcatenatingMediaSource2.java:58)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at androidx.media3.exoplayer.source.CompositeMediaSource.lambda$prepareChildSource$0$androidx-media3-exoplayer-source-CompositeMediaSource(CompositeMediaSource.java:119)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at androidx.media3.exoplayer.source.CompositeMediaSource$$ExternalSyntheticLambda0.onSourceInfoRefreshed(D8$$SyntheticClass:0)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at androidx.media3.exoplayer.source.BaseMediaSource.refreshSourceInfo(BaseMediaSource.java:96)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at androidx.media3.exoplayer.source.MaskingMediaSource.onChildSourceInfoRefreshed(MaskingMediaSource.java:204)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at androidx.media3.exoplayer.source.WrappingMediaSource.onChildSourceInfoRefreshed(WrappingMediaSource.java:155)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at androidx.media3.exoplayer.source.WrappingMediaSource.onChildSourceInfoRefreshed(WrappingMediaSource.java:50)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at androidx.media3.exoplayer.source.CompositeMediaSource.lambda$prepareChildSource$0$androidx-media3-exoplayer-source-CompositeMediaSource(CompositeMediaSource.java:119)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at androidx.media3.exoplayer.source.CompositeMediaSource$$ExternalSyntheticLambda0.onSourceInfoRefreshed(D8$$SyntheticClass:0)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at androidx.media3.exoplayer.source.BaseMediaSource.refreshSourceInfo(BaseMediaSource.java:96)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at androidx.media3.exoplayer.source.MergingMediaSource.onChildSourceInfoRefreshed(MergingMediaSource.java:314)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at androidx.media3.exoplayer.source.MergingMediaSource.onChildSourceInfoRefreshed(MergingMediaSource.java:55)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at androidx.media3.exoplayer.source.CompositeMediaSource.lambda$prepareChildSource$0$androidx-media3-exoplayer-source-CompositeMediaSource(CompositeMediaSource.java:119)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at androidx.media3.exoplayer.source.CompositeMediaSource$$ExternalSyntheticLambda0.onSourceInfoRefreshed(D8$$SyntheticClass:0)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at androidx.media3.exoplayer.source.BaseMediaSource.refreshSourceInfo(BaseMediaSource.java:96)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at androidx.media3.exoplayer.source.ClippingMediaSource.refreshClippedTimeline(ClippingMediaSource.java:493)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at androidx.media3.exoplayer.source.ClippingMediaSource.releasePeriod(ClippingMediaSource.java:430)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at androidx.media3.exoplayer.source.MergingMediaSource.releasePeriod(MergingMediaSource.java:274)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at androidx.media3.exoplayer.source.MaskingMediaPeriod.releasePeriod(MaskingMediaPeriod.java:146)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at androidx.media3.exoplayer.source.MaskingMediaSource.releasePeriod(MaskingMediaSource.java:128)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at androidx.media3.exoplayer.source.ConcatenatingMediaSource2.releasePeriod(ConcatenatingMediaSource2.java:308)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at androidx.media3.exoplayer.source.WrappingMediaSource.releasePeriod(WrappingMediaSource.java:149)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at androidx.media3.exoplayer.source.MaskingMediaPeriod.releasePeriod(MaskingMediaPeriod.java:146)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at androidx.media3.exoplayer.source.MaskingMediaSource.releasePeriod(MaskingMediaSource.java:128)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at androidx.media3.exoplayer.MediaSourceList.releasePeriod(MediaSourceList.java:354)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at androidx.media3.exoplayer.MediaPeriodHolder.releaseMediaPeriod(MediaPeriodHolder.java:482)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at androidx.media3.exoplayer.MediaPeriodHolder.release(MediaPeriodHolder.java:364)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at androidx.media3.exoplayer.MediaPeriodQueue.clear(MediaPeriodQueue.java:622)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at androidx.media3.exoplayer.ExoPlayerImplInternal.resetInternal(ExoPlayerImplInternal.java:2124)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at androidx.media3.exoplayer.ExoPlayerImplInternal.releaseInternal(ExoPlayerImplInternal.java:2055)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:880)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at android.os.Handler.dispatchMessage(Handler.java:102)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at android.os.Looper.loopOnce(Looper.java:205)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at android.os.Looper.loop(Looper.java:294)
+11-01 21:03:59.147  4741 13498 W MessageQueue: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+11-01 21:03:59.159  4741 13527 W MediaCodec: no metrics handle found
+11-01 21:03:59.162  4741 13506 E BufferQueueProducer: [ImageReader-640x360f1m4-4741-5](id:128500000202,api:1,p:4741,c:4741) cancelBuffer: BufferQueue has been abandoned
+11-01 21:03:59.226  4741 13498 W MessageQueue: Handler (android.view.Choreographer$FrameHandler) {cc48674} sending message to a Handler on a dead thread
+11-01 21:03:59.226  4741 13498 W MessageQueue: java.lang.IllegalStateException: Handler (android.view.Choreographer$FrameHandler) {cc48674} sending message to a Handler on a dead thread
+11-01 21:03:59.226  4741 13498 W MessageQueue: 	at android.os.MessageQueue.enqueueMessage(MessageQueue.java:560)
+11-01 21:03:59.226  4741 13498 W MessageQueue: 	at android.os.Handler.enqueueMessage(Handler.java:786)
+11-01 21:03:59.226  4741 13498 W MessageQueue: 	at android.os.Handler.sendMessageAtTime(Handler.java:735)
+11-01 21:03:59.226  4741 13498 W MessageQueue: 	at android.view.Choreographer$FrameDisplayEventReceiver.onVsync(Choreographer.java:1313)
+11-01 21:03:59.226  4741 13498 W MessageQueue: 	at android.view.DisplayEventReceiver.dispatchVsync(DisplayEventReceiver.java:332)
+11-01 21:03:59.226  4741 13498 W MessageQueue: 	at android.os.MessageQueue.nativePollOnce(Native Method)
+11-01 21:03:59.226  4741 13498 W MessageQueue: 	at android.os.MessageQueue.next(MessageQueue.java:335)
+11-01 21:03:59.226  4741 13498 W MessageQueue: 	at android.os.Looper.loopOnce(Looper.java:162)
+11-01 21:03:59.226  4741 13498 W MessageQueue: 	at android.os.Looper.loop(Looper.java:294)
+11-01 21:03:59.226  4741 13498 W MessageQueue: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+11-01 21:03:59.283  4741 13554 W MessageQueue: Handler (android.os.Handler) {ea74f5e} sending message to a Handler on a dead thread
+11-01 21:03:59.283  4741 13554 W MessageQueue: java.lang.IllegalStateException: Handler (android.os.Handler) {ea74f5e} sending message to a Handler on a dead thread
+11-01 21:03:59.283  4741 13554 W MessageQueue: 	at android.os.MessageQueue.enqueueMessage(MessageQueue.java:560)
+11-01 21:03:59.283  4741 13554 W MessageQueue: 	at android.os.Handler.enqueueMessage(Handler.java:786)
+11-01 21:03:59.283  4741 13554 W MessageQueue: 	at android.os.Handler.sendMessageAtTime(Handler.java:735)
+11-01 21:03:59.283  4741 13554 W MessageQueue: 	at android.os.Handler.sendMessageDelayed(Handler.java:705)
+11-01 21:03:59.283  4741 13554 W MessageQueue: 	at android.os.Handler.post(Handler.java:435)
+11-01 21:03:59.283  4741 13554 W MessageQueue: 	at androidx.media3.exoplayer.audio.AudioTrackAudioOutput.lambda$releaseAudioTrackAsync$1(AudioTrackAudioOutput.java:501)
+11-01 21:03:59.283  4741 13554 W MessageQueue: 	at androidx.media3.exoplayer.audio.AudioTrackAudioOutput$$ExternalSyntheticLambda3.run(D8$$SyntheticClass:0)
+11-01 21:03:59.283  4741 13554 W MessageQueue: 	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:487)
+11-01 21:03:59.283  4741 13554 W MessageQueue: 	at java.util.concurrent.FutureTask.run(FutureTask.java:264)
+11-01 21:03:59.283  4741 13554 W MessageQueue: 	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:307)
+11-01 21:03:59.283  4741 13554 W MessageQueue: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-01 21:03:59.283  4741 13554 W MessageQueue: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-01 21:03:59.283  4741 13554 W MessageQueue: 	at java.lang.Thread.run(Thread.java:1012)
+11-01 21:03:59.287  4741 13538 W SpeakerLayoutUtil: Built-in speaker's getSpeakerLayoutChannelMask not usable, defaulting to stereo.
+11-01 21:03:59.395   397  2361 W AudioFlinger: createTrack_l(): mismatch between requested flags (00000008) and output flags (00000002)
+11-01 21:03:59.510  4741 13538 W SpeakerLayoutUtil: Built-in speaker's getSpeakerLayoutChannelMask not usable, defaulting to stereo.
+11-01 21:03:59.729  4741 13538 W SpeakerLayoutUtil: Built-in speaker's getSpeakerLayoutChannelMask not usable, defaulting to stereo.
+11-01 21:04:00.367   841   841 W PageIndicator: Total number of pages invalid: 0. Assuming 1 page.
+11-01 21:04:05.783  4741 13541 W Codec2Client: query -- param skipped: index = 1342179345.
+11-01 21:04:05.783  4741 13541 W Codec2Client: query -- param skipped: index = 2415921170.
+11-01 21:04:05.783  4741 13541 W Codec2Client: query -- param skipped: index = 1610614798.
+11-01 21:04:05.787  4741 13546 W Codec2Client: query -- param skipped: index = 1342179345.
+11-01 21:04:05.787  4741 13546 W Codec2Client: query -- param skipped: index = 2415921170.
+11-01 21:04:05.787  4741 13546 W Codec2Client: query -- param skipped: index = 1610614798.
+11-01 21:04:05.794  4741 13560 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+11-01 21:04:05.794  4741 13560 E EGL_emulation: tid 13560: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+11-01 21:04:05.801  4741 13541 W MediaCodec: no metrics handle found
+11-01 21:04:05.813  4741 13546 W MediaCodec: no metrics handle found

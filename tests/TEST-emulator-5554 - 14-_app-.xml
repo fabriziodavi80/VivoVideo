@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="it.fabriziodavi.vivovideo.DeviceTest" tests="44" failures="0" errors="0" skipped="1" time="3215.761" timestamp="2026-11-01T21:08:04" hostname="localhost">
+  <properties>
+    <property name="device" value="emulator-5554 - 14" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="backupWithMediaAndRelink" classname="it.fabriziodavi.vivovideo.DeviceTest" time="28.336" />
+  <testcase name="maskPassAmongOtherTransitionsInExport" classname="it.fabriziodavi.vivovideo.DeviceTest" time="157.918" />
+  <testcase name="bisectEachEffectGroupSingle" classname="it.fabriziodavi.vivovideo.DeviceTest" time="125.419" />
+  <testcase name="exportAutoVideoEnergico" classname="it.fabriziodavi.vivovideo.DeviceTest" time="247.505" />
+  <testcase name="freezeFrameFromEditor" classname="it.fabriziodavi.vivovideo.DeviceTest" time="15.0" />
+  <testcase name="bisectFadesOnly" classname="it.fabriziodavi.vivovideo.DeviceTest" time="18.814" />
+  <testcase name="exportSimple" classname="it.fabriziodavi.vivovideo.DeviceTest" time="8.841" />
+  <testcase name="exportCreditsRoll" classname="it.fabriziodavi.vivovideo.DeviceTest" time="23.185" />
+  <testcase name="personMasksAndExport" classname="it.fabriziodavi.vivovideo.DeviceTest" time="56.197" />
+  <testcase name="transitionsAreSmoothInExport" classname="it.fabriziodavi.vivovideo.DeviceTest" time="38.419" />
+  <testcase name="crossfadeSegmentRendersAndPlays" classname="it.fabriziodavi.vivovideo.DeviceTest" time="53.535" />
+  <testcase name="exportAutoVideoCinema" classname="it.fabriziodavi.vivovideo.DeviceTest" time="92.772" />
+  <testcase name="exportNewestTransitions" classname="it.fabriziodavi.vivovideo.DeviceTest" time="112.904" />
+  <testcase name="previewPlaysPremium" classname="it.fabriziodavi.vivovideo.DeviceTest" time="16.711" />
+  <testcase name="exportEveryFeature" classname="it.fabriziodavi.vivovideo.DeviceTest" time="242.573" />
+  <testcase name="exportWithHdrOption" classname="it.fabriziodavi.vivovideo.DeviceTest" time="8.903" />
+  <testcase name="shadersCompileForHdr" classname="it.fabriziodavi.vivovideo.DeviceTest" time="0.256" />
+  <testcase name="exportWithoutCompositor" classname="it.fabriziodavi.vivovideo.DeviceTest" time="219.768" />
+  <testcase name="proxyCopyIsMadeAndUsed" classname="it.fabriziodavi.vivovideo.DeviceTest" time="10.711" />
+  <testcase name="softwareDecoderExports" classname="it.fabriziodavi.vivovideo.DeviceTest" time="0.053" />
+  <testcase name="onlineLibraryOpenverse" classname="it.fabriziodavi.vivovideo.DeviceTest" time="61.322">
+    <skipped />
+  </testcase>
+  <testcase name="voiceOverLevelAndPreviewDucking" classname="it.fabriziodavi.vivovideo.DeviceTest" time="6.405" />
+  <testcase name="bisectFullWithoutNewEffectsSingle" classname="it.fabriziodavi.vivovideo.DeviceTest" time="76.768" />
+  <testcase name="bestMomentFindsTheSharpPart" classname="it.fabriziodavi.vivovideo.DeviceTest" time="6.462" />
+  <testcase name="exportSocialEffects" classname="it.fabriziodavi.vivovideo.DeviceTest" time="123.823" />
+  <testcase name="exportTrendKit" classname="it.fabriziodavi.vivovideo.DeviceTest" time="103.482" />
+  <testcase name="exportDuckingAndLoudness" classname="it.fabriziodavi.vivovideo.DeviceTest" time="5.834" />
+  <testcase name="overlaidVideoStretchRendersAndPlays" classname="it.fabriziodavi.vivovideo.DeviceTest" time="14.151" />
+  <testcase name="precisePersonCutoutOrFallback" classname="it.fabriziodavi.vivovideo.DeviceTest" time="191.59" />
+  <testcase name="maskPassInExport" classname="it.fabriziodavi.vivovideo.DeviceTest" time="40.604" />
+  <testcase name="exportFollowsTheMixer" classname="it.fabriziodavi.vivovideo.DeviceTest" time="14.477" />
+  <testcase name="redactAnalyzesAndExports" classname="it.fabriziodavi.vivovideo.DeviceTest" time="72.141" />
+  <testcase name="whisperTranscribes" classname="it.fabriziodavi.vivovideo.DeviceTest" time="12.623" />
+  <testcase name="exportVideoLayer" classname="it.fabriziodavi.vivovideo.DeviceTest" time="245.166" />
+  <testcase name="reverseClip" classname="it.fabriziodavi.vivovideo.DeviceTest" time="24.515" />
+  <testcase name="exportWowTransitionsAndTexts" classname="it.fabriziodavi.vivovideo.DeviceTest" time="476.733" />
+  <testcase name="previewPlaysWow" classname="it.fabriziodavi.vivovideo.DeviceTest" time="14.258" />
+  <testcase name="previewPlaysPastTheEndOfAShortSong" classname="it.fabriziodavi.vivovideo.DeviceTest" time="9.1" />
+  <testcase name="bisectEffectsOnly" classname="it.fabriziodavi.vivovideo.DeviceTest" time="147.037" />
+  <testcase name="previewPlaysEveryFeature" classname="it.fabriziodavi.vivovideo.DeviceTest" time="18.008" />
+  <testcase name="customFontText" classname="it.fabriziodavi.vivovideo.DeviceTest" time="7.047" />
+  <testcase name="exportInterviewSplit" classname="it.fabriziodavi.vivovideo.DeviceTest" time="32.838" />
+  <testcase name="voiceRecorderRecordsAndCleans" classname="it.fabriziodavi.vivovideo.DeviceTest" time="1.81" />
+  <testcase name="stabilizeShakyVideo" classname="it.fabriziodavi.vivovideo.DeviceTest" time="30.65" />
+</testsuite>

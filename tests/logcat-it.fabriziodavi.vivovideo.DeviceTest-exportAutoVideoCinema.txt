@@ -1,0 +1,65 @@
+11-01 20:27:21.779  4741  9352 W Codec2Client: query -- param skipped: index = 1107298332.
+11-01 20:27:21.780  4741  9352 W Codec2Client: query -- param skipped: index = 1342179345.
+11-01 20:27:21.781  4741  9352 W Codec2Client: query -- param skipped: index = 2415921170.
+11-01 20:27:21.889  4741  9352 W MediaCodec: no metrics handle found
+11-01 20:27:22.717  4741  9361 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+11-01 20:27:22.717  4741  9361 E EGL_emulation: tid 9361: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+11-01 20:27:22.737  4741  9364 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-01 20:27:22.741  4741  9364 W Codec2Client: query -- param skipped: index = 1107298332.
+11-01 20:27:22.741  4741  9364 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-01 20:27:22.742  4741  9364 W Codec2Client: query -- param skipped: index = 1342179345.
+11-01 20:27:22.742  4741  9364 W Codec2Client: query -- param skipped: index = 2415921170.
+11-01 20:27:22.742  4741  9364 W Codec2Client: query -- param skipped: index = 1610614798.
+11-01 20:27:22.742  4741  9364 W Codec2Client: query -- param skipped: index = 2684356609.
+11-01 20:27:22.746   472  2853 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-01 20:27:22.819  4741  9362 W Codec2Client: query -- param skipped: index = 1107298332.
+11-01 20:27:22.820  4741  9362 W Codec2Client: query -- param skipped: index = 1342179345.
+11-01 20:27:22.820  4741  9362 W Codec2Client: query -- param skipped: index = 2415921170.
+11-01 20:27:22.820  4741  9362 W Codec2Client: query -- param skipped: index = 3254792206.
+11-01 20:27:22.820  4741  9362 W Codec2Client: query -- param skipped: index = 3254792194.
+11-01 20:27:27.755   350  9366 W C2BqBuffer: last successful dequeue was 3605117 us ago, 353 consecutive failures
+11-01 20:27:32.270  4741  9368 W ColorUtils: expected specified color aspects (0:0:0:0)
+11-01 20:27:32.277  4741  9368 W Codec2Client: query -- param skipped: index = 1342179345.
+11-01 20:27:32.277  4741  9368 W Codec2Client: query -- param skipped: index = 2415921170.
+11-01 20:27:32.279   472  2838 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-01 20:27:32.759   350  9366 W C2BqBuffer: last successful dequeue was 62259 us ago, 6 consecutive failures
+11-01 20:27:38.459  4741  9363 W MediaCodec: no metrics handle found
+11-01 20:27:39.376  4741  9384 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-01 20:27:39.378  4741  9384 W Codec2Client: query -- param skipped: index = 1107298332.
+11-01 20:27:39.378  4741  9384 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-01 20:27:39.380  4741  9384 W Codec2Client: query -- param skipped: index = 1342179345.
+11-01 20:27:39.380  4741  9384 W Codec2Client: query -- param skipped: index = 2415921170.
+11-01 20:27:39.380  4741  9384 W Codec2Client: query -- param skipped: index = 1610614798.
+11-01 20:27:39.380  4741  9384 W Codec2Client: query -- param skipped: index = 2684356609.
+11-01 20:27:39.465   472  2838 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-01 20:27:46.889  4741  4795 E Codec2-types: Failed to receive buffer from bufferpool -- resultStatus = 4.
+11-01 20:27:46.891  4741  4795 E Codec2-types: Invalid WorkBundle::baseBlocks[1].
+11-01 20:27:50.351   476  9369 W BufferPoolAccessor2.0: buffer status message processing failure - message : 4 connection : 2046197997121
+11-01 20:27:52.244   350  9385 W C2BqBuffer: last successful dequeue was 143509 us ago, 9 consecutive failures
+11-01 20:27:57.253   350  9385 W C2BqBuffer: last successful dequeue was 5152628 us ago, 484 consecutive failures
+11-01 20:28:00.072   841   841 W PageIndicator: Total number of pages invalid: 0. Assuming 1 page.
+11-01 20:28:00.073   841   841 W PageIndicator: Total number of pages invalid: 0. Assuming 1 page.
+11-01 20:28:02.261   350  9385 W C2BqBuffer: last successful dequeue was 10160251 us ago, 951 consecutive failures
+11-01 20:28:07.268   350  9385 W C2BqBuffer: last successful dequeue was 3826720 us ago, 375 consecutive failures
+11-01 20:28:12.276   350  9385 W C2BqBuffer: last successful dequeue was 84320 us ago, 8 consecutive failures
+11-01 20:28:18.071  4741  9383 W MediaCodec: no metrics handle found
+11-01 20:28:19.373  4741  9391 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-01 20:28:19.385  4741  9391 W Codec2Client: query -- param skipped: index = 1107298332.
+11-01 20:28:19.386  4741  9391 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-01 20:28:19.388  4741  9391 W Codec2Client: query -- param skipped: index = 1342179345.
+11-01 20:28:19.389  4741  9391 W Codec2Client: query -- param skipped: index = 2415921170.
+11-01 20:28:19.389  4741  9391 W Codec2Client: query -- param skipped: index = 1610614798.
+11-01 20:28:19.389  4741  9391 W Codec2Client: query -- param skipped: index = 2684356609.
+11-01 20:28:19.575   472  2853 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-01 20:28:25.358   521  9393 E GnssPsdsDownloader: No Long-Term PSDS servers were specified in the GnssConfiguration
+11-01 20:28:37.578   350  9392 W C2BqBuffer: last successful dequeue was 5007189 us ago, 468 consecutive failures
+11-01 20:28:40.416   521   769 E WifiStaIfaceAidlImpl: installApfPacketFilter failed with service-specific exception: android.os.ServiceSpecificException:  (code 4)
+11-01 20:28:42.587   350  9392 W C2BqBuffer: last successful dequeue was 2566833 us ago, 251 consecutive failures
+11-01 20:28:47.587   350  9392 W C2BqBuffer: last successful dequeue was 7567293 us ago, 739 consecutive failures
+11-01 20:28:54.356  4741  9361 E Surface : freeAllBuffers: 1 buffers were freed while being dequeued!
+11-01 20:28:54.357  4741  9361 W GraphicBufferSource: released unpopulated slots: [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63]
+11-01 20:28:54.357  4741  9361 E Surface : getSlotFromBufferLocked: unknown buffer: 0x0
+11-01 20:28:54.368  4741  9362 W MediaCodec: no metrics handle found
+11-01 20:28:54.368  4741  9367 W MediaCodec: no metrics handle found
+11-01 20:28:54.383  4741  9390 W MediaCodec: no metrics handle found
+11-01 20:28:54.416  1608  5885 W MediaProvider: isAppCloneUserPair for user 0: false

@@ -1,0 +1,25 @@
+11-01 20:40:07.774  4741 10648 W Codec2Client: query -- param skipped: index = 1107298332.
+11-01 20:40:07.776  4741 10648 W Codec2Client: query -- param skipped: index = 1342179345.
+11-01 20:40:07.776  4741 10648 W Codec2Client: query -- param skipped: index = 2415921170.
+11-01 20:40:07.807  4741 10648 W MediaCodec: no metrics handle found
+11-01 20:40:07.985  4741  4741 W CompositionPlayer: Setting multi-sequence Composition with single input video graph.
+11-01 20:40:08.076  4741 10655 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+11-01 20:40:08.076  4741 10655 E EGL_emulation: tid 10655: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+11-01 20:40:08.085  4741 10657 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-01 20:40:08.089  4741 10657 W Codec2Client: query -- param skipped: index = 1107298332.
+11-01 20:40:08.089  4741 10657 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-01 20:40:08.094  4741 10657 W Codec2Client: query -- param skipped: index = 1342179345.
+11-01 20:40:08.094  4741 10657 W Codec2Client: query -- param skipped: index = 2415921170.
+11-01 20:40:08.094  4741 10657 W Codec2Client: query -- param skipped: index = 1610614798.
+11-01 20:40:08.095  4741 10657 W Codec2Client: query -- param skipped: index = 2684356609.
+11-01 20:40:08.100   472   497 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-01 20:40:08.106  4741 10651 W SpeakerLayoutUtil: Built-in speaker's getSpeakerLayoutChannelMask not usable, defaulting to stereo.
+11-01 20:40:08.115  4741 10651 W SpeakerLayoutUtil: Built-in speaker's getSpeakerLayoutChannelMask not usable, defaulting to stereo.
+11-01 20:40:08.127   397   397 W AudioFlinger: createTrack_l(): mismatch between requested flags (00000008) and output flags (00000002)
+11-01 20:40:09.025  4741 10651 W SpeakerLayoutUtil: Built-in speaker's getSpeakerLayoutChannelMask not usable, defaulting to stereo.
+11-01 20:40:14.037  4741 10656 W Codec2Client: query -- param skipped: index = 1342179345.
+11-01 20:40:14.037  4741 10656 W Codec2Client: query -- param skipped: index = 2415921170.
+11-01 20:40:14.037  4741 10656 W Codec2Client: query -- param skipped: index = 1610614798.
+11-01 20:40:14.044  4741 10664 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+11-01 20:40:14.044  4741 10664 E EGL_emulation: tid 10664: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+11-01 20:40:14.062  4741 10656 W MediaCodec: no metrics handle found

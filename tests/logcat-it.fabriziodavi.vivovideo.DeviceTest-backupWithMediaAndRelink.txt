@@ -1,0 +1,300 @@
+11-01 20:14:50.629   335   381 E BpfHandler: Unsupported protocol: 1
+11-01 20:14:50.645  1470  3208 W ModuleInitIntentOp: Dropping unexpected action com.google.android.gms.phenotype.COMMITTED
+11-01 20:14:50.645  1470  5824 W ModuleInitIntentOp: Dropping unexpected action com.google.android.gms.phenotype.COMMITTED
+11-01 20:14:50.647  1470  5812 W ModuleInitIntentOp: Dropping unexpected action com.google.android.gms.phenotype.COMMITTED
+11-01 20:14:50.651  1470  5824 W ModuleInitIntentOp: Dropping unexpected action com.google.android.gms.phenotype.COMMITTED
+11-01 20:14:50.656  1470  3208 W ModuleInitIntentOp: Dropping unexpected action com.google.android.gms.phenotype.COMMITTED
+11-01 20:14:50.656  1470  5805 W ModuleInitIntentOp: Dropping unexpected action com.google.android.gms.phenotype.COMMITTED
+11-01 20:14:50.661  1470  3208 W ModuleInitIntentOp: Dropping unexpected action com.google.android.gms.phenotype.COMMITTED
+11-01 20:14:50.663  1470  5828 W ModuleInitIntentOp: Dropping unexpected action com.google.android.gms.phenotype.COMMITTED
+11-01 20:14:50.666  1470  3208 W ModuleInitIntentOp: Dropping unexpected action com.google.android.gms.phenotype.COMMITTED
+11-01 20:14:50.666  1470  3208 W ModuleInitIntentOp: Dropping unexpected action com.google.android.gms.phenotype.COMMITTED
+11-01 20:14:50.666  1470  3208 W ModuleInitIntentOp: Dropping unexpected action com.google.android.gms.phenotype.COMMITTED
+11-01 20:14:50.668  1470  5825 W ModuleInitIntentOp: Dropping unexpected action com.google.android.gms.phenotype.COMMITTED
+11-01 20:14:50.671  1470  3208 W ModuleInitIntentOp: Dropping unexpected action com.google.android.gms.phenotype.COMMITTED
+11-01 20:14:50.671  1470  3208 W ModuleInitIntentOp: Dropping unexpected action com.google.android.gms.phenotype.COMMITTED
+11-01 20:14:50.671  1470  3208 W ModuleInitIntentOp: Dropping unexpected action com.google.android.gms.phenotype.COMMITTED
+11-01 20:14:50.674  1470  5800 W ModuleInitIntentOp: Dropping unexpected action com.google.android.gms.phenotype.COMMITTED
+11-01 20:14:50.712  1437  5547 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:50.762  1437  5726 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:50.763  1437  5726 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:50.894  1470  5826 W ModuleInitIntentOp: Dropping unexpected action com.google.android.gms.phenotype.COMMITTED
+11-01 20:14:50.895  1470  5807 W ModuleInitIntentOp: Dropping unexpected action com.google.android.gms.phenotype.COMMITTED
+11-01 20:14:50.896  1470  5810 W ModuleInitIntentOp: Dropping unexpected action com.google.android.gms.phenotype.COMMITTED
+11-01 20:14:50.901  1470  5810 W ModuleInitIntentOp: Dropping unexpected action com.google.android.gms.phenotype.COMMITTED
+11-01 20:14:50.916  1470  5800 W ChimeraUtils: Module com.google.android.gms.growth missing resource growth_module_display_name(0)
+11-01 20:14:50.919  1470  5800 W ChimeraUtils: Module com.google.android.gms.growth missing resource growth_module_display_name(0)
+11-01 20:14:50.927  1470  5826 W MobileDataHub: [Service] appsupload-periodic periodic task disabled
+11-01 20:14:50.962  1437  5547 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:51.043  1437  5547 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:51.112  1470  5825 W ModuleInitIntentOp: Dropping unexpected action com.google.android.gms.phenotype.COMMITTED
+11-01 20:14:51.113  1470  5827 W ModuleInitIntentOp: Dropping unexpected action com.google.android.gms.phenotype.COMMITTED
+11-01 20:14:51.115  1470  5809 W ModuleInitIntentOp: Dropping unexpected action com.google.android.gms.phenotype.COMMITTED
+11-01 20:14:51.149  1437  3442 W BpBinder: Large outgoing transaction of 329584 bytes, interface descriptor , code 4
+11-01 20:14:51.157  1715  2292 W A       : Can't format flag AndroidGsaVelourJars__velour_birthdaydoodle_jar__name to integer.
+11-01 20:14:51.158  1715  2292 W A       : Can't format flag AndroidGsaVelourJars__velour_call_jar__name to integer.
+11-01 20:14:51.160  1715  2292 W A       : Can't format flag AndroidGsaVelourJars__velour_canvas_jar__name to integer.
+11-01 20:14:51.160  1715  2292 W A       : Can't format flag AndroidGsaVelourJars__velour_chkpkg_jar__name to integer.
+11-01 20:14:51.160  1715  2292 W A       : Can't format flag AndroidGsaVelourJars__velour_crashtest_jar__name to integer.
+11-01 20:14:51.161  1715  2292 W A       : Can't format flag AndroidGsaVelourJars__velour_dining_jar__name to integer.
+11-01 20:14:51.161  1715  2292 W A       : Can't format flag AndroidGsaVelourJars__velour_doodle_notifications_jar__name to integer.
+11-01 20:14:51.161  1715  2292 W A       : Can't format flag AndroidGsaVelourJars__velour_imageviewer_jar__name to integer.
+11-01 20:14:51.161  1715  2292 W A       : Can't format flag AndroidGsaVelourJars__velour_ipa_jar__name to integer.
+11-01 20:14:51.161  1715  2292 W A       : Can't format flag AndroidGsaVelourJars__velour_jslocation_jar__name to integer.
+11-01 20:14:51.161  1715  2292 W A       : Can't format flag AndroidGsaVelourJars__velour_localintent_jar__name to integer.
+11-01 20:14:51.161  1715  2292 W A       : Can't format flag AndroidGsaVelourJars__velour_messaging_jar__name to integer.
+11-01 20:14:51.161  1715  2292 W A       : Can't format flag AndroidGsaVelourJars__velour_nativesrp_activity_jar__name to integer.
+11-01 20:14:51.162  1715  2292 W A       : Can't format flag AndroidGsaVelourJars__velour_nativesrp_presenter_jar__name to integer.
+11-01 20:14:51.162  1715  2292 W A       : Can't format flag AndroidGsaVelourJars__velour_nowcontent_jar__name to integer.
+11-01 20:14:51.162  1715  2292 W A       : Can't format flag AndroidGsaVelourJars__velour_recents_activity_jar__name to integer.
+11-01 20:14:51.163  1715  2292 W A       : Can't format flag AndroidGsaVelourJars__velour_save_jar__name to integer.
+11-01 20:14:51.163  1715  2292 W A       : Can't format flag AndroidGsaVelourJars__velour_searchresults_activity_jar__name to integer.
+11-01 20:14:51.163  1715  2292 W A       : Can't format flag AndroidGsaVelourJars__velour_test_jar__name to integer.
+11-01 20:14:51.163  1715  2292 W A       : Can't format flag AndroidGsaVelourJars__velour_weather_jar__name to integer.
+11-01 20:14:51.164  1715  2292 W A       : Can't format flag bindle_flags__bloblobber_blob to integer.
+11-01 20:14:51.164  1715  2292 W A       : Can't format flag bindle_flags__velour_jar to integer.
+11-01 20:14:51.182  1437  5786 W CCTFlatFileLogStore: Excessive logging: 512 events, 176487 bytes from log source PHENOTYPE last 23s
+11-01 20:14:51.194  1715  2296 W CorpusConfigHelper: Invalid input from icing corpus JSON flag.
+11-01 20:14:51.194  1715  2296 W CorpusConfigHelper: android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+11-01 20:14:51.194  1715  2296 W CorpusConfigHelper: 	at android.util.JsonReader.syntaxError(JsonReader.java:1162)
+11-01 20:14:51.194  1715  2296 W CorpusConfigHelper: 	at android.util.JsonReader.checkLenient(JsonReader.java:840)
+11-01 20:14:51.194  1715  2296 W CorpusConfigHelper: 	at android.util.JsonReader.nextInArray(JsonReader.java:615)
+11-01 20:14:51.194  1715  2296 W CorpusConfigHelper: 	at android.util.JsonReader.peek(JsonReader.java:345)
+11-01 20:14:51.194  1715  2296 W CorpusConfigHelper: 	at android.util.JsonReader.hasNext(JsonReader.java:321)
+11-01 20:14:51.194  1715  2296 W CorpusConfigHelper: 	at com.google.android.apps.gsa.searchbox.c.b.b.k.c(PG:7)
+11-01 20:14:51.194  1715  2296 W CorpusConfigHelper: 	at com.google.android.apps.gsa.searchbox.c.b.b.j.a(Unknown Source:2)
+11-01 20:14:51.194  1715  2296 W CorpusConfigHelper: 	at com.google.android.apps.gsa.search.core.i.r.run(PG:5)
+11-01 20:14:51.194  1715  2296 W CorpusConfigHelper: 	at com.google.android.libraries.gsa.k.a.h.run(PG:2)
+11-01 20:14:51.194  1715  2296 W CorpusConfigHelper: 	at com.google.android.apps.gsa.shared.util.c.a.cf.b(PG:1)
+11-01 20:14:51.194  1715  2296 W CorpusConfigHelper: 	at com.google.android.apps.gsa.shared.util.c.a.ci.run(PG:1)
+11-01 20:14:51.194  1715  2296 W CorpusConfigHelper: 	at com.google.android.libraries.i.ae.run(PG:1)
+11-01 20:14:51.194  1715  2296 W CorpusConfigHelper: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-01 20:14:51.194  1715  2296 W CorpusConfigHelper: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-01 20:14:51.194  1715  2296 W CorpusConfigHelper: 	at com.google.android.libraries.i.k.run(PG:2)
+11-01 20:14:51.194  1715  2296 W CorpusConfigHelper: 	at com.google.android.libraries.i.p.run(PG:4)
+11-01 20:14:51.194  1715  2296 W CorpusConfigHelper: 	at java.lang.Thread.run(Thread.java:1012)
+11-01 20:14:51.243  1437  5560 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:51.270  1470  5827 W ModuleInitIntentOp: Dropping unexpected action com.google.android.gms.phenotype.COMMITTED
+11-01 20:14:51.317  1437  1437 W ProximityAuth: [PhoneHubNotificationProcessor] shutdown(): context is null.
+11-01 20:14:51.318  1437  1437 W ChimeraUtils: Module com.google.android.gms.auth_proximity missing resource null(0)
+11-01 20:14:51.366  1437  5819 W ProximityAuth: [GetSyncedDevices] Attestation: No devices out of 0 passed verification.
+11-01 20:14:51.420  1437  5560 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:51.472  1470  5785 W Icing   : No valid account for uploading user actions
+11-01 20:14:51.588   521   553 W system_server: Long monitor contention with owner binder:521_8 (924) at android.content.ComponentName com.android.server.am.ActivityManagerService.startService(android.app.IApplicationThread, android.content.Intent, java.lang.String, boolean, java.lang.String, java.lang.String, int, boolean, int, java.lang.String, java.lang.String)(ActivityManagerService.java:13195) waiters=0 in boolean com.android.server.am.BroadcastQueueModernImpl.lambda$new$0(android.os.Message) for 165ms
+11-01 20:14:51.589   521  1682 W system_server: Long monitor contention with owner binder:521_8 (924) at android.content.ComponentName com.android.server.am.ActivityManagerService.startService(android.app.IApplicationThread, android.content.Intent, java.lang.String, boolean, java.lang.String, java.lang.String, int, boolean, int, java.lang.String, java.lang.String)(ActivityManagerService.java:13195) waiters=4 in boolean com.android.server.am.ActivityManagerService.stopServiceToken(android.content.ComponentName, android.os.IBinder, int) for 104ms
+11-01 20:14:51.645  1437  5726 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:51.659  1470  5806 W MDM     : [323] aywf.d: Q+ devices does not need device admin.
+11-01 20:14:51.715  1437  5726 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:51.768  1470  5806 W ChimeraUtils: Module com.google.android.gms.mobiledataplan missing resource null(0)
+11-01 20:14:51.793  1437  5491 W MagicTether: [TetherListenerService] Invalid account list. [CONTEXT service_id=276 ]
+11-01 20:14:51.850   521  1664 W system_server: Long monitor contention with owner ActivityManager (553) at void com.android.server.am.BroadcastQueueModernImpl.checkPendingColdStartValidity()(BroadcastQueueModernImpl.java:551) waiters=0 in android.content.ComponentName com.android.server.am.ActivityManagerService.startService(android.app.IApplicationThread, android.content.Intent, java.lang.String, boolean, java.lang.String, java.lang.String, int, boolean, int, java.lang.String, java.lang.String) for 104ms
+11-01 20:14:51.916   847  5551 E RoleControllerServiceImpl: Default/fallback role holder package doesn't qualify for the role, package: com.google.android.gms.supervision, role: android.app.role.SYSTEM_SUPERVISION
+11-01 20:14:51.918   847  5551 E RoleControllerServiceImpl: Default/fallback role holder package doesn't qualify for the role, package: com.google.android.gms, role: android.app.role.SYSTEM_CALL_STREAMING
+11-01 20:14:51.924  1470  5785 W Icing   : No valid account for uploading user actions
+11-01 20:14:51.952   847  5551 W Role    : Default holder doesn't have required signing certificate: com.google.android.apps.work.clouddpc:23962F4B43B9857638EA66F4D419518EAE282491ACDA4B94707BD59003C45E58
+11-01 20:14:52.015  1470  5826 W libc    : Access denied finding property "ro.hardware.chipname"
+11-01 20:14:52.030  1470  5826 W ChipsetHelper: Unknown chipset! [CONTEXT service_id=301 ]
+11-01 20:14:52.067   335  2943 W resolv  : SSL_connect ssl error =5, mark 0xf0065: Connection refused
+11-01 20:14:52.067   335  2943 W resolv  : TLS Handshake failed
+11-01 20:14:52.067   335  2943 W resolv  : query failed
+11-01 20:14:52.067   335  2943 W resolv  : validateDnsTlsServer returned 0 for 10.0.2.3
+11-01 20:14:52.068   335  2943 W resolv  : Validation failed
+11-01 20:14:52.375  1437  1437 W ChimeraUtils: Module com.google.android.gms.location__nonwearable missing resource location_module_display_name(0)
+11-01 20:14:52.377  1437  5560 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:52.379  1437  5560 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:52.412  1437  5491 W NetworkScheduler: The extras of the task (com.google.android.gms.ocr.service.ModelCleanUpTaskService:type_[4]) are not valid to be persisted so that the task is not persisted [CONTEXT service_id=218 ]
+11-01 20:14:52.412  1437  5491 W NetworkScheduler: java.lang.IllegalArgumentException: Only the following extra parameter types are supported: Integer, Long, Double, String, Boolean, and nested Bundles with the same restrictions.
+11-01 20:14:52.412  1437  5491 W NetworkScheduler: 	at awaz.e(:com.google.android.gms@231818047@23.18.18 (190800-535401451):10)
+11-01 20:14:52.412  1437  5491 W NetworkScheduler: 	at byui.f(:com.google.android.gms@231818047@23.18.18 (190800-535401451):44)
+11-01 20:14:52.412  1437  5491 W NetworkScheduler: 	at bytb.n(:com.google.android.gms@231818047@23.18.18 (190800-535401451):3)
+11-01 20:14:52.412  1437  5491 W NetworkScheduler: 	at bytb.u(:com.google.android.gms@231818047@23.18.18 (190800-535401451):20)
+11-01 20:14:52.412  1437  5491 W NetworkScheduler: 	at bytb.h(:com.google.android.gms@231818047@23.18.18 (190800-535401451):3)
+11-01 20:14:52.412  1437  5491 W NetworkScheduler: 	at byot.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):9)
+11-01 20:14:52.412  1437  5491 W NetworkScheduler: 	at aced.c(:com.google.android.gms@231818047@23.18.18 (190800-535401451):6)
+11-01 20:14:52.412  1437  5491 W NetworkScheduler: 	at aced.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):7)
+11-01 20:14:52.412  1437  5491 W NetworkScheduler: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-01 20:14:52.412  1437  5491 W NetworkScheduler: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-01 20:14:52.412  1437  5491 W NetworkScheduler: 	at acjn.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+11-01 20:14:52.412  1437  5491 W NetworkScheduler: 	at java.lang.Thread.run(Thread.java:1012)
+11-01 20:14:52.696  1437  3172 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:52.794  1437  3172 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:52.840  1437  1489 W .gms.persistent: Long monitor contention with owner netscheduler-queue-handler (3368) at void bytb.o(int)(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4) waiters=0 in int bytb.r(byps) for 164ms
+11-01 20:14:52.876  1470  5826 W Pay     : Active account was null, notification task will be cancelled. [CONTEXT service_id=198 ]
+11-01 20:14:52.878  1470  5826 W Pay     : [eMoney txn sync] exiting without init: active tapandpay account not found! [CONTEXT service_id=198 ]
+11-01 20:14:52.881  1470  5826 W Pay     : Mdl not supported. Not triggering periodic MSO refresh task. [CONTEXT service_id=198 ]
+11-01 20:14:52.893  1470  5826 W Pay     : Active account was null, notification task will be cancelled. [CONTEXT service_id=198 ]
+11-01 20:14:52.895  1470  5826 W Pay     : [eMoney card recovery task] exiting without init: active tapandpay account not found! [CONTEXT service_id=198 ]
+11-01 20:14:53.066  1437  1489 W NetworkScheduler: Immediate task was not started com.google.android.gms/.tapandpay.gcmtask.TapAndPayGcmTaskService{u=0 tag="hce.dynamic_aid_registration.oneoff" trigger=window{start=0s,end=1s,earliest=0s,latest=0s} requirements=[NET_ANY,PREFERRED_CHARGING] attributes=[] scheduled=0s last_run=N/A exec_window_multiplier=1.0000 jid=N/A status=PENDING retries=0 client_lib=GMS_TASK_SCHEDULER-231818000}. Rescheduling immediate tasks can cause excessive battery drain.
+11-01 20:14:53.126  1470  5800 W PeoplePU: getServiceInfo failed.
+11-01 20:14:53.126  1470  5800 W PeoplePU: android.content.pm.PackageManager$NameNotFoundException: ComponentInfo{com.google.android.gms/com.google.android.gms.people.sync.focus.ContactsSyncAdapterService}
+11-01 20:14:53.126  1470  5800 W PeoplePU: 	at android.app.ApplicationPackageManager.getServiceInfo(ApplicationPackageManager.java:616)
+11-01 20:14:53.126  1470  5800 W PeoplePU: 	at android.app.ApplicationPackageManager.getServiceInfo(ApplicationPackageManager.java:599)
+11-01 20:14:53.126  1470  5800 W PeoplePU: 	at bvox.b(:com.google.android.gms@231818047@23.18.18 (190800-535401451):3)
+11-01 20:14:53.126  1470  5800 W PeoplePU: 	at bvgq.a(:com.google.android.gms@231818047@23.18.18 (190800-535401451):3)
+11-01 20:14:53.126  1470  5800 W PeoplePU: 	at com.google.android.gms.people.api.init.PeopleModuleInitIntentOperation.b(:com.google.android.gms@231818047@23.18.18 (190800-535401451):9)
+11-01 20:14:53.126  1470  5800 W PeoplePU: 	at zdm.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):7)
+11-01 20:14:53.126  1470  5800 W PeoplePU: 	at com.google.android.chimera.IntentOperation.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-01 20:14:53.126  1470  5800 W PeoplePU: 	at zhv.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-01 20:14:53.126  1470  5800 W PeoplePU: 	at hjm.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):3)
+11-01 20:14:53.126  1470  5800 W PeoplePU: 	at hjl.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):11)
+11-01 20:14:53.126  1470  5800 W PeoplePU: 	at dfhf.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-01 20:14:53.126  1470  5800 W PeoplePU: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-01 20:14:53.126  1470  5800 W PeoplePU: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-01 20:14:53.126  1470  5800 W PeoplePU: 	at java.lang.Thread.run(Thread.java:1012)
+11-01 20:14:53.127  1470  5800 W PeoplePU: getComponentEnabledSetting failed.
+11-01 20:14:53.127  1470  5800 W PeoplePU: java.lang.IllegalArgumentException: Unknown component: ComponentInfo{com.google.android.syncadapters.contacts/com.google.android.syncadapters.contacts.ContactsSyncAdapterService}
+11-01 20:14:53.127  1470  5800 W PeoplePU: 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3061)
+11-01 20:14:53.127  1470  5800 W PeoplePU: 	at android.os.Parcel.createException(Parcel.java:3041)
+11-01 20:14:53.127  1470  5800 W PeoplePU: 	at android.os.Parcel.readException(Parcel.java:3024)
+11-01 20:14:53.127  1470  5800 W PeoplePU: 	at android.os.Parcel.readException(Parcel.java:2966)
+11-01 20:14:53.127  1470  5800 W PeoplePU: 	at android.content.pm.IPackageManager$Stub$Proxy.getComponentEnabledSetting(IPackageManager.java:6034)
+11-01 20:14:53.127  1470  5800 W PeoplePU: 	at android.app.ApplicationPackageManager.getComponentEnabledSetting(ApplicationPackageManager.java:3097)
+11-01 20:14:53.127  1470  5800 W PeoplePU: 	at bvox.b(:com.google.android.gms@231818047@23.18.18 (190800-535401451):1)
+11-01 20:14:53.127  1470  5800 W PeoplePU: 	at bvgq.a(:com.google.android.gms@231818047@23.18.18 (190800-535401451):5)
+11-01 20:14:53.127  1470  5800 W PeoplePU: 	at com.google.android.gms.people.api.init.PeopleModuleInitIntentOperation.b(:com.google.android.gms@231818047@23.18.18 (190800-535401451):9)
+11-01 20:14:53.127  1470  5800 W PeoplePU: 	at zdm.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):7)
+11-01 20:14:53.127  1470  5800 W PeoplePU: 	at com.google.android.chimera.IntentOperation.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-01 20:14:53.127  1470  5800 W PeoplePU: 	at zhv.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-01 20:14:53.127  1470  5800 W PeoplePU: 	at hjm.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):3)
+11-01 20:14:53.127  1470  5800 W PeoplePU: 	at hjl.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):11)
+11-01 20:14:53.127  1470  5800 W PeoplePU: 	at dfhf.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-01 20:14:53.127  1470  5800 W PeoplePU: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-01 20:14:53.127  1470  5800 W PeoplePU: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-01 20:14:53.127  1470  5800 W PeoplePU: 	at java.lang.Thread.run(Thread.java:1012)
+11-01 20:14:53.127  1470  5800 W PeoplePU: Caused by: android.os.RemoteException: Remote stack trace:
+11-01 20:14:53.127  1470  5800 W PeoplePU: 	at com.android.server.pm.ComputerEngine.getComponentEnabledSettingInternal(ComputerEngine.java:5159)
+11-01 20:14:53.127  1470  5800 W PeoplePU: 	at com.android.server.pm.ComputerEngine.getComponentEnabledSetting(ComputerEngine.java:5141)
+11-01 20:14:53.127  1470  5800 W PeoplePU: 	at com.android.server.pm.IPackageManagerBase.getComponentEnabledSetting(IPackageManagerBase.java:388)
+11-01 20:14:53.127  1470  5800 W PeoplePU: 	at android.content.pm.IPackageManager$Stub.onTransact(IPackageManager.java:3012)
+11-01 20:14:53.127  1470  5800 W PeoplePU: 	at com.android.server.pm.PackageManagerService$IPackageManagerImpl.onTransact(PackageManagerService.java:6334)
+11-01 20:14:53.127  1470  5800 W PeoplePU:
+11-01 20:14:53.156  1437  5726 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:53.305  1437  5726 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:53.343  1470  5800 W PeoplePU: getComponentEnabledSetting failed.
+11-01 20:14:53.343  1470  5800 W PeoplePU: java.lang.IllegalArgumentException: Unknown component: ComponentInfo{com.google.android.syncadapters.contacts/com.google.android.syncadapters.contacts.ContactsSyncAdapterService}
+11-01 20:14:53.343  1470  5800 W PeoplePU: 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3061)
+11-01 20:14:53.343  1470  5800 W PeoplePU: 	at android.os.Parcel.createException(Parcel.java:3041)
+11-01 20:14:53.343  1470  5800 W PeoplePU: 	at android.os.Parcel.readException(Parcel.java:3024)
+11-01 20:14:53.343  1470  5800 W PeoplePU: 	at android.os.Parcel.readException(Parcel.java:2966)
+11-01 20:14:53.343  1470  5800 W PeoplePU: 	at android.content.pm.IPackageManager$Stub$Proxy.getComponentEnabledSetting(IPackageManager.java:6034)
+11-01 20:14:53.343  1470  5800 W PeoplePU: 	at android.app.ApplicationPackageManager.getComponentEnabledSetting(ApplicationPackageManager.java:3097)
+11-01 20:14:53.343  1470  5800 W PeoplePU: 	at bvox.b(:com.google.android.gms@231818047@23.18.18 (190800-535401451):1)
+11-01 20:14:53.343  1470  5800 W PeoplePU: 	at bvgq.a(:com.google.android.gms@231818047@23.18.18 (190800-535401451):29)
+11-01 20:14:53.343  1470  5800 W PeoplePU: 	at com.google.android.gms.people.api.init.PeopleModuleInitIntentOperation.b(:com.google.android.gms@231818047@23.18.18 (190800-535401451):9)
+11-01 20:14:53.343  1470  5800 W PeoplePU: 	at zdm.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):7)
+11-01 20:14:53.343  1470  5800 W PeoplePU: 	at com.google.android.chimera.IntentOperation.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-01 20:14:53.343  1470  5800 W PeoplePU: 	at zhv.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-01 20:14:53.343  1470  5800 W PeoplePU: 	at hjm.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):3)
+11-01 20:14:53.343  1470  5800 W PeoplePU: 	at hjl.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):11)
+11-01 20:14:53.343  1470  5800 W PeoplePU: 	at dfhf.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-01 20:14:53.343  1470  5800 W PeoplePU: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-01 20:14:53.343  1470  5800 W PeoplePU: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-01 20:14:53.343  1470  5800 W PeoplePU: 	at java.lang.Thread.run(Thread.java:1012)
+11-01 20:14:53.348  1470  5800 W PeoplePU: getComponentEnabledSetting failed.
+11-01 20:14:53.348  1470  5800 W PeoplePU: java.lang.IllegalArgumentException: Unknown component: ComponentInfo{com.google.android.syncadapters.contacts/com.google.android.syncadapters.contacts.ProxyGalProvider}
+11-01 20:14:53.348  1470  5800 W PeoplePU: 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3061)
+11-01 20:14:53.348  1470  5800 W PeoplePU: 	at android.os.Parcel.createException(Parcel.java:3041)
+11-01 20:14:53.348  1470  5800 W PeoplePU: 	at android.os.Parcel.readException(Parcel.java:3024)
+11-01 20:14:53.348  1470  5800 W PeoplePU: 	at android.os.Parcel.readException(Parcel.java:2966)
+11-01 20:14:53.348  1470  5800 W PeoplePU: 	at android.content.pm.IPackageManager$Stub$Proxy.getComponentEnabledSetting(IPackageManager.java:6034)
+11-01 20:14:53.348  1470  5800 W PeoplePU: 	at android.app.ApplicationPackageManager.getComponentEnabledSetting(ApplicationPackageManager.java:3097)
+11-01 20:14:53.348  1470  5800 W PeoplePU: 	at bvox.b(:com.google.android.gms@231818047@23.18.18 (190800-535401451):1)
+11-01 20:14:53.348  1470  5800 W PeoplePU: 	at buru.a(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-01 20:14:53.348  1470  5800 W PeoplePU: 	at com.google.android.gms.people.api.init.PeopleModuleInitIntentOperation.b(:com.google.android.gms@231818047@23.18.18 (190800-535401451):10)
+11-01 20:14:53.348  1470  5800 W PeoplePU: 	at zdm.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):7)
+11-01 20:14:53.348  1470  5800 W PeoplePU: 	at com.google.android.chimera.IntentOperation.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-01 20:14:53.348  1470  5800 W PeoplePU: 	at zhv.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-01 20:14:53.348  1470  5800 W PeoplePU: 	at hjm.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):3)
+11-01 20:14:53.348  1470  5800 W PeoplePU: 	at hjl.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):11)
+11-01 20:14:53.348  1470  5800 W PeoplePU: 	at dfhf.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-01 20:14:53.348  1470  5800 W PeoplePU: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-01 20:14:53.348  1470  5800 W PeoplePU: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-01 20:14:53.348  1470  5800 W PeoplePU: 	at java.lang.Thread.run(Thread.java:1012)
+11-01 20:14:53.588  1437  5560 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:53.597   847  5551 E RoleControllerServiceImpl: Default/fallback role holder package doesn't qualify for the role, package: com.google.android.gms.supervision, role: android.app.role.SYSTEM_SUPERVISION
+11-01 20:14:53.608   847  5551 E RoleControllerServiceImpl: Default/fallback role holder package doesn't qualify for the role, package: com.google.android.gms, role: android.app.role.SYSTEM_CALL_STREAMING
+11-01 20:14:53.626   847  5551 W Role    : Default holder doesn't have required signing certificate: com.google.android.apps.work.clouddpc:23962F4B43B9857638EA66F4D419518EAE282491ACDA4B94707BD59003C45E58
+11-01 20:14:53.884  1437  5560 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:53.965  2924  3163 W Settings: Setting airplane_mode_on has moved from android.provider.Settings.System to android.provider.Settings.Global, returning read-only value.
+11-01 20:14:54.092  1470  3129 E WakeLock: IntentOp:.chimera.container.InitConfigOperation ** IS FORCE-RELEASED ON TIMEOUT **
+11-01 20:14:54.224  1437  3172 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:54.243  2924  3163 W Settings: Setting airplane_mode_on has moved from android.provider.Settings.System to android.provider.Settings.Global, returning read-only value.
+11-01 20:14:54.282  1437  3172 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:54.425   521  2441 W system_server: Long monitor contention with owner ActivityManager (553) at void com.android.server.am.BroadcastQueueModernImpl.checkPendingColdStartValidity()(BroadcastQueueModernImpl.java:551) waiters=1 in android.content.Intent com.android.server.am.ActivityManagerService.registerReceiverWithFeature(android.app.IApplicationThread, java.lang.String, java.lang.String, java.lang.String, android.content.IIntentReceiver, android.content.IntentFilter, java.lang.String, int, int) for 110ms
+11-01 20:14:54.486  1470  5806 W MobileDataHub: [Service] appsupload-periodic periodic task disabled
+11-01 20:14:54.550  1437  1489 W .gms.persistent: Long monitor contention with owner netscheduler-queue-handler (3368) at void bytb.o(int)(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4) waiters=0 in void bytb.u(byps, int) for 339ms
+11-01 20:14:54.979   521   531 W system_server: Suspending all threads took: 17.196ms
+11-01 20:14:55.078  1470  5806 W ChimeraUtils: Module com.google.android.gms.phonesky_recovery missing resource null(0)
+11-01 20:14:55.087  1470  4719 E MDD     : FileGroupManager: Trying to add expired group enpromo-state-config.
+11-01 20:14:55.091  1470  4719 W MDD     : MDDManager class cqfz
+11-01 20:14:55.195  1437  5560 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:55.209  1437  5560 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:55.540  1470  4720 E WakeLock: IntentOp:.chimera.container.InitConfigOperation ** IS FORCE-RELEASED ON TIMEOUT **
+11-01 20:14:55.691  1470  5784 W gle.android.gms: Long monitor contention with owner [com.google.android.gms.chimera.container.intentoperation.GmsIntentOperationChimeraService-Executor] processing com.google.android.gms.semanticlocation.service.SemanticLocationModuleInitIntentOperation for action com.google.android.chimera.IntentOperation.NEW_MODULE (5809) at android.content.IContentProvider android.app.ActivityThread.acquireExistingProvider(android.content.Context, java.lang.String, int, boolean)(ActivityThread.java:7464) waiters=0 in android.content.IContentProvider android.app.ActivityThread.acquireExistingProvider(android.content.Context, java.lang.String, int, boolean) for 147ms
+11-01 20:14:55.723  1437  3172 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:55.728  1470  5809 W GmsTaskScheduler: com.google.android.gms.semanticlocationhistory.federated.FederatedTaskIdentityDataService is not available. This may cause the task to be lost.
+11-01 20:14:55.729  1437  3172 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:55.736  1470  5809 W GmsTaskScheduler: com.google.android.gms.semanticlocationhistory.federated.FederatedJobHistoryService is not available. This may cause the task to be lost.
+11-01 20:14:55.780  1470  5826 E PhenotypeFlagCommitter: Retrieving snapshot for com.google.android.gms.people failed
+11-01 20:14:55.780  1470  5826 E PhenotypeFlagCommitter: java.util.concurrent.TimeoutException: Timed out waiting for Task
+11-01 20:14:55.780  1470  5826 E PhenotypeFlagCommitter: 	at cfsz.o(:com.google.android.gms@231818047@23.18.18 (190800-535401451):6)
+11-01 20:14:55.780  1470  5826 E PhenotypeFlagCommitter: 	at bwch.e(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-01 20:14:55.780  1470  5826 E PhenotypeFlagCommitter: 	at bwch.j(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-01 20:14:55.780  1470  5826 E PhenotypeFlagCommitter: 	at bwch.h(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+11-01 20:14:55.780  1470  5826 E PhenotypeFlagCommitter: 	at buqd.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-01 20:14:55.780  1470  5826 E PhenotypeFlagCommitter: 	at com.google.android.chimera.IntentOperation.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-01 20:14:55.780  1470  5826 E PhenotypeFlagCommitter: 	at zhv.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-01 20:14:55.780  1470  5826 E PhenotypeFlagCommitter: 	at hjm.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):3)
+11-01 20:14:55.780  1470  5826 E PhenotypeFlagCommitter: 	at hjl.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):11)
+11-01 20:14:55.780  1470  5826 E PhenotypeFlagCommitter: 	at dfhf.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-01 20:14:55.780  1470  5826 E PhenotypeFlagCommitter: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-01 20:14:55.780  1470  5826 E PhenotypeFlagCommitter: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-01 20:14:55.780  1470  5826 E PhenotypeFlagCommitter: 	at java.lang.Thread.run(Thread.java:1012)
+11-01 20:14:55.856  1470  5809 W ChimeraUtils: Module com.google.android.gms.smartdevice missing resource null(0)
+11-01 20:14:56.070  1437  5726 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:56.162  1437  5726 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:56.162  1437  1489 W .gms.persistent: Long monitor contention with owner netscheduler-queue-handler (3368) at void bytb.o(int)(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4) waiters=0 in void bytb.u(byps, int) for 111ms
+11-01 20:14:56.360  1437  3172 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:56.362  1437  3806 I SemanticLocation: java.io.FileNotFoundException: /data/user/0/com.google.android.gms/files/model_bundle_metadata.pb: open failed: ENOENT (No such file or directory)
+11-01 20:14:56.362  1437  3806 I SemanticLocation: Caused by: android.system.ErrnoException: open failed: ENOENT (No such file or directory)
+11-01 20:14:56.458  1437  3172 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:56.485   847  5551 E RoleControllerServiceImpl: Default/fallback role holder package doesn't qualify for the role, package: com.google.android.gms.supervision, role: android.app.role.SYSTEM_SUPERVISION
+11-01 20:14:56.489   847  5551 E RoleControllerServiceImpl: Default/fallback role holder package doesn't qualify for the role, package: com.google.android.gms, role: android.app.role.SYSTEM_CALL_STREAMING
+11-01 20:14:56.491   847  5551 W Role    : Default holder doesn't have required signing certificate: com.google.android.apps.work.clouddpc:23962F4B43B9857638EA66F4D419518EAE282491ACDA4B94707BD59003C45E58
+11-01 20:14:56.506  1470  5809 W ActiveUnlock: Tried to set empty triggers [CONTEXT service_id=327 ]
+11-01 20:14:56.507  1470  5809 W ChimeraUtils: Module com.google.android.gms.activeunlock_primary missing resource null(0)
+11-01 20:14:56.514  4741  5598 E Surface : freeAllBuffers: 1 buffers were freed while being dequeued!
+11-01 20:14:56.517  4741  5598 W GraphicBufferSource: released unpopulated slots: [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63]
+11-01 20:14:56.517  4741  5598 E Surface : getSlotFromBufferLocked: unknown buffer: 0x0
+11-01 20:14:56.527  4741  5593 W MediaCodec: no metrics handle found
+11-01 20:14:56.540  4741  5612 W MediaCodec: no metrics handle found
+11-01 20:14:56.556  1437  5726 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:56.571  4741  5745 W MediaCodec: no metrics handle found
+11-01 20:14:56.591  1437  5726 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:56.611  1437  3172 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:56.613  1437  3172 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:56.621  1437  3806 I SemanticLocation: java.io.FileNotFoundException: /data/user/0/com.google.android.gms/files/model_bundle_metadata.pb: open failed: ENOENT (No such file or directory)
+11-01 20:14:56.621  1437  3806 I SemanticLocation: Caused by: android.system.ErrnoException: open failed: ENOENT (No such file or directory)
+11-01 20:14:56.657  1437  5560 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:56.672  1437  5560 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:56.701  1608  4176 W MediaProvider: isAppCloneUserPair for user 0: false
+11-01 20:14:56.702  1608  4176 W MediaProvider: isAppCloneUserPair for user 0: false
+11-01 20:14:56.732  1437  5726 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:56.734  1608  1871 E StorageManager: Failed to open /storage/emulated/0/Movies/VivoVideo/.pending-1794168896-VivoVideo_20261101_201456.mp4 to set project id.: No such file or directory
+11-01 20:14:56.735  1608  1871 W MediaProvider: Failed to update quota type for /storage/emulated/0/Movies/VivoVideo/.pending-1794168896-VivoVideo_20261101_201456.mp4
+11-01 20:14:56.735  1608  1871 W MediaProvider: java.io.IOException: Failed to update quota type for /storage/emulated/0/Movies/VivoVideo/.pending-1794168896-VivoVideo_20261101_201456.mp4
+11-01 20:14:56.735  1608  1871 W MediaProvider: 	at android.os.storage.StorageManager.updateExternalStorageFileQuotaType(StorageManager.java:2551)
+11-01 20:14:56.735  1608  1871 W MediaProvider: 	at com.android.providers.media.MediaProvider.updateQuotaTypeForFileInternal(MediaProvider.java:874)
+11-01 20:14:56.735  1608  1871 W MediaProvider: 	at com.android.providers.media.MediaProvider.updateQuotaTypeForUri(MediaProvider.java:857)
+11-01 20:14:56.735  1608  1871 W MediaProvider: 	at com.android.providers.media.MediaProvider.-$$Nest$mupdateQuotaTypeForUri(MediaProvider.java:0)
+11-01 20:14:56.735  1608  1871 W MediaProvider: 	at com.android.providers.media.MediaProvider$5.lambda$onInsert$0(MediaProvider.java:916)
+11-01 20:14:56.735  1608  1871 W MediaProvider: 	at com.android.providers.media.MediaProvider$5.$r8$lambda$fpXVCCb4tNgN0rBFXazZWCUznbc(MediaProvider.java:0)
+11-01 20:14:56.735  1608  1871 W MediaProvider: 	at com.android.providers.media.MediaProvider$5$$ExternalSyntheticLambda1.run(R8$$SyntheticClass:0)
+11-01 20:14:56.735  1608  1871 W MediaProvider: 	at android.os.Handler.handleCallback(Handler.java:958)
+11-01 20:14:56.735  1608  1871 W MediaProvider: 	at android.os.Handler.dispatchMessage(Handler.java:99)
+11-01 20:14:56.735  1608  1871 W MediaProvider: 	at android.os.Looper.loopOnce(Looper.java:205)
+11-01 20:14:56.735  1608  1871 W MediaProvider: 	at android.os.Looper.loop(Looper.java:294)
+11-01 20:14:56.735  1608  1871 W MediaProvider: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+11-01 20:14:56.741  1437  5726 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+11-01 20:14:56.767  1608  1680 W MediaProvider: isAppCloneUserPair for user 0: false
+11-01 20:14:56.776  1608  1680 W MediaProvider: isAppCloneUserPair for user 0: false
