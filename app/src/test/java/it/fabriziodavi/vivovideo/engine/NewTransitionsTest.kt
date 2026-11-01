@@ -180,8 +180,10 @@ class NewTransitionsTest {
     @Test fun newestComeFirstInThePanel() {
         val list = it.fabriziodavi.vivovideo.ui.TRANSITIONS_NEW_FIRST
         assertEquals(TransitionType.CROSSFADE, list.first())
+        // Prima quelle d'azione (01/11), poi quelle dal video dell'utente.
+        assertEquals(TransitionType.entries.filter { it.action }, list.subList(1, 7))
         assertEquals(listOf(TransitionType.WIPE, TransitionType.WIPE_DIAG, TransitionType.CLOCK, TransitionType.STEPS,
-            TransitionType.OVERLAY, TransitionType.INVISIBLE, TransitionType.MASK_PASS), list.subList(1, 8))
+            TransitionType.OVERLAY, TransitionType.INVISIBLE, TransitionType.MASK_PASS), list.subList(7, 14))
         assertEquals(TransitionType.entries.size, list.toSet().size)
         assertNull(TransitionType.FLASH.hint)
     }

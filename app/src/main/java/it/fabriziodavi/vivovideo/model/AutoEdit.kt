@@ -75,12 +75,12 @@ enum class AutoStyle(
     ENERGICO(
         "Energico", "Velocity edit: tagli netti sul battito, accelerazioni, blackout e flash brevi sui colpi, rimbalzi e B/N a scatti.",
         photoUs = 1_500_000, videoUs = 1_800_000, beatsPerSlot = 2,
-        transitions = listOf(TransitionType.WHIP, TransitionType.SNAPZOOM, TransitionType.SLIDE_UP, TransitionType.CAMSHAKE),
+        transitions = listOf(TransitionType.WHIP, TransitionType.SNAPZOOM, TransitionType.SLIDE_UP, TransitionType.CAMSHAKE, TransitionType.SWIPE, TransitionType.SLICES),
         transitionUs = 250_000,
         fx = listOf(ClipFx(FxType.GRAIN, 0.3f)),
         accents = listOf(ClipFx(FxType.BWBEAT, 1f), ClipFx(FxType.CHROMA, 0.3f)),
         title = TextPreset.TITOLONE,
-        impact = listOf(TransitionType.BLACKOUT, TransitionType.EXPOSE, TransitionType.SNAPZOOM, TransitionType.CAMSHAKE),
+        impact = listOf(TransitionType.IMPACT, TransitionType.STROBE, TransitionType.BLACKOUT, TransitionType.EXPOSE, TransitionType.SNAPZOOM, TransitionType.CAMSHAKE),
         beatFx = listOf(ClipFx(FxType.FLASHBEAT, 0.5f), ClipFx(FxType.BOUNCE, 0.5f)),
         ramps = true,
         grade = Grade(contrast = 0.2f, vibrance = 0.1f, shadows = -0.08f),
@@ -90,12 +90,12 @@ enum class AutoStyle(
     VIRALE(
         "Reel virale", "Da social 2026: intro che sale, tagli netti, velocity, B/N a scatti, look da fotocamera digitale e didascalie parola per parola.",
         photoUs = 1_200_000, videoUs = 1_500_000, beatsPerSlot = 2,
-        transitions = listOf(TransitionType.WHIP, TransitionType.SLIDE_UP, TransitionType.SNAPZOOM),
+        transitions = listOf(TransitionType.WHIP, TransitionType.SLIDE_UP, TransitionType.SNAPZOOM, TransitionType.SWIPE),
         transitionUs = 220_000,
         fx = listOf(ClipFx(FxType.GRAIN, 0.25f)),
         accents = listOf(ClipFx(FxType.BWBEAT, 1f), ClipFx(FxType.DIGICAM, 0.5f)),
         title = TextPreset.SOCIAL,
-        impact = listOf(TransitionType.BLACKOUT, TransitionType.EXPOSE, TransitionType.CAMSHAKE, TransitionType.RGB),
+        impact = listOf(TransitionType.STROBE, TransitionType.BLACKOUT, TransitionType.EXPOSE, TransitionType.CAMSHAKE, TransitionType.RGB),
         beatFx = listOf(ClipFx(FxType.BOUNCE, 0.6f), ClipFx(FxType.FLASHBEAT, 0.4f)),
         ramps = true,
         grade = Grade(contrast = 0.16f, vibrance = 0.12f, exposure = 0.03f),
@@ -162,12 +162,12 @@ enum class AutoStyle(
     BLOCKBUSTER(
         "Blockbuster", "Trailer da cinema: intro a raffica, teal & orange, bande cinema, bagliori anamorfici, blackout e flash sui colpi, momento eroe sul drop.",
         photoUs = 2_000_000, videoUs = 2_400_000, beatsPerSlot = 2,
-        transitions = listOf(TransitionType.CROSSFADE, TransitionType.SNAPZOOM, TransitionType.WHIP, TransitionType.CROSSFADE),
+        transitions = listOf(TransitionType.CROSSFADE, TransitionType.SNAPZOOM, TransitionType.WHIP, TransitionType.CROSSFADE, TransitionType.BLADE),
         transitionUs = 600_000,
         fx = listOf(ClipFx(FxType.LETTERBOX, 1f), ClipFx(FxType.HALATION, 0.4f)),
         accents = listOf(ClipFx(FxType.FLARE, 0.4f), ClipFx(FxType.CHROMA, 0.25f)),
         title = TextPreset.TITOLONE,
-        impact = listOf(TransitionType.BLACKOUT, TransitionType.EXPOSE, TransitionType.SNAPZOOM, TransitionType.CAMSHAKE),
+        impact = listOf(TransitionType.IMPACT, TransitionType.BLACKOUT, TransitionType.EXPOSE, TransitionType.SNAPZOOM, TransitionType.CAMSHAKE),
         beatFx = listOf(ClipFx(FxType.FLASHBEAT, 0.5f), ClipFx(FxType.SHAKEBEAT, 0.3f)),
         ramps = true, slowmo = true,
         grade = Grade(contrast = 0.22f, saturation = 0.05f, shadows = -0.1f, shadowWheel = Wheel(190f, 0.5f), highWheel = Wheel(30f, 0.45f)),
@@ -208,12 +208,12 @@ enum class AutoStyle(
     AZIONE(
         "Azione", "Sport e avventura: tagli secchi, scosse di camera sui colpi, zoom secchi, velocity e rallenty da eroe.",
         photoUs = 1_400_000, videoUs = 1_700_000, beatsPerSlot = 2,
-        transitions = listOf(TransitionType.WHIP, TransitionType.SNAPZOOM, TransitionType.CAMSHAKE, TransitionType.SLIDE_UP),
+        transitions = listOf(TransitionType.WHIP, TransitionType.SNAPZOOM, TransitionType.CAMSHAKE, TransitionType.SLIDE_UP, TransitionType.SWIPE, TransitionType.TILES),
         transitionUs = 250_000,
         fx = listOf(ClipFx(FxType.GRAIN, 0.2f)),
         accents = listOf(ClipFx(FxType.CHROMA, 0.3f), ClipFx(FxType.BWBEAT, 1f)),
         title = TextPreset.TITOLONE,
-        impact = listOf(TransitionType.CAMSHAKE, TransitionType.BLACKOUT, TransitionType.EXPOSE, TransitionType.SNAPZOOM),
+        impact = listOf(TransitionType.IMPACT, TransitionType.BLADE, TransitionType.CAMSHAKE, TransitionType.BLACKOUT, TransitionType.EXPOSE, TransitionType.SNAPZOOM),
         beatFx = listOf(ClipFx(FxType.SHAKEBEAT, 0.4f), ClipFx(FxType.FLASHBEAT, 0.5f)),
         ramps = true,
         grade = Grade(contrast = 0.3f, saturation = 0.0f, highlights = -0.15f, shadowWheel = Wheel(200f, 0.25f)),
@@ -223,12 +223,12 @@ enum class AutoStyle(
     ESTREMO(
         "Estremo", "Bike, MTB, corsa, GoPro: accelerazioni a proiettile su ogni video, scosse e flash sui colpi, blackout sul drop, grandangolo da action cam.",
         photoUs = 1_200_000, videoUs = 1_500_000, beatsPerSlot = 2,
-        transitions = listOf(TransitionType.WHIP, TransitionType.SNAPZOOM, TransitionType.CAMSHAKE, TransitionType.SLIDE_UP),
+        transitions = listOf(TransitionType.WHIP, TransitionType.SNAPZOOM, TransitionType.CAMSHAKE, TransitionType.SLIDE_UP, TransitionType.SWIPE, TransitionType.SLICES),
         transitionUs = 240_000,
         fx = listOf(ClipFx(FxType.GRAIN, 0.2f)),
         accents = listOf(ClipFx(FxType.FISHEYE, 0.2f), ClipFx(FxType.BWBEAT, 1f), ClipFx(FxType.CHROMA, 0.3f)),
         title = TextPreset.TITOLONE,
-        impact = listOf(TransitionType.BLACKOUT, TransitionType.CAMSHAKE, TransitionType.EXPOSE, TransitionType.SNAPZOOM),
+        impact = listOf(TransitionType.IMPACT, TransitionType.STROBE, TransitionType.BLADE, TransitionType.BLACKOUT, TransitionType.CAMSHAKE, TransitionType.EXPOSE, TransitionType.SNAPZOOM),
         beatFx = listOf(ClipFx(FxType.SHAKEBEAT, 0.45f), ClipFx(FxType.FLASHBEAT, 0.55f)),
         ramps = true, slowmo = true,
         grade = Grade(contrast = 0.35f, saturation = 0.12f, vibrance = 0.2f, highlights = -0.2f, shadows = -0.08f, shadowWheel = Wheel(205f, 0.35f), highWheel = Wheel(40f, 0.2f)),
@@ -809,7 +809,8 @@ object AutoEdit {
                     val type = if (isDrop) style.impact.first() else choices.random(rnd)
                     prevT = type
                     // Nei temi calmi anche i passaggi sui colpi restano lenti.
-                    val dur = if (strong && !style.calm) minOf(style.transitionUs, 400_000L) else style.transitionUs
+                    // Le transizioni d'azione 2026 hanno la loro durata (sotto è un lampo che non si vede).
+                    val dur = type.defaultUs?.takeIf { type.action } ?: if (strong && !style.calm) minOf(style.transitionUs, 400_000L) else style.transitionUs
                     c = c.copy(transitionOut = TransitionSpec(type, minOf(dur, c.outputUs / 2, clips[i + 1].outputUs / 2)))
                 }
             }

@@ -209,9 +209,10 @@ val LAYER_TABS = listOf("Aspetto", "Forma", "Animazione")
 /** Le novità premium in testa alle liste: si vedono subito. */
 // L'incrociata resta la prima (è la più usata), poi le novità.
 // Prima le transizioni di tendenza (stacchi da velocity edit), poi le altre novità e le classiche.
-val TRANSITIONS_NEW_FIRST: List<TransitionType> = listOf(TransitionType.CROSSFADE) + TransitionType.entries.filter { it.newest } +
+val TRANSITIONS_NEW_FIRST: List<TransitionType> = listOf(TransitionType.CROSSFADE) + TransitionType.entries.filter { it.action } +
+    TransitionType.entries.filter { it.newest } +
     TransitionType.entries.filter { it.trend } + TransitionType.entries.filter { it.premium && !it.trend } +
-    TransitionType.entries.filter { !it.premium && !it.trend && !it.newest && it != TransitionType.CROSSFADE }
+    TransitionType.entries.filter { !it.premium && !it.trend && !it.newest && !it.action && it != TransitionType.CROSSFADE }
 val PRESETS_NEW_FIRST: List<TextPreset> = TextPreset.entries.filter { it.trend } +
     TextPreset.entries.filter { !it.trend && it.ordinal >= TextPreset.CINEMA26.ordinal } + TextPreset.entries.filter { it.ordinal < TextPreset.CINEMA26.ordinal }
 val ANIMS_NEW_FIRST: List<TextAnim> = listOf(TextAnim.NONE) + TextAnim.entries.filter { it.ordinal >= TextAnim.BOUNCE.ordinal } +

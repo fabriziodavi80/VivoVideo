@@ -120,7 +120,8 @@ class TransitionEffect(
         TransitionType.INVISIBLE -> Params(shift = (if (entering) -0.22f else 0.22f) * e * e * e, blur = 0.14f * e * e, blurMode = 1, zoom = 1f + 0.04f * e)
         // A due clip: le fa il compositore con TransitionMaskEffect.
         TransitionType.WIPE, TransitionType.WIPE_DIAG, TransitionType.CLOCK, TransitionType.STEPS,
-        TransitionType.OVERLAY, TransitionType.MASK_PASS -> Params()
+        TransitionType.OVERLAY, TransitionType.MASK_PASS,
+        TransitionType.IMPACT, TransitionType.SWIPE, TransitionType.SLICES, TransitionType.TILES, TransitionType.BLADE, TransitionType.STROBE -> Params()
     }
 }
 

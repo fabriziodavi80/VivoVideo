@@ -76,7 +76,17 @@ enum class TransitionType(val label: String) {
     STEPS("Scalini"),
     OVERLAY("Sovrapposizione"),
     INVISIBLE("Taglio invisibile"),
-    MASK_PASS("Passaggio con maschera");
+    MASK_PASS("Passaggio con maschera"),
+    // Azione 2026 (01/11/2026, sport ed eventi): a due clip, brevi e secche, tutte e due le clip in movimento.
+    IMPACT("Frame d'impatto"),
+    SWIPE("Swipe"),
+    SLICES("Tagli a fette"),
+    TILES("Tessere"),
+    BLADE("Lama di luce"),
+    STROBE("Strobo");
+
+    /** Azione 2026: in cima al pannello, nei temi d'azione del video automatico. */
+    val action: Boolean get() = this in ACTION
 
     /**
      * A due clip: le due clip si sovrappongono nel compositore (come la dissolvenza incrociata, con i fotogrammi oltre il
@@ -89,6 +99,12 @@ enum class TransitionType(val label: String) {
         WIPE, WIPE_DIAG, CLOCK, STEPS -> 900_000L
         OVERLAY, MASK_PASS -> 1_200_000L
         INVISIBLE -> 350_000L
+        IMPACT -> 350_000L
+        SWIPE -> 450_000L
+        SLICES -> 550_000L
+        TILES -> 650_000L
+        BLADE -> 400_000L
+        STROBE -> 500_000L
         else -> null
     }
 
@@ -101,27 +117,34 @@ enum class TransitionType(val label: String) {
         STEPS -> "Scalini: la clip successiva scende a gradini, una colonna dopo l'altra."
         OVERLAY -> "Sovrapposizione: le due clip si fondono e le luci si accendono nel passaggio, come una doppia esposizione."
         INVISIBLE -> "Taglio invisibile: una scia di movimento veloce nasconde il taglio, come se la camera girasse da una ripresa all'altra. Meglio corta (0,3–0,5 s) e su riprese che si muovono."
+        IMPACT -> "Frame d'impatto: sul colpo, pochi fotogrammi a inchiostro (bianco e nero, alternati in negativo) con linee di velocità e uno scatto di zoom, come nei manga e nelle edit sportive. Brevissima: 0,3–0,4 s, sul battito."
+        SWIPE -> "Swipe: la clip nuova spinge via la vecchia con un piccolo rimbalzo e la scia di movimento; nei video verticali sale dal basso, come quando scorri un feed."
+        SLICES -> "Tagli a fette: la clip nuova arriva a strisce, da lati alternati e sfalsate, con un filo di luce sul bordo."
+        TILES -> "Tessere: la clip nuova si compone a tessere che scoppiano in ordine casuale."
+        BLADE -> "Lama di luce: un taglio diagonale velocissimo con una scia calda sul filo."
+        STROBE -> "Strobo: le due clip si alternano tre volte a ritmo serrato, con un colpo di luce e di zoom a ogni scambio. Da mettere su un drop o su un colpo forte."
         MASK_PASS -> "Passaggio con maschera: dopo il taglio la persona della clip prima resta davanti mentre dietro arriva già la clip successiva, poi svanisce. Serve lo scontorno della persona sulla clip prima del taglio (Effetti → Persona)."
         else -> null
     }
 
     companion object {
-        private val COMPOSITE = setOf(CROSSFADE, WIPE, WIPE_DIAG, CLOCK, STEPS, OVERLAY, MASK_PASS)
+        private val ACTION = setOf(IMPACT, SWIPE, SLICES, TILES, BLADE, STROBE)
+        private val COMPOSITE = setOf(CROSSFADE, WIPE, WIPE_DIAG, CLOCK, STEPS, OVERLAY, MASK_PASS) + ACTION
     }
 
     /** Transizioni adatte a uno slideshow "vario" (quelle più nervose solo se scelte apposta). */
     val soft: Boolean get() = this !in setOf(GLITCH, PIXELATE, SHAKE, RGB, PUNCH, TEAR, STRIPES, SHUTTER, BURST, SPEEDZOOM, SMASH, SQUASH, REWIND,
-        BLACKOUT, EXPOSE, CAMSHAKE, SNAPZOOM, STEPS, INVISIBLE, MASK_PASS)
+        BLACKOUT, EXPOSE, CAMSHAKE, SNAPZOOM, STEPS, INVISIBLE, MASK_PASS, IMPACT, SWIPE, SLICES, TILES, BLADE, STROBE)
 
     /** Transizioni d'impatto, da mettere sui colpi forti della musica. */
     val punchy: Boolean get() = this in setOf(PUNCH, FLASH, RGB, GLITCH, SHAKE, WHIP, SPIN, SLIDE_UP, ZOOM, SWIRL, TEAR, BURST, STRIPES, SHUTTER, SPEEDZOOM, SMASH, SQUASH, REWIND,
-        BLACKOUT, EXPOSE, CAMSHAKE, SNAPZOOM, STEPS, INVISIBLE)
+        BLACKOUT, EXPOSE, CAMSHAKE, SNAPZOOM, STEPS, INVISIBLE, IMPACT, SWIPE, SLICES, TILES, BLADE, STROBE)
 
     /** Di tendenza (2026): da mostrare per prime nel pannello. */
     val trend: Boolean get() = ordinal >= BLACKOUT.ordinal && ordinal < WIPE.ordinal
 
     /** Le più nuove (dal video scelto dall'utente): in cima al pannello, dopo l'incrociata. */
-    val newest: Boolean get() = ordinal >= WIPE.ordinal
+    val newest: Boolean get() = ordinal >= WIPE.ordinal && !action
 
     /** Di tendenza e morbide (adatte ai temi calmi). */
     val gentleTrend: Boolean get() = this == SOFTZOOM || this == DRIFT

@@ -298,7 +298,10 @@ class CompositionFactory(private val context: Context) {
                     if (cf.type == TransitionType.MASK_PASS && role == TransitionMaskEffect.PREV) clip.person?.let { fx ->
                         add(PersonEffect(fx.copy(mode = PersonMode.REMOVE)) { t -> clip.trimEndUs + (t - cf.cutUs).coerceAtLeast(0) })
                     }
-                    add(TransitionMaskEffect(cf.type, role, cf.cutUs - cf.beforeUs, cf.beforeUs + cf.afterUs, outW.toFloat() / outH))
+                    if (cf.type.action) {
+                        val r = if (role == TransitionMaskEffect.NEXT) ActionTransitionEffect.B_ABOVE else ActionTransitionEffect.A_ABOVE
+                        add(ActionTransitionEffect(cf.type, r, cf.cutUs - cf.beforeUs, cf.beforeUs + cf.afterUs, outW.toFloat() / outH))
+                    } else add(TransitionMaskEffect(cf.type, role, cf.cutUs - cf.beforeUs, cf.beforeUs + cf.afterUs, outW.toFloat() / outH))
                 }
             }
             val edited = if (clip.isPhoto) {
@@ -446,6 +449,9 @@ class CompositionFactory(private val context: Context) {
                     // Senza compositore (anteprima non ancora pronta, o ripiego): qualcosa di simile su una clip sola.
                     t.type == TransitionType.MASK_PASS -> null
                     t.type == TransitionType.OVERLAY -> t.copy(type = TransitionType.LUMA)
+                    // Azione senza compositore: uno stacco secco simile.
+                    t.type == TransitionType.IMPACT || t.type == TransitionType.STROBE -> t.copy(type = TransitionType.EXPOSE)
+                    t.type.action -> t.copy(type = TransitionType.SNAPZOOM)
                     else -> t.copy(type = TransitionType.FADE_BLACK)
                 }
                 val inSpec = adapt(project.clips.getOrNull(index - 1)?.transitionOut)
@@ -454,6 +460,11 @@ class CompositionFactory(private val context: Context) {
                 val outUs = project.transitionHalfUs(index)
                 if ((inSpec != null && inUs > 0) || (outSpec != null && outUs > 0)) {
                     add(TransitionEffect(startUs, clip.outputUs, inSpec?.type, inUs, outSpec?.type, outUs))
+                }
+                // Azione 2026: anche le clip sulla traccia principale si muovono (la precedente prima del taglio, la successiva dopo).
+                if (multi) crossfades.filter { it.type.action && (it.index == index || it.index + 1 == index) }.forEach { cf ->
+                    val r = if (cf.index == index) ActionTransitionEffect.A_BELOW else ActionTransitionEffect.B_BELOW
+                    add(ActionTransitionEffect(cf.type, r, cf.cutUs - cf.beforeUs, cf.beforeUs + cf.afterUs, outW.toFloat() / outH))
                 }
                 // Sovrapposizione: anche sotto, sulla traccia principale, le luci si accendono come sopra.
                 if (multi) crossfades.filter { it.type == TransitionType.OVERLAY && (it.index == index || it.index + 1 == index) }.forEach { cf ->
