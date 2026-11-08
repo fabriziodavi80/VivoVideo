@@ -52,7 +52,7 @@ object TeleStore {
  * Disegno degli indicatori: un pannello per ognuno, nello stile scelto, con le parti che si muovono a tempo
  * (lancetta, cuore, pedivella, mappa, profilo). [u] = unità (1% del lato corto per la grandezza scelta).
  */
-class TeleRenderer(context: Context, private val t: Telemetry, private val track: TeleTrack) {
+class TeleRenderer(private val context: Context, private val t: Telemetry, private val track: TeleTrack) {
     private val accent = t.accent
     private val hot = 0xFFFF3D5A.toInt()
     private val ftp = if (t.ftp > 0) t.ftp else track.ftpAuto
