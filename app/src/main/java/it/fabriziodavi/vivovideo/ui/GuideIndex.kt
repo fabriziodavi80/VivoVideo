@@ -17,7 +17,7 @@ object GuideIndex {
         "Per iniziare" to listOf("Novità", "Primi passi", "Selezionare", "Tagliare e ordinare", "Progetto"),
         "Creare un video" to listOf("Video automatico", "Slideshow automatico", "Fare un tutorial", "Intervista doppia"),
         "Montare" to listOf("Fermo immagine", "Velocità", "Inquadra", "Keyframe", "Foto", "Transizioni", "Effetti", "Colore",
-            "Funzioni intelligenti", "Privacy", "Livelli"),
+            "Funzioni intelligenti", "Privacy", "Livelli", "Dati della pedalata"),
         "Audio" to listOf("Musica", "Taglio a ritmo", "Voce fuori campo", "Mixer", "Audio delle clip", "Jump cut"),
         "Testi" to listOf("Testo", "Sottotitoli", "Titoli di coda", "Font"),
         "Esportare e aiuto" to listOf("Esportare", "Collaudo", "Se qualcosa va storto", "Come provare"),
