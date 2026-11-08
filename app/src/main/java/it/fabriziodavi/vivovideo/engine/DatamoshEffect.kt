@@ -1,6 +1,8 @@
 package it.fabriziodavi.vivovideo.engine
 
 import android.content.Context
+import android.opengl.EGL14
+import android.opengl.EGLContext
 import android.opengl.GLES20
 import android.opengl.GLES30
 import androidx.media3.common.VideoFrameProcessingException
@@ -27,6 +29,13 @@ class DatamoshEffect(private val windows: List<LongRange>) : GlEffect {
 
     /** Avanzamento (0…1) nella finestra che contiene [t], o null. */
     fun progress(t: Long): Float? = windows.firstOrNull { t in it }?.let { w -> (t - w.first).toFloat() / max(1L, w.last - w.first) }
+
+    // Media3 ricrea gli effetti quando cambia clip (nuova serie di effetti): l'ultimo fotogramma della clip prima
+    // resta qui (stesso contesto GL) e il programma nuovo lo riprende, altrimenti al taglio non ci sarebbe nulla da trascinare.
+    private var keptCtx: EGLContext? = null
+    private var keptTex = 0; private var keptFbo = 0
+    private var keptW = 0; private var keptH = 0; private var keptHdr = false
+    private var keptT = Long.MIN_VALUE
 
     private inner class Program(private val hdr: Boolean) : BaseGlShaderProgram(hdr, 1) {
         private val flowProg = prog(FLOW)
@@ -67,8 +76,22 @@ class DatamoshEffect(private val windows: List<LongRange>) : GlEffect {
                 fw = (w + block - 1) / block; fh = (h + block - 1) / block
                 val prevFbo = IntArray(1)
                 GLES20.glGetIntegerv(GLES20.GL_FRAMEBUFFER_BINDING, prevFbo, 0)
-                if (!ready) { GLES20.glGenTextures(4, tex, 0); GLES20.glGenFramebuffers(4, fbo, 0) }
-                for (i in 0..2) makeTex(i, w, h, hdr)
+                val ctx = EGL14.eglGetCurrentContext()
+                val reuse = !ready && keptTex != 0 && keptCtx == ctx && keptW == w && keptH == h && keptHdr == hdr
+                if (!ready) {
+                    GLES20.glGenTextures(4, tex, 0); GLES20.glGenFramebuffers(4, fbo, 0)
+                    if (keptTex != 0 && keptCtx == ctx) {
+                        if (reuse) {
+                            // Il fotogramma "precedente" è quello lasciato dal programma di prima.
+                            GLES20.glDeleteTextures(1, tex, 0); GLES20.glDeleteFramebuffers(1, fbo, 0)
+                            tex[0] = keptTex; fbo[0] = keptFbo; lastT = keptT
+                        } else {
+                            GLES20.glDeleteTextures(1, intArrayOf(keptTex), 0); GLES20.glDeleteFramebuffers(1, intArrayOf(keptFbo), 0)
+                        }
+                    }
+                    keptTex = 0; keptFbo = 0; keptCtx = null
+                }
+                for (i in 0..2) if (!(reuse && i == 0)) makeTex(i, w, h, hdr)
                 makeTex(3, fw, fh, false)
                 GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, prevFbo[0])
                 ready = true
@@ -145,7 +168,16 @@ class DatamoshEffect(private val windows: List<LongRange>) : GlEffect {
 
         override fun release() {
             super.release()
-            runCatching { GLES20.glDeleteTextures(4, tex, 0); GLES20.glDeleteFramebuffers(4, fbo, 0) }
+            runCatching {
+                if (ready && lastT != Long.MIN_VALUE) {
+                    // Si tiene il fotogramma precedente per il programma che verrà (vedi keptTex).
+                    keptCtx = EGL14.eglGetCurrentContext(); keptTex = tex[0]; keptFbo = fbo[0]
+                    keptW = w; keptH = h; keptHdr = hdr; keptT = lastT
+                    GLES20.glDeleteTextures(3, tex, 1); GLES20.glDeleteFramebuffers(3, fbo, 1)
+                } else {
+                    GLES20.glDeleteTextures(4, tex, 0); GLES20.glDeleteFramebuffers(4, fbo, 0)
+                }
+            }
             try { flowProg.delete(); moshProg.delete(); copyProg.delete() } catch (e: GlUtil.GlException) { throw VideoFrameProcessingException(e) }
         }
     }
