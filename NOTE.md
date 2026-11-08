@@ -1,6 +1,6 @@
 # VivoVideo · note per riprendere il lavoro
 
-Aggiornate all'08/11/2026, ultima versione **v1.0.235** (build 235; emulatore 51/51 OK). La 1.0 è la v1.0.201; dalla 202 ci sono i jump cut. Da leggere insieme a `CLAUDE.md`.
+Aggiornate al 09/11/2026, ultima versione **v1.0.239** (stesso codice della 238; emulatore 50/51: falliscono a caso le prove di anteprima `previewPlaysWow`/`crossfadeSegmentRendersAndPlays` per lentezza dell'emulatore, codice anteprima non toccato; la 235 era 51/51). La 1.0 è la v1.0.201; dalla 202 ci sono i jump cut. Da leggere insieme a `CLAUDE.md`.
 
 ## 1. Stato attuale dell'app
 
@@ -111,7 +111,7 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, ML Kit, whisper.cpp e Sign
 
 ### Subito
 1. Da verificare: esportazione **HDR** con testi/sottotitoli (v1.0.205+): la riga Colore deve dire HDR, e i sottotitoli non devono essere troppo scuri o abbaglianti.
-2. Collaudo: tutto OK al 30/10 tranne `int_double` (v1.0.225) da provare (l'utente ha segnato OK azione e social l'08/11); nuove `sport_data`, `text_behind`, `str_datamosh`, `text_kinetic` (v1.0.234). Datamosh: Media3 ricrea gli effetti al cambio clip, l'ultimo fotogramma si conserva nel contesto GL (keptTex). Testo dietro (v1.0.235, KO dell'utente "non si legge"): posizione automatica BehindPlacement sopra le spalle + behindShow. Prossimo in lista: **Riconoscitore di ehm**.
+2. Collaudo: tutto OK al 30/10 tranne `int_double` (v1.0.225) da provare (l'utente ha segnato OK azione e social l'08/11); nuove `sport_data`, `text_behind`, `str_datamosh`, `text_kinetic` (v1.0.234). Datamosh: Media3 ricrea gli effetti al cambio clip, l'ultimo fotogramma si conserva nel contesto GL (keptTex). Testo dietro (v1.0.235, KO dell'utente "non si legge"): posizione automatica BehindPlacement sopra le spalle + behindShow (OK dell'utente). Cinetici (v1.0.238, KO "in anticipo" + "Testo" automatico): DTW in whisper_jni + Subtitles.snapToVoice/ordered, testo vuoto tolto alla chiusura; vanno rifatti i sottotitoli vecchi. Prossimo in lista: **Riconoscitore di ehm**.
 
 ### Dopo la 1.0, in quest'ordine
 1. ~~Jump cut pronti~~: fatti nella v1.0.202 (vedi sopra). Da migliorare se serve: micro-dissolvenze anche in anteprima (ora solo nell'esportato), "frasi importanti" con il testo di Whisper invece del solo volume.
