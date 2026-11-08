@@ -213,7 +213,7 @@ object Moments {
 }
 
 /** Cosa fare dello sfondo dietro alla persona. */
-enum class PersonMode(val label: String) { BLUR("Sfoca lo sfondo"), COLOR("Sfondo a colore"), MONO("Sfondo in bianco e nero"), REMOVE("Solo la persona"), STICKER("Contorno sticker") }
+enum class PersonMode(val label: String) { BLUR("Sfoca lo sfondo"), COLOR("Sfondo a colore"), MONO("Sfondo in bianco e nero"), REMOVE("Solo la persona"), STICKER("Contorno sticker"), KEEP("Sfondo invariato") }
 
 /** Scontorno della persona: [maskFile] = maschere già calcolate (dal tempo [fromUs] del file, [rateHz] al secondo). */
 @Serializable

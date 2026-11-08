@@ -82,6 +82,7 @@ object GuideIndex {
         Tool.KEYFRAME -> "Keyframe"
         Tool.TRANSITION -> "Transizioni"
         Tool.SLIDESHOW -> "Slideshow automatico"
+        Tool.SPORT -> "Dati della pedalata"
         Tool.MORE -> "Fermo immagine"
         Tool.MUSIC -> "Musica"
         Tool.TEXT -> "Testo"

@@ -1,5 +1,9 @@
 package it.fabriziodavi.vivovideo.ui
 
+import it.fabriziodavi.vivovideo.model.Telemetry
+import it.fabriziodavi.vivovideo.model.TeleSync
+import it.fabriziodavi.vivovideo.model.TeleParser
+import it.fabriziodavi.vivovideo.engine.TeleStore
 import it.fabriziodavi.vivovideo.model.TextAnim
 import it.fabriziodavi.vivovideo.model.TextItem
 import it.fabriziodavi.vivovideo.model.TransitionSpec
@@ -1482,8 +1486,41 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         if (personPrecise && !fx.precise) "Il modello preciso di Google non è disponibile ora (servono i servizi Google e internet la prima volta): ho usato quello veloce. $ok" else ok
 
     /** Scontorna la persona della clip (maschere calcolate una volta) e tratta lo sfondo come [mode]. */
-    fun cutPerson(mode: PersonMode = PersonMode.BLUR) {
-        val c = workClip() ?: return
+    /** Stile cinetico del testo scelto (o di tutti i sottotitoli). Un testo scritto a mano riceve i tempi delle parole. */
+    fun setKinetic(style: it.fabriziodavi.vivovideo.model.KineticStyle?, all: Boolean) {
+        val t = selectedText ?: return
+        if (all) {
+            update { p -> p.copy(texts = p.texts.map { x -> if (x.subtitle) x.copy(kinetic = style) else x }) }
+            return
+        }
+        updateText { x ->
+            x.copy(kinetic = style, highlight = if (style != null && x.highlight == TextItem().highlight) Subtitles.KINETIC_HIGHLIGHT else x.highlight)
+        }
+        if (style != null && t.text.isBlank()) message = "Scrivi il testo: le parole arriveranno una alla volta."
+    }
+
+    /**
+     * Testo dietro la persona: se una clip sotto al testo non ha ancora lo scontorno, lo fa (lasciando lo sfondo com'è).
+     */
+    fun setTextBehind(on: Boolean) {
+        val t = selectedText ?: return
+        updateText { it.copy(behindPerson = on) }
+        if (!on) return
+        val p = project ?: return
+        val starts = p.clipStartsUs()
+        val under = p.clips.filterIndexed { i, c -> !c.isPhoto && starts[i] < t.endUs && starts[i] + c.outputUs > t.startUs }
+        val missing = under.filter { it.person?.maskFile.isNullOrEmpty() }
+        when {
+            under.isEmpty() -> message = "Sotto al testo ci sono solo foto: il testo dietro la persona funziona sui video."
+            missing.isNotEmpty() -> {
+                if (missing.size > 1) message = "Scontorno la prima clip sotto al testo; per le altre: Effetti → Persona."
+                cutPerson(PersonMode.KEEP, missing.first())
+            }
+        }
+    }
+
+    fun cutPerson(mode: PersonMode = PersonMode.BLUR, target: Clip? = null) {
+        val c = target ?: workClip() ?: return
         if (c.isPhoto) { message = "Lo scontorno della persona è per i video."; return }
         val ctx = getApplication<Application>()
         runClipWork(if (personPrecise) "Scontorno preciso…" else "Scontorno la persona…") { prog ->
@@ -1492,7 +1529,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             val fx = PersonMasks.analyze(ctx, c.uri, from, to, mode, prog, personPrecise) { st -> viewModelScope.launch { if (clipWork != null) clipWork = st } }
             val now = project?.clips?.firstOrNull { it.id == c.id } ?: return@runClipWork
             update { it.replaceClip(now.copy(person = fx)) }
-            message = personMessage(fx, "Persona scontornata: scegli cosa fare dello sfondo.")
+            message = personMessage(fx, if (mode == PersonMode.KEEP) "Persona scontornata: il testo ora le passa dietro." else "Persona scontornata: scegli cosa fare dello sfondo.")
         }
     }
 
@@ -2517,6 +2554,90 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             q
         }
         if (removed > 0) message = "Per la transizione «${spec?.type?.label}» su tutti i tagli serve video oltre ogni taglio: ho accorciato le clip vicino ai tagli, ${formatSeconds(removed)} in tutto. Annulla per tornare com'era."
+    }
+
+    // ---- Dati della pedalata (Garmin, Strava) ----
+
+    fun updateTelemetry(keepUndo: Boolean = true, change: (Telemetry) -> Telemetry) =
+        update(keepUndo) { p -> p.telemetry?.let { p.copy(telemetry = change(it)) } }
+
+    fun removeTelemetry() = update { it.copy(telemetry = null) }
+
+    /** Legge il file dell'attività, lo copia nell'app e lo abbina ai video del progetto. */
+    fun importTelemetry(uri: Uri) {
+        val ctx = getApplication<Application>()
+        viewModelScope.launch {
+            busy = "Lettura dell'attività…"
+            val r = withContext(Dispatchers.IO) {
+                runCatching {
+                    val bytes = ctx.contentResolver.openInputStream(uri)!!.use { it.readBytes() }
+                    val track = TeleParser.parse(bytes) ?: return@runCatching null
+                    val name = ctx.contentResolver.query(uri, arrayOf(android.provider.OpenableColumns.DISPLAY_NAME), null, null, null)
+                        ?.use { c -> if (c.moveToFirst()) c.getString(0) else null } ?: "attività"
+                    val dir = File(ctx.filesDir, "telemetry").apply { mkdirs() }
+                    val dest = File(dir, "${System.currentTimeMillis()}.dat")
+                    dest.writeBytes(bytes)
+                    Triple(dest.absolutePath, name, track)
+                }.getOrNull()
+            }
+            busy = null
+            if (r == null) { message = "Questo file non contiene un'attività con i tempi (servono .fit, .gpx o .tcx)."; return@launch }
+            val (path, name, track) = r
+            val old = project?.telemetry
+            val t = (old ?: Telemetry(file = path, name = name)).copy(file = path, name = name, clipStartMs = emptyMap(), offsetMs = 0)
+            update { it.copy(telemetry = t) }
+            busy = "Abbino i video all'attività…"
+            syncTelemetryNow(force = true)
+            busy = null
+            val p = project ?: return@launch
+            val n = TeleSync.covered(p.telemetry ?: return@launch, track, p.clips)
+            val videos = p.clips.count { !it.isPhoto }
+            message = when {
+                n == 0 -> "Nessun video cade dentro l'attività (${formatClock(track.startMs)}–${formatClock(track.endMs)}): controlla che sia il giro giusto, o sposta i dati a mano."
+                n < videos -> "Dati abbinati a $n video su $videos (gli altri sono fuori dall'attività)."
+                else -> "Dati abbinati a tutti i video ($n)."
+            }
+        }
+    }
+
+    private fun formatClock(ms: Long): String {
+        val z = java.time.Instant.ofEpochMilli(ms).atZone(java.time.ZoneId.systemDefault())
+        return String.format(java.util.Locale.ITALIAN, "%02d/%02d %02d:%02d", z.dayOfMonth, z.monthValue, z.hour, z.minute)
+    }
+
+    /**
+     * Ora di inizio di ogni video del progetto (dalla data nel file, corretta con la posizione se c'è).
+     * Si fa per i video nuovi; con [force] per tutti.
+     */
+    fun syncTelemetry(force: Boolean = false) {
+        viewModelScope.launch { syncTelemetryNow(force) }
+    }
+
+    private suspend fun syncTelemetryNow(force: Boolean) {
+        val p = project ?: return
+        val t = p.telemetry ?: return
+        val ctx = getApplication<Application>()
+        val uris = (p.clips.filter { !it.isPhoto && !it.baked }.map { it.reversed?.uri ?: it.uri }).distinct()
+            .filter { force || it !in t.clipStartMs }
+        if (uris.isEmpty()) return
+        run {
+            val found = withContext(Dispatchers.IO) {
+                val track = TeleStore.load(t.file) ?: return@withContext emptyMap<String, Long>()
+                uris.mapNotNull { u ->
+                    runCatching {
+                        val m = android.media.MediaMetadataRetriever()
+                        try {
+                            m.setDataSource(ctx, Uri.parse(u))
+                            val date = TeleSync.parseVideoDate(m.extractMetadata(android.media.MediaMetadataRetriever.METADATA_KEY_DATE)) ?: return@runCatching null
+                            val dur = m.extractMetadata(android.media.MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull() ?: 0L
+                            val loc = TeleSync.parseVideoLocation(m.extractMetadata(android.media.MediaMetadataRetriever.METADATA_KEY_LOCATION))
+                            u to TeleSync.refineStart(track, date, dur, loc)
+                        } finally { m.release() }
+                    }.getOrNull()
+                }.toMap()
+            }
+            if (found.isNotEmpty()) update(keepUndo = false) { q -> q.telemetry?.let { q.copy(telemetry = it.copy(clipStartMs = it.clipStartMs + found)) } }
+        }
     }
 
     fun updateColor(keepUndo: Boolean = true, change: (ColorSettings) -> ColorSettings) =

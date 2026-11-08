@@ -88,7 +88,8 @@ varying vec2 vUv;
 void main() {
   vec2 local = (vUv - uRect.xy) / uRect.zw;
   if (local.x >= 0.0 && local.x <= 1.0 && local.y >= 0.0 && local.y <= 1.0) {
-    gl_FragColor = vec4(texture2D(uTex, local).rgb, 1.0);
+    // L'alfa può portare la maschera della persona (testo dietro): resta com'è.
+    gl_FragColor = texture2D(uTex, local);
     return;
   }
   // Sfondo: zoom del 10% in più, sfocatura larga a disco, un po' più scuro.

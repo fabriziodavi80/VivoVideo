@@ -234,6 +234,30 @@ class ScreenshotTest {
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/23_intervista.png")
     }
 
+    /** Dati della pedalata: schede Attività e Stile (con le anteprime degli stili). */
+    private fun sport(tab: Int, name: String) {
+        val ctx = ApplicationProvider.getApplicationContext<Application>()
+        val t0 = 1_793_527_200_000L
+        val pts = (0 until 300).joinToString("") { i ->
+            val time = java.time.Instant.ofEpochMilli(t0 + i * 1000L).toString()
+            "<trkpt lat=\"${45.8 + i * 0.0001}\" lon=\"${9.2 + kotlin.math.sin(i / 30.0) * 0.001}\"><ele>${400 + i / 3}</ele><time>$time</time><extensions><hr>${130 + i % 40}</hr><power>${200 + i % 90}</power><cad>88</cad></extensions></trkpt>"
+        }
+        val f = java.io.File(ctx.filesDir, "giro.gpx").apply { writeText("<gpx>$pts</gpx>") }
+        val vm = vm()
+        val p = vm.project!!
+        vm.openProject(p.copy(telemetry = it.fabriziodavi.vivovideo.model.Telemetry(file = f.absolutePath, name = "Giro del lago.gpx",
+            clipStartMs = p.clips.associate { c -> c.uri to t0 + 60_000 })), startPreview = false)
+        vm.selectedClipId = null
+        compose.setContent { VivoTheme { EditorScreen(vm, initialTool = Tool.SPORT, initialTab = tab) } }
+        compose.onRoot().captureRoboImage("build/outputs/roborazzi/$name")
+    }
+
+    @Config(qualifiers = "w412dp-h1500dp-xxhdpi")
+    @Test fun sportActivity() = sport(0, "28_dati_attivita.png")
+
+    @Config(qualifiers = "w412dp-h1500dp-xxhdpi")
+    @Test fun sportStyle() = sport(2, "29_dati_stile.png")
+
     @Test fun guide() {
         compose.setContent { VivoTheme { GuideScreen {} } }
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/14_guida.png")

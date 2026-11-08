@@ -151,6 +151,8 @@ import it.fabriziodavi.vivovideo.model.Clip
 import it.fabriziodavi.vivovideo.model.ClipStyle
 import it.fabriziodavi.vivovideo.model.StabMath
 import it.fabriziodavi.vivovideo.model.PersonMode
+import it.fabriziodavi.vivovideo.model.Subtitles
+import it.fabriziodavi.vivovideo.model.KineticStyle
 import it.fabriziodavi.vivovideo.model.ClipAttr
 import it.fabriziodavi.vivovideo.engine.ExportPreset
 import kotlin.math.ln
@@ -177,6 +179,7 @@ enum class Tool(val label: String, val icon: () -> ImageVector, val group: ToolG
     TRANSITION("Transizione", { VVIcons.Transition }, ToolGroup.EDIT),
     SLIDESHOW("Slideshow", { VVIcons.Movie }, ToolGroup.EDIT),
     FORMAT("Formato", { VVIcons.Fullscreen }, ToolGroup.EDIT),
+    SPORT("Dati sport", { VVIcons.Speed }, ToolGroup.EDIT),
     MORE("Altro", { VVIcons.Tune }, ToolGroup.EDIT, needsClip = true),
     MUSIC("Audio", { VVIcons.Music }, ToolGroup.AUDIO),
     TEXT("Testo", { VVIcons.Text }, ToolGroup.TEXT),
@@ -188,7 +191,7 @@ enum class Tool(val label: String, val icon: () -> ImageVector, val group: ToolG
 
 /** Strumenti della seconda riga di "Modifica" (Velocità diventa Durata sulle foto). */
 fun editTools(photo: Boolean) = listOf(
-    Tool.SPLIT, if (photo) Tool.DURATION else Tool.SPEED, Tool.FRAME, Tool.KEYFRAME, Tool.TRANSITION, Tool.SLIDESHOW, Tool.MORE,
+    Tool.SPLIT, if (photo) Tool.DURATION else Tool.SPEED, Tool.FRAME, Tool.KEYFRAME, Tool.TRANSITION, Tool.SLIDESHOW, Tool.SPORT, Tool.MORE,
 )
 
 /** Pannello che si apre toccando una voce della barra principale (null = mostra la seconda riga). */
@@ -282,6 +285,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
         relinkTarget = null
     }
     val fontPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) vm.addFont(uri) }
+    val telePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) vm.importTelemetry(uri) }
 
     /** Clip su cui lavorare: quella selezionata o, se nessuna, quella sotto l'indicatore. */
     fun targetClip() = vm.selectedClip ?: project.locate(vm.playheadUs)?.let { (i, _) -> project.clips[i] }
@@ -567,6 +571,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
         Tool.LAYER -> if (vm.selectedLayer != null) LAYER_TABS else emptyList()
         Tool.EFFECTS -> EFFECT_TABS
         Tool.COLOR -> COLOR_TABS
+        Tool.SPORT -> if (project.telemetry != null) SPORT_TABS else emptyList()
         else -> emptyList()
     }
     val panelBody: @Composable (Tool) -> Unit = { t ->
@@ -581,6 +586,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
             Tool.LAYER -> LayerPanel(vm, running, tab, pickLayer)
             Tool.SLIDESHOW -> SlideshowPanel(vm, running)
             Tool.FORMAT -> FormatPanel(vm, running)
+            Tool.SPORT -> TelemetryPanel(vm, running, tab) { telePicker.launch(arrayOf("*/*")) }
             Tool.EFFECTS -> EffectsPanel(vm, running, tab)
             Tool.COLOR -> ColorPanel(vm, running, tab) { lutPicker.launch(arrayOf("*/*")) }
             Tool.EXPORT -> ExportPanel(vm) { uri ->
@@ -1520,6 +1526,8 @@ private fun TextPanel(vm: EditorViewModel, running: Boolean, tab: Int, onPickFon
     )
     when (tab) {
         0 -> {
+            ToggleRow("Dietro la persona", t.behindPerson, enabled) { vm.setTextBehind(it) }
+            if (t.behindPerson) Hint("Il testo sta fra lo sfondo e la persona, che gli passa davanti. Serve lo scontorno della persona sulla clip (se manca lo fa l'app, lasciando lo sfondo com'è). Funziona meglio con un testo grande, dietro la testa o le spalle.")
             PanelLabel("Stili pronti")
             PillRow(PRESETS_NEW_FIRST, TextPreset.matching(t), { it?.label ?: "" }, enabled) { pr -> if (pr != null) vm.applyTextPreset(pr) }
             PanelLabel("Carattere")
@@ -1569,6 +1577,23 @@ private fun TextPanel(vm: EditorViewModel, running: Boolean, tab: Int, onPickFon
             ToggleRow("Tutto maiuscolo", t.upper, enabled) { v -> vm.updateText { it.copy(upper = v) } }
         }
         1 -> {
+            PanelLabel("Cinetico: una parola alla volta")
+            PillRow(listOf<KineticStyle?>(null) + KineticStyle.entries, t.kinetic, { it?.label ?: "No" }, enabled) { k -> vm.setKinetic(k, all = false) }
+            if (t.kinetic != null) {
+                Hint(t.kinetic.hint + ". Le parole importanti (numeri, parole lunghe, esclamazioni) prendono il colore di risalto." +
+                    if (t.subtitle) " Sui sottotitoli segue la voce." else " Le parole arrivano una ogni ~0,35 s.")
+                if (t.subtitle) SecondaryButton("Usa questo stile per tutti i sottotitoli", Modifier.fillMaxWidth(), onClick = { if (enabled) vm.setKinetic(t.kinetic, all = true) })
+                PanelLabel("Colore delle parole importanti")
+                Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    (listOf(Subtitles.KINETIC_HIGHLIGHT) + TEXT_COLORS).distinct().forEach { c ->
+                        Box(
+                            Modifier.size(30.dp).clip(RoundedCornerShape(15.dp)).background(Color(c))
+                                .border(if (c == t.highlight) 3.dp else 1.dp, if (c == t.highlight) VV.Tally else VV.Line, RoundedCornerShape(15.dp))
+                                .clickable(enabled = enabled) { vm.updateText { it.copy(highlight = c) } }
+                        )
+                    }
+                }
+            }
             PanelLabel("In entrata")
             PillRow(ANIMS_NEW_FIRST, t.animIn, { it.label }, enabled) { a -> vm.updateText { it.copy(animIn = a) } }
             PanelLabel("In uscita")

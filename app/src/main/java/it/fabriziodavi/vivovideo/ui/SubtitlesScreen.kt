@@ -34,6 +34,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import it.fabriziodavi.vivovideo.engine.Whisper
 import it.fabriziodavi.vivovideo.model.SubPosition
 import it.fabriziodavi.vivovideo.model.SubStyle
@@ -47,7 +48,7 @@ fun SubtitlesScreen(vm: EditorViewModel) {
     BackHandler { if (busy != null) vm.cancelSubtitles() else vm.showSubtitles = false }
     var model by remember { mutableStateOf(Whisper.defaultModel(ctx)) }
     var lang by remember { mutableStateOf("it") }
-    var style by remember { mutableStateOf(SubStyle.SOCIAL) }
+    var style by remember { mutableStateOf(SubStyle.POP) }
     var pos by remember { mutableStateOf(SubPosition.BOTTOM) }
     val existing = vm.project?.texts?.count { it.subtitle } ?: 0
 
@@ -89,13 +90,22 @@ fun SubtitlesScreen(vm: EditorViewModel) {
                     SubStyle.REVEAL -> buildAnnotatedString { append("Che bella giornata…") }
                     SubStyle.SOCIAL -> buildAnnotatedString { append("Che bella giornata") }
                     SubStyle.MINIMAL -> buildAnnotatedString { append("che bella giornata oggi") }
+                    // Cinetici: una parola alla volta, quelle importanti nel colore di risalto.
+                    SubStyle.POP, SubStyle.GLASS, SubStyle.CHROME, SubStyle.GLITCHY, SubStyle.WAVE -> buildAnnotatedString {
+                        withStyle(SpanStyle(color = Color(Subtitles.KINETIC_HIGHLIGHT), fontSize = 26.sp)) { append("GIORNATA") }
+                    }
                     else -> buildAnnotatedString { append("Che bella giornata oggi") }
                 }
                 Text(
                     sample, color = Color.White, fontWeight = FontWeight.Bold,
-                    modifier = if (style == SubStyle.BOX) Modifier.background(Color(0x99000000), RoundedCornerShape(6.dp)).padding(horizontal = 10.dp, vertical = 4.dp) else Modifier,
+                    modifier = when {
+                        style == SubStyle.BOX -> Modifier.background(Color(0x99000000), RoundedCornerShape(6.dp)).padding(horizontal = 10.dp, vertical = 4.dp)
+                        style == SubStyle.GLASS -> Modifier.background(Color(0x40FFFFFF), RoundedCornerShape(14.dp)).border(1.dp, Color(0x99FFFFFF), RoundedCornerShape(14.dp)).padding(horizontal = 14.dp, vertical = 4.dp)
+                        else -> Modifier
+                    },
                 )
             }
+            style.kinetic?.let { Hint(it.hint + ". Le parole importanti (numeri, parole lunghe, esclamazioni) si colorano da sole.") }
             PanelLabel("Posizione")
             Segmented(SubPosition.entries, pos, { it.label }, busy == null) { pos = it }
             if (existing > 0) Hint("Ci sono già $existing sottotitoli automatici: verranno sostituiti dai nuovi (Annulla per tornare indietro).")

@@ -401,10 +401,13 @@ class CompositionFactory(private val context: Context) {
         val multi = allowMulti && (videoLayers.isNotEmpty() || crossfades.isNotEmpty())
         // Con video sovrapposti, testi e immagini vanno sopra a tutto: effetti dell'intera composizione.
         fun overlaysFor(fromUs: Long, toUs: Long): List<androidx.media3.effect.TextureOverlay> {
-            val texts = project.texts.filter { t -> t.startUs < toUs && t.endUs > fromUs && t.text.isNotBlank() }
+            // I testi dietro alla persona li disegna TextBehindEffect dentro alle clip.
+            val texts = project.texts.filter { t -> t.startUs < toUs && t.endUs > fromUs && t.text.isNotBlank() && !t.behindPerson }
             // Senza compositore, i video sovrapposti si vedono come immagine ferma (posizione e movimento restano veri).
             val layers = project.layers.filter { l -> (!l.isVideo || !multi) && l.startUs < toUs && l.endUs > fromUs }
-            return layers.map { l -> LayerOverlay(context, l, outW, outH) } + texts.map { t -> TimedTextOverlay(context, t, outW, outH) }
+            // Dati della pedalata: sotto ai testi, sopra alle immagini.
+            val tele = TelemetryOverlay.all(context, project.telemetry, project.telemetryClips ?: project.clips, outW, outH)
+            return layers.map { l -> LayerOverlay(context, l, outW, outH) } + tele + texts.map { t -> TimedTextOverlay(context, t, outW, outH) }
         }
         /** Clip della traccia principale; [light] = solo per i tempi (invisibile, senza effetti). */
         fun mainItems(light: Boolean, removeAudio: Boolean) = project.clips.mapIndexed { index, clip ->
@@ -427,16 +430,21 @@ class CompositionFactory(private val context: Context) {
             val effects: List<Effect> = if (light) listOf(Presentation.createForWidthAndHeight(outW, outH, Presentation.LAYOUT_SCALE_TO_FIT)) else buildList<Effect> {
                 addAll(colorEffects(clip, project))
                 addAll(smartEffects(clip, startUs, outW, outH))
+                // Testo dietro la persona: la maschera passa nell'alfa fino a TextBehindEffect (dopo inquadratura e keyframe).
+                val behind = project.texts.filter { t -> t.behindPerson && t.text.isNotBlank() && t.startUs < startUs + clip.outputUs && t.endUs > startUs }
+                val masked = behind.isNotEmpty() && !clip.baked && !clip.isPhoto && clip.person?.maskFile?.isNotEmpty() == true
+                if (masked) clip.person?.let { fx ->
+                    add(PersonEffect(fx, stash = true) { t -> clip.trimStartUs + clip.speedCurve().sourceTimeAt(localTimeUs(t, startUs)) })
+                }
                 add(framing(clip, outW, outH))
                 if (clip.frame != Transform()) {
                     add(FrameTransformation(clip.frame, outW.toFloat() / outH))
                 }
-                if (clip.keyframes.isNotEmpty()) {
-                    if (clip.keyframes.any { it.value.x != 0f || it.value.y != 0f || it.value.scale != 1f || it.value.rotation != 0f }) {
-                        add(KeyframeTransformation(clip, outW.toFloat() / outH, startUs))
-                    }
-                    if (clip.keyframes.any { it.value.opacity != 1f }) add(KeyframeFade(clip, startUs))
+                if (clip.keyframes.any { it.value.x != 0f || it.value.y != 0f || it.value.scale != 1f || it.value.rotation != 0f }) {
+                    add(KeyframeTransformation(clip, outW.toFloat() / outH, startUs))
                 }
+                if (behind.isNotEmpty()) add(TextBehindEffect(behind, outW, outH, masked))
+                if (clip.keyframes.any { it.value.opacity != 1f }) add(KeyframeFade(clip, startUs))
                 if (clip.fx.isNotEmpty() || clip.fadeInUs > 0 || clip.fadeOutUs > 0) {
                     val needsBeats = clip.fx.any { f -> f.type.onBeats }
                     add(FxEffect(clip.fx, if (needsBeats) beats else emptyList(), startUs, clip.outputUs, clip.fadeInUs, clip.fadeOutUs, clip.fadeColor))
@@ -529,7 +537,7 @@ class CompositionFactory(private val context: Context) {
             return Composition.Builder(sequences)
                 .setHdrMode(hdrMode)
                 .setVideoCompositorSettings(LayerCompositorSettings(outW, outH, lanes, crossfades))
-                .setEffects(Effects(emptyList(), overlayEffects(ov)))
+                .setEffects(Effects(emptyList(), datamosh(project, starts) + overlayEffects(ov)))
                 .build()
         }
         val items = mainItems(light = false, removeAudio = nativeAudio != null)
@@ -550,9 +558,22 @@ class CompositionFactory(private val context: Context) {
         return Composition.Builder(sequences)
             .setHdrMode(hdrMode)
             // Niente effetti audio sull'uscita in anteprima: in Media3 sono ancora sperimentali (distorcevano).
+            .setEffects(Effects(emptyList(), datamosh(project, starts)))
             .build()
     }
 }
+
+/** Datamosh sui tagli che lo chiedono: dal taglio per la durata scelta (al massimo la clip dopo). */
+internal fun datamoshWindows(project: Project, starts: List<Long>): List<LongRange> =
+    project.clips.indices.toList().dropLast(1).mapNotNull { i ->
+        val spec = project.clips[i].transitionOut?.takeIf { it.type == TransitionType.DATAMOSH } ?: return@mapNotNull null
+        val cut = starts[i + 1]
+        val dur = minOf(spec.durationUs, project.clips[i + 1].outputUs).coerceAtLeast(100_000)
+        cut until cut + dur
+    }
+
+private fun datamosh(project: Project, starts: List<Long>): List<Effect> =
+    datamoshWindows(project, starts).takeIf { it.isNotEmpty() }?.let { listOf(DatamoshEffect(it)) } ?: emptyList()
 
 /** Media3 disegna al massimo 15 testi o immagini per strato (oltre dà errore: "more than 15 SDR overlays"). */
 internal const val MAX_OVERLAYS_PER_EFFECT = 15

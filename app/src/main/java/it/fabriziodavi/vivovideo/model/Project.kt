@@ -83,7 +83,9 @@ enum class TransitionType(val label: String) {
     SLICES("Tagli a fette"),
     TILES("Tessere"),
     BLADE("Lama di luce"),
-    STROBE("Strobo");
+    STROBE("Strobo"),
+    // 2027 (08/11/2026): i pixel della clip prima si sciolgono trascinati dal movimento della nuova.
+    DATAMOSH("Datamosh");
 
     /** Azione 2026: in cima al pannello, nei temi d'azione del video automatico. */
     val action: Boolean get() = this in ACTION
@@ -105,6 +107,7 @@ enum class TransitionType(val label: String) {
         TILES -> 650_000L
         BLADE -> 400_000L
         STROBE -> 500_000L
+        DATAMOSH -> 1_400_000L
         else -> null
     }
 
@@ -123,6 +126,7 @@ enum class TransitionType(val label: String) {
         TILES -> "Tessere: la clip nuova si compone a tessere che scoppiano in ordine casuale."
         BLADE -> "Lama di luce: un taglio diagonale velocissimo con una scia calda sul filo."
         STROBE -> "Strobo: le due clip si alternano tre volte a ritmo serrato, con un colpo di luce e di zoom a ogni scambio. Da mettere su un drop o su un colpo forte."
+        DATAMOSH -> "Datamosh: dopo il taglio l'immagine di prima resta e si scioglie, trascinata dal movimento della clip nuova, a blocchi come un video rotto; poi la clip nuova emerge a tasselli. Più la clip nuova si muove, più l'effetto è forte. Parte sul taglio: 1–2 s."
         MASK_PASS -> "Passaggio con maschera: dopo il taglio la persona della clip prima resta davanti mentre dietro arriva già la clip successiva, poi svanisce. Serve lo scontorno della persona sulla clip prima del taglio (Effetti → Persona)."
         else -> null
     }
@@ -134,7 +138,7 @@ enum class TransitionType(val label: String) {
 
     /** Transizioni adatte a uno slideshow "vario" (quelle più nervose solo se scelte apposta). */
     val soft: Boolean get() = this !in setOf(GLITCH, PIXELATE, SHAKE, RGB, PUNCH, TEAR, STRIPES, SHUTTER, BURST, SPEEDZOOM, SMASH, SQUASH, REWIND,
-        BLACKOUT, EXPOSE, CAMSHAKE, SNAPZOOM, STEPS, INVISIBLE, MASK_PASS, IMPACT, SWIPE, SLICES, TILES, BLADE, STROBE)
+        BLACKOUT, EXPOSE, CAMSHAKE, SNAPZOOM, STEPS, INVISIBLE, MASK_PASS, IMPACT, SWIPE, SLICES, TILES, BLADE, STROBE, DATAMOSH)
 
     /** Transizioni d'impatto, da mettere sui colpi forti della musica. */
     val punchy: Boolean get() = this in setOf(PUNCH, FLASH, RGB, GLITCH, SHAKE, WHIP, SPIN, SLIDE_UP, ZOOM, SWIRL, TEAR, BURST, STRIPES, SHUTTER, SPEEDZOOM, SMASH, SQUASH, REWIND,
@@ -542,6 +546,10 @@ data class TextItem(
     val highlight: Int = 0xFFF2B33D.toInt(),
     /** Titoli di coda: il testo (più righe) scorre dal basso in alto a velocità costante per tutta la durata. */
     val roll: Boolean = false,
+    /** Dietro alla persona: il testo sta fra lo sfondo e la persona scontornata (serve lo scontorno sulla clip). */
+    val behindPerson: Boolean = false,
+    /** Sottotitoli cinetici: una parola alla volta, grande, con le parole importanti colorate e animate. */
+    val kinetic: KineticStyle? = null,
 ) {
     val endUs: Long get() = startUs + durationUs
 
@@ -843,6 +851,10 @@ data class Project(
     val mix: Mix = Mix(),
     /** Video e foto come sono stati importati (interi, in ordine di importazione): per "Torna ai video originali". */
     val originals: List<Clip> = emptyList(),
+    /** Dati della pedalata (Garmin/Strava) mostrati sul video. */
+    val telemetry: Telemetry? = null,
+    /** Solo in anteprima, con i pezzi preparati: le clip vere, per sapere quale istante dell'attività mostrare. */
+    @kotlinx.serialization.Transient val telemetryClips: List<Clip>? = null,
 ) {
     /**
      * I video e le foto di partenza: quelli ricordati all'importazione; per i progetti fatti prima, ricostruiti dalle clip

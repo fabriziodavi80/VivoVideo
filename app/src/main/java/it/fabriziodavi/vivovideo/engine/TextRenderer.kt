@@ -17,6 +17,7 @@ import android.util.LruCache
 import androidx.media3.common.OverlaySettings
 import androidx.media3.effect.StaticOverlaySettings
 import it.fabriziodavi.vivovideo.R
+import it.fabriziodavi.vivovideo.model.Keywords
 import it.fabriziodavi.vivovideo.model.TextAnim
 import it.fabriziodavi.vivovideo.model.TextFont
 import it.fabriziodavi.vivovideo.model.TextItem
@@ -569,6 +570,10 @@ class TimedTextOverlay(
     override fun getBitmap(presentationTimeUs: Long): Bitmap {
         val local = presentationTimeUs - item.startUs
         val dur = item.durationUs
+        // Cinetico: una parola alla volta (il movimento lo fanno le impostazioni del livello).
+        if (item.kinetic != null && item.text.isNotBlank()) {
+            KineticText.bitmap(context, item, frameW, frameH, local)?.let { return it }
+        }
         // Lettera per lettera (uscita prima: se il testo è corto vince la fine).
         if (item.animOut.letters) {
             val ou = lettersOutUs(item)
@@ -631,6 +636,14 @@ class TimedTextOverlay(
     override fun getOverlaySettings(presentationTimeUs: Long): OverlaySettings {
         val local = presentationTimeUs - item.startUs
         if (item.roll) return rollSettings(local, item.durationUs)
+        val kin = item.kinetic
+        if (kin != null && item.text.isNotBlank()) {
+            val (k, since) = KineticText.current(item, local)
+            if (k < 0) return overlaySettings(0f, 1f, item.rotation, item.x, item.y)
+            val key = Keywords.isKey(KineticText.words(item)[k])
+            val m = KineticText.motion(kin, key, k, since, local, item.durationUs)
+            return overlaySettings(m.alpha, m.scale, item.rotation + m.rotation, item.x, item.y + m.dy)
+        }
         val f = animFactors(item.animIn, item.animOut, local, item.durationUs)
         var x = item.x; var y = item.y; var scale = 1f; var rot = item.rotation; var alpha = 1f
         item.endPose?.let { e ->

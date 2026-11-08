@@ -169,6 +169,7 @@ object CrossfadePreview {
         // Se qualcosa non torna (durate diverse) meglio l'anteprima normale.
         val result = p.copy(
             clips = out,
+            telemetryClips = p.telemetryClips ?: p.clips,
             layers = p.layers.filterNot { l -> l.isVideo && ready.any { j -> j.cf == null && l.startUs >= j.startUs - SNAP_US && l.endUs <= j.endUs + SNAP_US } },
         )
         return if (kotlin.math.abs(result.durationUs - p.durationUs) > 30_000) p else result

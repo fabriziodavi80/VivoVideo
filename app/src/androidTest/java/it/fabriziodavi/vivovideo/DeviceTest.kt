@@ -20,6 +20,12 @@ import it.fabriziodavi.vivovideo.engine.VoiceChain
 import it.fabriziodavi.vivovideo.engine.VoiceRecorder
 import it.fabriziodavi.vivovideo.engine.Decoders
 import it.fabriziodavi.vivovideo.engine.Whisper
+import it.fabriziodavi.vivovideo.model.TeleItem
+import it.fabriziodavi.vivovideo.model.TeleLayout
+import it.fabriziodavi.vivovideo.model.TeleSlot
+import it.fabriziodavi.vivovideo.model.TeleStyle
+import it.fabriziodavi.vivovideo.model.TeleWidget
+import it.fabriziodavi.vivovideo.model.Telemetry
 import it.fabriziodavi.vivovideo.model.Subtitles
 import it.fabriziodavi.vivovideo.model.SubStyle
 import it.fabriziodavi.vivovideo.model.SubPosition
@@ -900,6 +906,117 @@ class DeviceTest {
         } + video("tutti", videoA, s = 500_000, e = 3_000_000).copy(fx = social.map { ClipFx(it) }, transitionOut = TransitionSpec(TransitionType.CROSSFADE, 600_000)) +
             video("dopo", videoB, s = 0, e = 2_000_000).copy(fx = listOf(ClipFx(FxType.CHROME), ClipFx(FxType.STEPZOOM)))
         exportAndCheck(Project(name = "social", clips = clips))
+    }
+
+    /** Un giro finto (GPX) di 5 minuti, dal 1/11/2026 alle 10:00 UTC, con battito, potenza, cadenza e quota. */
+    private fun rideFile(): File {
+        val t0 = 1_793_527_200_000L
+        val pts = (0 until 300).joinToString("") { i ->
+            val time = java.time.Instant.ofEpochMilli(t0 + i * 1000L).toString()
+            "<trkpt lat=\"${45.8 + i * 0.0001}\" lon=\"${9.2 + kotlin.math.sin(i / 30.0) * 0.001}\"><ele>${400 + i / 3.0}</ele><time>$time</time>" +
+                "<extensions><hr>${130 + i % 40}</hr><power>${200 + i % 90}</power><cad>88</cad><atemp>15</atemp></extensions></trkpt>"
+        }
+        return File(dir(), "giro.gpx").apply { writeText("<gpx>$pts</gpx>") }
+    }
+
+    private fun rideProject(style: TeleStyle): Project {
+        val t0 = 1_793_527_200_000L
+        val clips = listOf(video("a", videoA, s = 0, e = 3_000_000), video("b", videoB, s = 1_000_000, e = 4_000_000).copy(transitionOut = null))
+        val tele = Telemetry(file = rideFile().absolutePath, name = "giro", items = TeleLayout.FULL.items + TeleItem(TeleWidget.TIME, TeleSlot.RIGHT),
+            style = style, clipStartMs = mapOf(videoA.toString() to t0 + 30_000, videoB.toString() to t0 + 120_000))
+        return Project(name = "dati", clips = clips, telemetry = tele)
+    }
+
+    /** Dati della pedalata: tutti gli indicatori nel video esportato, in due stili, e l'anteprima che scorre. */
+    @Test fun exportTelemetry() {
+        exportAndCheck(rideProject(TeleStyle.GLASS))
+        exportAndCheck(rideProject(TeleStyle.RACE), multi = false)
+    }
+
+    @Test fun previewPlaysTelemetry() {
+        playFor(rideProject(TeleStyle.HUD), minFps = 3f)
+    }
+
+    /**
+     * Testo dietro la persona: maschera "persona" sulla metà sinistra, testo verde grande al centro.
+     * Nel video esportato il verde deve esserci solo a destra (sullo sfondo).
+     */
+    @Test fun exportTextBehindPerson() {
+        val a = makeMotionVideo("moto_a.mp4", 4, Color.rgb(150, 20, 20))
+        val side = 256; val n = 70
+        val maskFile = File(dir(), "maschera_sinistra_testo.bin")
+        java.io.DataOutputStream(maskFile.outputStream().buffered()).use { o ->
+            o.writeInt(n); o.writeInt(side)
+            val one = ByteArray(side * side) { i -> if (i % side < side / 2) 255.toByte() else 0 }
+            repeat(n) { o.write(one) }
+        }
+        val fx = PersonFx(mode = PersonMode.KEEP, maskFile = maskFile.absolutePath, fromUs = 0, rateHz = 15, count = n)
+        val text = TextItem(text = "DIETRO DIETRO", startUs = 0, durationUs = 2_000_000, size = 0.22f, color = Color.GREEN,
+            look = TextLook.SEMPLICE, animIn = TextAnim.NONE, animOut = TextAnim.NONE, behindPerson = true)
+        val p = Project(name = "dietro", clips = listOf(
+            Clip(id = "a", uri = a.toString(), sourceDurationUs = 4_000_000, trimStartUs = 0, trimEndUs = 2_000_000, width = W, height = H, fps = 60f, person = fx),
+        ), texts = listOf(text))
+        val uri = exportAndCheckUri(p, multi = false)
+        val r = MediaMetadataRetriever()
+        var left = 0; var right = 0
+        try {
+            r.setDataSource(ctx, uri)
+            val bm = r.getFrameAtTime(1_000_000, MediaMetadataRetriever.OPTION_CLOSEST)!!
+            for (y in 0 until bm.height step 3) for (x in 0 until bm.width step 3) {
+                val px = bm.getPixel(x, y)
+                if (Color.green(px) > 150 && Color.red(px) < 110 && Color.blue(px) < 110) {
+                    if (x < bm.width * 0.44f) left++ else if (x > bm.width * 0.56f) right++
+                }
+            }
+            bm.recycle()
+        } finally { r.release() }
+        android.util.Log.i("VivoVideoTest", "testo dietro: verde a sinistra $left, a destra $right")
+        assertTrue("testo dietro la persona: verde a sinistra $left, a destra $right", right > 300 && left < right / 15)
+    }
+
+    /**
+     * Datamosh: dopo il taglio dal rosso al blu, per un po' resta il rosso (trascinato), alla fine c'è il blu.
+     */
+    @Test fun exportDatamosh() {
+        val a = makeMotionVideo("moto_a.mp4", 4, Color.rgb(150, 20, 20))
+        val b = makeMotionVideo("moto_b.mp4", 4, Color.rgb(20, 20, 150))
+        val p = Project(name = "datamosh", clips = listOf(
+            Clip(id = "a", uri = a.toString(), sourceDurationUs = 4_000_000, trimStartUs = 0, trimEndUs = 2_000_000, width = W, height = H, fps = 60f,
+                transitionOut = TransitionSpec(TransitionType.DATAMOSH, 1_400_000)),
+            Clip(id = "b", uri = b.toString(), sourceDurationUs = 4_000_000, trimStartUs = 0, trimEndUs = 2_000_000, width = W, height = H, fps = 60f),
+        ))
+        val uri = exportAndCheckUri(p, multi = false)
+        val r = MediaMetadataRetriever()
+        fun tone(t: Long): Char {
+            val bm = r.getFrameAtTime(t, MediaMetadataRetriever.OPTION_CLOSEST)!!
+            var rr = 0L; var bb = 0L
+            for (y in 0 until bm.height step 8) for (x in 0 until bm.width step 8) { val px = bm.getPixel(x, y); rr += Color.red(px); bb += Color.blue(px) }
+            bm.recycle()
+            return if (rr > bb * 2) 'R' else if (bb > rr * 2) 'B' else '?'
+        }
+        try {
+            r.setDataSource(ctx, uri)
+            val early = tone(2_250_000); val late = tone(3_900_000); val before = tone(1_500_000)
+            android.util.Log.i("VivoVideoTest", "datamosh: prima $before, subito dopo il taglio $early, alla fine $late")
+            assertEquals('R', before)
+            assertEquals("subito dopo il taglio deve restare l'immagine di prima", 'R', early)
+            assertEquals('B', late)
+        } finally { r.release() }
+    }
+
+    @Test fun previewPlaysDatamosh() {
+        val clips = listOf(video("a", videoA, s = 0, e = 3_000_000).copy(transitionOut = TransitionSpec(TransitionType.DATAMOSH, 1_400_000)),
+            video("b", videoB, s = 0, e = 4_000_000))
+        playFor(Project(name = "datamosh", clips = clips), minFps = 3f)
+    }
+
+    /** Sottotitoli cinetici di tutti gli stili (uno anche dietro la persona senza maschera: si disegna normale). */
+    @Test fun exportKineticTexts() {
+        val texts = it.fabriziodavi.vivovideo.model.KineticStyle.entries.mapIndexed { i, k ->
+            TextItem(text = "Che salita incredibile 2026!", startUs = i * 1_000_000L, durationUs = 1_000_000, size = 0.07f, kinetic = k,
+                subtitle = true, wordsUs = listOf(0, 200_000, 400_000, 600_000), highlight = Subtitles.KINETIC_HIGHLIGHT, behindPerson = i == 2)
+        } + TextItem(text = "Titolo cinetico", startUs = 0, durationUs = 2_000_000, kinetic = it.fabriziodavi.vivovideo.model.KineticStyle.POP, y = -0.3f)
+        exportAndCheck(Project(name = "cinetici", clips = listOf(video("a", videoA, s = 0, e = 6_000_000)), texts = texts))
     }
 
     /** Tendenze 2026: le nuove transizioni, gli effetti combinati nella stessa scena (con i battiti) e i nuovi testi. */

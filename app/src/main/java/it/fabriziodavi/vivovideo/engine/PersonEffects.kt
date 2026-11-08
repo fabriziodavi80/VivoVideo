@@ -286,11 +286,11 @@ object FrameReader {
  * Lo sfondo dietro alla persona: sfocato, a colore, in bianco e nero, o trasparente (solo la persona).
  * [srcTimeUs] porta il tempo del montaggio al tempo del file, dove vivono le maschere.
  */
-class PersonEffect(private val fx: PersonFx, private val srcTimeUs: (Long) -> Long) : GlEffect {
-    override fun toGlShaderProgram(context: Context, useHdr: Boolean): GlShaderProgram = PersonProgram(fx, srcTimeUs, useHdr)
+class PersonEffect(private val fx: PersonFx, private val stash: Boolean = false, private val srcTimeUs: (Long) -> Long) : GlEffect {
+    override fun toGlShaderProgram(context: Context, useHdr: Boolean): GlShaderProgram = PersonProgram(fx, stash, srcTimeUs, useHdr)
 }
 
-private class PersonProgram(private val fx: PersonFx, private val srcTimeUs: (Long) -> Long, useHdr: Boolean) : BaseGlShaderProgram(useHdr, 1) {
+private class PersonProgram(private val fx: PersonFx, private val stash: Boolean, private val srcTimeUs: (Long) -> Long, useHdr: Boolean) : BaseGlShaderProgram(useHdr, 1) {
     private val program: GlProgram = try { GlProgram(VERTEX, HdrGl.fragment(PERSON_FRAGMENT, useHdr)) } catch (e: GlUtil.GlException) { throw VideoFrameProcessingException(e) }
     private val masks = PersonMasks.load(fx.maskFile)
     private val tex = IntArray(2)
@@ -346,6 +346,7 @@ private class PersonProgram(private val fx: PersonFx, private val srcTimeUs: (Lo
             program.setSamplerTexIdUniform("uMaskB", tex[1], 2)
             program.setFloatsUniform("uMix", floatArrayOf(mix))
             program.setFloatsUniform("uMode", floatArrayOf(fx.mode.ordinal.toFloat()))
+            program.setFloatsUniform("uStash", floatArrayOf(if (stash) 1f else 0f))
             val c = fx.color
             program.setFloatsUniform("uColor", floatArrayOf(((c shr 16) and 255) / 255f, ((c shr 8) and 255) / 255f, (c and 255) / 255f, 1f))
             program.setFloatsUniform("uTexel", floatArrayOf(1f / w, 1f / h))
@@ -383,6 +384,7 @@ uniform sampler2D uMaskA;
 uniform sampler2D uMaskB;
 uniform float uMix;
 uniform float uMode;
+uniform float uStash;
 uniform vec4 uColor;
 uniform vec2 uTexel;
 varying vec2 vUv;
@@ -438,7 +440,7 @@ void main() {
   float alpha = (uMode > 2.5 && uMode < 3.5) ? m * src.a : src.a;
   vec3 outc = mix(bg, src.rgb, m);
   // Contorno sticker: un bordo bianco pieno attorno alla persona, come un adesivo ritagliato (con un'ombra leggera).
-  if (uMode > 3.5) {
+  if (uMode > 3.5 && uMode < 4.5) {
     float dil = 0.0; float sh = 0.0;
     for (int i = 0; i < 16; i++) {
       float a = float(i) * 0.3927;
@@ -451,6 +453,11 @@ void main() {
     float ring = smoothstep(0.35, 0.6, dil) * (1.0 - m);
     float shadow = smoothstep(0.35, 0.6, sh) * (1.0 - m) * (1.0 - ring);
     outc = mix(outc * (1.0 - 0.35 * shadow), vec3(1.0), ring);
+  }
+  // Testo dietro la persona: la maschera viaggia nel canale alfa fino a TextBehindEffect (che lo rimette pieno).
+  if (uStash > 0.5) {
+    gl_FragColor = vec4(src.rgb, m);
+    return;
   }
   gl_FragColor = vec4(outc, alpha);
 }

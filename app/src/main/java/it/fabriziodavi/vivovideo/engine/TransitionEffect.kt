@@ -122,6 +122,8 @@ class TransitionEffect(
         TransitionType.WIPE, TransitionType.WIPE_DIAG, TransitionType.CLOCK, TransitionType.STEPS,
         TransitionType.OVERLAY, TransitionType.MASK_PASS,
         TransitionType.IMPACT, TransitionType.SWIPE, TransitionType.SLICES, TransitionType.TILES, TransitionType.BLADE, TransitionType.STROBE -> Params()
+        // Lo fa DatamoshEffect su tutto il montaggio (serve il fotogramma prima del taglio).
+        TransitionType.DATAMOSH -> Params()
     }
 }
 
