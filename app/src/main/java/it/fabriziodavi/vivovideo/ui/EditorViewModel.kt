@@ -2,6 +2,7 @@ package it.fabriziodavi.vivovideo.ui
 
 import it.fabriziodavi.vivovideo.model.Telemetry
 import it.fabriziodavi.vivovideo.model.TeleSync
+import it.fabriziodavi.vivovideo.model.BehindPlacement
 import it.fabriziodavi.vivovideo.model.TeleParser
 import it.fabriziodavi.vivovideo.engine.TeleStore
 import it.fabriziodavi.vivovideo.model.TextAnim
@@ -1514,12 +1515,48 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             under.isEmpty() -> message = "Sotto al testo ci sono solo foto: il testo dietro la persona funziona sui video."
             missing.isNotEmpty() -> {
                 if (missing.size > 1) message = "Scontorno la prima clip sotto al testo; per le altre: Effetti → Persona."
-                cutPerson(PersonMode.KEEP, missing.first())
+                cutPerson(PersonMode.KEEP, missing.first()) { done -> placeBehind(t.id, done) }
             }
+            else -> placeBehind(t.id, under.first())
         }
     }
 
-    fun cutPerson(mode: PersonMode = PersonMode.BLUR, target: Clip? = null) {
+    /**
+     * Mette il testo [textId] dove si legge dietro alla persona della clip [clip]: grande, sopra le spalle, con la testa
+     * che ne copre solo la parte bassa (vedi BehindPlacement). Si può sempre spostare a mano dopo.
+     */
+    fun placeBehind(textId: String, clip: Clip? = null) {
+        val p = project ?: return
+        val t = p.texts.firstOrNull { it.id == textId } ?: return
+        val starts = p.clipStartsUs()
+        val c = clip?.let { k -> p.clips.firstOrNull { it.id == k.id } }
+            ?: p.clips.filterIndexed { i, k -> !k.isPhoto && starts[i] < t.endUs && starts[i] + k.outputUs > t.startUs }.firstOrNull { !it.person?.maskFile.isNullOrEmpty() }
+            ?: run { message = "Prima serve lo scontorno della persona sulla clip sotto al testo."; return }
+        val fx = c.person?.takeIf { it.maskFile.isNotEmpty() } ?: return
+        val idx = p.clips.indexOfFirst { it.id == c.id }
+        val (fw, fh) = factory.outputSize(p, 1080)
+        viewModelScope.launch {
+            val spot = withContext(Dispatchers.IO) {
+                val m = PersonMasks.load(fx.maskFile) ?: return@withContext null
+                val from = maxOf(t.startUs, starts[idx]); val to = minOf(t.endUs, starts[idx] + c.outputUs)
+                val frames = (0 until 8).mapNotNull { k ->
+                    val tl = from + (to - from) * (k + 0.5) / 8
+                    val (uri, fileUs) = TeleSync.sourceAt(p.clips, tl.toLong()) ?: return@mapNotNull null
+                    if (uri != c.uri && uri != c.reversed?.uri) return@mapNotNull null
+                    val f = ((fileUs - fx.fromUs) * fx.rateHz / 1_000_000L).toInt().coerceIn(0, m.count - 1)
+                    val b = m.slice(f); ByteArray(b.remaining()).also { b.get(it) }
+                }
+                BehindPlacement.place(frames, m.side, fw, fh, t.text, t.upper)
+            }
+            if (spot == null) { message = "Non trovo la persona nella clip sotto al testo: mettilo tu dove vuoi."; return@launch }
+            val now = project?.texts?.firstOrNull { it.id == textId } ?: return@launch
+            update { it.replaceText(now.copy(x = spot.x, y = spot.y, size = spot.size, behindShow = spot.show, endPose = null)) }
+            message = if (spot.tight) "Sopra la testa non c'è spazio: ho messo il testo in alto e si legge un po' anche attraverso la persona (Si legge attraverso)."
+                else "Testo messo dietro la testa: la persona ne copre solo la parte bassa. Puoi spostarlo come vuoi."
+        }
+    }
+
+    fun cutPerson(mode: PersonMode = PersonMode.BLUR, target: Clip? = null, onDone: ((Clip) -> Unit)? = null) {
         val c = target ?: workClip() ?: return
         if (c.isPhoto) { message = "Lo scontorno della persona è per i video."; return }
         val ctx = getApplication<Application>()
@@ -1530,6 +1567,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             val now = project?.clips?.firstOrNull { it.id == c.id } ?: return@runClipWork
             update { it.replaceClip(now.copy(person = fx)) }
             message = personMessage(fx, if (mode == PersonMode.KEEP) "Persona scontornata: il testo ora le passa dietro." else "Persona scontornata: scegli cosa fare dello sfondo.")
+            onDone?.invoke(now.copy(person = fx))
         }
     }
 

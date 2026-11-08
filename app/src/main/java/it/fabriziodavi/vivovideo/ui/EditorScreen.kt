@@ -1527,7 +1527,13 @@ private fun TextPanel(vm: EditorViewModel, running: Boolean, tab: Int, onPickFon
     when (tab) {
         0 -> {
             ToggleRow("Dietro la persona", t.behindPerson, enabled) { vm.setTextBehind(it) }
-            if (t.behindPerson) Hint("Il testo sta fra lo sfondo e la persona, che gli passa davanti. Serve lo scontorno della persona sulla clip (se manca lo fa l'app, lasciando lo sfondo com'è). Funziona meglio con un testo grande, dietro la testa o le spalle.")
+            if (t.behindPerson) {
+                Hint("Il testo sta fra lo sfondo e la persona, che gli passa davanti. L'app lo mette grande sopra le spalle, con la testa che ne copre solo la parte bassa, così si legge. Serve lo scontorno della persona (se manca lo fa l'app, lasciando lo sfondo com'è).")
+                SecondaryButton("Rimetti dietro la testa", onClick = { if (enabled) vm.placeBehind(t.id) })
+                LabeledSlider("Si legge attraverso la persona", null, (t.behindShow * 100).toInt(), enabled, range = 0..60, format = { if (it == 0) "no" else "$it%" }) { v ->
+                    vm.updateText { it.copy(behindShow = v / 100f) }
+                }
+            }
             PanelLabel("Stili pronti")
             PillRow(PRESETS_NEW_FIRST, TextPreset.matching(t), { it?.label ?: "" }, enabled) { pr -> if (pr != null) vm.applyTextPreset(pr) }
             PanelLabel("Carattere")

@@ -60,6 +60,7 @@ class TextBehindEffect(
                 program.setSamplerTexIdUniform("uTex", inputTexId, 0)
                 program.setFloatsUniform("uRes", floatArrayOf(w, h))
                 program.setFloatsUniform("uMasked", floatArrayOf(if (masked) 1f else 0f))
+                var show = 0f
                 val active = items.indices.filter { presentationTimeUs >= items[it].startUs && presentationTimeUs < items[it].endUs }.take(MAX)
                 for (slot in 0 until MAX) {
                     val i = active.getOrNull(slot)
@@ -79,12 +80,14 @@ class TextBehindEffect(
                         k.copyInto(place, 0, 0, 4)
                         rot[0] = k[4]; rot[1] = k[5]
                         alpha = st.alphaScale
+                        show = maxOf(show, items[i].behindShow.coerceIn(0f, 0.9f))
                     }
                     program.setSamplerTexIdUniform("uText$slot", tex[slot], slot + 1)
                     program.setFloatsUniform("uPlace$slot", place)
                     program.setFloatsUniform("uRot$slot", rot)
                     program.setFloatsUniform("uAlpha$slot", floatArrayOf(alpha))
                 }
+                program.setFloatsUniform("uShow", floatArrayOf(show))
                 program.bindAttributesAndUniforms()
                 GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
             } catch (e: GlUtil.GlException) {
@@ -143,6 +146,7 @@ uniform float uAlpha1;
 uniform float uAlpha2;
 uniform vec2 uRes;
 uniform float uMasked;
+uniform float uShow;
 varying vec2 vUv;
 
 vec4 textAt(sampler2D t, vec4 place, vec2 rot, float alpha, vec2 px) {
@@ -166,7 +170,8 @@ void main() {
   vec4 t2 = textAt(uText2, uPlace2, uRot2, uAlpha2, px);
   col = t2.rgb + col * (1.0 - t2.a);
   // Dove c'è la persona (alfa alto) resta il video: il testo le passa dietro.
-  float person = uMasked > 0.5 ? smoothstep(0.35, 0.65, src.a) : 0.0;
+  // Con uShow il testo si legge un po' anche attraverso la persona.
+  float person = uMasked > 0.5 ? smoothstep(0.35, 0.65, src.a) * (1.0 - uShow) : 0.0;
   gl_FragColor = vec4(mix(col, src.rgb, person), 1.0);
 }
 """

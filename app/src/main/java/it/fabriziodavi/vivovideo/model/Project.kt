@@ -548,6 +548,8 @@ data class TextItem(
     val roll: Boolean = false,
     /** Dietro alla persona: il testo sta fra lo sfondo e la persona scontornata (serve lo scontorno sulla clip). */
     val behindPerson: Boolean = false,
+    /** Dietro alla persona: quanto il testo si legge anche attraverso la persona (0 = per niente, 0,6 = molto). */
+    val behindShow: Float = 0f,
     /** Sottotitoli cinetici: una parola alla volta, grande, con le parole importanti colorate e animate. */
     val kinetic: KineticStyle? = null,
 ) {

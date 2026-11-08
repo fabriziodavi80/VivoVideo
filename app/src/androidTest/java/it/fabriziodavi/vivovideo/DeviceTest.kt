@@ -974,6 +974,38 @@ class DeviceTest {
         assertTrue("testo dietro la persona: verde a sinistra $left, a destra $right", right > 300 && left < right / 15)
     }
 
+    /** Testo dietro la persona con "Si legge attraverso": le lettere bianche si vedono anche sulla persona (a sinistra). */
+    @Test fun exportTextBehindShowThrough() {
+        val a = makeMotionVideo("moto_a.mp4", 4, Color.rgb(150, 20, 20))
+        val side = 256; val n = 70
+        val maskFile = File(dir(), "maschera_sinistra_vedi.bin")
+        java.io.DataOutputStream(maskFile.outputStream().buffered()).use { o ->
+            o.writeInt(n); o.writeInt(side)
+            val one = ByteArray(side * side) { i -> if (i % side < side / 2) 255.toByte() else 0 }
+            repeat(n) { o.write(one) }
+        }
+        val fx = PersonFx(mode = PersonMode.KEEP, maskFile = maskFile.absolutePath, fromUs = 0, rateHz = 15, count = n)
+        val text = TextItem(text = "DIETRO DIETRO", startUs = 0, durationUs = 2_000_000, size = 0.22f, color = Color.WHITE,
+            look = TextLook.SEMPLICE, animIn = TextAnim.NONE, animOut = TextAnim.NONE, behindPerson = true, behindShow = 0.6f)
+        val p = Project(name = "dietro_vedi", clips = listOf(
+            Clip(id = "a", uri = a.toString(), sourceDurationUs = 4_000_000, trimStartUs = 0, trimEndUs = 2_000_000, width = W, height = H, fps = 60f, person = fx),
+        ), texts = listOf(text))
+        val uri = exportAndCheckUri(p, multi = false)
+        val r = MediaMetadataRetriever()
+        var left = 0; var right = 0
+        try {
+            r.setDataSource(ctx, uri)
+            val bm = r.getFrameAtTime(1_000_000, MediaMetadataRetriever.OPTION_CLOSEST)!!
+            for (y in 0 until bm.height step 3) for (x in 0 until bm.width step 3) {
+                val px = bm.getPixel(x, y)
+                if (Color.green(px) > 100 && Color.blue(px) > 100) { if (x < bm.width * 0.44f) left++ else if (x > bm.width * 0.56f) right++ }
+            }
+            bm.recycle()
+        } finally { r.release() }
+        android.util.Log.i("VivoVideoTest", "testo attraverso: chiaro a sinistra $left, a destra $right")
+        assertTrue("si legge attraverso la persona: a sinistra $left, a destra $right", right > 300 && left > right / 4)
+    }
+
     /**
      * Datamosh: dopo il taglio dal rosso al blu, per un po' resta il rosso (trascinato), alla fine c'è il blu.
      */
