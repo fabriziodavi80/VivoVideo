@@ -107,7 +107,8 @@ object Whisper {
         if (ctx == 0L) error("Modello non leggibile: prova a scaricarlo di nuovo.")
         try {
             val threads = Runtime.getRuntime().availableProcessors().coerceIn(2, 6)
-            parseWords(nativeTranscribe(ctx, normalized(pcm), lang, threads, prompt, beam))
+            val norm = normalized(pcm)
+            it.fabriziodavi.vivovideo.model.Subtitles.snapToVoice(parseWords(nativeTranscribe(ctx, norm, lang, threads, prompt, beam)), norm)
         } finally { nativeFree(ctx) }
     }
 

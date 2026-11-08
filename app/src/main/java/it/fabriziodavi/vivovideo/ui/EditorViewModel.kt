@@ -167,7 +167,12 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     private var selectedTextState by mutableStateOf<String?>(null)
     var selectedTextId: String?
         get() = selectedTextState
-        set(v) { selectedTextState = v; if (v != null) { selectedClipState = null; selectedMusicState = null; selectedLayerState = null } }
+        set(v) {
+            val old = selectedTextState
+            selectedTextState = v
+            if (v != null) { selectedClipState = null; selectedMusicState = null; selectedLayerState = null }
+            if (old != null && old != v) dropBlankTexts()
+        }
     /** Livello immagine selezionato; selezionarlo toglie le altre selezioni. */
     private var selectedLayerState by mutableStateOf<String?>(null)
     var selectedLayerId: String?
@@ -594,7 +599,16 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     // ---------------- Testi ----------------
 
     /** Nuovo testo dall'indicatore: 3 secondi (o fino alla fine del video). */
-    fun addText() {
+    /** Un testo lasciato vuoto (parole cancellate) non resta come riquadro vuoto: si toglie quando lo lasci. */
+    fun dropBlankTexts(includeSelected: Boolean = false) {
+        val p = project ?: return
+        val blank = p.texts.filter { it.text.isBlank() && (includeSelected || it.id != selectedTextState) }
+        if (blank.isEmpty()) return
+        if (blank.any { it.id == selectedTextState }) selectedTextState = null
+        update { it.copy(texts = it.texts - blank.toSet()) }
+    }
+
+    fun addText(auto: Boolean = false) {
         val p = project ?: return
         if (p.clips.isEmpty()) { message = "Aggiungi prima un video o una foto."; return }
         val total = p.durationUs
@@ -605,6 +619,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             .copy(startUs = start, durationUs = minOf(3_000_000L, total - start).coerceAtLeast(TextItem.MIN_US))
         update { it.copy(texts = it.texts + t) }
         selectedTextId = t.id
+        if (auto) message = "Nuovo testo all'indicatore: scrivi le tue parole al posto di «Testo». Se non ti serve, Elimina."
     }
 
     /** Seleziona un testo e porta l'indicatore dove si vede (dopo l'animazione di entrata). */

@@ -232,6 +232,8 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
     var zoom by remember { mutableIntStateOf(2) }
     var renaming by remember { mutableStateOf(false) }
     var activeTool by remember { mutableStateOf(initialTool) }
+    // Chiudendo il pannello del testo, un testo lasciato vuoto si toglie (niente riquadri vuoti).
+    LaunchedEffect(activeTool) { if (activeTool != Tool.TEXT) vm.dropBlankTexts(includeSelected = true) }
     // Voce della barra principale aperta (per "Modifica" mostra la seconda riga).
     var group by remember { mutableStateOf(initialTool?.group ?: if (vm.selectedClipId != null) ToolGroup.EDIT else null) }
     var tab by remember(activeTool) { mutableIntStateOf(if (activeTool == initialTool) initialTab else 0) }
@@ -301,7 +303,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
             Tool.MORE -> clipMenu = true
             Tool.TEXT -> {
                 activeTool = Tool.TEXT
-                if (project.texts.isEmpty()) vm.addText()
+                if (project.texts.isEmpty()) vm.addText(auto = true)
             }
             Tool.LAYER -> {
                 activeTool = Tool.LAYER

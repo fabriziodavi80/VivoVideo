@@ -15,7 +15,26 @@ Java_it_fabriziodavi_vivovideo_engine_Whisper_nativeInit(JNIEnv *env, jobject, j
     const char *p = env->GetStringUTFChars(path, nullptr);
     whisper_context_params cp = whisper_context_default_params();
     cp.use_gpu = false;
+    // Tempi delle parole allineati sull'audio (DTW sulle teste di attenzione del modello): molto più precisi dei
+    // tempi dei token, che spesso anticipano la parola (08/11/2026: sottotitoli cinetici "in anticipo").
+    std::string name(p);
+    whisper_alignment_heads_preset preset = WHISPER_AHEADS_NONE;
+    if (name.find("tiny") != std::string::npos) preset = WHISPER_AHEADS_TINY;
+    else if (name.find("base") != std::string::npos) preset = WHISPER_AHEADS_BASE;
+    else if (name.find("small") != std::string::npos) preset = WHISPER_AHEADS_SMALL;
+    else if (name.find("medium") != std::string::npos) preset = WHISPER_AHEADS_MEDIUM;
+    if (preset != WHISPER_AHEADS_NONE) {
+        cp.dtw_token_timestamps = true;
+        cp.dtw_aheads_preset = preset;
+        cp.flash_attn = false;
+    }
     whisper_context *ctx = whisper_init_from_file_with_params(p, cp);
+    if (ctx == nullptr && preset != WHISPER_AHEADS_NONE) {
+        // Se l'allineamento non si può usare, il modello si carica come prima.
+        cp = whisper_context_default_params();
+        cp.use_gpu = false;
+        ctx = whisper_init_from_file_with_params(p, cp);
+    }
     env->ReleaseStringUTFChars(path, p);
     return reinterpret_cast<jlong>(ctx);
 }
@@ -84,6 +103,17 @@ Java_it_fabriziodavi_vivovideo_engine_Whisper_nativeTranscribe(JNIEnv *env, jobj
         const char *text = whisper_full_get_segment_text(ctx, i);
         int64_t t0 = whisper_full_get_segment_t0(ctx, i) * 10; // centesimi → millisecondi
         int64_t t1 = whisper_full_get_segment_t1(ctx, i) * 10;
+        // Inizio dall'allineamento (primo token vero della parola), se c'è e non è assurdo.
+        const int nt = whisper_full_n_tokens(ctx, i);
+        for (int j = 0; j < nt; j++) {
+            if (whisper_full_get_token_id(ctx, i, j) >= whisper_token_eot(ctx)) continue;
+            int64_t d = whisper_full_get_token_data(ctx, i, j).t_dtw;
+            if (d >= 0) {
+                int64_t ms = d * 10;
+                if (ms >= t0 - 600 && ms <= t1 + 300) { t0 = ms; if (t1 < t0 + 60) t1 = t0 + 60; }
+            }
+            break;
+        }
         out += std::to_string(t0) + "\t" + std::to_string(t1) + "\t" + text + "\n";
     }
     g_progress.store(100);
