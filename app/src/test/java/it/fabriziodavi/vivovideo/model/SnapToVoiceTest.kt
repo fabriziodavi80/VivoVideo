@@ -32,4 +32,11 @@ class SnapToVoiceTest {
         val w = listOf(SpokenWord(0, 10, "x"))
         assertEquals(w, Subtitles.snapToVoice(w, FloatArray(0)))
     }
+
+    @Test fun startsStayInOrder() {
+        val w = listOf(SpokenWord(1_000_000, 1_300_000, "a"), SpokenWord(950_000, 1_500_000, "b"))
+        val s = Subtitles.ordered(w)
+        assertEquals(1_000_000, s[1].startUs)
+        assertTrue(s[1].endUs >= s[1].startUs)
+    }
 }

@@ -67,10 +67,10 @@ object Subtitles {
      * si parla, si sposta in avanti al primo punto in cui la voce sale (al massimo fino a metà parola).
      */
     fun snapToVoice(words: List<SpokenWord>, pcm: FloatArray, rate: Int = 16_000): List<SpokenWord> {
-        if (words.isEmpty() || pcm.isEmpty()) return words
+        if (words.isEmpty() || pcm.isEmpty()) return ordered(words)
         val hop = rate / 100 // 10 ms
         val n = pcm.size / hop
-        if (n < 10) return words
+        if (n < 10) return ordered(words)
         val rms = FloatArray(n) { f -> var e = 0.0; for (i in f * hop until (f + 1) * hop) e += pcm[i] * pcm[i]; kotlin.math.sqrt(e / hop).toFloat() }
         val sorted = rms.sorted()
         val floor = sorted[(n * 0.15).toInt()].coerceAtLeast(1e-4f)
@@ -78,7 +78,7 @@ object Subtitles {
         // Voce: sopra il rumore di fondo con un buon margine, ma comunque una frazione del parlato forte.
         val thr = maxOf(floor * 3.5f, loud * 0.12f)
         fun voiced(f: Int) = f in 0 until n && rms[f] >= thr
-        return words.map { w ->
+        return ordered(words.map { w ->
             val f0 = (w.startUs / 10_000).toInt()
             val f1 = (w.endUs / 10_000).toInt().coerceAtMost(n - 1)
             // Già sulla voce (contando un attacco di 20 ms): resta.
@@ -87,6 +87,16 @@ object Subtitles {
             val first = (f0..limit).firstOrNull { voiced(it) && voiced(it + 1) } ?: return@map w
             val start = (first - 2).coerceAtLeast(f0) * 10_000L
             w.copy(startUs = start, endUs = maxOf(w.endUs, start + 60_000))
+        })
+    }
+
+    /** Inizi sempre in ordine (l'allineamento può far cominciare una parola un soffio prima della precedente). */
+    fun ordered(words: List<SpokenWord>): List<SpokenWord> {
+        var prev = Long.MIN_VALUE
+        return words.map { w ->
+            val st = maxOf(w.startUs, prev)
+            prev = st
+            if (st == w.startUs) w else w.copy(startUs = st, endUs = maxOf(w.endUs, st + 60_000))
         }
     }
 
