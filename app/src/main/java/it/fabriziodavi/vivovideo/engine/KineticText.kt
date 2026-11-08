@@ -178,6 +178,9 @@ object KineticText {
         val ck = "w|${ws.joinToString(" ")}|$k|$q|${item.size}|${item.font}|${item.fontFile}|${item.highlight}|${item.color}|$frameW|$frameH"
         cache.get(ck)?.let { return it }
         val p = paint(context, item, item.size * frameH)
+        // La frase intera deve stare nel 90% della larghezza: se no il carattere si rimpicciolisce.
+        val full = p.measureText(ws.joinToString(" "))
+        if (full > frameW * 0.9f) p.textSize *= frameW * 0.9f / full
         val space = p.measureText(" ")
         val widths = ws.map { p.measureText(it) }
         val fm = p.fontMetrics

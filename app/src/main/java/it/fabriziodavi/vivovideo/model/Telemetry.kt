@@ -569,7 +569,8 @@ object TeleLayoutCalc {
         TeleWidget.ALTITUDE -> 50f to 15f
         TeleWidget.MAP -> 26f to 26f
         TeleWidget.TEMP -> 19f to 11f
-        TeleWidget.DISTANCE, TeleWidget.TIME -> 30f to 11f
+        TeleWidget.DISTANCE -> 30f to 11f
+        TeleWidget.TIME -> 36f to 11f
         else -> 31f to 12.5f
     }
 

@@ -196,7 +196,8 @@ class TeleRenderer(private val context: Context, private val t: Telemetry, priva
             for (i in 0 until 7) {
                 val seed = i * 37.17f
                 val ph = ((nowMs / 1000f) * (1.6f + k * 2.5f) + frac(sin(seed) * 91.3f)) % 1f
-                val yy = cy - rad * 0.55f + frac(sin(seed * 3.1f) * 47.7f) * rad * 1.1f
+                // Nell'apertura in basso del contagiri, sotto al numero (non lo coprono).
+                val yy = cy + rad * 0.62f + frac(sin(seed * 3.1f) * 47.7f) * rad * 0.42f
                 val len = rad * (0.3f + 0.5f * k)
                 val x0 = cx + rad * 0.9f - ph * rad * 2.2f
                 sp.color = withA(Color.WHITE, (k - 0.45f) * 1.4f * (1f - ph))
@@ -378,8 +379,8 @@ class TeleRenderer(private val context: Context, private val t: Telemetry, priva
 
     private fun altitude(c: Canvas, r: RectF, s: TeleSample, u: Float) {
         panel(c, r, u)
-        val pad = u * 2.2f
-        val box = RectF(r.left + pad + u * 14f, r.top + pad, r.right - pad, r.bottom - pad)
+        val pad = u * 2.2f + raceShift(u)
+        val box = RectF(r.left + pad + u * 14f, r.top + u * 2.2f, r.right - u * 2.2f - raceShift(u), r.bottom - u * 2.2f)
         label(c, "Quota", r.left + pad, r.top + u * 3.2f, u, 0xB3FFFFFF.toInt())
         val big = r.height() * 0.4f
         val wv = text(c, fmt(s.altitude), r.left + pad, r.top + u * 3.4f + big * 0.92f, big)
@@ -414,7 +415,11 @@ class TeleRenderer(private val context: Context, private val t: Telemetry, priva
     /** Mappa: il percorso intero in chiaro, il tratto fatto acceso, il punto con l'onda che pulsa. */
     private fun map(c: Canvas, r: RectF, s: TeleSample, u: Float, nowMs: Long) {
         val round = t.style == TeleStyle.HUD || t.style == TeleStyle.NEON
-        panel(c, r, u, round)
+        if (t.style == TeleStyle.RACE) {
+            // Gara: pannello dritto (quello inclinato taglierebbe il percorso), con la banda colorata in alto.
+            c.drawRoundRect(r, u * 1.2f, u * 1.2f, paint().apply { color = 0xD90B0D12.toInt() })
+            c.drawRect(r.left, r.top, r.right, r.top + u * 0.9f, paint().apply { color = accent })
+        } else panel(c, r, u, round)
         if (!track.hasGps) { label(c, "Niente GPS", r.centerX(), r.centerY(), u, align = Paint.Align.CENTER); return }
         val pad = r.width() * (if (round) 0.2f else 0.11f)
         val box = RectF(r.left + pad, r.top + pad, r.right - pad, r.bottom - pad)
@@ -462,7 +467,7 @@ class TeleRenderer(private val context: Context, private val t: Telemetry, priva
 
     private fun distance(c: Canvas, r: RectF, s: TeleSample, u: Float) {
         panel(c, r, u)
-        val pad = u * 2.4f
+        val pad = u * 2.4f + raceShift(u)
         label(c, "Distanza", r.left + pad, r.top + u * 3f, u, 0xB3FFFFFF.toInt())
         val big = r.height() * 0.45f
         val km = s.distanceM / 1000f
@@ -478,25 +483,28 @@ class TeleRenderer(private val context: Context, private val t: Telemetry, priva
 
     private fun time(c: Canvas, r: RectF, s: TeleSample, u: Float) {
         panel(c, r, u)
-        val pad = u * 2.4f
+        val pad = u * 2.4f + raceShift(u)
         val local = java.time.Instant.ofEpochMilli(s.timeMs).atZone(java.time.ZoneId.systemDefault())
-        val big = r.height() * 0.5f
+        val big = r.height() * 0.44f
         text(c, String.format(Locale.ITALIAN, "%02d:%02d", local.hour, local.minute), r.left + pad, r.top + u * 1.6f + big * 0.92f, big)
         val el = ((s.timeMs - track.startMs) / 1000).coerceAtLeast(0)
-        label(c, "Tempo", r.right - pad, r.top + u * 3f, u, 0xB3FFFFFF.toInt(), Paint.Align.RIGHT)
-        text(c, String.format(Locale.ITALIAN, "%d:%02d:%02d", el / 3600, (el / 60) % 60, el % 60), r.right - pad, r.bottom - u * 2.2f, r.height() * 0.3f,
+        label(c, "Tempo", r.right - u * 2.4f - raceShift(u), r.top + u * 3f, u, 0xB3FFFFFF.toInt(), Paint.Align.RIGHT)
+        text(c, String.format(Locale.ITALIAN, "%d:%02d:%02d", el / 3600, (el / 60) % 60, el % 60), r.right - u * 2.4f - raceShift(u), r.bottom - u * 2.2f, r.height() * 0.26f,
             accent, align = Paint.Align.RIGHT)
     }
 
     private fun temp(c: Canvas, r: RectF, s: TeleSample, u: Float) {
         panel(c, r, u)
-        val pad = u * 2.2f
+        val pad = u * 2.2f + raceShift(u)
         label(c, "Temp.", r.left + pad, r.top + u * 3f, u, 0xB3FFFFFF.toInt())
         val big = r.height() * 0.5f
         text(c, fmt(s.temp) + "°", r.left + pad, r.top + u * 3.2f + big * 0.9f, big)
     }
 
     private fun frac(x: Float) = x - floor(x)
+
+    /** Nello stile Gara i pannelli sono inclinati con la banda a sinistra: i testi partono un po' più in là. */
+    private fun raceShift(u: Float) = if (t.style == TeleStyle.RACE) u * 2.6f else 0f
 }
 
 /**
