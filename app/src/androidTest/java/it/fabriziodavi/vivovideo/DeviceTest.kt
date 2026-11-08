@@ -450,6 +450,10 @@ class DeviceTest {
         val text = words.joinToString(" ") { it.text.lowercase() }
         assertTrue("trascrizione: $text", text.contains("country"))
         assertTrue(words.zipWithNext().all { (a, b) -> a.startUs <= b.startUs })
+        // Tempi allineati sull'audio: l'ultimo "country" si sente intorno ai 10 s (fra 9 e 10,9).
+        android.util.Log.i("VivoVideoTest", "whisper tempi: " + words.joinToString(" ") { "${it.text}@${it.startUs / 10_000 / 100f}" })
+        val last = words.last { it.text.lowercase().contains("country") }
+        assertTrue("ultimo country a ${last.startUs} µs", last.startUs in 9_000_000..10_900_000)
         val subs = Subtitles.build(words, SubStyle.KARAOKE, SubPosition.BOTTOM, 11_000_000)
         assertTrue(subs.isNotEmpty())
     }
