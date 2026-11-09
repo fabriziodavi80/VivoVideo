@@ -1,6 +1,6 @@
 # VivoVideo · note per riprendere il lavoro
 
-Aggiornate al 09/11/2026, ultima versione **v1.0.239** (stesso codice della 238; emulatore 50/51: falliscono a caso le prove di anteprima `previewPlaysWow`/`crossfadeSegmentRendersAndPlays` per lentezza dell'emulatore, codice anteprima non toccato; la 235 era 51/51). La 1.0 è la v1.0.201; dalla 202 ci sono i jump cut. Da leggere insieme a `CLAUDE.md`.
+Aggiornate al 09/11/2026, ultima versione **v1.0.242** (sottotitoli cinetici: modello large-v3-turbo «Massima precisione», `Subtitles.wordTimes` con almeno 100 ms a parola, `Subtitles.retime` per le parole corrette o aggiunte a mano; collaudo `text_kinetic` OK il 09/11). Collaudo: restano da provare `int_double` (Intervista doppia) e i dati Garmin (`sport_data`). Sull'emulatore falliscono a volte a caso `previewPlaysWow`/`crossfadeSegmentRendersAndPlays` per lentezza. La 1.0 è la v1.0.201; dalla 202 ci sono i jump cut. Da leggere insieme a `CLAUDE.md`.
 
 ## 1. Stato attuale dell'app
 
