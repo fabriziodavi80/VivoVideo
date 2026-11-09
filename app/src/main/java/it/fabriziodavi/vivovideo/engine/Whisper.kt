@@ -20,8 +20,13 @@ object Whisper {
     enum class Model(val label: String, val file: String, val sizeMb: Int, val hint: String) {
         FAST("Veloce", "ggml-base-q5_1.bin", 60, "Più rapido, qualche errore in più."),
         ACCURATE("Preciso", "ggml-small-q5_1.bin", 190, "Più preciso con l'italiano, un po' più lento."),
-        /** Il più grande che regge il telefono: sbaglia molte meno parole, circa tre volte più lento di Preciso. */
-        BEST("Massima precisione", "ggml-medium-q5_0.bin", 539, "Il migliore per l'italiano e per le voci difficili; più lento."),
+        /** Medium: sbaglia molte meno parole di Preciso, circa tre volte più lento. */
+        BEST("Molto preciso", "ggml-medium-q5_0.bin", 539, "Ottimo per l'italiano; più lento."),
+        /**
+         * Large-v3-turbo (09/11/2026, collaudo: "salta delle parole o ne capisce una per un'altra"): l'ascolto del modello
+         * più grande di whisper con un decodificatore leggero; per l'italiano sbaglia e salta meno parole di Medium.
+         */
+        TURBO("Massima precisione", "ggml-large-v3-turbo-q5_0.bin", 574, "Il più preciso: sbaglia e salta meno parole, anche con voci difficili. Il più lento."),
         /** Solo per le prove sull'emulatore. */
         TINY("Minimo", "ggml-tiny-q5_1.bin", 32, "Solo per le prove.");
 
@@ -44,7 +49,7 @@ object Whisper {
 
     /** Il modello proposto: il più preciso già scaricato (se nessuno, Preciso). */
     fun defaultModel(ctx: Context): Model =
-        listOf(Model.BEST, Model.ACCURATE, Model.FAST).firstOrNull { isDownloaded(ctx, it) } ?: Model.ACCURATE
+        listOf(Model.TURBO, Model.BEST, Model.ACCURATE, Model.FAST).firstOrNull { isDownloaded(ctx, it) } ?: Model.ACCURATE
 
     /** Scarica il modello (con avanzamento 0…1); se c'è già non fa nulla. */
     suspend fun download(ctx: Context, m: Model, onProgress: (Float) -> Unit): File = withContext(Dispatchers.IO) {

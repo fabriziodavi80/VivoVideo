@@ -454,8 +454,21 @@ class DeviceTest {
         // Tempi allineati sull'audio: l'ultimo "country" si sente intorno ai 10 s (fra 9 e 10,9).
         val last = words.last { it.text.lowercase().contains("country") }
         assertTrue("ultimo country a ${last.startUs} µs", last.startUs in 9_000_000..10_900_000)
+        // Inizi dopo una pausa (09/11/2026, collaudo: "a volte in anticipo, a volte in ritardo"): dove la voce riparte dopo
+        // almeno 250 ms di silenzio deve cominciare una parola, entro 200 ms (né prima né dopo).
+        val hop = 160
+        val rms = FloatArray(pcm.size / hop) { f -> var e = 0.0; for (i in f * hop until (f + 1) * hop) e += pcm[i] * pcm[i]; kotlin.math.sqrt(e / hop).toFloat() }
+        val sorted = rms.sorted()
+        val thr = maxOf(sorted[(rms.size * 0.15).toInt()].coerceAtLeast(1e-4f) * 3.5f, sorted[(rms.size * 0.9).toInt()] * 0.12f)
+        val onsets = (25 until rms.size - 1).filter { f -> rms[f] >= thr && rms[f + 1] >= thr && (1..25).all { rms[f - it] < thr } }.map { it * 10_000L }
+        val misses = onsets.map { o -> o to words.minOf { kotlin.math.abs(it.startUs - o) } }
+        android.util.Log.i("VivoVideoTest", "whisper ripartenze: " + misses.joinToString(" ") { (o, d) -> "${o / 10_000 / 100f}s→${d / 1000}ms" })
+        assertTrue("ripartenze della voce: ${misses.joinToString { (o, d) -> "${o / 1000} ms: parola a ${d / 1000} ms" }}",
+            onsets.isNotEmpty() && misses.count { it.second <= 200_000 } * 2 >= onsets.size)
         val subs = Subtitles.build(words, SubStyle.KARAOKE, SubPosition.BOTTOM, 11_000_000)
         assertTrue(subs.isNotEmpty())
+        // Nessuna parola persa nelle righe.
+        assertEquals(Subtitles.clean(words).size, subs.sumOf { it.wordsUs.size })
     }
 
     /** Libreria in rete: una ricerca vera su Openverse (musica ed effetti) e lo scaricamento di un brano. */

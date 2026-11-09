@@ -64,7 +64,10 @@ object Subtitles {
     /**
      * Inizio delle parole spostato sulla voce vera (08/11/2026): il riconoscimento a volte fa iniziare la parola nel
      * silenzio prima (sottotitoli cinetici in anticipo). Con l'audio [pcm] mono a [rate] Hz: se l'inizio cade dove non
-     * si parla, si sposta in avanti al primo punto in cui la voce sale (al massimo fino a metà parola).
+     * si parla, si sposta in avanti al primo punto in cui la voce sale (al massimo fino a 3/4 della parola).
+     * 09/11/2026 (collaudo: "a volte in anticipo, a volte in ritardo"): anche il contrario. Se la parola risulta iniziare
+     * a voce già partita da poco (al massimo [LATE_US]) dopo una pausa vera (almeno [PAUSE_US], più delle consonanti
+     * doppie), l'inizio torna al punto in cui la voce è ripartita, purché dopo l'inizio della parola prima.
      */
     fun snapToVoice(words: List<SpokenWord>, pcm: FloatArray, rate: Int = 16_000): List<SpokenWord> {
         if (words.isEmpty() || pcm.isEmpty()) return ordered(words)
@@ -78,17 +81,37 @@ object Subtitles {
         // Voce: sopra il rumore di fondo con un buon margine, ma comunque una frazione del parlato forte.
         val thr = maxOf(floor * 3.5f, loud * 0.12f)
         fun voiced(f: Int) = f in 0 until n && rms[f] >= thr
-        return ordered(words.map { w ->
+        val pauseF = (PAUSE_US / 10_000).toInt()
+        val lateF = (LATE_US / 10_000).toInt()
+        var prevStart = Long.MIN_VALUE
+        val out = words.map { w ->
             val f0 = (w.startUs / 10_000).toInt()
             val f1 = (w.endUs / 10_000).toInt().coerceAtMost(n - 1)
-            // Già sulla voce (contando un attacco di 20 ms): resta.
-            if (voiced(f0) || voiced(f0 + 1) || voiced(f0 + 2)) return@map w
-            val limit = f0 + maxOf(1, (f1 - f0) / 2)
-            val first = (f0..limit).firstOrNull { voiced(it) && voiced(it + 1) } ?: return@map w
-            val start = (first - 2).coerceAtLeast(f0) * 10_000L
-            w.copy(startUs = start, endUs = maxOf(w.endUs, start + 60_000))
-        })
+            val moved = if (voiced(f0) || voiced(f0 + 1) || voiced(f0 + 2)) {
+                // Sulla voce: si guarda indietro se la voce è ripartita da poco dopo una pausa.
+                var g = f0
+                while (g > 0 && f0 - g < lateF && voiced(g - 1)) g--
+                val onset = f0 - g < lateF && g > 0 && (1..pauseF).all { !voiced(g - it) }
+                val start = (g - 2).coerceAtLeast(0) * 10_000L
+                if (onset && g < f0 && start > prevStart + 60_000) w.copy(startUs = start) else w
+            } else {
+                val limit = f0 + maxOf(1, (f1 - f0) * 3 / 4)
+                val first = (f0..limit).firstOrNull { voiced(it) && voiced(it + 1) }
+                if (first == null) w else {
+                    val start = (first - 2).coerceAtLeast(f0) * 10_000L
+                    w.copy(startUs = start, endUs = maxOf(w.endUs, start + 60_000))
+                }
+            }
+            prevStart = moved.startUs
+            moved
+        }
+        return ordered(out)
     }
+
+    /** Pausa minima prima di una parola perché il suo inizio possa tornare indietro (le consonanti doppie durano meno). */
+    const val PAUSE_US = 160_000L
+    /** Di quanto al massimo un inizio torna indietro sulla voce partita prima. */
+    const val LATE_US = 300_000L
 
     /** Inizi sempre in ordine (l'allineamento può far cominciare una parola un soffio prima della precedente). */
     fun ordered(words: List<SpokenWord>): List<SpokenWord> {
@@ -100,16 +123,23 @@ object Subtitles {
         }
     }
 
-    /** Toglie i segni che non sono parole ("[Musica]", "(applausi)", note…). */
+    /**
+     * Toglie i segni che non sono parole ("[Musica]", "(applausi)", note…). Una parentesi aperta toglie le parole solo
+     * se si chiude entro poche parole: una parentesi rimasta aperta non deve far sparire il resto del parlato.
+     */
     fun clean(words: List<SpokenWord>): List<SpokenWord> {
-        var skip = false
-        return words.mapNotNull { w ->
-            val t = w.text.trim()
-            if (t.startsWith("[") || t.startsWith("(")) skip = true
-            val keep = !skip && t.isNotEmpty() && t.any { it.isLetterOrDigit() }
-            if (t.endsWith("]") || t.endsWith(")")) skip = false
-            if (keep) w.copy(text = t) else null
+        val out = mutableListOf<SpokenWord>()
+        var i = 0
+        while (i < words.size) {
+            val t = words[i].text.trim()
+            if (t.startsWith("[") || t.startsWith("(")) {
+                val close = (i until minOf(words.size, i + 6)).firstOrNull { k -> words[k].text.trim().let { it.endsWith("]") || it.endsWith(")") } }
+                if (close != null) { i = close + 1; continue }
+            }
+            if (t.isNotEmpty() && t.any { it.isLetterOrDigit() }) out += words[i].copy(text = t.trimStart('(', '['))
+            i++
         }
+        return out
     }
 
     /**
@@ -133,15 +163,33 @@ object Subtitles {
         return out
     }
 
-    /** Sottotitoli pronti (testi della timeline, marcati come sottotitoli) dalle parole riconosciute. */
-    fun build(words: List<SpokenWord>, style: SubStyle, pos: SubPosition, projectUs: Long): List<TextItem> {
-        val lines = group(clean(words), maxWords = style.maxWords)
-        return lines.mapIndexedNotNull { i, line ->
-            val start = line.first().startUs.coerceIn(0, (projectUs - TextItem.MIN_US).coerceAtLeast(0))
+    /**
+     * Righe dei sottotitoli con i loro tempi: nessuna parola si perde. 09/11/2026 (collaudo: "a volte salta delle
+     * parole"): una riga troppo breve per restare a schermo (es. «Sì.» detto subito prima della frase dopo) prima veniva
+     * scartata; ora si unisce alla riga dopo (l'ultima, alla precedente).
+     */
+    fun timedLines(words: List<SpokenWord>, maxWords: Int, projectUs: Long): List<Triple<List<SpokenWord>, Long, Long>> {
+        val lines = group(clean(words), maxWords = maxWords).map { it.toMutableList() }.toMutableList()
+        fun startOf(l: List<SpokenWord>) = l.first().startUs.coerceIn(0, (projectUs - TextItem.MIN_US).coerceAtLeast(0))
+        fun endOf(i: Int): Long {
+            val line = lines[i]
             // Resta a schermo fino all'inizio della riga dopo (al massimo 1,2 s dopo l'ultima parola).
             val nextStart = lines.getOrNull(i + 1)?.first()?.startUs ?: projectUs
-            val end = minOf(maxOf(line.last().endUs + 300_000, start + 700_000), line.last().endUs + 1_200_000, nextStart, projectUs)
-            if (end - start < TextItem.MIN_US) return@mapIndexedNotNull null
+            return minOf(maxOf(line.last().endUs + 300_000, startOf(line) + 700_000), line.last().endUs + 1_200_000, nextStart, projectUs)
+        }
+        var i = 0
+        while (i < lines.size) {
+            if (endOf(i) - startOf(lines[i]) >= TextItem.MIN_US || lines.size == 1) { i++; continue }
+            if (i + 1 < lines.size) { lines[i].addAll(lines.removeAt(i + 1)) }
+            else { lines[i - 1].addAll(lines.removeAt(i)); i-- }
+        }
+        return lines.indices.map { k -> Triple(lines[k], startOf(lines[k]), endOf(k)) }
+            .filter { (_, s, e) -> e - s >= TextItem.MIN_US }
+    }
+
+    /** Sottotitoli pronti (testi della timeline, marcati come sottotitoli) dalle parole riconosciute. */
+    fun build(words: List<SpokenWord>, style: SubStyle, pos: SubPosition, projectUs: Long): List<TextItem> {
+        return timedLines(words, style.maxWords, projectUs).map { (line, start, end) ->
             val text = line.joinToString(" ") { it.text }.let { if (style == SubStyle.MINIMAL) it.lowercase() else it }
             val base = TextItem(
                 text = text, startUs = start, durationUs = end - start, x = 0f, y = pos.y,

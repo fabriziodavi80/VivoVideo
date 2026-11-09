@@ -39,4 +39,34 @@ class SnapToVoiceTest {
         assertEquals(1_000_000, s[1].startUs)
         assertTrue(s[1].endUs >= s[1].startUs)
     }
+
+    @Test fun lateStartAfterAPauseMovesBackToTheVoice() {
+        val w = listOf(SpokenWord(1_200_000, 1_600_000, "ciao"), SpokenWord(2_150_000, 2_500_000, "amici"))
+        val s = Subtitles.snapToVoice(w, audio())
+        assertTrue("prima ${s[0].startUs}", s[0].startUs in 970_000..1_010_000)
+        assertTrue("seconda ${s[1].startUs}", s[1].startUs in 1_970_000..2_010_000)
+    }
+
+    @Test fun wordInsideTheSamePhraseDoesNotStealThePreviousOnset() {
+        val w = listOf(SpokenWord(1_050_000, 1_200_000, "ciao"), SpokenWord(1_250_000, 1_600_000, "bella"))
+        val s = Subtitles.snapToVoice(w, audio())
+        assertTrue(s[0].startUs < 1_010_000)
+        assertEquals(1_250_000, s[1].startUs)
+    }
+
+    @Test fun shortStopInsideSpeechIsNotAPause() {
+        // Voce con un buco di 60 ms (una "tt"): la parola dopo il buco resta dov'è.
+        val a = FloatArray(32_000) { i ->
+            val t = i / 16_000f
+            val voice = (t in 0.5f..1.3f) || (t in 1.36f..1.9f)
+            (if (voice) 0.4f * sin(2 * Math.PI * 220 * t).toFloat() else 0f) + 0.002f * sin(i * 1.7f)
+        }
+        val w = listOf(SpokenWord(500_000, 1_300_000, "molto"), SpokenWord(1_450_000, 1_900_000, "fatto"))
+        assertEquals(1_450_000, Subtitles.snapToVoice(w, a)[1].startUs)
+    }
+
+    @Test fun tooLateStaysPut() {
+        val w = listOf(SpokenWord(1_450_000, 1_600_000, "boh"))
+        assertEquals(1_450_000, Subtitles.snapToVoice(w, audio())[0].startUs)
+    }
 }

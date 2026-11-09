@@ -19,7 +19,9 @@ Java_it_fabriziodavi_vivovideo_engine_Whisper_nativeInit(JNIEnv *env, jobject, j
     // tempi dei token, che spesso anticipano la parola (08/11/2026: sottotitoli cinetici "in anticipo").
     std::string name(p);
     whisper_alignment_heads_preset preset = WHISPER_AHEADS_NONE;
-    if (name.find("tiny") != std::string::npos) preset = WHISPER_AHEADS_TINY;
+    if (name.find("large-v3-turbo") != std::string::npos) preset = WHISPER_AHEADS_LARGE_V3_TURBO;
+    else if (name.find("large-v3") != std::string::npos) preset = WHISPER_AHEADS_LARGE_V3;
+    else if (name.find("tiny") != std::string::npos) preset = WHISPER_AHEADS_TINY;
     else if (name.find("base") != std::string::npos) preset = WHISPER_AHEADS_BASE;
     else if (name.find("small") != std::string::npos) preset = WHISPER_AHEADS_SMALL;
     else if (name.find("medium") != std::string::npos) preset = WHISPER_AHEADS_MEDIUM;

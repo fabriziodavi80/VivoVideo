@@ -56,4 +56,28 @@ class SubtitlesTest {
         assertEquals(-1, Subtitles.wordAt(listOf(100L, 400L), 50))
         assertEquals(1, Subtitles.wordAt(listOf(100L, 400L), 450))
     }
+
+    @Test fun noWordIsLostInShortLines() {
+        // «Sì.» detto subito prima della frase dopo: la riga è troppo breve per stare da sola, ma la parola resta.
+        val w = listOf(
+            SpokenWord(1_000_000, 1_150_000, "Sì."),
+            SpokenWord(1_200_000, 1_400_000, "andiamo"),
+            SpokenWord(1_420_000, 1_600_000, "subito"),
+            SpokenWord(1_620_000, 1_700_000, "Ok."),
+        )
+        for (style in SubStyle.entries) {
+            val subs = Subtitles.build(w, style, SubPosition.BOTTOM, 1_750_000)
+            val text = subs.joinToString(" ") { it.text }.lowercase()
+            for (x in w) assertTrue("$style: manca ${x.text} in «$text»", text.contains(x.text.lowercase()))
+            assertTrue(subs.all { it.durationUs >= TextItem.MIN_US })
+            assertTrue(subs.all { it.wordsUs.size == it.text.split(' ').size })
+        }
+    }
+
+    @Test fun unclosedBracketDoesNotEatTheSpeech() {
+        val w = listOf("(ride", "allora", "partiamo", "insieme", "oggi", "verso", "il", "mare").mapIndexed { i, t -> SpokenWord(i * 300_000L, i * 300_000L + 250_000, t) }
+        assertEquals(listOf("ride", "allora", "partiamo", "insieme", "oggi", "verso", "il", "mare"), Subtitles.clean(w).map { it.text })
+        val m = listOf("[Musica]", "ciao").mapIndexed { i, t -> SpokenWord(i * 300_000L, i * 300_000L + 250_000, t) }
+        assertEquals(listOf("ciao"), Subtitles.clean(m).map { it.text })
+    }
 }
