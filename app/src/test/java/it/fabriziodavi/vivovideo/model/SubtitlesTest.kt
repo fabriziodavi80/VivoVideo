@@ -80,4 +80,48 @@ class SubtitlesTest {
         val m = listOf("[Musica]", "ciao").mapIndexed { i, t -> SpokenWord(i * 300_000L, i * 300_000L + 250_000, t) }
         assertEquals(listOf("ciao"), Subtitles.clean(m).map { it.text })
     }
+
+    private fun ok(ts: List<Long>, n: Int, dur: Long) {
+        assertEquals(n, ts.size)
+        ts.zipWithNext().forEach { (a, b) -> assertTrue("parola troppo breve: $ts", b - a >= Subtitles.WORD_MIN_US) }
+        assertTrue("fuori dal testo: $ts", ts.first() >= 0 && ts.last() < dur)
+    }
+
+    @Test fun wordsStartingTogetherAllGetShown() {
+        val ts = Subtitles.wordTimes(listOf(0, 400_000, 400_000, 420_000, 900_000), 5, 1_500_000)
+        ok(ts, 5, 1_500_000)
+        assertEquals(0L, ts[0]); assertEquals(400_000L, ts[1])
+        // Gruppo stretto alla fine: le parole tornano indietro, non escono dal testo.
+        ok(Subtitles.wordTimes(listOf(0, 950_000, 960_000, 970_000), 4, 1_000_000), 4, 1_000_000)
+        // Testo cortissimo con tante parole: passo regolare.
+        val short = Subtitles.wordTimes(listOf(0, 0, 0, 0), 4, 300_000)
+        assertEquals(4, short.size)
+        short.zipWithNext().forEach { (a, b) -> assertTrue("$short", b > a) }
+        assertTrue(short.last() < 300_000)
+    }
+
+    @Test fun moreWordsThanTimesStillAppear() {
+        val ts = Subtitles.wordTimes(listOf(0, 300_000), 4, 2_000_000)
+        ok(ts, 4, 2_000_000)
+        assertEquals(300_000L, ts[1])
+        assertTrue(ts[3] <= 1_800_000)
+    }
+
+    @Test fun wordAddedByHandGetsItsOwnTime() {
+        val times = listOf(0L, 500_000, 1_000_000)
+        // Parola aggiunta in mezzo: le altre tengono il tempo, la nuova sta tra le due vicine.
+        val a = Subtitles.retime("ciao a tutti", "ciao a voi tutti", times, 1_600_000)
+        ok(a, 4, 1_600_000)
+        assertEquals(listOf(0L, 500_000L, 1_000_000L), listOf(a[0], a[1], a[3]))
+        assertTrue(a[2] in 600_000..900_000)
+        // Parola corretta: prende il tempo di quella che sostituisce.
+        assertEquals(times, Subtitles.retime("ciao a tutti", "Ciao a tutto!", times, 1_600_000))
+        // Parola aggiunta in fondo e all'inizio.
+        val c = Subtitles.retime("ciao a tutti", "ciao a tutti amici", times, 1_600_000)
+        ok(c, 4, 1_600_000); assertTrue(c[3] > 1_000_000)
+        val d = Subtitles.retime("ciao a tutti", "ehi ciao a tutti", times, 1_600_000)
+        ok(d, 4, 1_600_000); assertEquals(1_000_000L, d[3])
+        // Parola tolta: le altre tengono il tempo.
+        assertEquals(listOf(0L, 1_000_000L), Subtitles.retime("ciao a tutti", "ciao tutti", times, 1_600_000))
+    }
 }

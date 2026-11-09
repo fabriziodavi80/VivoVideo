@@ -603,7 +603,7 @@ class TimedTextOverlay(
         // Sottotitoli con i tempi del parlato: karaoke (parola colorata) o parole che compaiono mentre sono dette.
         if (item.wordMode != 0 && item.wordsUs.isNotEmpty()) {
             val ranges = Regex("\\S+").findAll(TextRenderer.displayText(item)).map { it.range }.toList()
-            val k = Subtitles.wordAt(item.wordsUs, local).coerceAtMost(ranges.lastIndex)
+            val k = Subtitles.wordAt(Subtitles.wordTimes(item.wordsUs, ranges.size, item.durationUs), local).coerceAtMost(ranges.lastIndex)
             if (ranges.isNotEmpty()) {
                 return if (item.wordMode == 1) TextRenderer.render(context, item, frameW, frameH, highlight = if (k >= 0) ranges[k] else null)
                 else TextRenderer.render(context, item, frameW, frameH, visible = if (k >= 0) ranges[k].last + 1 else 0)

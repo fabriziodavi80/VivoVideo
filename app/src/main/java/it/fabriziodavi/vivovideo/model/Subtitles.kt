@@ -217,6 +217,94 @@ object Subtitles {
         }
     }
 
+    /** Tempo minimo a schermo di una parola nei cinetici e nel karaoke (3 fotogrammi a 30 fps). */
+    const val WORD_MIN_US = 100_000L
+
+    /**
+     * Inizi delle [n] parole del testo, pronti da mostrare (09/11/2026, collaudo: "salta delle parole, anche se le
+     * aggiungo a mano"). Se i tempi della voce sono meno delle parole scritte, le parole in più si distribuiscono
+     * fino alla fine del testo invece di non comparire mai; se due parole iniziano insieme (o quasi), ognuna resta
+     * comunque a schermo almeno [WORD_MIN_US], spostando le vicine quanto basta.
+     */
+    fun wordTimes(times: List<Long>, n: Int, durationUs: Long): List<Long> {
+        if (n <= 0) return emptyList()
+        val end = durationUs.coerceAtLeast(1)
+        val base = times.take(n).map { it.coerceIn(0, end) }.toMutableList()
+        if (base.size < n) {
+            val from = if (base.isEmpty()) 0L else base.last()
+            val stop = maxOf(from + 1, end * 9 / 10)
+            val missing = n - base.size
+            if (base.isEmpty()) for (i in 0 until missing) base += stop * i / missing
+            else for (i in 1..missing) base += from + (stop - from) * i / missing
+        }
+        return spread(base, end)
+    }
+
+    /** Ogni parola almeno [WORD_MIN_US] dopo la precedente, senza uscire dal testo; se non c'è posto, passo regolare. */
+    private fun spread(ts: MutableList<Long>, end: Long): List<Long> {
+        val n = ts.size
+        val gap = WORD_MIN_US
+        if (n == 1) return ts
+        if ((n - 1) * gap > end - gap / 2) return List(n) { it * (end - gap / 2).coerceAtLeast(0) / (n - 1).coerceAtLeast(1) }
+        for (i in 1 until n) ts[i] = maxOf(ts[i], ts[i - 1] + gap)
+        val last = end - gap
+        if (ts[n - 1] > last) {
+            ts[n - 1] = last
+            for (i in n - 2 downTo 0) ts[i] = minOf(ts[i], ts[i + 1] - gap)
+        }
+        if (ts[0] < 0) {
+            val shift = -ts[0]
+            for (i in 0 until n) ts[i] += shift
+        }
+        return ts
+    }
+
+    private fun norm(w: String) = w.lowercase().filter { it.isLetterOrDigit() }
+
+    /**
+     * Tempi delle parole dopo che il testo di un sottotitolo è stato corretto a mano. Le parole rimaste uguali tengono
+     * il loro tempo; una parola cambiata al posto di un'altra ne prende il tempo; le parole aggiunte si mettono tra la
+     * parola prima e quella dopo. Così una parola scritta a mano compare anche nei cinetici e nel karaoke.
+     */
+    fun retime(oldText: String, newText: String, times: List<Long>, durationUs: Long): List<Long> {
+        val a = Regex("\\S+").findAll(oldText).map { norm(it.value) }.toList()
+        val b = Regex("\\S+").findAll(newText).map { norm(it.value) }.toList()
+        if (b.isEmpty()) return emptyList()
+        val t = wordTimes(times, a.size, durationUs)
+        if (a.isEmpty()) return wordTimes(emptyList(), b.size, durationUs)
+        // Parole in comune, in ordine (sottosequenza comune più lunga).
+        val L = Array(a.size + 1) { IntArray(b.size + 1) }
+        for (i in a.size - 1 downTo 0) for (j in b.size - 1 downTo 0)
+            L[i][j] = if (a[i] == b[j] && a[i].isNotEmpty()) L[i + 1][j + 1] + 1 else maxOf(L[i + 1][j], L[i][j + 1])
+        val pairs = mutableListOf<Pair<Int, Int>>()
+        var i = 0; var j = 0
+        while (i < a.size && j < b.size) {
+            if (a[i] == b[j] && a[i].isNotEmpty()) { pairs += i to j; i++; j++ }
+            else if (L[i + 1][j] >= L[i][j + 1]) i++ else j++
+        }
+        pairs += a.size to b.size
+        val out = LongArray(b.size)
+        var pi = -1; var pj = -1
+        for ((ai, bj) in pairs) {
+            val newGap = (pj + 1 until bj).toList()
+            val oldGap = (pi + 1 until ai).toList()
+            if (newGap.isNotEmpty()) {
+                if (oldGap.size == newGap.size) newGap.forEachIndexed { k, x -> out[x] = t[oldGap[k]] }
+                else {
+                    // Da dove partono le parole nuove e dove finiscono: dalla parola prima (o dal primo tempo sostituito).
+                    val left = if (oldGap.isNotEmpty()) t[oldGap.first()] else if (pi >= 0) t[pi] else 0L
+                    val right = if (ai < a.size) t[ai] else maxOf(left + 1, durationUs * 9 / 10)
+                    val slots = if (oldGap.isNotEmpty() || pi < 0) newGap.size else newGap.size + 1
+                    val first = if (oldGap.isNotEmpty() || pi < 0) 0 else 1
+                    newGap.forEachIndexed { k, x -> out[x] = left + (right - left) * (k + first) / slots }
+                }
+            }
+            if (ai < a.size) out[bj] = t[ai]
+            pi = ai; pj = bj
+        }
+        return spread(out.toMutableList(), durationUs.coerceAtLeast(1))
+    }
+
     /** Parola in corso a [localUs] dall'inizio del testo (indice), o -1 prima della prima. */
     fun wordAt(wordsUs: List<Long>, localUs: Long): Int {
         var k = -1

@@ -34,7 +34,8 @@ object KineticText {
 
     /** Inizio di ogni parola: quelli della voce per i sottotitoli, a passo regolare per i testi scritti a mano. */
     fun times(item: TextItem): List<Long> =
-        if (item.subtitle && item.wordsUs.isNotEmpty()) item.wordsUs else Subtitles.evenWords(item.text, item.durationUs)
+        if (item.subtitle && item.wordsUs.isNotEmpty()) Subtitles.wordTimes(item.wordsUs, words(item).size, item.durationUs)
+        else Subtitles.evenWords(item.text, item.durationUs)
 
     /** Parola in corso e da quanto (µs) è iniziata; -1 prima della prima. */
     fun current(item: TextItem, local: Long): Pair<Int, Long> {

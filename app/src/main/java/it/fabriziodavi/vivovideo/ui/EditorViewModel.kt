@@ -661,7 +661,11 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
 
     fun updateText(typing: Boolean = false, change: (TextItem) -> TextItem) {
         val t = selectedText ?: return
-        update(keepUndo = !typing, rebuild = false) { it.replaceText(change(t)) }
+        var n = change(t)
+        // Testo di un sottotitolo corretto a mano: i tempi delle parole seguono il nuovo testo (parole aggiunte comprese).
+        if (n.subtitle && n.wordsUs.isNotEmpty() && n.text != t.text)
+            n = n.copy(wordsUs = Subtitles.retime(t.text, n.text, t.wordsUs, n.durationUs))
+        update(keepUndo = !typing, rebuild = false) { it.replaceText(n) }
         scheduleRebuild()
     }
 
