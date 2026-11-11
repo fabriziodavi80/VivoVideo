@@ -82,6 +82,32 @@ class InterviewTest {
         assertTrue(qas.all { it.a != null && it.b != null })
     }
 
+    /** Parlato con le pause scelte: coppie (frase, pausa dopo in µs). */
+    private fun paused(vararg parts: Pair<String, Long>): List<SpokenWord> {
+        val out = mutableListOf<SpokenWord>()
+        var t = 300_000L
+        parts.forEach { (s, pause) -> s.split(" ").forEach { w -> out += SpokenWord(t, t + 250_000, w); t += 300_000 }; t += pause }
+        return out
+    }
+
+    @Test fun questionWrittenDifferentlyInTheTwoVideosStaysWhole() {
+        // A e B: la stessa domanda scritta un po' diversa dal riconoscimento; in A una pausa di 0,9 s a metà domanda.
+        val a = paused("Allora, qual è il tuo piatto" to 900_000L, "preferito in assoluto." to 700_000L, "La pizza margherita." to 700_000L,
+            "E che sport fai di solito." to 700_000L, "Corro." to 700_000L)
+        val b = plain("Allora qual'è il tuo piatto preferita in assoluto.", "Il risotto.", "E che sport fai di solito.", "Nuoto.")
+        val qas = Interview.match(a, b, 30_000_000, 30_000_000)
+        assertEquals(listOf("Allora, qual è il tuo piatto preferito in assoluto?", "E che sport fai di solito?"), qas.map { it.question })
+        fun said(words: List<SpokenWord>, s: Span) = words.filter { it.startUs >= s.startUs - 1 && it.endUs <= s.endUs + 1 }.joinToString(" ") { it.text }
+        // La risposta comincia dopo la domanda intera, in tutti e due i video.
+        assertEquals("La pizza margherita.", said(a, qas[0].a!!))
+        assertEquals("Il risotto.", said(b, qas[0].b!!))
+        assertEquals("Nuoto.", said(b, qas[1].b!!))
+        // Pausa a metà domanda in un video solo, con le parole uguali nei due: la domanda resta intera.
+        val a2 = paused("Qual è il tuo piatto" to 900_000L, "preferito in assoluto." to 700_000L, "La pizza." to 700_000L)
+        val b2 = plain("Qual è il tuo piatto preferito in assoluto.", "Il risotto.")
+        assertEquals(listOf("Qual è il tuo piatto preferito in assoluto?"), Interview.match(a2, b2, 20_000_000, 20_000_000).map { it.question })
+    }
+
     @Test fun aSingleVideoStillFindsQuestionWords() {
         // Nessun pezzo uguale nell'altro video e nessun "?": valgono le frasi che cominciano con una parola da domanda.
         val a = plain("Come ti chiami.", "Marco.", "Quanti anni hai.", "Quarantasei.")

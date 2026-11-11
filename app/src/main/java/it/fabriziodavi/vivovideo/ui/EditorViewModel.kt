@@ -1799,7 +1799,8 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                 busy = null
                 val qas = withContext(Dispatchers.Default) { Interview.match(wa, wb, a.sourceDurationUs, b.sourceDurationUs, typed) }
                 interviewQas = qas
-                Diary.log("Intervista doppia: ${wa.size} + ${wb.size} parole, ${qas.size} domande, risposte trovate A ${qas.count { it.a != null }} e B ${qas.count { it.b != null }}.")
+                Diary.log("Intervista doppia: ${wa.size} + ${wb.size} parole, ${qas.size} domande, risposte trovate A ${qas.count { it.a != null }} e B ${qas.count { it.b != null }}." +
+                    qas.joinToString("") { q -> " «${q.question.take(80)}» A ${q.a?.let { "%.1f".format(it.lengthUs / 1e6) } ?: "-"} s, B ${q.b?.let { "%.1f".format(it.lengthUs / 1e6) } ?: "-"} s." })
                 if (qas.isEmpty()) {
                     Diary.log("Intervista doppia, parlato A: " + wa.joinToString(" ") { it.text.trim() }.take(160))
                     message = "Non ho trovato domande nei video: scrivile tu, una per riga, come le ha dette chi intervista."
