@@ -67,9 +67,91 @@ object Interview {
         return out
     }
 
-    /** Le domande del parlato: frasi con il punto di domanda e almeno tre parole (non "sì?", "davvero?"). */
-    fun questionsIn(words: List<SpokenWord>): List<String> =
-        sentences(words).filter { it.isQuestion && tokens(it.text).size >= 3 }.map { it.text.trim() }
+    /** Parole che aprono una domanda (senza accenti né apostrofi: "cos'è" → "cose", "perché" → "perche"). */
+    private val ASK = setOf(
+        "chi", "cosa", "cose", "che", "come", "dove", "quando", "quale", "quali", "qual",
+        "quanto", "quanta", "quanti", "quante", "perche",
+    )
+
+    /** Pausa dopo cui, anche senza punteggiatura, comincia un'altra frase (chi risponde attacca dopo la domanda). */
+    private const val TURN_US = 600_000L
+
+    private fun endsTurn(words: List<SpokenWord>, i: Int): Boolean {
+        val end = words[i].text.trimEnd().lastOrNull()
+        val gap = words.getOrNull(i + 1)?.let { it.startUs - words[i].endUs } ?: 0L
+        return end == '.' || end == '?' || end == '!' || gap > TURN_US
+    }
+
+    private fun asText(words: List<SpokenWord>, from: Int, to: Int): String {
+        val t = words.subList(from, to + 1).joinToString(" ") { it.text.trim() }.trimEnd('.', ',', ';', ':', '!', ' ')
+        return t.replaceFirstChar { it.uppercase() }.let { if (it.endsWith("?")) it else "$it?" }
+    }
+
+    /**
+     * Le domande del parlato [words], in ordine. Prima le frasi con il punto di domanda e almeno tre parole (non "sì?",
+     * "davvero?"). 11/11/2026 (collaudo: con il modello Massima precisione 0 domande): il riconoscimento non sempre
+     * scrive il "?", quindi valgono anche i pezzi detti uguali nell'altro video [other] (chi intervista fa le stesse
+     * domande a tutti e due), purché sembrino domande; e, se ancora niente, le frasi che cominciano con chi, cosa, come,
+     * dove, quando, quale, quanto, perché.
+     */
+    fun questionsIn(words: List<SpokenWord>, other: List<SpokenWord> = emptyList()): List<String> {
+        val found = mutableListOf<Pair<Int, String>>()
+        val taken = BooleanArray(words.size)
+        sentences(words).filter { it.isQuestion && tokens(it.text).size >= 3 }.forEach { q ->
+            found += q.firstWord to q.text.trim()
+            for (k in q.firstWord..q.lastWord) taken[k] = true
+        }
+        if (other.isNotEmpty()) shared(words, other).forEach { (a, b) ->
+            if ((a..b).none { taken[it] }) { found += a to asText(words, a, b); for (k in a..b) taken[k] = true }
+        }
+        if (found.isEmpty()) {
+            var from = 0
+            for (i in words.indices) if (endsTurn(words, i) || i == words.lastIndex) {
+                val t = (from..i).map { norm(words[it].text) }.filter { it.isNotEmpty() }
+                if (t.size in 3..16 && t.take(2).any { it in ASK }) found += from to asText(words, from, i)
+                from = i + 1
+            }
+        }
+        return found.sortedBy { it.first }.map { it.second }
+    }
+
+    /**
+     * Pezzi di almeno tre parole (due se cominciano con dove, come, quanti…) detti uguali (parole di fila) in [a] e in [b]: le domande ripetute dall'intervistatore.
+     * Un pezzo si ferma alla fine della frase (punto o pausa), così non si porta dietro l'inizio di una risposta uguale
+     * ("mi chiamo…"); per contare come domanda deve avere una parola da domanda o almeno cinque parole.
+     */
+    internal fun shared(a: List<SpokenWord>, b: List<SpokenWord>): List<Pair<Int, Int>> {
+        val ta = a.map { norm(it.text) }
+        val tb = b.map { norm(it.text) }
+        if (ta.isEmpty() || tb.isEmpty()) return emptyList()
+        val L = Array(ta.size + 1) { IntArray(tb.size + 1) }
+        val runs = mutableListOf<Pair<Int, Int>>()
+        for (i in 1..ta.size) for (j in 1..tb.size) {
+            if (ta[i - 1].isNotEmpty() && ta[i - 1] == tb[j - 1]) L[i][j] = L[i - 1][j - 1] + 1
+        }
+        for (i in 1..ta.size) for (j in 1..tb.size) {
+            val n = L[i][j]
+            val maximal = i == ta.size || j == tb.size || L[i + 1][j + 1] == 0
+            // Due parole bastano se aprono con una parola da domanda ("dove abiti", "quanti anni"), non "che bello".
+            if (n == 0) continue
+            val min = if (ta[i - n] in ASK && ta[i - n] != "che") 2 else 3
+            if (n >= min && maximal) runs += (i - n) to (i - 1)
+        }
+        val out = mutableListOf<Pair<Int, Int>>()
+        val used = BooleanArray(ta.size)
+        for ((s, e) in runs.sortedByDescending { it.second - it.first }) {
+            // Il pezzo fino alla prima fine di frase al suo interno.
+            var end = e
+            for (k in s until e) if (endsTurn(a, k)) { end = k; break }
+            val t = (s..end).map { ta[it] }
+            val short = t.size == 2 && t[0] in ASK && t[0] != "che"
+            if ((t.size < 3 && !short) || (t.none { it in ASK } && t.size < 5)) continue
+            if ((s..end).any { used[it] }) continue
+            for (k in s..end) used[k] = true
+            out += s to end
+        }
+        return out.sortedBy { it.first }
+    }
 
     /**
      * Dove si dice la domanda [q] nel parlato, a partire dalla parola [from]: indice della prima e dell'ultima parola,
@@ -88,7 +170,8 @@ object Interview {
             // La domanda finisce al suo punto interrogativo: le parole dopo sono già la risposta ("il risotto…").
             var end = minOf(wt.size, i + win)
             var mark = -1
-            for (j in i until end) if (words[j].text.trimEnd().endsWith("?")) { end = j + 1; mark = j; break }
+            // Senza "?" (11/11/2026) la domanda finisce comunque alla fine della frase: punto o pausa prima della risposta.
+            for (j in i until end) if (endsTurn(words, j)) { end = j + 1; mark = j; break }
             val window = (i until end)
             val hit = window.filter { wt[it] in need }
             val score = hit.map { wt[it] }.toSet().size.toDouble() / need.size
@@ -121,7 +204,7 @@ object Interview {
 
     /** Domande e risposte dei due video. Senza domande scritte, quelle del primo video (o del secondo, se il primo non ne ha). */
     fun match(wordsA: List<SpokenWord>, wordsB: List<SpokenWord>, durA: Long, durB: Long, typed: List<String> = emptyList()): List<InterviewQA> {
-        val qs = typed.map { it.trim() }.filter { it.isNotEmpty() }.ifEmpty { questionsIn(wordsA).ifEmpty { questionsIn(wordsB) } }
+        val qs = typed.map { it.trim() }.filter { it.isNotEmpty() }.ifEmpty { questionsIn(wordsA, wordsB).ifEmpty { questionsIn(wordsB, wordsA) } }
         val a = answers(wordsA, qs, durA)
         val b = answers(wordsB, qs, durB)
         return qs.indices.map { InterviewQA(qs[it], a[it], b[it]) }

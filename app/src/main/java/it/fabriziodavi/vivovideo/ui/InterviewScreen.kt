@@ -24,6 +24,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -67,6 +68,8 @@ fun InterviewScreen(vm: EditorViewModel) {
     var typed by remember { mutableStateOf("") }
     var model by remember { mutableStateOf(Whisper.defaultModel(ctx)) }
     val qas = vm.interviewQas
+    // Nessuna domanda trovata: si apre da solo il campo per scriverle (prima il pulsante restava su «Analizza» e basta).
+    LaunchedEffect(qas) { if (qas != null && qas.isEmpty()) auto = false }
     val colors = OutlinedTextFieldDefaults.colors(
         focusedBorderColor = VV.Tally, unfocusedBorderColor = VV.Line, cursorColor = VV.Tally,
         focusedTextColor = VV.Text, unfocusedTextColor = VV.Text,
@@ -112,8 +115,9 @@ fun InterviewScreen(vm: EditorViewModel) {
             }
             ToggleRow("Cartello con la domanda prima delle risposte", cards, busy == null) { cards = it }
             PanelLabel("Domande")
-            ToggleRow("Trovale da sola (le frasi con il punto di domanda)", auto, busy == null) { auto = it; vm.resetInterviewAnalysis() }
+            ToggleRow("Trovale da sola (le frasi dette uguali ai due, o con il punto di domanda)", auto, busy == null) { auto = it; vm.resetInterviewAnalysis() }
             if (!auto) {
+                if (qas != null && qas.isEmpty()) Hint("Non ho trovato domande nei video. Scrivile qui, una per riga, come le ha dette chi intervista (bastano le parole principali), poi tocca «Analizza i due video»: non riascolta, è subito pronto.")
                 OutlinedTextField(
                     value = typed, onValueChange = { typed = it }, colors = colors, minLines = 3,
                     modifier = Modifier.fillMaxWidth(), placeholder = { Text("Una domanda per riga, come la dice chi intervista", color = VV.Faint) },

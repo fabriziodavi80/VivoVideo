@@ -50,6 +50,46 @@ class InterviewTest {
         assertTrue(qas[0].a!!.endUs < q2.startUs)
     }
 
+    /** Parlato senza punto di domanda (come lo scrive a volte il modello Massima precisione), con pause brevi. */
+    private fun plain(vararg sentences: String): List<SpokenWord> {
+        val out = mutableListOf<SpokenWord>()
+        var t = 300_000L
+        sentences.forEach { s ->
+            s.split(" ").forEach { w -> out += SpokenWord(t, t + 250_000, w); t += 300_000 }
+            t += 700_000
+        }
+        return out
+    }
+
+    @Test fun questionsWithoutQuestionMarkAreFoundBecauseBothHeardThem() {
+        val a = plain("Ciao come ti chiami.", "Mi chiamo Marco.", "Qual è il tuo piatto preferito.", "La pizza margherita.", "Che lavoro fai.", "Faccio il contabile.")
+        val b = plain("Ciao, come ti chiami.", "Mi chiamo Giulia.", "Qual e il tuo piatto preferito.", "Il risotto ai funghi.", "Che lavoro fai.", "Insegno matematica.")
+        val qas = Interview.match(a, b, 30_000_000, 30_000_000)
+        assertEquals(listOf("Ciao come ti chiami?", "Qual è il tuo piatto preferito?", "Che lavoro fai?"), qas.map { it.question })
+        assertTrue(qas.all { it.a != null && it.b != null })
+        // La risposta uguale ("Mi chiamo…") non diventa una domanda e resta nella risposta.
+        fun said(words: List<SpokenWord>, s: Span) = words.filter { it.startUs >= s.startUs - 1 && it.endUs <= s.endUs + 1 }.joinToString(" ") { it.text }
+        assertEquals("Mi chiamo Marco.", said(a, qas[0].a!!))
+        assertEquals("Il risotto ai funghi.", said(b, qas[1].b!!))
+    }
+
+    @Test fun withoutPunctuationAtAllThePausesSplitTheTurns() {
+        val a = plain("ciao come ti chiami", "mi chiamo Marco", "dove abiti", "a Brescia")
+        val b = plain("ciao come ti chiami", "sono Giulia", "dove abiti adesso", "a Verona")
+        val qas = Interview.match(a, b, 20_000_000, 20_000_000)
+        assertEquals(2, qas.size)
+        assertEquals("Ciao come ti chiami?", qas[0].question)
+        assertTrue(qas.all { it.a != null && it.b != null })
+    }
+
+    @Test fun aSingleVideoStillFindsQuestionWords() {
+        // Nessun pezzo uguale nell'altro video e nessun "?": valgono le frasi che cominciano con una parola da domanda.
+        val a = plain("Come ti chiami.", "Marco.", "Quanti anni hai.", "Quarantasei.")
+        assertEquals(listOf("Come ti chiami?", "Quanti anni hai?"), Interview.questionsIn(a, plain("Boh.")))
+        // Risposte uguali senza parole da domanda e corte non sono domande.
+        assertTrue(Interview.shared(plain("Mi piace molto."), plain("Mi piace molto.")).isEmpty())
+    }
+
     @Test fun typedQuestionsWinAndMissingOnesAreNull() {
         val qas = Interview.match(wordsA, wordsB, 60_000_000, 60_000_000, typed = listOf("Che lavoro fai", "Hai animali in casa?"))
         assertEquals(2, qas.size)

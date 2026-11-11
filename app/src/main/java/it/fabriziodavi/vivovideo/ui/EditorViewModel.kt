@@ -1766,6 +1766,9 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
      * Ascolta i due video (riconoscimento vocale sul telefono) e trova domande e risposte: quelle scritte in [typed]
      * o, se è vuoto, le frasi con il punto di domanda.
      */
+    /** Parlato già ascoltato dei due video (chiave: video A, video B, modello): rifare l'analisi con le domande scritte è immediato. */
+    private var interviewHeard: Triple<String, List<SpokenWord>, List<SpokenWord>>? = null
+
     fun analyzeInterview(model: Whisper.Model, lang: String, typed: List<String>) {
         val a = interviewA ?: return
         val b = interviewB ?: return
@@ -1788,13 +1791,19 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                     val poll = launch { while (true) { kotlinx.coroutines.delay(400); busy = "Ascolto $who… ${Whisper.progress()}%" } }
                     return try { Whisper.transcribe(Whisper.modelFile(ctx, model), pcm, lang, "", Whisper.SUBTITLE_BEAM) } finally { poll.cancel() }
                 }
-                val wa = listen(a, "il video A")
-                val wb = listen(b, "il video B")
+                val key = "${a.uri}|${b.uri}|${model.name}|$lang"
+                val heard = interviewHeard?.takeIf { it.first == key }
+                val wa = heard?.second ?: listen(a, "il video A")
+                val wb = heard?.third ?: listen(b, "il video B")
+                interviewHeard = Triple(key, wa, wb)
                 busy = null
                 val qas = withContext(Dispatchers.Default) { Interview.match(wa, wb, a.sourceDurationUs, b.sourceDurationUs, typed) }
                 interviewQas = qas
                 Diary.log("Intervista doppia: ${wa.size} + ${wb.size} parole, ${qas.size} domande, risposte trovate A ${qas.count { it.a != null }} e B ${qas.count { it.b != null }}.")
-                if (qas.isEmpty()) message = "Non ho trovato domande nei video: scrivile tu, una per riga, come le ha dette chi intervista."
+                if (qas.isEmpty()) {
+                    Diary.log("Intervista doppia, parlato A: " + wa.joinToString(" ") { it.text.trim() }.take(160))
+                    message = "Non ho trovato domande nei video: scrivile tu, una per riga, come le ha dette chi intervista."
+                }
             } catch (e: kotlinx.coroutines.CancellationException) {
                 busy = null; throw e
             } catch (e: Exception) {

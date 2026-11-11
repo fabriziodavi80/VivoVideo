@@ -108,7 +108,7 @@ object TestPlan {
             "In un progetto già montato (tagli, effetti, testi, musica) apri Progetto → Torna ai video originali → conferma; poi Annulla.",
             "Restano solo i video e le foto importati, interi e nell'ordine di importazione, senza nessuna modifica né testi o musica; Annulla riporta tutto com'era."),
         Item("int_double", "Intelligenti", "Intervista doppia",
-            "Gira due video brevi con le stesse 3 domande fatte a voce a due persone. Home → Intervista doppia → scegli A e B, nomi e didascalie → Analizza → Crea l'intervista; prova sia Alternata sia Schermo diviso ed esporta.",
+            "Gira due video brevi con le stesse 3 domande fatte a voce a due persone. Home → Intervista doppia → scegli A e B, nomi e didascalie → Analizza (anche con Massima precisione) → Crea l'intervista; prova sia Alternata sia Schermo diviso ed esporta. Se dice che non ha trovato domande, scrivile nel campo che si apre e rifai l'analisi.",
             "Le domande trovate sono quelle giuste e le risposte non tagliano parole; alternata: cartello, A, B con i nomi; schermo diviso: tutti e due sullo schermo, parla uno alla volta e l'altro è fermo e più scuro, anche nel video esportato."),
         Item("str_trans_action", "Strumenti", "Transizioni d'azione 2026",
             "Su un progetto di sport (MTB, bici, corsa) con musica metti Frame d'impatto, Swipe, Tagli a fette, Tessere, Lama di luce e Strobo su tagli diversi; poi prova il video automatico con il tema Estremo. Anteprima ed esporta.",
