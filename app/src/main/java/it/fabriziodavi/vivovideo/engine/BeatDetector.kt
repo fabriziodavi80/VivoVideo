@@ -28,9 +28,66 @@ object BeatDetector {
         val env = onsetEnvelope(x)
         if (env.size < FPS * 2) return Result(0f, emptyList())
         val period = estimatePeriod(env)
-        val beats = track(env, period)
+        val beats = onTheDownbeat(track(env, period), lowEnvelope(x), period)
         val bpm = 60f * FPS / period
         return Result(bpm, beats.map { it * 1_000_000L / FPS })
+    }
+
+    /**
+     * Battiti sul battere, non in levare (11/11/2026, collaudo: "i tagli cadono in levare ma sono a tempo"). Il flusso
+     * spettrale sente forte anche i piatti, che nella musica pop e dance suonano spesso a metà fra un battito e l'altro:
+     * la griglia restava a tempo ma sfasata di mezzo battito. Qui si confronta la grancassa (frequenze basse) sui battiti
+     * trovati e a metà strada: se è chiaramente più forte a metà, tutti i battiti si spostano di mezzo battito.
+     */
+    internal fun onTheDownbeat(beats: List<Long>, low: FloatArray, period: Float): List<Long> {
+        if (beats.size < 4 || low.isEmpty()) return beats
+        fun peak(f: Long): Float {
+            val r = (period / 8).toInt().coerceAtLeast(2)
+            var m = 0f
+            for (k in (f - r).toInt()..(f + r).toInt()) if (k in low.indices) m = max(m, low[k])
+            return m
+        }
+        val mids = beats.zipWithNext { a, b -> (a + b) / 2 }
+        val onBeats = beats.dropLast(1).map { peak(it) }.sorted()
+        val onMids = mids.map { peak(it) }.sorted()
+        // Mediane: un colpo isolato non decide.
+        val b = onBeats[onBeats.size / 2]
+        val m = onMids[onMids.size / 2]
+        if (m <= b * 1.5f || m < 0.5f) return beats
+        val half = (period / 2).toLong()
+        val shifted = mids.toMutableList()
+        shifted += beats.last() + half
+        return shifted.filter { it < low.size }
+    }
+
+    /** Attacchi delle sole frequenze basse (grancassa, basso: circa 45–160 Hz), 100 valori al secondo, normalizzati. */
+    internal fun lowEnvelope(input: FloatArray): FloatArray {
+        val x = FloatArray(input.size + NFFT).also { input.copyInto(it, NFFT / 2) }
+        val frames = (x.size - NFFT) / HOP + 1
+        if (frames <= 1) return FloatArray(0)
+        val window = FloatArray(NFFT) { (0.5 - 0.5 * cos(2 * PI * it / NFFT)).toFloat() }
+        val re = FloatArray(NFFT); val im = FloatArray(NFFT)
+        val hiBin = (160.0 * NFFT / RATE).toInt()
+        var prev = FloatArray(hiBin + 1)
+        val env = FloatArray(frames)
+        for (f in 0 until frames) {
+            val o = f * HOP
+            for (i in 0 until NFFT) { re[i] = x[o + i] * window[i]; im[i] = 0f }
+            fft(re, im)
+            val cur = FloatArray(hiBin + 1)
+            var flux = 0f
+            for (b in 2..hiBin) {
+                val m = ln(1f + 100f * sqrt(re[b] * re[b] + im[b] * im[b]))
+                cur[b] = m
+                val d = m - prev[b]
+                if (d > 0) flux += d
+            }
+            env[f] = if (f <= NFFT / HOP) 0f else flux
+            prev = cur
+        }
+        val sd = sqrt(env.fold(0.0) { s, v -> s + v * v } / frames).toFloat().coerceAtLeast(1e-6f)
+        for (i in env.indices) env[i] /= sd
+        return env
     }
 
     /**

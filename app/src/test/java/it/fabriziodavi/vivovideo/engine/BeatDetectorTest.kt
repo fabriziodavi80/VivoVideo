@@ -10,7 +10,7 @@ import kotlin.random.Random
 
 class BeatDetectorTest {
     /** Ritmo sintetico: cassa (con attacco) ogni battito + charleston più debole in levare + rumore. */
-    private fun synth(bpm: Double, seconds: Double, offsetS: Double): FloatArray {
+    private fun synth(bpm: Double, seconds: Double, offsetS: Double, hat: Float = 0.12f, hatLen: Int = 40): FloatArray {
         val sr = 48_000
         val n = (seconds * sr).toInt()
         val x = FloatArray(n)
@@ -27,9 +27,9 @@ class BeatDetectorTest {
                 if (i < sr / 200) x[k] += (rnd.nextFloat() - 0.5f) * 0.8f * (1f - i / (sr / 200f))
             }
             val h = ((t + beat / 2) * sr).toInt()
-            for (i in 0 until sr / 40) {
+            for (i in 0 until sr / hatLen) {
                 val k = h + i; if (k >= n) break
-                x[k] += ((rnd.nextFloat() - 0.5f) * 0.12f * exp(-i / 300.0)).toFloat()
+                x[k] += ((rnd.nextFloat() - 0.5f) * hat * exp(-i / 300.0)).toFloat()
             }
             t += beat
         }
@@ -50,5 +50,20 @@ class BeatDetectorTest {
             val expected = offset * 1e6 + k * periodUs
             assertTrue("battito a $b, atteso $expected", abs(b - expected) < 40_000)
         }
+    }
+
+    @Test fun beatsFallOnTheKickEvenWithLoudOffbeatHats() {
+        // Collaudo dell'11/11/2026: "i tagli cadono in levare". Piatti in levare molto più forti della cassa: prima la
+        // griglia si agganciava ai piatti, a tempo ma sfasata di mezzo battito.
+        val bpm = 124.0
+        val offset = 0.21
+        val r = BeatDetector.detect(synth(bpm, 24.0, offset, hat = 1.6f, hatLen = 12), 48_000)
+        assertEquals(bpm, r.bpm.toDouble(), 2.0)
+        val periodUs = 60_000_000.0 / bpm
+        val onKick = r.beatsUs.count { b ->
+            val k = Math.round((b / 1e6 - offset) * 1e6 / periodUs)
+            abs(b - (offset * 1e6 + k * periodUs)) < 50_000
+        }
+        assertTrue("battiti sulla cassa: $onKick su ${r.beatsUs.size}", onKick >= r.beatsUs.size * 9 / 10)
     }
 }
