@@ -1,6 +1,6 @@
 # VivoVideo · note per riprendere il lavoro
 
-Aggiornate al 09/11/2026, ultima versione **v1.0.242** (sottotitoli cinetici: modello large-v3-turbo «Massima precisione», `Subtitles.wordTimes` con almeno 100 ms a parola, `Subtitles.retime` per le parole corrette o aggiunte a mano; collaudo `text_kinetic` OK il 09/11). Collaudo: restano da provare `int_double` (Intervista doppia) e i dati Garmin (`sport_data`). Sull'emulatore falliscono a volte a caso `previewPlaysWow`/`crossfadeSegmentRendersAndPlays` per lentezza. La 1.0 è la v1.0.201; dalla 202 ci sono i jump cut. Da leggere insieme a `CLAUDE.md`.
+Aggiornate all'11/11/2026, ultima versione **v1.0.248** (emulatore 51/51). Intervista doppia rifatta: con il modello Massima precisione il riconoscimento non scrive punteggiatura e i tempi delle parole (DTW) sbagliano anche di 1 s, quindi `Interview.pairedIdx` trova le domande solo dal testo (allineamento parola per parola dei due video, `key` per 10/dieci, fra/tra, qual'è) e `Interview.refine` taglia le risposte nella prima pausa vera dell'audio (pcm 16 kHz). Il diario scrive il parlato riconosciuto e i tagli. Collaudo: `int_double` in corso (ultimo difetto: coda della 3ª domanda in B, da riprovare rifacendo l'intervista con la 248), poi `sport_data`. La 1.0 è la v1.0.201; dalla 202 ci sono i jump cut. Da leggere insieme a `CLAUDE.md`.
 
 ## 1. Stato attuale dell'app
 
