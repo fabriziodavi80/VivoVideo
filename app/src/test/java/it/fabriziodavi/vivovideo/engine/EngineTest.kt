@@ -294,6 +294,24 @@ class EngineTest {
         assertTrue(amber(ov.getBitmap(400_000)) > 30)
     }
 
+    @Test fun fillKeepsTheBlackOutlineReadable() {
+        fun count(b: Bitmap, f: (Int) -> Boolean): Int { var n = 0; for (y in 0 until b.height) for (x in 0 until b.width) { val c = b.getPixel(x, y)
+            if (Color.alpha(c) > 200 && f(c)) n++ }; return n }
+        val magenta = { c: Int -> Color.red(c) > 200 && Color.green(c) < 110 && Color.blue(c) > 150 }
+        val white = { c: Int -> Color.red(c) > 220 && Color.green(c) > 220 && Color.blue(c) > 220 }
+        val dark = { c: Int -> Color.red(c) < 60 && Color.green(c) < 60 && Color.blue(c) < 60 }
+        val text = "che bella giornata"
+        val t = TextItem(text = text, font = TextFont.POSTER, look = TextLook.CONTORNO, color = 0xFFFFFFFF.toInt(),
+            highlight = 0xFFFF2EC4.toInt(), wordsUs = listOf(0, 300_000, 600_000), wordMode = 3)
+        val plain = TextRenderer.render(app, t, 1080, 1920)
+        val filled = TextRenderer.render(app, t, 1080, 1920, highlight = 0 until text.length)
+        val letters = count(plain, white)
+        assertTrue("lettere bianche: $letters", letters > 200)
+        // Colorate tutte: il colore sta solo dentro le lettere, il contorno resta nero come prima.
+        assertTrue("colore ${count(filled, magenta)} contro lettere $letters", count(filled, magenta) < letters * 1.3)
+        assertTrue("contorno nero ${count(filled, dark)} contro ${count(plain, dark)}", count(filled, dark) > count(plain, dark) * 0.7)
+    }
+
     @Test fun wowTransitionsPeakAtTheCutAndVanishAway() {
         val wow = listOf(TransitionType.GLITCH, TransitionType.PRISM, TransitionType.LEAK, TransitionType.IRIS, TransitionType.PIXELATE, TransitionType.SHAKE)
         wow.forEach { t ->

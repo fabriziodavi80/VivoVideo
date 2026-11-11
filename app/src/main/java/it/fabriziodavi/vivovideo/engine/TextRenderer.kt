@@ -71,7 +71,7 @@ object TextRenderer {
     private fun isLight(c: Int): Boolean =
         (0.2126 * Color.red(c) + 0.7152 * Color.green(c) + 0.0722 * Color.blue(c)) > 140
 
-    private class Prepared(val layout: StaticLayout, val width: Int, val pad: Int, val paint: TextPaint)
+    private class Prepared(val layout: StaticLayout, val width: Int, val pad: Int, val paint: TextPaint, val outline: StaticLayout? = null)
 
     private fun prepare(context: Context, item: TextItem, frameW: Int, frameH: Int, visible: Int, highlight: IntRange? = null): Prepared {
         val paint = TextPaint(Paint.ANTI_ALIAS_FLAG or Paint.SUBPIXEL_TEXT_FLAG).apply {
@@ -102,7 +102,16 @@ object TextRenderer {
         layout = StaticLayout.Builder.obtain(content, 0, content.length, paint, width)
             .setAlignment(Layout.Alignment.ALIGN_CENTER).setIncludePad(true).build()
         val pad = (paint.textSize * when (item.look) { TextLook.RIQUADRO -> 0.45f; TextLook.NEON -> 0.6f; else -> 0.25f }).toInt() + 2
-        return Prepared(layout, width, pad, paint)
+        // Il contorno non prende il colore di risalto: altrimenti le lettere colorate hanno un bordo spesso
+        // dello stesso colore e si impastano tra loro (sottotitoli che si colorano, karaoke).
+        val outline = if (item.look == TextLook.CONTORNO && highlight != null) {
+            val plain: CharSequence = if (visible >= text.length) text else SpannableString(text).apply {
+                setSpan(ForegroundColorSpan(Color.TRANSPARENT), visible.coerceAtLeast(0), text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+            StaticLayout.Builder.obtain(plain, 0, plain.length, paint, width)
+                .setAlignment(Layout.Alignment.ALIGN_CENTER).setIncludePad(true).build()
+        } else null
+        return Prepared(layout, width, pad, paint, outline)
     }
 
     /** Dimensioni (in pixel del quadro) dell'immagine del testo: serve per il riquadro di modifica. */
@@ -138,7 +147,12 @@ object TextRenderer {
             p.paint.strokeWidth = p.paint.textSize * 0.14f
             p.paint.strokeJoin = Paint.Join.ROUND
             p.paint.color = if (light) Color.BLACK else Color.WHITE
-            p.layout.draw(c)
+            if (p.outline != null) {
+                // Ombra morbida sotto il contorno: il testo si legge anche sui fondi chiari.
+                p.paint.setShadowLayer(p.paint.textSize * 0.12f, 0f, p.paint.textSize * 0.04f, 0x99000000.toInt())
+                p.outline.draw(c)
+                p.paint.clearShadowLayer()
+            } else p.layout.draw(c)
             p.paint.style = Paint.Style.FILL
             p.paint.color = fill
         }
