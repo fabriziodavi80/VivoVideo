@@ -138,14 +138,18 @@ fun InterviewScreen(vm: EditorViewModel) {
             }
             if (qas != null && qas.isNotEmpty()) {
                 PanelLabel("Domande e risposte trovate")
-                Hint("Togli con ✕ le domande che non vuoi nel video. Le risposte non trovate restano fuori da sole.")
+                Hint("Il testo della domanda è quello del cartello: correggilo qui se serve. Togli con ✕ le domande che non vuoi nel video. Le risposte non trovate restano fuori da sole.")
                 qas.forEachIndexed { i, qa ->
                     Row(
                         Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(VV.Raised).padding(start = 12.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Column(Modifier.weight(1f).padding(vertical = 8.dp)) {
-                            Text("${i + 1}. ${qa.question}", style = MaterialTheme.typography.bodyMedium, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                            // Il testo del cartello: si corregge qui se il riconoscimento ha sbagliato una parola.
+                            OutlinedTextField(
+                                value = qa.question, onValueChange = { vm.renameInterviewQuestion(i, it) }, colors = colors,
+                                enabled = busy == null, modifier = Modifier.fillMaxWidth(), label = { Text("Domanda ${i + 1}", color = VV.Faint) },
+                            )
                             Text(
                                 "A: " + (qa.a?.let { sec(it.lengthUs) } ?: "non trovata") + "   ·   B: " + (qa.b?.let { sec(it.lengthUs) } ?: "non trovata"),
                                 style = MaterialTheme.typography.bodySmall, color = if (qa.usable) VV.Dim else VV.Danger,

@@ -128,6 +128,21 @@ class InterviewTest {
         assertEquals("spero in barca", said(b, qas[2].b!!))
     }
 
+    @Test fun answersEndingWithTheSameWordDoNotStartTheNextQuestion() {
+        // Tutte e due le risposte finiscono con "passeggiata" subito prima della domanda dopo.
+        val a = paused("Cosa faresti con una giornata libera?" to 900_000L, "Andrei a fare una passeggiata." to 800_000L,
+            "Come ti vedi fra 10 anni?" to 900_000L, "Sposato." to 500_000L)
+        val b = paused("Cosa faresti con una giornata libera?" to 900_000L, "Una bella passeggiata." to 700_000L,
+            "Come ti vedi tra dieci anni?" to 900_000L, "In barca." to 500_000L)
+        assertEquals(listOf("Cosa faresti con una giornata libera?", "Come ti vedi fra 10 anni?"), Interview.match(a, b, 20_000_000, 20_000_000).map { it.question })
+        // Anche senza punteggiatura.
+        val a2 = paused("cosa faresti con una giornata libera" to 900_000L, "andrei a fare una passeggiata" to 800_000L,
+            "come ti vedi fra 10 anni" to 900_000L, "sposato" to 500_000L)
+        val b2 = paused("cosa faresti con una giornata libera" to 900_000L, "una bella passeggiata" to 700_000L,
+            "come ti vedi tra dieci anni" to 900_000L, "in barca" to 500_000L)
+        assertEquals(listOf("Cosa faresti con una giornata libera?", "Come ti vedi fra 10 anni?"), Interview.match(a2, b2, 20_000_000, 20_000_000).map { it.question })
+    }
+
     @Test fun aSingleVideoStillFindsQuestionWords() {
         // Nessun pezzo uguale nell'altro video e nessun "?": valgono le frasi che cominciano con una parola da domanda.
         val a = plain("Come ti chiami.", "Marco.", "Quanti anni hai.", "Quarantasei.")

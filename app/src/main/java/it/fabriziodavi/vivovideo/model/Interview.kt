@@ -377,6 +377,21 @@ object Interview {
             // Mai due domande sovrapposte (l'inizio allargato all'indietro non entra nella domanda di prima).
             if (prev != null) { q.a0 = maxOf(q.a0, prev.a1 + 1); q.b0 = maxOf(q.b0, prev.b1 + 1) }
             if (matched < 2 || (!asks && matched < 4)) continue
+            // 11/11/2026 (collaudo: "Passeggiata come ti vedi…"): la coda della risposta di prima, uguale nei due video, non
+            // fa parte della domanda. Se la domanda vera comincia poco dopo (parola da domanda dopo un punto o una pausa),
+            // parte da lì; una prima parola che chiude una frase non è della domanda.
+            fun trimHead(t: List<String>, w: List<SpokenWord>, s0: Int, e: Int): Int {
+                var s = s0
+                (s + 1..minOf(e, s + 3)).firstOrNull { k -> t[k] in ASK && (endsSentence(w, k - 1) || gapAfter(w, k - 1) > TURN_US) }?.let { s = it }
+                while (s < e && endsSentence(w, s)) s++
+                return s
+            }
+            q.a0 = trimHead(ta, wa, q.a0, q.a1); q.b0 = trimHead(tb, wb, q.b0, q.b1)
+            // Fine: fino al punto della frase, se arriva entro due parole dette di fila ("…il tuo piatto | preferito?").
+            fun toStop(w: List<SpokenWord>, e: Int): Int =
+                if (endsSentence(w, e)) e
+                else (1..2).firstOrNull { d -> e + d <= w.lastIndex && endsSentence(w, e + d) && (e until e + d).none { endsSentence(w, it) || gapAfter(w, it) > TURN_US } }?.let { e + it } ?: e
+            q.a1 = toStop(wa, q.a1); q.b1 = toStop(wb, q.b1)
             qs += q
         }
         if (qs.isEmpty()) return emptyList()
