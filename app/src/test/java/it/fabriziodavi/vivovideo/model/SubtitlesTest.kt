@@ -124,4 +124,35 @@ class SubtitlesTest {
         // Parola tolta: le altre tengono il tempo.
         assertEquals(listOf(0L, 1_000_000L), Subtitles.retime("ciao a tutti", "ciao tutti", times, 1_600_000))
     }
+
+    @Test fun fillColorsTheTextAsItIsSpoken() {
+        // "Che bella giornata": parole a 0, 0,4 e 0,8 s.
+        val text = "Che bella giornata"
+        val ranges = Regex("\\S+").findAll(text).map { it.range }.toList()
+        val times = listOf(0L, 400_000L, 800_000L)
+        assertEquals(0, Subtitles.filledChars(ranges, listOf(100_000L, 400_000L, 800_000L), 50_000, 2_000_000))
+        // Appena iniziata la prima parola: almeno una lettera; a metà parola, metà lettere.
+        assertEquals(1, Subtitles.filledChars(ranges, times, 0, 2_000_000))
+        assertEquals(2, Subtitles.filledChars(ranges, times, 200_000, 2_000_000))
+        // Alla parola dopo, la prima è tutta colorata ("Che " fino a "b").
+        assertEquals(5, Subtitles.filledChars(ranges, times, 400_000, 2_000_000))
+        // Il riempimento non torna mai indietro.
+        var prev = 0
+        for (t in 0L..2_000_000L step 20_000) { val n = Subtitles.filledChars(ranges, times, t, 2_000_000); assertTrue(n >= prev); prev = n }
+        // Alla fine tutto il testo è colorato.
+        assertEquals(text.length, Subtitles.filledChars(ranges, times, 1_900_000, 2_000_000))
+    }
+
+    @Test fun fillStyleUsesTheChosenColor() {
+        val w = listOf(w(0.0, 0.3, "Che"), w(0.4, 0.7, "bella"), w(0.8, 1.3, "giornata"))
+        val magenta = Subtitles.ACCENTS.first { it.first == "Magenta" }.second
+        val subs = Subtitles.build(w, SubStyle.FILL, SubPosition.BOTTOM, 5_000_000, accent = magenta)
+        assertTrue(subs.isNotEmpty() && subs.all { it.wordMode == 3 && it.highlight == magenta && it.kinetic == null })
+        // Senza scelta: lime acido.
+        assertTrue(Subtitles.build(w, SubStyle.FILL, SubPosition.BOTTOM, 5_000_000).all { it.highlight == Subtitles.KINETIC_HIGHLIGHT })
+        // Il colore vale anche per karaoke e cinetici, non per gli stili senza colore.
+        assertTrue(Subtitles.build(w, SubStyle.KARAOKE, SubPosition.BOTTOM, 5_000_000, magenta).all { it.highlight == magenta })
+        assertTrue(Subtitles.build(w, SubStyle.POP, SubPosition.BOTTOM, 5_000_000, magenta).all { it.highlight == magenta })
+        assertTrue(Subtitles.build(w, SubStyle.CLASSIC, SubPosition.BOTTOM, 5_000_000, magenta).none { it.highlight == magenta })
+    }
 }

@@ -129,7 +129,8 @@ Base tecnica: Kotlin, Jetpack Compose, Media3 1.11.1, ML Kit, whisper.cpp e Sign
 9. **Scontorno**: bordi e capelli (pennello di ritocco con propagazione, filtro guidato a colori, modello di matting più pesante).
 10. **Stabilizzazione**: correzione rolling shutter, zoom variabile nel tempo, omografia.
 11. **Stories per Instagram** (richiesta dell'utente del 31/10/2026): creazione di stories (9:16, segmenti brevi). Dettagli da definire con l'utente.
-12. **Collage di foto** (richiesta dell'utente del 31/10/2026): più foto insieme in un unico quadro. Dettagli da definire con l'utente.
+12. **Collage di foto** (richiesta dell'utente del 31/10/2026): più foto insieme in un unico quadro. L'11/11 l'utente ha chiesto **innumerevoli modelli** prendendo spunto dai migliori programmi a pagamento in commercio (cercare quali modelli offrono oggi e farne tanti, moderni). Dettagli da definire con l'utente.
+13. ~~Sottotitoli che si colorano mentre parli~~ (11/11, visto su Instagram): fatto, `SubStyle.FILL`, `wordMode = 3`, `Subtitles.filledChars`, colori `Subtitles.ACCENTS`, `vm.setWordMode`.
 
 ### Da tenere d'occhio
 - `PreviewLoudness` misura il mix in secondo piano dopo ogni modifica all'audio: verificare i tempi su progetti lunghi.

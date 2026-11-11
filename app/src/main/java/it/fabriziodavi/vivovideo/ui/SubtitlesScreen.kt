@@ -19,6 +19,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,6 +54,7 @@ fun SubtitlesScreen(vm: EditorViewModel) {
     var lang by remember { mutableStateOf("it") }
     var style by remember { mutableStateOf(SubStyle.POP) }
     var pos by remember { mutableStateOf(SubPosition.BOTTOM) }
+    var accent by remember { mutableStateOf(Subtitles.KINETIC_HIGHLIGHT) }
     val existing = vm.project?.texts?.count { it.subtitle } ?: 0
 
     Column(Modifier.fillMaxSize().background(VV.Canvas).safeDrawingPadding()) {
@@ -84,15 +89,19 @@ fun SubtitlesScreen(vm: EditorViewModel) {
                 val sample = when (style) {
                     SubStyle.KARAOKE -> buildAnnotatedString {
                         append("Che bella ")
-                        withStyle(SpanStyle(color = Color(Subtitles.HIGHLIGHT))) { append("giornata") }
+                        withStyle(SpanStyle(color = Color(accent))) { append("giornata") }
                         append(" oggi")
+                    }
+                    SubStyle.FILL -> buildAnnotatedString {
+                        withStyle(SpanStyle(color = Color(accent))) { append("CHE BELLA GIOR") }
+                        append("NATA")
                     }
                     SubStyle.REVEAL -> buildAnnotatedString { append("Che bella giornata…") }
                     SubStyle.SOCIAL -> buildAnnotatedString { append("Che bella giornata") }
                     SubStyle.MINIMAL -> buildAnnotatedString { append("che bella giornata oggi") }
                     // Cinetici: una parola alla volta, quelle importanti nel colore di risalto.
                     SubStyle.POP, SubStyle.GLASS, SubStyle.CHROME, SubStyle.GLITCHY, SubStyle.WAVE -> buildAnnotatedString {
-                        withStyle(SpanStyle(color = Color(Subtitles.KINETIC_HIGHLIGHT), fontSize = 26.sp)) { append("GIORNATA") }
+                        withStyle(SpanStyle(color = Color(accent), fontSize = 26.sp)) { append("GIORNATA") }
                     }
                     else -> buildAnnotatedString { append("Che bella giornata oggi") }
                 }
@@ -106,6 +115,20 @@ fun SubtitlesScreen(vm: EditorViewModel) {
                 )
             }
             style.kinetic?.let { Hint(it.hint + ". Le parole importanti (numeri, parole lunghe, esclamazioni) si colorano da sole.") }
+            if (style == SubStyle.FILL) Hint("La frase intera, bianca con il contorno: il colore la riempie lettera per lettera mentre la persona parla, come nei reel.")
+            if (style.kinetic != null || style == SubStyle.FILL || style == SubStyle.KARAOKE) {
+                PanelLabel(if (style == SubStyle.FILL || style == SubStyle.KARAOKE) "Colore della voce" else "Colore delle parole importanti")
+                Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Subtitles.ACCENTS.forEach { (name, c) ->
+                        Box(
+                            Modifier.size(34.dp).clip(RoundedCornerShape(17.dp)).background(Color(c))
+                                .border(if (c == accent) 3.dp else 1.dp, if (c == accent) Color.White else VV.Line, RoundedCornerShape(17.dp))
+                                .clickable(enabled = busy == null) { accent = c }
+                                .semantics { contentDescription = name }
+                        )
+                    }
+                }
+            }
             PanelLabel("Posizione")
             Segmented(SubPosition.entries, pos, { it.label }, busy == null) { pos = it }
             if (existing > 0) Hint("Ci sono già $existing sottotitoli automatici: verranno sostituiti dai nuovi (Annulla per tornare indietro).")
@@ -116,7 +139,7 @@ fun SubtitlesScreen(vm: EditorViewModel) {
                 LinearProgressIndicator(Modifier.fillMaxWidth().height(4.dp).clip(RoundedCornerShape(2.dp)), color = VV.Tally, trackColor = VV.Raised2)
                 SecondaryButton("Annulla", Modifier.fillMaxWidth(), onClick = { vm.cancelSubtitles() })
             } else {
-                PrimaryButton("Crea i sottotitoli", Modifier.fillMaxWidth()) { vm.autoSubtitles(model, lang, style, pos) }
+                PrimaryButton("Crea i sottotitoli", Modifier.fillMaxWidth()) { vm.autoSubtitles(model, lang, style, pos, accent) }
                 if (existing > 0) SecondaryButton("Togli i sottotitoli automatici", Modifier.fillMaxWidth(), onClick = { vm.removeSubtitles(); vm.showSubtitles = false })
             }
         }

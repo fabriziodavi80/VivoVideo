@@ -541,7 +541,10 @@ data class TextItem(
     val subtitle: Boolean = false,
     /** Inizio di ogni parola rispetto a [startUs] (sottotitoli con i tempi del parlato). */
     val wordsUs: List<Long> = emptyList(),
-    /** 0 = testo intero; 1 = karaoke (la parola detta si colora di [highlight]); 2 = le parole compaiono mentre sono dette. */
+    /**
+     * 0 = testo intero; 1 = karaoke (la parola detta si colora di [highlight]); 2 = le parole compaiono mentre sono dette;
+     * 3 = il testo si colora di [highlight] lettera per lettera mentre è detto.
+     */
     val wordMode: Int = 0,
     val highlight: Int = 0xFFF2B33D.toInt(),
     /** Titoli di coda: il testo (più righe) scorre dal basso in alto a velocità costante per tutta la durata. */

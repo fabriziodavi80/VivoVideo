@@ -1602,6 +1602,25 @@ private fun TextPanel(vm: EditorViewModel, running: Boolean, tab: Int, onPickFon
                     }
                 }
             }
+            if (t.subtitle && t.wordsUs.isNotEmpty() && t.kinetic == null) {
+                // Sottotitoli con i tempi della voce: come seguono il parlato e di che colore.
+                PanelLabel("Le parole seguono la voce")
+                val modes = listOf(0 to "No", 3 to "Si colora mentre parli", 1 to "Karaoke", 2 to "Parola per parola")
+                PillRow(modes.map { it.first }, t.wordMode, { m -> modes.first { it.first == m }.second }, enabled) { m -> vm.setWordMode(m, null, all = false) }
+                if (t.wordMode == 1 || t.wordMode == 3) {
+                    PanelLabel("Colore della voce")
+                    Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Subtitles.ACCENTS.forEach { (_, c) ->
+                            Box(
+                                Modifier.size(30.dp).clip(RoundedCornerShape(15.dp)).background(Color(c))
+                                    .border(if (c == t.highlight) 3.dp else 1.dp, if (c == t.highlight) VV.Tally else VV.Line, RoundedCornerShape(15.dp))
+                                    .clickable(enabled = enabled) { vm.setWordMode(t.wordMode, c, all = false) }
+                            )
+                        }
+                    }
+                }
+                SecondaryButton("Usa per tutti i sottotitoli", Modifier.fillMaxWidth(), onClick = { if (enabled) vm.setWordMode(t.wordMode, t.highlight, all = true) })
+            }
             PanelLabel("In entrata")
             PillRow(ANIMS_NEW_FIRST, t.animIn, { it.label }, enabled) { a -> vm.updateText { it.copy(animIn = a) } }
             PanelLabel("In uscita")

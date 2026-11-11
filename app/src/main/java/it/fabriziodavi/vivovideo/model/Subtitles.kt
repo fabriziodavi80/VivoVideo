@@ -11,6 +11,8 @@ enum class SubStyle(val label: String, val maxWords: Int = 7, val kinetic: Kinet
     CHROME("Cromo", maxWords = 4, kinetic = KineticStyle.CHROME),
     GLITCHY("Glitch", maxWords = 4, kinetic = KineticStyle.GLITCH),
     WAVE("Onda", maxWords = 4, kinetic = KineticStyle.WAVE),
+    // Instagram 2026-27: la frase intera, bianca, che si colora lettera per lettera mentre è detta.
+    FILL("Si colora mentre parli", maxWords = 4),
     // Tendenze 2026: due o tre parole alla volta, bianco bold con contorno; oppure minuscolo e quieto.
     SOCIAL("Social", maxWords = 3), MINIMAL("Minimal"),
     CLASSIC("Classico"), KARAOKE("Karaoke"), REVEAL("Parola per parola"), BOX("Riquadro");
@@ -188,7 +190,30 @@ object Subtitles {
     }
 
     /** Sottotitoli pronti (testi della timeline, marcati come sottotitoli) dalle parole riconosciute. */
-    fun build(words: List<SpokenWord>, style: SubStyle, pos: SubPosition, projectUs: Long): List<TextItem> {
+    /** Colori di risalto d'impatto (2027) per le parole dette e le parole importanti. */
+    val ACCENTS: List<Pair<String, Int>> = listOf(
+        "Lime acido" to KINETIC_HIGHLIGHT, "Ciano elettrico" to 0xFF00E5FF.toInt(), "Magenta" to 0xFFFF2EC4.toInt(),
+        "Arancio fluo" to 0xFFFF7A1A.toInt(), "Viola elettrico" to 0xFFA66BFF.toInt(), "Rosso corallo" to 0xFFFF4D5E.toInt(),
+        "Verde menta" to 0xFF3DFFB0.toInt(), "Giallo burro" to HIGHLIGHT,
+    )
+
+    /**
+     * Quante lettere del testo sono già colorate nello stile «Si colora mentre parli» a [local] µs dall'inizio: le parole
+     * già dette tutte, quella in corso lettera per lettera fino all'inizio della parola dopo (l'ultima in circa 70 ms a
+     * lettera). [ranges] sono le parole nel testo, [times] i loro inizi.
+     */
+    fun filledChars(ranges: List<IntRange>, times: List<Long>, local: Long, durationUs: Long): Int {
+        val k = wordAt(times, local).coerceAtMost(ranges.lastIndex)
+        if (k < 0) return 0
+        val r = ranges[k]
+        val len = r.last - r.first + 1
+        val t0 = times[k]
+        val t1 = times.getOrNull(k + 1) ?: (t0 + (len * 70_000L).coerceIn(200_000L, 600_000L)).coerceAtMost(durationUs)
+        val f = ((local - t0).toDouble() / (t1 - t0).coerceAtLeast(1)).coerceIn(0.0, 1.0)
+        return r.first + kotlin.math.ceil(f * len).toInt().coerceIn(1, len)
+    }
+
+    fun build(words: List<SpokenWord>, style: SubStyle, pos: SubPosition, projectUs: Long, accent: Int? = null): List<TextItem> {
         return timedLines(words, style.maxWords, projectUs).map { (line, start, end) ->
             val text = line.joinToString(" ") { it.text }.let { if (style == SubStyle.MINIMAL) it.lowercase() else it }
             val base = TextItem(
@@ -213,7 +238,9 @@ object Subtitles {
                 SubStyle.SOCIAL -> base.copy(wordMode = 2, font = TextFont.POSTER, look = TextLook.CONTORNO, size = 0.06f)
                 // Minimal: minuscolo, piccolo, su una riga, senza animazioni.
                 SubStyle.MINIMAL -> base.copy(size = 0.04f)
-            }
+                // Si colora mentre parli: bold bianco con contorno, il colore riempie le parole mentre sono dette.
+                SubStyle.FILL -> base.copy(wordMode = 3, font = TextFont.POSTER, look = TextLook.CONTORNO, size = 0.062f, highlight = KINETIC_HIGHLIGHT)
+            }.let { t -> if (accent != null && (t.wordMode == 1 || t.wordMode == 3 || t.kinetic != null)) t.copy(highlight = accent) else t }
         }
     }
 

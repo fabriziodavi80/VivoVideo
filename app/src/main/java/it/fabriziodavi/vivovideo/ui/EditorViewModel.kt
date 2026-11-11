@@ -1508,6 +1508,21 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
 
     /** Scontorna la persona della clip (maschere calcolate una volta) e tratta lo sfondo come [mode]. */
     /** Stile cinetico del testo scelto (o di tutti i sottotitoli). Un testo scritto a mano riceve i tempi delle parole. */
+    /**
+     * Come le parole seguono la voce in un sottotitolo (0 niente, 1 karaoke, 2 parola per parola, 3 si colora mentre parli)
+     * e con che colore; [all] = a tutti i sottotitoli automatici.
+     */
+    fun setWordMode(mode: Int, color: Int?, all: Boolean) {
+        fun apply(x: TextItem): TextItem {
+            var y = x.copy(wordMode = mode, kinetic = if (mode == 0 || mode == 2) x.kinetic else null)
+            if (color != null) y = y.copy(highlight = color)
+            else if (mode == 3 && x.highlight == TextItem().highlight) y = y.copy(highlight = Subtitles.KINETIC_HIGHLIGHT)
+            return y
+        }
+        if (all) { update { p -> p.copy(texts = p.texts.map { x -> if (x.subtitle && x.wordsUs.isNotEmpty()) apply(x) else x }) }; return }
+        updateText { apply(it) }
+    }
+
     fun setKinetic(style: it.fabriziodavi.vivovideo.model.KineticStyle?, all: Boolean) {
         val t = selectedText ?: return
         if (all) {
@@ -2035,7 +2050,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
      * Ascolta l'audio del video (clip, voci, audio staccato; la musica no) e crea i sottotitoli,
      * sostituendo quelli automatici di prima. Il modello si scarica la prima volta.
      */
-    fun autoSubtitles(model: Whisper.Model, lang: String, style: SubStyle, pos: SubPosition) {
+    fun autoSubtitles(model: Whisper.Model, lang: String, style: SubStyle, pos: SubPosition, accent: Int? = null) {
         val ctx = getApplication<Application>()
         val p = project ?: return
         if (p.clips.isEmpty() || busy != null) return
@@ -2056,7 +2071,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                 val poll = launch { while (true) { kotlinx.coroutines.delay(400); busy = "Ascolto il video… ${Whisper.progress()}%" } }
                 val words = try { Whisper.transcribe(Whisper.modelFile(ctx, model), pcm, lang) } finally { poll.cancel() }
                 busy = null
-                val subs = Subtitles.build(words, style, pos, p.durationUs)
+                val subs = Subtitles.build(words, style, pos, p.durationUs, accent)
                 if (subs.isEmpty()) { message = "Non ho sentito parole nel video (la musica non viene ascoltata, solo l'audio delle clip e le voci)."; return@launch }
                 update { it.copy(texts = it.texts.filterNot { t -> t.subtitle } + subs) }
                 showSubtitles = false
