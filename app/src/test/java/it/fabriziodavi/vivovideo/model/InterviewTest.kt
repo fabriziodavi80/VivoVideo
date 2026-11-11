@@ -108,6 +108,26 @@ class InterviewTest {
         assertEquals(listOf("Qual è il tuo piatto preferito in assoluto?"), Interview.match(a2, b2, 20_000_000, 20_000_000).map { it.question })
     }
 
+    @Test fun theThreeQuestionsOfTheTestStayWholeWithoutPunctuation() {
+        // Collaudo dell'11/11/2026: le tre domande vere, scritte un po' diverse nei due video ("qual'è"/"qual è",
+        // "fra 10"/"tra dieci"), senza punteggiatura, con una pausa a metà domanda e risposte che cominciano uguali.
+        val a = paused("qual è il tuo" to 800_000L, "piatto preferito" to 900_000L, "mi piace la pizza" to 900_000L,
+            "cosa faresti con una giornata libera" to 1_000_000L, "sì andrei al mare" to 900_000L,
+            "come ti vedi" to 700_000L, "fra 10 anni" to 1_100_000L, "spero in pensione" to 500_000L)
+        val b = paused("qual'è il tuo piatto preferito" to 800_000L, "mi piace il risotto" to 1_000_000L,
+            "cosa faresti con una giornata" to 600_000L, "libera" to 900_000L, "sì dormirei" to 800_000L,
+            "come ti vedi tra dieci anni" to 900_000L, "spero in barca" to 500_000L)
+        val qas = Interview.match(a, b, 30_000_000, 30_000_000)
+        assertEquals(listOf("Qual è il tuo piatto preferito?", "Cosa faresti con una giornata libera?", "Come ti vedi fra 10 anni?"), qas.map { it.question })
+        fun said(words: List<SpokenWord>, s: Span) = words.filter { it.startUs >= s.startUs - 1 && it.endUs <= s.endUs + 1 }.joinToString(" ") { it.text }
+        assertEquals("mi piace la pizza", said(a, qas[0].a!!))
+        assertEquals("mi piace il risotto", said(b, qas[0].b!!))
+        assertEquals("sì andrei al mare", said(a, qas[1].a!!))
+        assertEquals("sì dormirei", said(b, qas[1].b!!))
+        assertEquals("spero in pensione", said(a, qas[2].a!!))
+        assertEquals("spero in barca", said(b, qas[2].b!!))
+    }
+
     @Test fun aSingleVideoStillFindsQuestionWords() {
         // Nessun pezzo uguale nell'altro video e nessun "?": valgono le frasi che cominciano con una parola da domanda.
         val a = plain("Come ti chiami.", "Marco.", "Quanti anni hai.", "Quarantasei.")
