@@ -268,6 +268,9 @@ object Interview {
 
     private fun openEnd(t: String) = t in OPEN
 
+    /** Parole con cui comincia una risposta. */
+    private val REPLY = setOf("si", "no", "beh", "be", "allora", "mah", "boh", "eh", "ehm", "dunque", "ok", "certo", "mmm", "uhm", "allora", "sicuramente", "ovviamente")
+
     /**
      * Parole uguali nei due video, allineate in ordine come quando si confrontano due versioni di un testo (punteggio:
      * +3 parola uguale, -1 parola diversa o in più). Restituisce le coppie (indice in A, indice in B).
@@ -349,7 +352,6 @@ object Interview {
                     // Una parola da domanda dopo parole diverse, o dopo una frase già lunga: domanda nuova.
                     (starter(ta[ca]) && (ua + ub >= 1 || groups.last().size >= 3)) ||
                     (ta[ca] == "che" && ua >= 1 && ub >= 1) ||
-                    (pause(wa, ca - 1) && pause(wb, cb - 1)) ||
                     ((pa until ca).any { endsSentence(wa, it) } && (pb until cb).any { endsSentence(wb, it) })
                 )
             if (split) groups += mutableListOf(pairs[k]) else groups.last() += pairs[k]
@@ -377,8 +379,9 @@ object Interview {
             (a0..minOf(a1, a0 + 3)).firstOrNull { starter(ta[it]) }?.let { a0 = it }
             (b0..minOf(b1, b0 + 3)).firstOrNull { starter(tb[it]) }?.let { b0 = it }
             // Fine: niente articoli o preposizioni in coda, sono l'inizio della risposta ("…preferito la | pasta").
-            while (a1 > a0 && openEnd(ta[a1]) && !endsSentence(wa, a1)) a1--
-            while (b1 > b0 && openEnd(tb[b1]) && !endsSentence(wb, b1)) b1--
+            // Neanche le parole con cui si comincia a rispondere ("sì", "beh", "allora"), se dette uguali da tutti e due.
+            while (a1 > a0 && (openEnd(ta[a1]) || ta[a1] in REPLY) && !endsSentence(wa, a1)) a1--
+            while (b1 > b0 && (openEnd(tb[b1]) || tb[b1] in REPLY) && !endsSentence(wb, b1)) b1--
             // Ultima parola scritta quasi uguale nei due video ("preferito"/"preferita") e fino al "?" vicino.
             if (a1 + 1 <= wa.lastIndex && b1 + 1 <= wb.lastIndex && ta[a1 + 1] != tb[b1 + 1] && near(ta[a1 + 1], tb[b1 + 1])) { a1++; b1++ }
             fun toMark(w: List<SpokenWord>, e: Int): Int =
@@ -400,6 +403,9 @@ object Interview {
 
     // ---------------- Tagli sull'audio ----------------
 
+    /** Pausa minima fra chi chiede e chi risponde. */
+    private const val TURN_PAUSE_US = 250_000L
+
     /** Livello (dB) di ogni tratto di 10 ms dell'audio mono [pcm] a [rate] Hz. */
     internal fun levels(pcm: FloatArray, rate: Int): FloatArray {
         val hop = rate / 100
@@ -420,20 +426,25 @@ object Interview {
         return floor + (voice - floor) * 0.3f
     }
 
-    /** La pausa (silenzio) più lunga fra [fromUs] e [toUs], almeno [minUs]: inizio e fine in µs, o null. */
-    internal fun longestPause(db: FloatArray, thr: Float, fromUs: Long, toUs: Long, minUs: Long = 120_000): Pair<Long, Long>? {
+    /**
+     * Le pause (silenzi di almeno [minUs]) fra [fromUs] e [toUs]; [first] sceglie la prima lunga almeno [TURN_PAUSE_US],
+     * altrimenti l'ultima così: la pausa fra domanda e risposta è la prima dopo la domanda, quella prima
+     * della domanda dopo è l'ultima, anche se dentro la risposta c'è una pausa più lunga.
+     */
+    internal fun pauseAt(db: FloatArray, thr: Float, fromUs: Long, toUs: Long, first: Boolean, minUs: Long = 150_000): Pair<Long, Long>? {
         val f0 = (fromUs / 10_000).toInt().coerceIn(0, db.size); val f1 = (toUs / 10_000).toInt().coerceIn(0, db.size)
-        var best: Pair<Int, Int>? = null
+        val runs = mutableListOf<Pair<Int, Int>>()
         var run = -1
         for (f in f0..f1) {
             val quiet = f < f1 && db[f] < thr
             if (quiet && run < 0) run = f
-            if (!quiet && run >= 0) {
-                if (best == null || f - run > best.second - best.first) best = run to f
-                run = -1
-            }
+            if (!quiet && run >= 0) { if ((f - run) * 10_000L >= minUs) runs += run to f; run = -1 }
         }
-        return best?.takeIf { (it.second - it.first) * 10_000L >= minUs }?.let { it.first * 10_000L to it.second * 10_000L }
+        if (runs.isEmpty()) return null
+        // Una pausa vera fra due persone dura almeno un quarto di secondo; se nessuna arriva, la più lunga.
+        val ok = runs.filter { (it.second - it.first) * 10_000L >= TURN_PAUSE_US }.ifEmpty { listOf(runs.maxBy { it.second - it.first }) }
+        val r = if (first) ok.first() else ok.last()
+        return r.first * 10_000L to r.second * 10_000L
     }
 
     /**
@@ -450,9 +461,9 @@ object Interview {
         val last = (nextStart ?: words.size) - 1
         if (first > last) return span
         val inTo = words.getOrNull(first + 1)?.startUs?.takeIf { first + 1 <= last } ?: (words[first].startUs + 1_500_000)
-        val a = longestPause(db, thr, words[qEnd].startUs + 100_000, inTo)?.let { (it.second - 80_000).coerceAtLeast(it.first) } ?: span.startUs
+        val a = pauseAt(db, thr, words[qEnd].startUs + 100_000, inTo, first = true)?.let { (it.second - 80_000).coerceAtLeast(it.first) } ?: span.startUs
         val b = if (nextStart != null) {
-            longestPause(db, thr, words[last].startUs + 100_000, words[nextStart].startUs + 600_000)?.let { it.first + 200_000 } ?: span.endUs
+            pauseAt(db, thr, words[last].startUs + 100_000, words[nextStart].startUs + 600_000, first = false)?.let { it.first + 200_000 } ?: span.endUs
         } else {
             // Ultima risposta: fino a dove la voce finisce davvero, più un respiro.
             val f0 = (words[last].startUs / 10_000).toInt().coerceIn(0, db.size)
