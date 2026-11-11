@@ -57,6 +57,7 @@ import it.fabriziodavi.vivovideo.model.InterviewQA
 import it.fabriziodavi.vivovideo.model.Shuffle
 import it.fabriziodavi.vivovideo.model.Reframe
 import it.fabriziodavi.vivovideo.model.SpokenWord
+import it.fabriziodavi.vivovideo.model.Span
 import it.fabriziodavi.vivovideo.engine.Whoosh
 import it.fabriziodavi.vivovideo.engine.Stabilizer
 import it.fabriziodavi.vivovideo.engine.ExportEstimate
@@ -1772,7 +1773,10 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
      * o, se è vuoto, le frasi con il punto di domanda.
      */
     /** Parlato già ascoltato dei due video (chiave: video A, video B, modello): rifare l'analisi con le domande scritte è immediato. */
-    private var interviewHeard: Triple<String, List<SpokenWord>, List<SpokenWord>>? = null
+    private var interviewHeard: InterviewHeard? = null
+
+    /** Parole e audio (mono 16 kHz) dei due video: l'audio serve a tagliare le risposte nelle pause vere. */
+    private class InterviewHeard(val key: String, val wa: List<SpokenWord>, val wb: List<SpokenWord>, val pa: FloatArray, val pb: FloatArray)
 
     fun analyzeInterview(model: Whisper.Model, lang: String, typed: List<String>) {
         val a = interviewA ?: return
@@ -1786,7 +1790,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                     busy = "Scarico il modello ${model.label} (${model.sizeMb} MB, solo la prima volta)…"
                     Whisper.download(ctx, model) { f -> handler.post { busy = "Scarico il modello ${model.label}… ${(f * 100).toInt()}%" } }
                 }
-                suspend fun listen(c: Clip, who: String): List<SpokenWord> {
+                suspend fun listen(c: Clip, who: String): Pair<List<SpokenWord>, FloatArray> {
                     busy = "Preparo l'audio di $who…"
                     val pcm = withContext(Dispatchers.Default) {
                         val wav = renderTimelineAudio(ctx, Project(name = "intervista", clips = listOf(c)), loudness = false)
@@ -1794,18 +1798,26 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                     }
                     busy = "Ascolto $who… 0%"
                     val poll = launch { while (true) { kotlinx.coroutines.delay(400); busy = "Ascolto $who… ${Whisper.progress()}%" } }
-                    return try { Whisper.transcribe(Whisper.modelFile(ctx, model), pcm, lang, "", Whisper.SUBTITLE_BEAM) } finally { poll.cancel() }
+                    return try { Whisper.transcribe(Whisper.modelFile(ctx, model), pcm, lang, "", Whisper.SUBTITLE_BEAM) to pcm } finally { poll.cancel() }
                 }
                 val key = "${a.uri}|${b.uri}|${model.name}|$lang"
-                val heard = interviewHeard?.takeIf { it.first == key }
-                val wa = heard?.second ?: listen(a, "il video A")
-                val wb = heard?.third ?: listen(b, "il video B")
-                interviewHeard = Triple(key, wa, wb)
+                val heard = interviewHeard?.takeIf { it.key == key } ?: run {
+                    val (wa, pa) = listen(a, "il video A")
+                    val (wb, pb) = listen(b, "il video B")
+                    InterviewHeard(key, wa, wb, pa, pb)
+                }
+                interviewHeard = heard
+                val wa = heard.wa; val wb = heard.wb
                 busy = null
-                val qas = withContext(Dispatchers.Default) { Interview.match(wa, wb, a.sourceDurationUs, b.sourceDurationUs, typed) }
+                val qas = withContext(Dispatchers.Default) {
+                    Interview.match(wa, wb, a.sourceDurationUs, b.sourceDurationUs, typed, heard.pa, heard.pb, 16_000)
+                }
                 interviewQas = qas
                 Diary.log("Intervista doppia: ${wa.size} + ${wb.size} parole, ${qas.size} domande, risposte trovate A ${qas.count { it.a != null }} e B ${qas.count { it.b != null }}." +
-                    qas.joinToString("") { q -> " «${q.question.take(80)}» A ${q.a?.let { "%.1f".format(it.lengthUs / 1e6) } ?: "-"} s, B ${q.b?.let { "%.1f".format(it.lengthUs / 1e6) } ?: "-"} s." })
+                    qas.joinToString("") { q ->
+                        fun sp(x: Span?) = x?.let { String.format(java.util.Locale.ITALIAN, "%.1f–%.1f s", it.startUs / 1e6, it.endUs / 1e6) } ?: "-"
+                        " «${q.question.take(80)}» A ${sp(q.a)}, B ${sp(q.b)}."
+                    })
                 // Il parlato riconosciuto, con l'inizio di ogni parola in secondi: serve a capire le segnalazioni.
                 fun heardText(w: List<SpokenWord>) = w.joinToString(" ") { x -> x.text.trim() + "@" + String.format(java.util.Locale.ITALIAN, "%.1f", x.startUs / 1e6) }.take(900)
                 Diary.log("Intervista doppia, parlato A: " + heardText(wa))

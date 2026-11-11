@@ -238,9 +238,6 @@ object Interview {
         }
     }
 
-    /** Pausa che, insieme a parole diverse nei due video, separa una domanda dalla risposta. */
-    private const val BREAK_US = 300_000L
-
     private val NUMBERS = listOf(
         "zero", "uno", "due", "tre", "quattro", "cinque", "sei", "sette", "otto", "nove", "dieci", "undici", "dodici", "tredici",
         "quattordici", "quindici", "sedici", "diciassette", "diciotto", "diciannove", "venti",
@@ -271,12 +268,6 @@ object Interview {
 
     private fun openEnd(t: String) = t in OPEN
 
-    /** Nel parlato con la punteggiatura, una domanda che non finisce con il punto non è finita (pausa a metà). */
-    private fun unfinished(words: List<SpokenWord>, i: Int) =
-        !endsSentence(words, i) && words.count { it.text.trimEnd().lastOrNull().let { c -> c == '.' || c == '?' || c == '!' } } >= 2
-
-    private fun boundary(words: List<SpokenWord>, i: Int) = i < 0 || i >= words.lastIndex || endsSentence(words, i) || gapAfter(words, i) > BREAK_US
-
     /**
      * Parole uguali nei due video, allineate in ordine come quando si confrontano due versioni di un testo (punteggio:
      * +3 parola uguale, -1 parola diversa o in più). Restituisce le coppie (indice in A, indice in B).
@@ -302,120 +293,207 @@ object Interview {
         return out.reversed()
     }
 
+    /** Due parole scritte quasi uguali dal riconoscimento ("preferito"/"preferita", "lavoro"/"lavori"). */
+    private fun near(x: String, y: String): Boolean {
+        if (x == y) return true
+        if (x.length < 5 || y.length < 5) return false
+        val n = minOf(x.length, y.length)
+        var k = 0
+        while (k < n && x[k] == y[k]) k++
+        return k >= n - 1 && kotlin.math.abs(x.length - y.length) <= 1
+    }
+
+    /** Parola che apre una domanda nuova (non "che": troppo comune dentro le frasi). */
+    private fun starter(t: String) = t in ASK && t != "che"
+
     /**
-     * Domande e risposte trovate confrontando i due video parola per parola (11/11/2026, collaudo: "taglia 1 domanda
-     * su 3, testi e audio troncati"). Chi intervista dice le stesse domande a tutti e due, quindi le domande sono i
-     * tratti quasi uguali nei due video e le risposte i tratti diversi in mezzo; non servono né il punto di domanda né
-     * le pause (il riconoscimento può non scrivere la punteggiatura, chi intervista può fermarsi a metà, chi risponde
-     * può attaccare subito). Una o due parole scritte diverse dentro la domanda ("qual è"/"qual'è", "tra"/"fra") non la
-     * spezzano. Un tratto uguale è una domanda se ha almeno due parole uguali e sembra una domanda (chi, cosa, come,
-     * quale… all'inizio, o "?"), oppure almeno quattro parole uguali.
+     * Domande e risposte trovate confrontando il testo dei due video parola per parola (11/11/2026, collaudo con i
+     * video veri: il riconoscimento non scrive la punteggiatura e i tempi delle parole non sono affidabili, quindi le
+     * pause fra le parole non contano). Chi intervista dice le stesse domande a tutti e due: i tratti uguali sono le
+     * domande, quelli diversi le risposte. Una domanda nuova comincia con una parola da domanda (cosa, come, qual…)
+     * dopo parole diverse; una domanda non finisce con un articolo o una preposizione ("…preferito la | pasta": "la" è
+     * già della risposta). Dove tagliare lo decide poi l'audio ([refine]), non i tempi delle parole.
      */
-    internal fun paired(wa: List<SpokenWord>, wb: List<SpokenWord>, durA: Long, durB: Long): List<InterviewQA> {
+    internal fun paired(wa: List<SpokenWord>, wb: List<SpokenWord>, durA: Long, durB: Long): List<InterviewQA> =
+        pairedIdx(wa, wb).let { qs -> qs.mapIndexed { k, q ->
+            val next = qs.getOrNull(k + 1)
+            InterviewQA(asText(wa, q[0], q[1]), wordSpan(wa, q[1], next?.get(0), durA), wordSpan(wb, q[3], next?.get(2), durB))
+        } }
+
+    /** Risposta dalle parole: dopo l'ultima parola della domanda fino a prima della domanda dopo. */
+    private fun wordSpan(words: List<SpokenWord>, qEnd: Int, nextStart: Int?, dur: Long): Span? {
+        val first = qEnd + 1
+        val last = (nextStart ?: words.size) - 1
+        if (first > words.lastIndex || last < first) return null
+        val a = (words[first].startUs - LEAD_US).coerceAtLeast(words[qEnd].startUs + 60_000)
+        val b = (words[last].endUs + TAIL_US).let { e -> nextStart?.let { minOf(e, words[it].startUs - 50_000) } ?: e }.coerceAtMost(dur)
+        return Span(a, b).takeIf { it.lengthUs >= MIN_ANSWER_US }
+    }
+
+    /** Le domande come indici di parole: [inizio A, fine A, inizio B, fine B]. */
+    internal fun pairedIdx(wa: List<SpokenWord>, wb: List<SpokenWord>): List<IntArray> {
         val ta = wa.map { key(it.text) }; val tb = wb.map { key(it.text) }
         val pairs = align(ta, tb)
         if (pairs.size < 2) return emptyList()
-        // Gruppi di parole uguali vicine: si separano dove in mezzo ci sono parole diverse in tutti e due i video che
-        // sono una risposta (tre o più per parte, o una fine di frase da tutte e due le parti) o troppe parole in un video.
+        // Pausa vera nello stesso punto dei due video (quando i tempi ci sono): lì attacca chi risponde.
+        fun pause(w: List<SpokenWord>, i: Int) = gapAfter(w, i) > PAUSE_US
         val groups = mutableListOf(mutableListOf(pairs[0]))
         for (k in 1 until pairs.size) {
             val (pa, pb) = pairs[k - 1]; val (ca, cb) = pairs[k]
             val ua = ca - pa - 1; val ub = cb - pb - 1
-            fun stop(w: List<SpokenWord>, i: Int) = endsSentence(w, i) || (gapAfter(w, i) > BREAK_US && !openEnd(norm(w[i].text)))
-            val split = (ua >= 3 && ub >= 3) || ua > 4 || ub > 4 ||
-                ((ua >= 1 || ub >= 1) && (pa until ca).any { boundary(wa, it) } && (pb until cb).any { boundary(wb, it) }) ||
-                // Fine di frase nello stesso punto dei due video: "come ti chiami. | Mi chiamo…" sono due cose diverse.
-                (ua == 0 && ub == 0 && stop(wa, pa) && stop(wb, pb))
+            // Parole diverse in mezzo ma quasi uguali a coppie ("preferito"/"preferita"): sono la stessa frase.
+            val similar = ua == ub && ua in 1..2 && (1..ua).all { d -> near(ta[pa + d], tb[pb + d]) }
+            val split = !similar && (
+                // Tre o più parole diverse da una parte: è una risposta ("andrei a fare | una passeggiata").
+                ua >= 3 || ub >= 3 ||
+                    // Una parola da domanda dopo parole diverse, o dopo una frase già lunga: domanda nuova.
+                    (starter(ta[ca]) && (ua + ub >= 1 || groups.last().size >= 3)) ||
+                    (ta[ca] == "che" && ua >= 1 && ub >= 1) ||
+                    (pause(wa, ca - 1) && pause(wb, cb - 1)) ||
+                    ((pa until ca).any { endsSentence(wa, it) } && (pb until cb).any { endsSentence(wb, it) })
+                )
             if (split) groups += mutableListOf(pairs[k]) else groups.last() += pairs[k]
         }
-        data class Q(var a0: Int, var a1: Int, var b0: Int, var b1: Int)
-        val qs = mutableListOf<Q>()
-        for (g in groups) {
-            val q = Q(g.first().first, g.last().first, g.first().second, g.last().second)
-            // Fine della domanda: fino al "?" se è a una o due parole (una parola in più detta solo a uno: "…, dimmi?").
+        // Il resto di una domanda spezzata (chi intervista si ferma a metà): subito dopo, senza parola da domanda, al
+        // massimo due parole diverse per parte, nessun punto in mezzo; e la domanda di prima resta a metà ("qual è il
+        // tuo… piatto") oppure la pausa è in un video solo.
+        val merged = mutableListOf(groups[0])
+        for (g in groups.drop(1)) {
+            val p = merged.last()
+            val (pa, pb) = p.last(); val (ca, cb) = g.first()
+            val ok = !starter(ta[ca]) && !starter(tb[cb]) && ca - pa - 1 <= 2 && cb - pb - 1 <= 2 &&
+                (pa until ca).none { endsSentence(wa, it) } && (pb until cb).none { endsSentence(wb, it) } &&
+                (openEnd(ta[pa]) || !((pa until ca).any { pause(wa, it) } && (pb until cb).any { pause(wb, it) }))
+            if (ok) p += g else merged += g
+        }
+        val out = mutableListOf<IntArray>()
+        for (g in merged) {
+            var a0 = g.first().first; var a1 = g.last().first; var b0 = g.first().second; var b1 = g.last().second
+            // La parola da domanda subito prima, scritta diversa nei due video ("che faresti" / "cosa faresti").
+            val pa1 = out.lastOrNull()?.get(1) ?: -1; val pb1 = out.lastOrNull()?.get(3) ?: -1
+            if (a0 - 1 > pa1 && ta[a0 - 1] in ASK && !endsSentence(wa, a0 - 1)) a0--
+            if (b0 - 1 > pb1 && tb[b0 - 1] in ASK && !endsSentence(wb, b0 - 1)) b0--
+            // Inizio: dalla parola da domanda, se è fra le prime ("passeggiata | come ti vedi", "allora | qual è").
+            (a0..minOf(a1, a0 + 3)).firstOrNull { starter(ta[it]) }?.let { a0 = it }
+            (b0..minOf(b1, b0 + 3)).firstOrNull { starter(tb[it]) }?.let { b0 = it }
+            // Fine: niente articoli o preposizioni in coda, sono l'inizio della risposta ("…preferito la | pasta").
+            while (a1 > a0 && openEnd(ta[a1]) && !endsSentence(wa, a1)) a1--
+            while (b1 > b0 && openEnd(tb[b1]) && !endsSentence(wb, b1)) b1--
+            // Ultima parola scritta quasi uguale nei due video ("preferito"/"preferita") e fino al "?" vicino.
+            if (a1 + 1 <= wa.lastIndex && b1 + 1 <= wb.lastIndex && ta[a1 + 1] != tb[b1 + 1] && near(ta[a1 + 1], tb[b1 + 1])) { a1++; b1++ }
             fun toMark(w: List<SpokenWord>, e: Int): Int =
                 (1..2).firstOrNull { d -> e + d <= w.lastIndex && w[e + d].text.trimEnd().endsWith("?") && (e until e + d).none { endsSentence(w, it) } }?.let { e + it } ?: e
-            q.a1 = toMark(wa, q.a1); q.b1 = toMark(wb, q.b1)
-            // Parole in più dette di fila alla fine della domanda, in un video solo ("…preferito dimmi"): senza pausa prima e
-            // con la pausa dopo, sono ancora domanda (la risposta arriva dopo una pausa).
-            // Una domanda che resta a metà ("qual è il tuo…") va avanti fino alla vera fine della frase (al massimo 3 parole).
-            fun tail(w: List<SpokenWord>, e: Int): Int {
-                if (openEnd(norm(w[e].text)) && !endsSentence(w, e))
-                    (1..3).firstOrNull { d -> e + d <= w.lastIndex && boundary(w, e + d) && !openEnd(norm(w[e + d].text)) && (e + 1 until e + d).none { boundary(w, it) && !openEnd(norm(w[it].text)) } }
-                        ?.let { return e + it }
-                return if (boundary(w, e)) e else (1..2).firstOrNull { d -> e + d <= w.lastIndex && boundary(w, e + d) && (e until e + d).none { boundary(w, it) } }?.let { e + it } ?: e
-            }
-            // Ultima parola scritta diversa nei due video ("preferito"/"preferita"): conta se in tutti e due chiude la frase.
-            if (!endsSentence(wa, q.a1) && !endsSentence(wb, q.b1) && q.a1 + 1 <= wa.lastIndex && q.b1 + 1 <= wb.lastIndex &&
-                ta[q.a1 + 1] != tb[q.b1 + 1] && boundary(wa, q.a1 + 1) && boundary(wb, q.b1 + 1) &&
-                !boundary(wa, q.a1) && !boundary(wb, q.b1)
-            ) { q.a1++; q.b1++ }
-            q.a1 = tail(wa, q.a1); q.b1 = tail(wb, q.b1)
-            // Inizio: le parole prima, se la frase comincia lì (al massimo due: "Allora, qual è…").
-            // Se poco prima c'è la parola da domanda ("qual … è il tuo"), la domanda parte da lì.
-            fun askBack(t: List<String>, w: List<SpokenWord>, s: Int): Int =
-                (1..3).firstOrNull { d -> s - d >= 0 && t[s - d] in ASK && (s - d until s).none { endsSentence(w, it) } }?.let { s - it } ?: s
-            fun back(w: List<SpokenWord>, s: Int): Int =
-                (1..2).firstOrNull { d -> s - d < 0 || boundary(w, s - d - 1) && !boundary(w, s - d) && (s - d until s).none { endsSentence(w, it) } }
-                    ?.let { d -> if (s - d < 0) s else s - d } ?: s
-            if (!boundary(wa, q.a0 - 1)) q.a0 = back(wa, q.a0).let { if (boundary(wa, it - 1)) it else q.a0 }
-            if (!boundary(wb, q.b0 - 1)) q.b0 = back(wb, q.b0).let { if (boundary(wb, it - 1)) it else q.b0 }
-            if (q.a0 > 0 && ta[q.a0] !in ASK) q.a0 = askBack(ta, wa, q.a0)
-            if (q.b0 > 0 && tb[q.b0] !in ASK) q.b0 = askBack(tb, wb, q.b0)
-            val matched = g.size
-            val head = (q.a0..minOf(q.a1, q.a0 + 2)).map { ta[it] } + (q.b0..minOf(q.b1, q.b0 + 2)).map { tb[it] }
-            val asks = head.any { it in ASK } || wa[q.a1].text.trimEnd().endsWith("?") || wb[q.b1].text.trimEnd().endsWith("?")
-            // Il resto di una domanda spezzata da una pausa ("come ti vedi … tra dieci anni"): subito dopo la domanda di
-            // prima (al massimo due parole diverse per parte, nessun fine frase in mezzo) e almeno due parole uguali.
-            val prev = qs.lastOrNull()
-            if (prev != null && matched >= 2 && q.a0 - prev.a1 - 1 <= 2 && q.b0 - prev.b1 - 1 <= 2 &&
-                (prev.a1 until q.a0).none { endsSentence(wa, it) } && (prev.b1 until q.b0).none { endsSentence(wb, it) } &&
-                // La pausa è in un video solo (chi intervista si è fermato): in tutti e due è chi risponde che attacca,
-                // a meno che la domanda di prima resti a metà ("qual è il tuo…", "…nella", "…tra").
-                (openEnd(ta[prev.a1]) || unfinished(wa, prev.a1) || unfinished(wb, prev.b1) || !((prev.a1 until q.a0).any { gapAfter(wa, it) > BREAK_US } && (prev.b1 until q.b0).any { gapAfter(wb, it) > BREAK_US }))
-            ) { prev.a1 = maxOf(prev.a1, q.a1); prev.b1 = maxOf(prev.b1, q.b1); continue }
-            // Mai due domande sovrapposte (l'inizio allargato all'indietro non entra nella domanda di prima).
-            if (prev != null) { q.a0 = maxOf(q.a0, prev.a1 + 1); q.b0 = maxOf(q.b0, prev.b1 + 1) }
+            a1 = toMark(wa, a1); b1 = toMark(wb, b1)
+            val matched = g.count { it.first in a0..a1 }
+            val head = (a0..minOf(a1, a0 + 2)).map { ta[it] } + (b0..minOf(b1, b0 + 2)).map { tb[it] }
+            val asks = head.any { it in ASK } || wa[a1].text.trimEnd().endsWith("?") || wb[b1].text.trimEnd().endsWith("?")
             if (matched < 2 || (!asks && matched < 4)) continue
-            // 11/11/2026 (collaudo: "Passeggiata come ti vedi…"): la coda della risposta di prima, uguale nei due video, non
-            // fa parte della domanda. Se la domanda vera comincia poco dopo (parola da domanda dopo un punto o una pausa),
-            // parte da lì; una prima parola che chiude una frase non è della domanda.
-            fun trimHead(t: List<String>, w: List<SpokenWord>, s0: Int, e: Int): Int {
-                var s = s0
-                (s + 1..minOf(e, s + 3)).firstOrNull { k -> t[k] in ASK && (endsSentence(w, k - 1) || gapAfter(w, k - 1) > TURN_US) }?.let { s = it }
-                while (s < e && endsSentence(w, s)) s++
-                return s
-            }
-            q.a0 = trimHead(ta, wa, q.a0, q.a1); q.b0 = trimHead(tb, wb, q.b0, q.b1)
-            // Fine: fino al punto della frase, se arriva entro due parole dette di fila ("…il tuo piatto | preferito?").
-            fun toStop(w: List<SpokenWord>, e: Int): Int =
-                if (endsSentence(w, e)) e
-                else (1..2).firstOrNull { d -> e + d <= w.lastIndex && endsSentence(w, e + d) && (e until e + d).none { endsSentence(w, it) || gapAfter(w, it) > TURN_US } }?.let { e + it } ?: e
-            q.a1 = toStop(wa, q.a1); q.b1 = toStop(wb, q.b1)
-            qs += q
+            val prev = out.lastOrNull()
+            if (prev != null && (a0 <= prev[1] || b0 <= prev[3])) continue
+            out += intArrayOf(a0, a1, b0, b1)
         }
-        if (qs.isEmpty()) return emptyList()
-        fun span(words: List<SpokenWord>, qEnd: Int, nextStart: Int?, dur: Long): Span? {
-            val first = qEnd + 1
-            val last = (nextStart ?: words.size) - 1
-            if (first > words.lastIndex || last < first) return null
-            val a = (words[first].startUs - LEAD_US).coerceAtLeast(words[qEnd].endUs)
-            val b = (words[last].endUs + TAIL_US).let { e -> nextStart?.let { minOf(e, words[it].startUs - 50_000) } ?: e }.coerceAtMost(dur)
-            return Span(a, b).takeIf { it.lengthUs >= MIN_ANSWER_US }
-        }
-        return qs.mapIndexed { k, q ->
-            val next = qs.getOrNull(k + 1)
-            InterviewQA(asText(wa, q.a0, q.a1), span(wa, q.a1, next?.a0, durA), span(wb, q.b1, next?.b0, durB))
+        return out
+    }
+
+    /** Pausa fra due parole che, nello stesso punto dei due video, separa la domanda dalla risposta. */
+    private const val PAUSE_US = 300_000L
+
+    // ---------------- Tagli sull'audio ----------------
+
+    /** Livello (dB) di ogni tratto di 10 ms dell'audio mono [pcm] a [rate] Hz. */
+    internal fun levels(pcm: FloatArray, rate: Int): FloatArray {
+        val hop = rate / 100
+        val n = pcm.size / hop
+        return FloatArray(n) { f ->
+            var e = 0.0
+            for (k in f * hop until (f + 1) * hop) e += pcm[k] * pcm[k]
+            (10 * kotlin.math.log10(e / hop + 1e-10)).toFloat()
         }
     }
 
+    /** Soglia fra voce e silenzio: poco sopra il fondo (10° percentile) verso la voce (90°). */
+    internal fun threshold(db: FloatArray): Float {
+        if (db.isEmpty()) return 0f
+        val s = db.sorted()
+        val floor = s[(s.size * 0.10).toInt().coerceIn(0, s.lastIndex)]
+        val voice = s[(s.size * 0.90).toInt().coerceIn(0, s.lastIndex)]
+        return floor + (voice - floor) * 0.3f
+    }
+
+    /** La pausa (silenzio) più lunga fra [fromUs] e [toUs], almeno [minUs]: inizio e fine in µs, o null. */
+    internal fun longestPause(db: FloatArray, thr: Float, fromUs: Long, toUs: Long, minUs: Long = 120_000): Pair<Long, Long>? {
+        val f0 = (fromUs / 10_000).toInt().coerceIn(0, db.size); val f1 = (toUs / 10_000).toInt().coerceIn(0, db.size)
+        var best: Pair<Int, Int>? = null
+        var run = -1
+        for (f in f0..f1) {
+            val quiet = f < f1 && db[f] < thr
+            if (quiet && run < 0) run = f
+            if (!quiet && run >= 0) {
+                if (best == null || f - run > best.second - best.first) best = run to f
+                run = -1
+            }
+        }
+        return best?.takeIf { (it.second - it.first) * 10_000L >= minUs }?.let { it.first * 10_000L to it.second * 10_000L }
+    }
+
+    /**
+     * Tagli delle risposte messi nelle pause vere dell'audio (11/11/2026, collaudo: "l'audio delle domande è tagliato",
+     * con i tempi delle parole sballati anche di un secondo). L'inizio della risposta è la fine della pausa più lunga fra
+     * l'ultima parola della domanda e la seconda della risposta; la fine è l'inizio della pausa più lunga prima della
+     * domanda dopo (o la fine della voce). Senza pausa chiara restano i tempi delle parole.
+     */
+    internal fun refine(words: List<SpokenWord>, pcm: FloatArray?, rate: Int, qEnd: Int, nextStart: Int?, span: Span?, dur: Long): Span? {
+        if (span == null || pcm == null || pcm.isEmpty()) return span
+        val db = levels(pcm, rate)
+        val thr = threshold(db)
+        val first = qEnd + 1
+        val last = (nextStart ?: words.size) - 1
+        if (first > last) return span
+        val inTo = words.getOrNull(first + 1)?.startUs?.takeIf { first + 1 <= last } ?: (words[first].startUs + 1_500_000)
+        val a = longestPause(db, thr, words[qEnd].startUs + 100_000, inTo)?.let { (it.second - 80_000).coerceAtLeast(it.first) } ?: span.startUs
+        val b = if (nextStart != null) {
+            longestPause(db, thr, words[last].startUs + 100_000, words[nextStart].startUs + 600_000)?.let { it.first + 200_000 } ?: span.endUs
+        } else {
+            // Ultima risposta: fino a dove la voce finisce davvero, più un respiro.
+            val f0 = (words[last].startUs / 10_000).toInt().coerceIn(0, db.size)
+            val lastVoice = (db.size - 1 downTo f0).firstOrNull { db[it] >= thr } ?: f0
+            (lastVoice * 10_000L + 300_000)
+        }
+        val out = Span(a.coerceIn(0, dur), b.coerceIn(0, dur))
+        return if (out.lengthUs >= MIN_ANSWER_US) out else span
+    }
+
     /** Domande e risposte dei due video. Senza domande scritte, quelle del primo video (o del secondo, se il primo non ne ha). */
-    fun match(wordsA: List<SpokenWord>, wordsB: List<SpokenWord>, durA: Long, durB: Long, typed: List<String> = emptyList()): List<InterviewQA> {
+    fun match(
+        wordsA: List<SpokenWord>, wordsB: List<SpokenWord>, durA: Long, durB: Long, typed: List<String> = emptyList(),
+        pcmA: FloatArray? = null, pcmB: FloatArray? = null, rate: Int = 16_000,
+    ): List<InterviewQA> {
         val written = typed.map { it.trim() }.filter { it.isNotEmpty() }
-        if (written.isEmpty()) paired(wordsA, wordsB, durA, durB).takeIf { it.isNotEmpty() }?.let { return it }
+        if (written.isEmpty()) {
+            val qs = pairedIdx(wordsA, wordsB)
+            if (qs.isNotEmpty()) return qs.mapIndexed { k, q ->
+                val next = qs.getOrNull(k + 1)
+                InterviewQA(
+                    asText(wordsA, q[0], q[1]),
+                    refine(wordsA, pcmA, rate, q[1], next?.get(0), wordSpan(wordsA, q[1], next?.get(0), durA), durA),
+                    refine(wordsB, pcmB, rate, q[3], next?.get(2), wordSpan(wordsB, q[3], next?.get(2), durB), durB),
+                )
+            }
+        }
         val qs = written.ifEmpty { questionsIn(wordsA, wordsB).ifEmpty { questionsIn(wordsB, wordsA) } }
-        val a = answers(wordsA, qs, durA)
-        val b = answers(wordsB, qs, durB)
+        // Anche con le domande scritte, i tagli vanno nelle pause vere dell'audio.
+        fun spans(words: List<SpokenWord>, pcm: FloatArray?, dur: Long): List<Span?> {
+            val base = answers(words, qs, dur)
+            var from = 0
+            val found = qs.map { q -> find(words, q, from)?.also { from = it.second + 1 } }
+            return qs.indices.map { k ->
+                val f = found[k] ?: return@map base[k]
+                val next = (k + 1 until qs.size).firstNotNullOfOrNull { found[it] }?.first
+                refine(words, pcm, rate, f.second, next, base[k], dur)
+            }
+        }
+        val a = spans(wordsA, pcmA, durA)
+        val b = spans(wordsB, pcmB, durB)
         return qs.indices.map { InterviewQA(qs[it], a[it], b[it]) }
     }
 

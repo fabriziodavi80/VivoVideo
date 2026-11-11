@@ -65,7 +65,8 @@ class InterviewTest {
         val a = plain("Ciao come ti chiami.", "Mi chiamo Marco.", "Qual è il tuo piatto preferito.", "La pizza margherita.", "Che lavoro fai.", "Faccio il contabile.")
         val b = plain("Ciao, come ti chiami.", "Mi chiamo Giulia.", "Qual e il tuo piatto preferito.", "Il risotto ai funghi.", "Che lavoro fai.", "Insegno matematica.")
         val qas = Interview.match(a, b, 30_000_000, 30_000_000)
-        assertEquals(listOf("Ciao come ti chiami?", "Qual è il tuo piatto preferito?", "Che lavoro fai?"), qas.map { it.question })
+        // "Ciao" resta fuori: la domanda parte dalla parola da domanda.
+        assertEquals(listOf("Come ti chiami?", "Qual è il tuo piatto preferito?", "Che lavoro fai?"), qas.map { it.question })
         assertTrue(qas.all { it.a != null && it.b != null })
         // La risposta uguale ("Mi chiamo…") non diventa una domanda e resta nella risposta.
         fun said(words: List<SpokenWord>, s: Span) = words.filter { it.startUs >= s.startUs - 1 && it.endUs <= s.endUs + 1 }.joinToString(" ") { it.text }
@@ -78,7 +79,7 @@ class InterviewTest {
         val b = plain("ciao come ti chiami", "sono Giulia", "dove abiti adesso", "a Verona")
         val qas = Interview.match(a, b, 20_000_000, 20_000_000)
         assertEquals(2, qas.size)
-        assertEquals("Ciao come ti chiami?", qas[0].question)
+        assertEquals("Come ti chiami?", qas[0].question)
         assertTrue(qas.all { it.a != null && it.b != null })
     }
 
@@ -96,7 +97,8 @@ class InterviewTest {
             "E che sport fai di solito." to 700_000L, "Corro." to 700_000L)
         val b = plain("Allora qual'è il tuo piatto preferita in assoluto.", "Il risotto.", "E che sport fai di solito.", "Nuoto.")
         val qas = Interview.match(a, b, 30_000_000, 30_000_000)
-        assertEquals(listOf("Allora, qual è il tuo piatto preferito in assoluto?", "E che sport fai di solito?"), qas.map { it.question })
+        // "Allora" resta fuori: la domanda parte dalla parola da domanda.
+        assertEquals(listOf("Qual è il tuo piatto preferito in assoluto?", "E che sport fai di solito?"), qas.map { it.question })
         fun said(words: List<SpokenWord>, s: Span) = words.filter { it.startUs >= s.startUs - 1 && it.endUs <= s.endUs + 1 }.joinToString(" ") { it.text }
         // La risposta comincia dopo la domanda intera, in tutti e due i video.
         assertEquals("La pizza margherita.", said(a, qas[0].a!!))
@@ -141,6 +143,51 @@ class InterviewTest {
         val b2 = paused("cosa faresti con una giornata libera" to 900_000L, "una bella passeggiata" to 700_000L,
             "come ti vedi tra dieci anni" to 900_000L, "in barca" to 500_000L)
         assertEquals(listOf("Cosa faresti con una giornata libera?", "Come ti vedi fra 10 anni?"), Interview.match(a2, b2, 20_000_000, 20_000_000).map { it.question })
+    }
+
+    /** Parlato come lo dà il riconoscimento sul telefono: "parola@secondi", fine di ogni parola = inizio della dopo. */
+    private fun heard(s: String): List<SpokenWord> {
+        val p = s.trim().split(" ").map { val (w, t) = it.split("@"); w to (t.replace(',', '.').toDouble() * 1e6).toLong() }
+        return p.mapIndexed { i, (w, t) -> SpokenWord(t, maxOf(p.getOrNull(i + 1)?.second ?: (t + 400_000), t + 60_000), w) }
+    }
+
+    @Test fun realTestVideosOfNovember11() {
+        // Il parlato vero dei due video del collaudo (diario dell'11/11/2026, modello Massima precisione): niente
+        // punteggiatura, tempi spostati ("anni" e "ancora" insieme a 16,0 s), risposte che cominciano con "la".
+        val a = heard("qual@0,1 è@0,5 il@0,7 tuo@1,2 piatto@2,3 preferito@3,0 la@4,5 pasta@5,1 cosa@7,4 faresti@7,9 con@8,0 una@8,2 giornata@9,1 libera@9,7 se@11,9 c'è@12,1 il@12,4 sole@12,8 una@13,1 bella@13,5 passeggiata@13,9 come@14,4 ti@15,4 vedi@17,0 tra@17,7 dieci@17,9 anni@18,4 male@21,6 male@22,1")
+        val b = heard("qual@0,1 è@0,6 il@0,7 tuo@1,0 piatto@2,1 preferito@3,5 la@4,7 pizza@5,3 cosa@7,5 faresti@7,8 in@8,5 una@8,7 giornata@8,9 libera@9,5 andrei@10,6 al@11,2 mare@11,6 come@11,9 ti@13,0 vedi@13,0 tra@13,6 dieci@15,5 anni@16,0 ancora@16,0 al@20,2 lavoro@20,7")
+        val qas = Interview.match(a, b, 23_000_000, 22_000_000)
+        assertEquals(listOf("Qual è il tuo piatto preferito?", "Cosa faresti con una giornata libera?", "Come ti vedi tra dieci anni?"), qas.map { it.question })
+        fun said(words: List<SpokenWord>, s: Span) = words.filter { it.startUs >= s.startUs - 1 && it.startUs < s.endUs }.joinToString(" ") { it.text }
+        assertEquals("la pasta", said(a, qas[0].a!!))
+        assertEquals("la pizza", said(b, qas[0].b!!))
+        assertEquals("se c'è il sole una bella passeggiata", said(a, qas[1].a!!))
+        assertEquals("andrei al mare", said(b, qas[1].b!!))
+        assertEquals("male male", said(a, qas[2].a!!))
+        // "anni" e "ancora" risultano iniziare insieme: senza audio il taglio va subito dopo l'inizio di "anni"
+        // (con l'audio lo decide la pausa vera, vedi cutsGoInTheRealPauseOfTheAudio).
+        assertTrue(qas[2].b!!.startUs in 16_000_000..16_100_000 && qas[2].b!!.endUs >= 20_700_000)
+    }
+
+    @Test fun cutsGoInTheRealPauseOfTheAudio() {
+        // Audio finto a 16 kHz: voce (tono) da 0 a 2,0 s (domanda), silenzio fino a 2,8 s, voce fino a 5,0 s (risposta),
+        // silenzio fino a 6,0 s, voce fino a 7,0 s (domanda dopo). I tempi delle parole sono sbagliati di mezzo secondo.
+        val rate = 16_000
+        val pcm = FloatArray(8 * rate) { i ->
+            val t = i.toDouble() / rate
+            val voice = t < 2.0 || (t >= 2.8 && t < 5.0) || (t >= 6.0 && t < 7.0)
+            if (voice) (0.3 * kotlin.math.sin(2 * Math.PI * 220 * t)).toFloat() else 0.001f
+        }
+        val w = listOf(
+            SpokenWord(0, 900_000, "come"), SpokenWord(900_000, 1_700_000, "ti"), SpokenWord(1_700_000, 2_300_000, "chiami"),
+            SpokenWord(2_300_000, 3_600_000, "mi"), SpokenWord(3_600_000, 4_400_000, "chiamo"), SpokenWord(4_400_000, 5_600_000, "Marco"),
+            SpokenWord(5_600_000, 6_500_000, "dove"), SpokenWord(6_500_000, 7_000_000, "abiti"),
+        )
+        val r = Interview.refine(w, pcm, rate, qEnd = 2, nextStart = 6, span = Span(2_150_000, 5_550_000), dur = 8_000_000)!!
+        assertTrue("inizio ${r.startUs}", r.startUs in 2_600_000..2_800_000)
+        assertTrue("fine ${r.endUs}", r.endUs in 5_100_000..5_300_000)
+        // Senza audio restano i tempi delle parole.
+        assertEquals(Span(2_150_000, 5_550_000), Interview.refine(w, null, rate, 2, 6, Span(2_150_000, 5_550_000), 8_000_000))
     }
 
     @Test fun aSingleVideoStillFindsQuestionWords() {
