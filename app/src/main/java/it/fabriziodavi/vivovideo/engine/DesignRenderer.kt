@@ -432,7 +432,6 @@ object DesignRenderer {
     private fun drawCutout(c: Canvas, d: Design, e: DPhoto, r: RectF, s: Float, spec: CollageSpec, src: Bitmap, mask: Bitmap, dst: RectF) {
         val b = max(1f, e.border * s)
         c.save()
-        c.clipRect(r.left - b * 2, r.top - b * 2, r.right + b * 2, r.bottom + b * 2)
         val shadow = Paint(Paint.FILTER_BITMAP_FLAG).apply { colorFilter = PorterDuffColorFilter(0x47000000, PorterDuff.Mode.SRC_IN) }
         c.drawBitmap(mask, null, RectF(dst).apply { offset(b * 0.3f, b * 0.9f + e.shadow * s * 0.3f) }, shadow)
         val edge = Paint(Paint.FILTER_BITMAP_FLAG).apply { colorFilter = PorterDuffColorFilter(tint(e.borderColor, d, spec), PorterDuff.Mode.SRC_IN) }
@@ -440,7 +439,8 @@ object DesignRenderer {
             val a = (2 * Math.PI * k / 16).toFloat()
             c.drawBitmap(mask, null, RectF(dst).apply { offset(kotlin.math.cos(a) * b * ring, kotlin.math.sin(a) * b * ring) }, edge)
         }
-        val l = c.saveLayer(RectF(r.left - b * 2, r.top - b * 2, r.right + b * 2, r.bottom + b * 2), null)
+        // Strato senza bordi: con i bordi restava una riga chiara sul suo contorno.
+        val l = c.saveLayer(null, null)
         c.drawBitmap(src, null, dst, filterPaint(e.filter, d, spec))
         c.drawBitmap(mask, null, dst, Paint(Paint.FILTER_BITMAP_FLAG).apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.DST_IN) })
         c.restoreToCount(l)
@@ -564,7 +564,7 @@ object DesignRenderer {
         c.drawText("${monthNames[cal.get(java.util.Calendar.MONTH)]} ${cal.get(java.util.Calendar.YEAR)}".uppercase(java.util.Locale.ITALY), r.centerX(), r.top + head * 0.55f, p)
         p.letterSpacing = 0f; p.typeface = DesignFonts.get(DFont.MONO); p.textSize = min(cw, ch) * 0.34f
         weekdays.forEachIndexed { i, w -> c.drawText(w, r.left + cw * (i + 0.5f), r.top + head * 1.6f, p) }
-        p.typeface = DesignFonts.get(DFont.SERIF); p.textSize = min(cw, ch) * 0.52f
+        p.typeface = DesignFonts.get(DFont.SERIF); p.textSize = min(cw, ch) * 0.66f
         val fm = p.fontMetrics
         for (dd in 1..days) {
             val k = first + dd - 1
