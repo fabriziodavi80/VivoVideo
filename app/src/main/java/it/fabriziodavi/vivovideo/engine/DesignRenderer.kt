@@ -41,6 +41,7 @@ import it.fabriziodavi.vivovideo.model.DPhotoWord
 import it.fabriziodavi.vivovideo.model.DRect
 import it.fabriziodavi.vivovideo.model.DRansom
 import it.fabriziodavi.vivovideo.model.DShape
+import it.fabriziodavi.vivovideo.model.DSplat
 import it.fabriziodavi.vivovideo.model.DStamp
 import it.fabriziodavi.vivovideo.model.DTorn
 import it.fabriziodavi.vivovideo.model.DText
@@ -125,7 +126,7 @@ object DesignRenderer {
         c.translate(w / 2f, h / 2f); c.scale(cam.scale, cam.scale); c.translate(-cam.cx * w, -cam.cy * h)
 
         val photos = d.els.count { it is DPhoto } + d.words.sumOf { DesignTexts.word(it, spec, meta).length }
-        val late = d.els.count { it !is DPhoto && it !is DPhotoWord && it !is DTorn }
+        val late = d.els.count { it !is DPhoto && it !is DPhotoWord && it !is DTorn && it !is DPattern }
         val torns = d.els.count { it is DTorn }
         var pi = 0; var li = 0; var ti = 0
         for (e in d.els) {
@@ -153,7 +154,7 @@ object DesignRenderer {
                     val u = lateU(li++, late, tUs, dur, still, if (e.draw) 0.5f else 0.45f)
                     if (u > 0f) if (e.draw) drawPath(c, d, e, r, s, spec, u) else withPop(c, r, u) { drawPath(c, d, e, r, s, spec, 1f) }
                 }
-                is DPattern -> drawPattern(c, d, e, r, s, spec)
+                is DPattern -> drawPattern(c, d, e, r, s, spec, if (still) 0f else tUs / 1_000_000f)
                 is DBarcode -> { val u = lateU(li++, late, tUs, dur, still); if (u > 0f) withPop(c, r, u) { drawBarcode(c, d, e, r, spec) } }
                 is DPalette -> { val u = lateU(li++, late, tUs, dur, still); if (u > 0f) drawPalette(c, d, e, r, s, spec, frames, tUs, u) }
                 is DTorn -> {
@@ -168,6 +169,7 @@ object DesignRenderer {
                     }
                 }
                 is DRansom -> { val u = lateU(li++, late, tUs, dur, still); if (u > 0f) drawRansom(c, d, e, r, s, spec, meta, tUs, still) }
+                is DSplat -> { val u = lateU(li++, late, tUs, dur, still, 0.2f); if (u > 0f) drawSplat(c, d, e, r, s, spec, u) }
                 is DStamp -> { val u = lateU(li++, late, tUs, dur, still); if (u > 0f) withPop(c, r, u) { drawStamp(c, d, e, r, s, spec, meta) } }
             }
         }
@@ -508,6 +510,34 @@ object DesignRenderer {
         c.restore()
     }
 
+    /** Schizzo: macchia a raggi irregolari e gocce lungo i raggi; nel video si allarga di colpo. */
+    private fun drawSplat(c: Canvas, d: Design, e: DSplat, r: RectF, s: Float, spec: CollageSpec, u: Float) {
+        val p = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = tint(e.color, d, spec) }
+        val k = if (u >= 1f) 1f else CollageAnim.outBack(u)
+        val cx = r.centerX(); val cy = r.centerY()
+        val rad = min(r.width(), r.height()) * 0.28f * k
+        c.save()
+        if (e.rot != 0f) c.rotate(e.rot, cx, cy)
+        val n = 26
+        val path = Path()
+        for (i in 0..n) {
+            val a = (2 * Math.PI * i / n).toFloat()
+            val rr = rad * (0.75f + 0.5f * rnd(i % n, e.seed) + if (i % 5 == 0) 0.45f * rnd(i, e.seed + 3) else 0f)
+            val x = cx + kotlin.math.cos(a) * rr; val y = cy + kotlin.math.sin(a) * rr
+            if (i == 0) path.moveTo(x, y) else path.quadTo(cx + kotlin.math.cos(a - 0.12f) * rr * 1.05f, cy + kotlin.math.sin(a - 0.12f) * rr * 1.05f, x, y)
+        }
+        path.close()
+        c.drawPath(path, p)
+        // Gocce sparse, più piccole man mano che si allontanano.
+        for (i in 0 until 34) {
+            val a = rnd(i, e.seed + 7) * 6.283f
+            val dist = rad * (1.2f + 2.4f * rnd(i, e.seed + 11)) * k
+            val gr = rad * (0.05f + 0.16f * rnd(i, e.seed + 13)) * (1.4f - dist / (rad * 3.8f + 1f))
+            if (gr > 0.4f) c.drawCircle(cx + kotlin.math.cos(a) * dist, cy + kotlin.math.sin(a) * dist, gr, p)
+        }
+        c.restore()
+    }
+
     private fun drawStamp(c: Canvas, d: Design, e: DStamp, r: RectF, s: Float, spec: CollageSpec, meta: DesignMeta) {
         val text = (spec.texts[e.id] ?: DesignTexts.fill(e.text, meta)).uppercase(java.util.Locale.ITALY)
         val lines = text.split('\n').take(2)
@@ -617,6 +647,7 @@ object DesignRenderer {
             typeface = DesignFonts.get(e.font)
             textSize = e.size * s
             letterSpacing = e.track
+            textSkewX = e.skew
             color = tint(e.color, d, spec)
             if (e.stroke > 0) { style = Paint.Style.STROKE; strokeWidth = e.stroke * s; strokeJoin = Paint.Join.ROUND }
             if (e.shadow) setShadowLayer(e.size * s * 0.08f, 0f, e.size * s * 0.03f, 0x73000000)
@@ -744,7 +775,7 @@ object DesignRenderer {
         c.restore()
     }
 
-    private fun drawPattern(c: Canvas, d: Design, e: DPattern, r: RectF, s: Float, spec: CollageSpec) {
+    private fun drawPattern(c: Canvas, d: Design, e: DPattern, r: RectF, s: Float, spec: CollageSpec, sec: Float = 0f) {
         val p = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = tint(e.color, d, spec) }
         c.save()
         if (e.rot != 0f) c.rotate(e.rot, r.centerX(), r.centerY())
@@ -754,6 +785,41 @@ object DesignRenderer {
                 val step = e.step * s
                 var x = r.left; while (x <= r.right) { c.drawLine(x, r.top, x, r.bottom, p); x += step }
                 var y = r.top; while (y <= r.bottom) { c.drawLine(r.left, y, r.right, y, p); y += step }
+            }
+            DPatternKind.TOPO -> {
+                // Curve di livello: anelli deformati attorno a tre cime, come una carta topografica.
+                p.style = Paint.Style.STROKE; p.strokeWidth = max(1f, 1.3f * s)
+                val peaks = listOf(0.3f to 0.3f, 0.72f to 0.55f, 0.4f to 0.85f)
+                peaks.forEachIndexed { pi, (fx, fy) ->
+                    val cx = r.left + fx * r.width(); val cy = r.top + fy * r.height()
+                    for (ring in 1..14) {
+                        val base = ring * e.step * s
+                        val path = Path()
+                        for (i in 0..72) {
+                            val a = (2 * Math.PI * i / 72).toFloat()
+                            val wob = 1 + 0.18f * kotlin.math.sin(a * 3 + pi + ring * 0.3f) + 0.1f * kotlin.math.sin(a * 5 + pi * 2f)
+                            val x = cx + kotlin.math.cos(a) * base * wob * 1.25f; val y = cy + kotlin.math.sin(a) * base * wob
+                            if (i == 0) path.moveTo(x, y) else path.lineTo(x, y)
+                        }
+                        path.close()
+                        p.alpha = if (ring % 5 == 0) 200 else 110
+                        c.save(); c.clipRect(r); c.drawPath(path, p); c.restore()
+                    }
+                }
+            }
+            DPatternKind.SPEED -> {
+                // Linee di velocità orizzontali, di lunghezze e spessori diversi.
+                p.strokeCap = Paint.Cap.ROUND
+                for (i in 0 until 46) {
+                    val y = r.top + rnd(i, 91) * r.height()
+                    val len = r.width() * (0.15f + 0.5f * rnd(i, 93))
+                    // Nel video le linee corrono verso sinistra, ognuna alla sua velocità.
+                    val run = (rnd(i, 97) * (r.width() + len) - sec * r.width() * (0.8f + 1.6f * rnd(i, 103))) % (r.width() + len)
+                    val x = r.left - len + (if (run < 0) run + r.width() + len else run)
+                    p.strokeWidth = (1f + 3.5f * rnd(i, 99)) * s
+                    p.alpha = (60 + 150 * rnd(i, 101)).toInt()
+                    c.drawLine(x, y, x + len, y, p)
+                }
             }
             DPatternKind.PAPER -> {
                 // Grana della carta e qualche fibra.

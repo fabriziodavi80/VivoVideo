@@ -18,7 +18,8 @@ import it.fabriziodavi.vivovideo.model.DColor.WHITE
  */
 object Designs {
     val all: List<Design> by lazy {
-        listOf(paperTrip(), paperNews(), paperLove(), paperRecipe(), paperWall(), paperRansom(), paperSticker(), paperRiso(),
+        listOf(bib(), topo(), speed(), mud(), hud(), record(), sequence(), skipass(),
+            paperTrip(), paperNews(), paperLove(), paperRecipe(), paperWall(), paperRansom(), paperSticker(), paperRiso(),
             notes(), chrome(), leak(), blue(), pearls(), thenNow(), windows(), dump(),
             cover(), reportage(), letters(), bentoTrip(), bentoRide(), year(), scrap(), stickers(), mood(), duotone(), pop(), glass(),
             sport(), love(), ticket(), route(), street(), food())
@@ -37,6 +38,197 @@ object Designs {
     private fun bk(x: Number, y: Number, w: Number, h: Number, ax: Anchor = S) = b(x, y, w, h, K, ax)
 
     private const val SPARKLE = "M50 0 C54 36 64 46 100 50 C64 54 54 64 50 100 C46 64 36 54 0 50 C36 46 46 36 50 0 Z"
+
+    private const val MUD = 0xF0553A24L
+
+    // A1 -----------------------------------------------------------------------------------------------
+    private fun bib(): Design {
+        val pin = 0xFFB8BCC4L
+        val els = arrayListOf<DEl>(
+            DPhoto(b(0, 0, 794, 1123, F), 0),
+            DRect(b(0, 0, 794, 1123, F), 0, grad = listOf(0f to 0x66000000L, 0.3f to 0L, 0.6f to 0L, 1f to 0xB3000000L)),
+            DSplat(bk(520, 60, 260, 260), MUD, seed = 3),
+            DSplat(bk(30, 830, 210, 210), MUD, seed = 5, rot = 40f),
+            DSplat(bk(620, 930, 140, 140), MUD, seed = 9),
+            DText(bk(40, 40, 500, 22), "kicker", "Rubrica", "{giorno}", DFont.MONO_BOLD, 16f, WHITE, track = 0.15f, upper = true, shadow = true),
+            DText(bk(40, 70, 714, 200), "title", "Titolo", "Finisher", DFont.ANTON, 150f, WHITE, line = 0.85f, upper = true, skew = -0.12f, shadow = true),
+            DRect(bk(167, 560, 460, 330), WHITE, radius = 10f, rot = -3f, shadow = 16f),
+            DRect(bk(167, 560, 460, 330), ACC, rot = -3f, poly = pts(0f, 0f, 1f, 0f, 1f, 0.18f, 0f, 0.18f)),
+            DText(bk(167, 560, 460, 330), "race", "Gara", "{luogo|Granfondo} {ANNO}", DFont.ANTON, 34f, WHITE, DAlign.CENTER, line = 1.75f, upper = true, rot = -3f),
+            DText(bk(167, 560, 460, 316), "num", "Numero", "127", DFont.ANTON, 200f, BLACK, DAlign.CENTER, line = 0.95f, rot = -3f, bottom = true),
+        )
+        for ((x, y) in listOf(182 to 618, 596 to 597, 197 to 862, 611 to 840)) {
+            els += DRect(bk(x, y, 16, 16), pin, circle = true)
+            els += DRect(bk(x, y, 16, 16), 0xFF6B7280, circle = true, stroke = 2f)
+        }
+        val stats = listOf("Tempo" to "5:12:08", "Posizione" to "214°", "Km" to "142")
+        stats.forEachIndexed { i, (l, v) ->
+            val x = 40 + i * 245
+            els += DText(b(x, 990, 230, 16, E), "l$i", "Etichetta ${i + 1}", l, DFont.MONO, 12f, WHITE, track = 0.18f, upper = true)
+            els += DText(b(x, 1010, 230, 60, E), "s$i", l, v, DFont.ANTON, 54f, if (i == 0) ACC else WHITE, count = true)
+        }
+        return Design("x-bib", "Pettorale", DesignFamily.ACTION, DOrient.PORTRAIT, 794f, 1123f, BLACK,
+            accents = listOf(0xFFE63946, 0xFF2F5BFF, 0xFFFF8C00, 0xFF16A34A), els = els, motion = CollageMotion.STILL,
+            hint = "Granfondo, maratona, trail: il numero di gara spillato, fango e i tuoi tempi")
+    }
+
+    // A2 -----------------------------------------------------------------------------------------------
+    private fun topo(): Design {
+        val ink = 0xFF2B2418L
+        val els = arrayListOf<DEl>(
+            DPattern(b(0, 0, 794, 1123, F), DPatternKind.TOPO, 0xFF8B7B5E, 22f),
+            DPath(b(0, 0, 794, 1123, F), "M80 980 C160 900 120 820 220 760 C320 700 260 600 380 560 C500 520 460 420 560 380 C660 340 640 240 720 180", 794f, 1123f,
+                stroke = ACC, width = 7f, dash = listOf(18f, 10f), draw = true),
+            DRect(bk(70, 970, 22, 22), ACC, circle = true),
+            DRect(bk(709, 169, 22, 22), ACC, circle = true),
+            DText(bk(40, 40, 600, 76), "title", "Titolo", "{luogo|Monte Grappa}", DFont.GROTESK, 64f, ink),
+            DText(bk(40, 120, 600, 18), "coords", "Sottotitolo", "45.8701° N · 11.8040° E", DFont.MONO, 13f, ink, track = 0.1f),
+            DPhoto(bk(150, 200, 500, 640), 0, radius = 24f, border = 14f, shadow = 12f, cutout = true),
+            DRect(b(40, 900, 714, 180, E), 0xE6FFFFFF, radius = 18f, shadow = 10f),
+        )
+        listOf("Dislivello" to "1.640 m", "Distanza" to "48 km", "Quota" to "1.775 m").forEachIndexed { i, (l, v) ->
+            val x = 64 + i * 236
+            els += DText(b(x, 920, 220, 14, E), "l$i", "Etichetta ${i + 1}", l, DFont.MONO, 11f, ink, track = 0.18f, upper = true)
+            els += DText(b(x, 938, 220, 46, E), "s$i", l, v, DFont.ANTON, 40f, if (i == 0) ACC else ink, count = true)
+        }
+        els += DPath(b(64, 996, 666, 64, E), "M0 60 L60 52 L110 40 L170 44 L230 26 L300 30 L350 12 L400 6 L460 20 L520 18 L580 34 L640 46 L666 50 L666 64 L0 64 Z", 666f, 64f, fill = ACC)
+        els += DPath(b(64, 996, 666, 64, E), "M0 60 L60 52 L110 40 L170 44 L230 26 L300 30 L350 12 L400 6 L460 20 L520 18 L580 34 L640 46 L666 50", 666f, 64f, stroke = ink, width = 2f, draw = true)
+        return Design("x-topo", "Topografica", DesignFamily.ACTION, DOrient.PORTRAIT, 794f, 1123f, 0xFFEDE8DC,
+            accents = listOf(0xFFFF5B14, 0xFFE63946, 0xFF1D4ED8), els = els, motion = CollageMotion.CASCADE,
+            hint = "Tu scontornato come un adesivo sulle curve di livello, con il percorso e l'altimetria che si disegnano")
+    }
+
+    // A3 -----------------------------------------------------------------------------------------------
+    private fun speed() = Design(
+        "x-speed", "Velocità", DesignFamily.ACTION, DOrient.PORTRAIT, 794f, 1123f, 0xFF0E0E10,
+        accents = listOf(0xFFFFD60A, 0xFF00E5FF, 0xFFFF2D55), motion = CollageMotion.SLIDE,
+        hint = "Discesa, sprint, curva: linee di velocità che corrono e la velocità massima gigante e inclinata",
+        els = listOf(
+            DPhoto(b(0, 0, 794, 1123, F), 0),
+            DRect(b(0, 0, 794, 1123, F), 0, grad = listOf(0f to 0x80000000L, 0.35f to 0x1A000000L, 1f to 0xCC000000L)),
+            DPattern(b(0, 0, 794, 1123, F), DPatternKind.SPEED, WHITE, 0f),
+            DText(bk(40, 40, 714, 120), "title", "Titolo", "Discesa", DFont.ANTON, 110f, WHITE, line = 0.9f, upper = true, skew = -0.2f, shadow = true),
+            DText(bk(44, 520, 500, 30), "label", "Etichetta", "Velocità massima", DFont.MONO_BOLD, 18f, ACC, track = 0.2f, upper = true),
+            DRect(bk(-50, 650, 900, 160), ACC, rot = -8f),
+            DText(bk(30, 556, 480, 260), "speed", "Velocità", "62", DFont.ANTON, 280f, WHITE, line = 0.85f, skew = -0.25f, count = true, shadow = true),
+            DText(bk(470, 690, 300, 84), "unit", "Unità", "km/h", DFont.ANTON, 80f, BLACK, upper = true, rot = -8f, skew = -0.25f),
+            DPhoto(b(480, 830, 270, 170, E), 1, radius = 10f, rot = -8f, border = 4f),
+            DText(b(40, 1040, 714, 30, E), "place", "Luogo", "{luogo|Passo dello Stelvio} · {data}", DFont.MONO_BOLD, 18f, WHITE, track = 0.12f, upper = true),
+        ),
+    )
+
+    // A4 -----------------------------------------------------------------------------------------------
+    private fun mud() = Design(
+        "x-mud", "Fango", DesignFamily.ACTION, DOrient.PORTRAIT, 794f, 1123f, 0xFF2A1F17,
+        accents = listOf(MUD, 0xF03B2A1C, 0xF07A6A55), accents2 = listOf(0xFFFFD60A, 0xFFFF5B14, WHITE), motion = CollageMotion.STILL,
+        hint = "MTB, enduro, gravel, cross: schizzi di fango sulla foto e una scritta che grida",
+        els = listOf(
+            DPhoto(b(0, 0, 794, 1123, F), 0),
+            DRect(b(0, 0, 794, 1123, F), 0, grad = listOf(0f to 0L, 0.55f to 0L, 1f to 0xCC000000L)),
+            DSplat(bk(20, 20, 320, 320), ACC, seed = 21),
+            DSplat(bk(500, 110, 280, 280), ACC, seed = 23, rot = 70f),
+            DSplat(bk(330, 430, 170, 170), ACC, seed = 25),
+            DSplat(bk(580, 650, 240, 240), ACC, seed = 27, rot = 20f),
+            DSplat(bk(-40, 600, 220, 220), ACC, seed = 29),
+            DText(b(36, 740, 400, 30, E), "tag", "Etichetta", "Enduro · run 3", DFont.MONO_BOLD, 16f, BLACK, pill = ACC2, pad = 12f, square = true),
+            DText(b(30, 790, 734, 260, E), "title", "Titolo", "Full\ngas", DFont.ARCHIVO, 170f, WHITE, line = 0.85f, upper = true, skew = -0.08f, shadow = true),
+            DText(b(36, 1064, 714, 24, E), "sub", "Sottotitolo", "{luogo|Finale Ligure} · {Mese} {ANNO}", DFont.MONO_BOLD, 16f, WHITE, track = 0.15f, upper = true),
+        ),
+    )
+
+    // A5 -----------------------------------------------------------------------------------------------
+    private fun hud(): Design {
+        val els = arrayListOf<DEl>(
+            DPhoto(b(0, 0, 600, 900, F), 0),
+            DRect(b(-150, -50, 900, 1000, F), 0, radial = true, grad = listOf(0f to 0L, 0.65f to 0L, 1f to 0xA6000000L)),
+        )
+        for ((x, y, d) in listOf(Triple(24, 24, "M0 40 L0 0 L40 0"), Triple(536, 24, "M0 0 L40 0 L40 40"), Triple(24, 836, "M0 0 L0 40 L40 40"), Triple(536, 836, "M40 0 L40 40 L0 40")))
+            els += DPath(bk(x, y, 40, 40), d, 40f, 40f, stroke = ACC, width = 4f)
+        els += DRect(bk(80, 42, 14, 14), 0xFFFF2D2D, circle = true)
+        els += DText(bk(102, 37, 100, 22), "", "", "REC", DFont.MONO_BOLD, 16f, WHITE)
+        els += DText(bk(360, 37, 160, 22), "tc", "Tempo", "01:24:37", DFont.MONO_BOLD, 16f, WHITE, DAlign.RIGHT)
+        els += DPath(bk(150, 440, 300, 20), "M0 10 L110 10 M190 10 L300 10 M140 10 L150 18 L160 10", 300f, 20f, stroke = WHITE, width = 2f)
+        els += DPath(bk(36, 620, 190, 100), "M10 92 C10 30 60 8 95 8 C130 8 180 30 180 92", 190f, 100f, stroke = 0x66FFFFFF, width = 8f)
+        els += DPath(bk(36, 620, 190, 100), "M10 92 C10 30 60 8 95 8 C112 8 128 12 140 18", 190f, 100f, stroke = ACC, width = 8f, draw = true)
+        els += DText(bk(36, 662, 190, 70), "speed", "Velocità", "48", DFont.GROTESK, 64f, WHITE, DAlign.CENTER, count = true, shadow = true)
+        els += DText(bk(36, 730, 190, 18), "", "", "km/h", DFont.MONO_BOLD, 13f, WHITE, DAlign.CENTER, track = 0.2f, upper = true)
+        els += DText(bk(330, 650, 234, 16), "l1", "Etichetta 1", "Quota", DFont.MONO, 12f, WHITE, DAlign.RIGHT, track = 0.18f, upper = true)
+        els += DText(bk(330, 668, 234, 44), "alt", "Quota", "1.775 m", DFont.ANTON, 40f, WHITE, DAlign.RIGHT, count = true, shadow = true)
+        els += DPath(bk(420, 724, 26, 24), "M13 22 C4 15 1 10 2 6 C3 2 9 1 13 6 C17 1 23 2 24 6 C25 10 22 15 13 22 Z", 26f, 24f, fill = 0xFFFF2D55)
+        els += DText(bk(450, 720, 114, 32), "hr", "Battito", "162", DFont.ANTON, 30f, WHITE, DAlign.RIGHT, count = true, shadow = true)
+        els += DText(bk(40, 864, 520, 18), "place", "Luogo", "{luogo|Bike park} · gps fix", DFont.MONO, 12f, WHITE, DAlign.CENTER, track = 0.15f, upper = true)
+        return Design("x-hud", "Casco", DesignFamily.ACTION, DOrient.PORTRAIT, 600f, 900f, BLACK,
+            accents = listOf(WHITE, 0xFFFFD60A, 0xFF00E5FF), els = els, motion = CollageMotion.STILL,
+            hint = "La grafica di una action cam sul casco: mirini, REC, velocità che sale, quota e battito")
+    }
+
+    // A6 -----------------------------------------------------------------------------------------------
+    private fun record(): Design {
+        val dim = 0xFFB0B6C3L
+        val els = arrayListOf<DEl>(
+            DPhoto(bk(0, 0, 794, 520), 0),
+            DRect(bk(0, 300, 794, 222), 0, grad = listOf(0f to 0L, 1f to ACC2)),
+            DRect(bk(40, 470, 150, 150), ACC, circle = true, shadow = 12f),
+            DText(bk(40, 514, 150, 62), "pr", "Bollino", "PR", DFont.ANTON, 64f, BLACK, DAlign.CENTER, rot = -8f),
+            DText(bk(220, 480, 534, 64), "seg", "Segmento", "Salita del {luogo|Ghisallo}", DFont.GROTESK, 44f, WHITE, wrap = true),
+            DText(bk(220, 550, 534, 20), "date", "Data", "{giorno}", DFont.MONO, 14f, dim, track = 0.1f, upper = true),
+            DText(bk(40, 640, 714, 170), "time", "Tempo", "12:47", DFont.ANTON, 180f, WHITE, line = 0.9f, count = true),
+            DText(bk(40, 820, 350, 30), "rank", "Posizione", "3° su 4.812", DFont.MONO_BOLD, 22f, ACC),
+            DText(bk(404, 820, 350, 30), "gain", "Miglioramento", "−0:38 dal tuo meglio", DFont.MONO_BOLD, 22f, WHITE, DAlign.RIGHT),
+        )
+        val hs = listOf(120, 150, 95, 170, 140, 180, 130, 160)
+        hs.forEachIndexed { i, hh ->
+            val x = 40 + i * 89
+            els += DRect(bk(x, 1060 - hh, 70, hh), if (hh == hs.max()) ACC else 0xFF3A3F4B, radius = 6f)
+            els += DText(bk(x, 1068, 70, 16), "", "", "${i + 1}", DFont.MONO, 12f, dim, DAlign.CENTER)
+        }
+        return Design("x-pr", "Record", DesignFamily.ACTION, DOrient.PORTRAIT, 794f, 1123f, ACC2,
+            accents = listOf(0xFFFF5B14, 0xFFFFD60A, 0xFF00E5FF), accents2 = listOf(0xFF111318, 0xFF1A1033, 0xFF0B2E2A), els = els,
+            motion = CollageMotion.SLIDE, hint = "Il tuo record su una salita o un segmento: tempo che conta, posizione e il ritmo km per km")
+    }
+
+    // A7 -----------------------------------------------------------------------------------------------
+    private fun sequence(): Design {
+        val w = 158.8f
+        val els = arrayListOf<DEl>(
+            DText(bk(40, 40, 714, 100), "title", "Titolo", "Il salto", DFont.ANTON, 100f, WHITE, line = 0.9f, upper = true, skew = -0.15f),
+            DText(bk(44, 132, 714, 20), "sub", "Sottotitolo", "{luogo|Bike park} · {data}", DFont.MONO, 14f, WHITE, track = 0.12f, upper = true),
+        )
+        for (k in 0 until 5) {
+            val bx = k * w - 30
+            els += DPhoto(bk(bx, 170, w + 60, 810), k, poly = pts(0.288f, 0f, 0.986f, 0f, 0.712f, 1f, 0.014f, 1f))
+            els += DText(bk(k * w + 14, 990, 120, 64), "", "", "${k + 1}", DFont.ANTON, 56f, ACC, skew = -0.15f)
+        }
+        els += DText(b(40, 1062, 714, 30, E), "stat", "Dato", "Volo: 6,4 m", DFont.MONO_BOLD, 20f, WHITE, track = 0.1f, upper = true)
+        return Design("x-sequence", "Sequenza", DesignFamily.ACTION, DOrient.PORTRAIT, 794f, 1123f, BLACK,
+            accents = listOf(0xFFFFD60A, 0xFFFF2D55, 0xFF00E5FF), els = els, motion = CollageMotion.WIPE,
+            hint = "Cinque foto di un salto, una curva o una virata in strisce inclinate e numerate, come una foto stroboscopica")
+    }
+
+    // A8 -----------------------------------------------------------------------------------------------
+    private fun skipass(): Design {
+        val ink = 0xFF0F172AL; val grey = 0xFF64748BL
+        val els = arrayListOf<DEl>(
+            DPhoto(b(-40, -40, 680, 980, F), 0, filter = DFilter.BLUR),
+            DRect(b(0, 0, 600, 900, F), 0x33FFFFFF),
+            DRect(bk(60, 90, 480, 720), WHITE, radius = 28f, shadow = 20f),
+            DRect(bk(276, 100, 48, 14), 0xFFDDE6EE, radius = 7f),
+            DPhoto(bk(84, 124, 432, 290), 0, radius = 18f),
+            DText(bk(84, 430, 432, 24), "kicker", "Rubrica", "Skipass giornaliero", DFont.MONO_BOLD, 16f, ACC, track = 0.15f, upper = true),
+            DText(bk(84, 458, 432, 70), "resort", "Comprensorio", "{luogo|Cervinia}", DFont.GROTESK, 60f, ink),
+            DText(bk(84, 530, 432, 20), "date", "Data", "{giorno}", DFont.MONO, 14f, grey),
+        )
+        listOf("Quota max" to "3.480 m", "Pista" to "Nera", "Discese" to "14", "Dislivello" to "12.400 m").forEachIndexed { i, (l, v) ->
+            val x = 84 + (i % 2) * 220; val y = 570 + (i / 2) * 64
+            els += DText(bk(x, y, 210, 14), "l$i", "Etichetta ${i + 1}", l, DFont.MONO, 11f, grey, track = 0.18f, upper = true)
+            els += DText(bk(x, y + 16, 210, 40), "s$i", l, v, DFont.GROTESK, 32f, ink, count = true)
+        }
+        els += DPath(bk(84, 704, 432, 2), "M0 1 L432 1", 432f, 2f, stroke = 0xFFB0B8C4, width = 2f, dash = listOf(6f, 6f))
+        els += DBarcode(bk(84, 724, 432, 60), ink)
+        return Design("x-skipass", "Skipass", DesignFamily.ACTION, DOrient.PORTRAIT, 600f, 900f, 0xFFDDE6EE,
+            accents = listOf(0xFF1D4ED8, 0xFFE63946, 0xFF0F766E), els = els, motion = CollageMotion.SLIDE,
+            hint = "Sci e snowboard: il biglietto dell'impianto con la quota, la pista, le discese e la tua foto")
+    }
 
     // T1 -----------------------------------------------------------------------------------------------
     private fun notes(): Design {

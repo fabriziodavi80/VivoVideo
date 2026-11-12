@@ -32,7 +32,7 @@ enum class DShape { RECT, CIRCLE, ARCH, PILL, TORN_BOTTOM, TORN_TOP, TORN }
 enum class DFilter { NONE, BW, DUOTONE, BLUR, HALFTONE }
 
 /** Carta a quadretti, fori della pellicola, grana della carta, righe del quaderno, colonne di testo di giornale. */
-enum class DPatternKind { GRID, SPROCKETS, PAPER, LINES, TEXTLINES }
+enum class DPatternKind { GRID, SPROCKETS, PAPER, LINES, TEXTLINES, TOPO, SPEED }
 
 /** Riquadro sul foglio di riferimento, con gli ancoraggi orizzontale e verticale. */
 data class DBox(val x: Float, val y: Float, val w: Float, val h: Float, val ax: Anchor = Anchor.START, val ay: Anchor = Anchor.START)
@@ -97,6 +97,9 @@ data class DTorn(
 /** Scritta a lettere ritagliate da giornali diversi (ogni lettera un font, un colore, un pezzo di carta). */
 data class DRansom(override val box: DBox, val id: String, val label: String, val text: String, val seed: Int = 7, override val rot: Float = 0f) : DEl
 
+/** Schizzi di fango o di vernice: una macchia irregolare e tante gocce attorno. */
+data class DSplat(override val box: DBox, val color: Long, val seed: Int = 1, override val rot: Float = 0f) : DEl
+
 /** Timbro rotondo (passaporto, "fatto in casa"): due righe dentro un doppio cerchio. */
 data class DStamp(override val box: DBox, val id: String, val label: String, val text: String, val color: Long, override val rot: Float = 0f) : DEl
 
@@ -141,6 +144,8 @@ data class DText(
     val bottom: Boolean = false,
     /** Lettere sfumate dall'alto in basso (cromo, metallo): i colori, uguali distanze. */
     val gradient: List<Long> = emptyList(),
+    /** Lettere inclinate in avanti (velocità): come textSkewX, es. -0.25. */
+    val skew: Float = 0f,
 ) : DEl
 
 /** Una parola con una foto dentro ogni lettera. */
@@ -194,6 +199,7 @@ data class DBarcode(override val box: DBox, val color: Long, override val rot: F
 data class DPalette(override val box: DBox, val count: Int, val color: Long, override val rot: Float = 0f) : DEl
 
 enum class DesignFamily(val label: String, val hint: String) {
+    ACTION("Azione", "Sport d'azione: MTB, bici, corsa, sci, surf. Pettorale, mappa, velocità, fango, action cam, record, sequenza, skipass"),
     PAPER("Carta", "Carta strappata con la fibra bianca, lettere ritagliate, retino, la persona ritagliata come un adesivo"),
     TREND("Tendenze", "I formati più usati del 2026: nota del telefono, cromo Y2K, luce calda, allora e adesso, finestre retrò, dump del mese"),
     MAGAZINE("Rivista", "Scritte grandi come una copertina: la persona può passare davanti al titolo"),
