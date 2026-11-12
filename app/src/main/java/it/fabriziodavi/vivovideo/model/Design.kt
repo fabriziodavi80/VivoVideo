@@ -32,7 +32,8 @@ enum class DShape { RECT, CIRCLE, ARCH, PILL, TORN_BOTTOM, TORN_TOP, TORN }
 enum class DFilter { NONE, BW, DUOTONE, BLUR, HALFTONE }
 
 /** Carta a quadretti, fori della pellicola, grana della carta, righe del quaderno, colonne di testo di giornale. */
-enum class DPatternKind { GRID, SPROCKETS, PAPER, LINES, TEXTLINES, TOPO, SPEED }
+/** ... [CONFETTI] coriandoli (cadono nel video), [QR] quadretti tipo codice QR (decorativo), [DISCO] palla a specchi. */
+enum class DPatternKind { GRID, SPROCKETS, PAPER, LINES, TEXTLINES, TOPO, SPEED, CONFETTI, QR, DISCO }
 
 /** Riquadro sul foglio di riferimento, con gli ancoraggi orizzontale e verticale. */
 data class DBox(val x: Float, val y: Float, val w: Float, val h: Float, val ax: Anchor = Anchor.START, val ay: Anchor = Anchor.START)
@@ -97,6 +98,9 @@ data class DTorn(
 /** Scritta a lettere ritagliate da giornali diversi (ogni lettera un font, un colore, un pezzo di carta). */
 data class DRansom(override val box: DBox, val id: String, val label: String, val text: String, val seed: Int = 7, override val rot: Float = 0f) : DEl
 
+/** Il calendario del mese della data [text] ("gg.mm.aaaa" o segnaposto), con il giorno cerchiato a mano in [accent]. */
+data class DCalendar(override val box: DBox, val id: String, val label: String, val text: String, val color: Long, val accent: Long, override val rot: Float = 0f) : DEl
+
 /** Schizzi di fango o di vernice: una macchia irregolare e tante gocce attorno. */
 data class DSplat(override val box: DBox, val color: Long, val seed: Int = 1, override val rot: Float = 0f) : DEl
 
@@ -146,6 +150,8 @@ data class DText(
     val gradient: List<Long> = emptyList(),
     /** Lettere inclinate in avanti (velocità): come textSkewX, es. -0.25. */
     val skew: Float = 0f,
+    /** Alone luminoso di questo colore (neon). */
+    val glow: Long? = null,
 ) : DEl
 
 /** Una parola con una foto dentro ogni lettera. */
@@ -199,6 +205,7 @@ data class DBarcode(override val box: DBox, val color: Long, override val rot: F
 data class DPalette(override val box: DBox, val count: Int, val color: Long, override val rot: Float = 0f) : DEl
 
 enum class DesignFamily(val label: String, val hint: String) {
+    EVENTS("Eventi", "Matrimoni, compleanni, feste, lauree, nascite, convegni: save the date, palloncini, disco, pass VIP, badge, relatore"),
     ACTION("Azione", "Sport d'azione: MTB, bici, corsa, sci, surf. Pettorale, mappa, velocità, fango, action cam, record, sequenza, skipass"),
     PAPER("Carta", "Carta strappata con la fibra bianca, lettere ritagliate, retino, la persona ritagliata come un adesivo"),
     TREND("Tendenze", "I formati più usati del 2026: nota del telefono, cromo Y2K, luce calda, allora e adesso, finestre retrò, dump del mese"),
@@ -241,7 +248,7 @@ data class Design(
         els.filterIsInstance<DPhoto>().filter { it.cutout }.map { it.slot }).distinct()
     /** Scritte a lettere ritagliate e timbri (si cambiano come le altre scritte). */
     val extraTexts: List<Triple<String, String, String>> get() = els.mapNotNull { e ->
-        when (e) { is DRansom -> Triple(e.id, e.label, e.text); is DStamp -> Triple(e.id, e.label, e.text); else -> null }
+        when (e) { is DRansom -> Triple(e.id, e.label, e.text); is DStamp -> Triple(e.id, e.label, e.text); is DCalendar -> Triple(e.id, e.label, e.text); else -> null }
     }
     val words: List<DPhotoWord> get() = els.filterIsInstance<DPhotoWord>()
 }

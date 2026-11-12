@@ -27,6 +27,7 @@ import it.fabriziodavi.vivovideo.model.CollageTemplate
 import it.fabriziodavi.vivovideo.model.ColorNames
 import it.fabriziodavi.vivovideo.model.DAlign
 import it.fabriziodavi.vivovideo.model.DBarcode
+import it.fabriziodavi.vivovideo.model.DCalendar
 import it.fabriziodavi.vivovideo.model.DColor
 import it.fabriziodavi.vivovideo.model.DEl
 import it.fabriziodavi.vivovideo.model.DFilter
@@ -169,6 +170,7 @@ object DesignRenderer {
                     }
                 }
                 is DRansom -> { val u = lateU(li++, late, tUs, dur, still); if (u > 0f) drawRansom(c, d, e, r, s, spec, meta, tUs, still) }
+                is DCalendar -> { val u = lateU(li++, late, tUs, dur, still, 0.5f); if (u > 0f) drawCalendar(c, d, e, r, s, spec, meta, u) }
                 is DSplat -> { val u = lateU(li++, late, tUs, dur, still, 0.2f); if (u > 0f) drawSplat(c, d, e, r, s, spec, u) }
                 is DStamp -> { val u = lateU(li++, late, tUs, dur, still); if (u > 0f) withPop(c, r, u) { drawStamp(c, d, e, r, s, spec, meta) } }
             }
@@ -538,6 +540,55 @@ object DesignRenderer {
         c.restore()
     }
 
+    private val weekdays = listOf("L", "M", "M", "G", "V", "S", "D")
+    private val monthNames = listOf("gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre")
+
+    /** Calendario del mese con il giorno cerchiato a mano (nel video il cerchio si disegna). */
+    private fun drawCalendar(c: Canvas, d: Design, e: DCalendar, r: RectF, s: Float, spec: CollageSpec, meta: DesignMeta, u: Float) {
+        val txt = spec.texts[e.id] ?: DesignTexts.fill(e.text, meta)
+        val m = Regex("(\\d{1,2})[./-](\\d{1,2})[./-](\\d{4})").find(txt)
+        val cal = java.util.Calendar.getInstance(java.util.Locale.ITALY)
+        if (m != null) cal.set(m.groupValues[3].toInt(), (m.groupValues[2].toInt() - 1).coerceIn(0, 11), 1) else cal.set(java.util.Calendar.DAY_OF_MONTH, 1)
+        val day = m?.groupValues?.get(1)?.toIntOrNull() ?: java.util.Calendar.getInstance().get(java.util.Calendar.DAY_OF_MONTH)
+        val days = cal.getActualMaximum(java.util.Calendar.DAY_OF_MONTH)
+        val first = (cal.get(java.util.Calendar.DAY_OF_WEEK) + 5) % 7  // lunedì = 0
+        val col = tint(e.color, d, spec); val acc = tint(e.accent, d, spec)
+        val rows = (first + days + 6) / 7
+        val cw = r.width() / 7
+        val head = cw * 0.9f
+        val ch = (r.height() - head * 2) / rows
+        val p = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = col; textAlign = Paint.Align.CENTER }
+        c.save()
+        if (e.rot != 0f) c.rotate(e.rot, r.centerX(), r.centerY())
+        p.typeface = DesignFonts.get(DFont.MONO_BOLD); p.textSize = head * 0.42f; p.letterSpacing = 0.2f
+        c.drawText("${monthNames[cal.get(java.util.Calendar.MONTH)]} ${cal.get(java.util.Calendar.YEAR)}".uppercase(java.util.Locale.ITALY), r.centerX(), r.top + head * 0.55f, p)
+        p.letterSpacing = 0f; p.typeface = DesignFonts.get(DFont.MONO); p.textSize = min(cw, ch) * 0.34f
+        weekdays.forEachIndexed { i, w -> c.drawText(w, r.left + cw * (i + 0.5f), r.top + head * 1.6f, p) }
+        p.typeface = DesignFonts.get(DFont.SERIF); p.textSize = min(cw, ch) * 0.52f
+        val fm = p.fontMetrics
+        for (dd in 1..days) {
+            val k = first + dd - 1
+            val cx = r.left + cw * (k % 7 + 0.5f); val cy = r.top + head * 2 + ch * (k / 7 + 0.5f)
+            p.color = if (dd == day) acc else col
+            c.drawText("$dd", cx, cy - (fm.ascent + fm.descent) / 2, p)
+            if (dd == day) {
+                // Cerchio tracciato a mano: un giro e un pezzetto, un po' storto.
+                val rad = min(cw, ch) * 0.46f
+                val path = Path()
+                for (i in 0..44) {
+                    val a = (-1.9f + i / 44f * 7.1f)
+                    val rr = rad * (1f + 0.08f * kotlin.math.sin(a * 2.3f))
+                    val x = cx + kotlin.math.cos(a) * rr * 1.15f; val y = cy + kotlin.math.sin(a) * rr
+                    if (i == 0) path.moveTo(x, y) else path.lineTo(x, y)
+                }
+                var draw = path
+                if (u < 1f) { draw = Path(); PathMeasure(path, false).let { pm -> pm.getSegment(0f, pm.length * u, draw, true) } }
+                c.drawPath(draw, Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeWidth = max(2f, 3.2f * s); color = acc; strokeCap = Paint.Cap.ROUND })
+            }
+        }
+        c.restore()
+    }
+
     private fun drawStamp(c: Canvas, d: Design, e: DStamp, r: RectF, s: Float, spec: CollageSpec, meta: DesignMeta) {
         val text = (spec.texts[e.id] ?: DesignTexts.fill(e.text, meta)).uppercase(java.util.Locale.ITALY)
         val lines = text.split('\n').take(2)
@@ -651,6 +702,7 @@ object DesignRenderer {
             color = tint(e.color, d, spec)
             if (e.stroke > 0) { style = Paint.Style.STROKE; strokeWidth = e.stroke * s; strokeJoin = Paint.Join.ROUND }
             if (e.shadow) setShadowLayer(e.size * s * 0.08f, 0f, e.size * s * 0.03f, 0x73000000)
+            if (e.glow != null) setShadowLayer(e.size * s * 0.22f, 0f, 0f, tint(e.glow, d, spec))
         }
         val p2 = if (e.font2 != null || e.color2 != null) Paint(p).apply {
             typeface = DesignFonts.get(e.font2 ?: e.font)
@@ -695,6 +747,7 @@ object DesignRenderer {
                 lp.shader = LinearGradient(0f, base + fm.ascent, 0f, base + fm.descent, e.gradient.map { tint(it, d, spec) }.toIntArray(), null, Shader.TileMode.CLAMP)
             }
             c.drawText(line, x, base, lp)
+            if (e.glow != null) c.drawText(line, x, base, lp)
             lp.shader = null
         }
         c.restore()
@@ -819,6 +872,61 @@ object DesignRenderer {
                     p.strokeWidth = (1f + 3.5f * rnd(i, 99)) * s
                     p.alpha = (60 + 150 * rnd(i, 101)).toInt()
                     c.drawLine(x, y, x + len, y, p)
+                }
+            }
+            DPatternKind.CONFETTI -> {
+                // Coriandoli: rettangolini e pallini nei colori del modello; nel video cadono girando.
+                val cols = listOf(tint(DColor.ACC, d, spec), tint(DColor.ACC2, d, spec), 0xFFFFFFFF.toInt(), 0xFFFFD23F.toInt(), 0xFFFF7AB8.toInt())
+                c.save(); c.clipRect(r)
+                for (i in 0 until 110) {
+                    val fall = sec * r.height() * (0.15f + 0.25f * rnd(i, 113))
+                    val x = r.left + rnd(i, 107) * r.width() + kotlin.math.sin(sec * 2 + i) * 8 * s
+                    val y0 = r.top + rnd(i, 109) * r.height() + fall
+                    val y = r.top + ((y0 - r.top) % r.height())
+                    p.color = cols[i % cols.size]
+                    val sz = (5f + 7f * rnd(i, 127)) * s
+                    if (i % 3 == 0) c.drawCircle(x, y, sz * 0.45f, p) else {
+                        c.save(); c.rotate(rnd(i, 131) * 360 + sec * 180 * (if (i % 2 == 0) 1 else -1), x, y)
+                        c.drawRect(x - sz * 0.3f, y - sz * 0.8f, x + sz * 0.3f, y + sz * 0.8f, p); c.restore()
+                    }
+                }
+                c.restore()
+            }
+            DPatternKind.QR -> {
+                // Riquadro a quadretti tipo codice QR (solo decorativo): tre "occhi" agli angoli.
+                val n = 25; val cell = min(r.width(), r.height()) / n
+                fun eye(ex: Int, ey: Int) {
+                    c.drawRect(r.left + ex * cell, r.top + ey * cell, r.left + (ex + 7) * cell, r.top + (ey + 7) * cell, p)
+                    val w = Paint(p).apply { color = 0xFFFFFFFF.toInt() }
+                    c.drawRect(r.left + (ex + 1) * cell, r.top + (ey + 1) * cell, r.left + (ex + 6) * cell, r.top + (ey + 6) * cell, w)
+                    c.drawRect(r.left + (ex + 2) * cell, r.top + (ey + 2) * cell, r.left + (ex + 5) * cell, r.top + (ey + 5) * cell, p)
+                }
+                for (j in 0 until n) for (i in 0 until n) {
+                    val inEye = (i < 8 && j < 8) || (i >= n - 8 && j < 8) || (i < 8 && j >= n - 8)
+                    if (!inEye && rnd(j * n + i, 211) > 0.52f) c.drawRect(r.left + i * cell, r.top + j * cell, r.left + (i + 1) * cell, r.top + (j + 1) * cell, p)
+                }
+                eye(0, 0); eye(n - 7, 0); eye(0, n - 7)
+            }
+            DPatternKind.DISCO -> {
+                // Palla a specchi: tasselli grigi più chiari verso la luce, qualche riflesso bianco.
+                val cx = r.centerX(); val cy = r.centerY(); val rad = min(r.width(), r.height()) / 2
+                val clip = Path().apply { addCircle(cx, cy, rad, Path.Direction.CW) }
+                c.save(); c.clipPath(clip)
+                c.drawCircle(cx, cy, rad, Paint(p).apply { color = 0xFF2A2A33.toInt() })
+                val n = 14; val t = rad * 2 / n
+                for (j in 0 until n) for (i in 0 until n) {
+                    val x = cx - rad + i * t; val y = cy - rad + j * t
+                    val dx = (x + t / 2 - (cx - rad * 0.35f)) / rad; val dy = (y + t / 2 - (cy - rad * 0.35f)) / rad
+                    val light = (1f - kotlin.math.sqrt(dx * dx + dy * dy) * 0.55f).coerceIn(0.15f, 1f) * (0.75f + 0.25f * rnd(j * n + i, 223))
+                    val v = (70 + 185 * light).toInt().coerceIn(0, 255)
+                    c.drawRect(x + t * 0.06f, y + t * 0.06f, x + t * 0.94f, y + t * 0.94f, Paint(p).apply { color = Color.rgb(v, v, (v + 12).coerceAtMost(255)) })
+                }
+                c.restore()
+                // Lampi che girano.
+                for (k in 0 until 4) {
+                    val a = rnd(k, 229) * 6.28f + sec * 1.5f
+                    val px = cx + kotlin.math.cos(a) * rad * 0.55f; val py = cy + kotlin.math.sin(a) * rad * 0.55f
+                    c.drawCircle(px, py, rad * 0.06f, Paint(p).apply { color = 0xFFFFFFFF.toInt(); setShadowLayer(rad * 0.15f, 0f, 0f, 0xFFFFFFFF.toInt()) })
                 }
             }
             DPatternKind.PAPER -> {
