@@ -46,7 +46,8 @@ object PhotoPlace {
                 ctx.contentResolver.openInputStream(u)!!.use { s ->
                     val ex = ExifInterface(s)
                     if (taken == 0L) taken = exifDate(ex)
-                    if (lat == null) ex.latLong?.let { ll -> if (ll[0] != 0.0 || ll[1] != 0.0) { lat = ll[0]; lon = ll[1] } }
+                    val ll = FloatArray(2)
+                    if (lat == null && ex.getLatLong(ll) && (ll[0] != 0f || ll[1] != 0f)) { lat = ll[0].toDouble(); lon = ll[1].toDouble() }
                 }
             } else runCatching {
                 val r = MediaMetadataRetriever()
