@@ -20,7 +20,7 @@ data class TimelapsePlan(val trimmedUs: Long, val speed: Int, val srcFps: Float,
     val outFrames: Int get() = (outputUs * 30 / 1_000_000).toInt()
     val spanUs: Double get() = speed * 1_000_000.0 / 30
     /** Non più dei fotogrammi che ci sono davvero nell'intervallo. */
-    val samples: Int get() = trails.samples.coerceAtMost((spanUs / (1_000_000.0 / srcFps.coerceAtLeast(1f))).toInt().coerceAtLeast(1))
+    val samples: Int get() = trails.samples.coerceAtMost((spanUs * srcFps.coerceAtLeast(1f) / 1_000_000.0 + 1e-6).toInt().coerceAtLeast(1))
     val stepUs: Long get() = (spanUs / samples).toLong().coerceAtLeast(1)
     /** Gruppo (fotogramma del risultato) di un campione al tempo [relUs] dall'inizio; mezzo passo di tolleranza per i tempi dei fotogrammi veri. */
     fun groupOf(relUs: Long): Int = ((relUs + stepUs / 2) / spanUs).toInt()
