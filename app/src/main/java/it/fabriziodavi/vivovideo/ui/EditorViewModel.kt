@@ -2074,7 +2074,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         val options = CollageTemplates.forCount(s.items.size, a)
         // Lo stesso modello se va bene per il nuovo formato, altrimenti uno della stessa famiglia.
         val t = CollageTemplates.byId(s.templateId, a)
-            ?: options.firstOrNull { old?.design != null && it.design?.family == old.design.family }
+            ?: options.firstOrNull { old?.design != null && it.design?.family == old?.design?.family }
             ?: options.firstOrNull { old?.design == null && it.design == null && it.family == old?.family }
             ?: options.first()
         if (t.id == s.templateId) s.copy(aspect = a) else s.copy(aspect = a, templateId = t.id, style = t.style, motion = t.motion, accent = null, accent2 = null)

@@ -91,10 +91,10 @@ object DesignFonts {
  * i numeri contano, i tratti (percorsi, frecce, profili) si disegnano.
  */
 object DesignRenderer {
-    fun color(c: Long, d: Design, spec: CollageSpec): Int = when (c) {
+    fun tint(c: Long, d: Design, spec: CollageSpec): Int = when (c) {
         DColor.ACC -> (spec.accent ?: d.accents.first()).toInt()
         DColor.ACC2 -> (spec.accent2 ?: d.accents2.firstOrNull() ?: d.accents.first()).toInt()
-        DColor.BG -> if (DColor.isToken(d.bg)) color(d.bg.takeIf { it != DColor.BG } ?: DColor.WHITE, d, spec) else d.bg.toInt()
+        DColor.BG -> if (DColor.isToken(d.bg)) tint(d.bg.takeIf { it != DColor.BG } ?: DColor.WHITE, d, spec) else d.bg.toInt()
         else -> c.toInt()
     }
 
@@ -115,7 +115,7 @@ object DesignRenderer {
         val meta = DesignMeta.of(spec.items)
         val s = DLayout.scale(d, w.toFloat(), h.toFloat())
         val dur = spec.durationUs
-        c.drawColor(color(d.bg, d, spec))
+        c.drawColor(tint(d.bg, d, spec))
         val cam = CollageAnim.camera(spec.motion, t.cells.firstOrNull(), w.toFloat() / h, tUs, dur, still)
         c.save()
         c.translate(w / 2f, h / 2f); c.scale(cam.scale, cam.scale); c.translate(-cam.cx * w, -cam.cy * h)
@@ -232,7 +232,7 @@ object DesignRenderer {
                 postConcat(ColorMatrix(floatArrayOf(1.2f, 0f, 0f, 0f, -22f, 0f, 1.2f, 0f, 0f, -22f, 0f, 0f, 1.2f, 0f, -22f, 0f, 0f, 0f, 1f, 0f)))
             })
             DFilter.DUOTONE -> {
-                val light = color(DColor.ACC, d, spec); val dark = color(DColor.ACC2, d, spec)
+                val light = tint(DColor.ACC, d, spec); val dark = tint(DColor.ACC2, d, spec)
                 val dr = Color.red(dark).toFloat(); val dg = Color.green(dark).toFloat(); val db = Color.blue(dark).toFloat()
                 val lr = (Color.red(light) - dr) / 255f; val lg = (Color.green(light) - dg) / 255f; val lb = (Color.blue(light) - db) / 255f
                 // Luminosità (con più contrasto) → dal colore scuro al chiaro.
@@ -265,7 +265,7 @@ object DesignRenderer {
             val b = e.border * s
             val card = RectF(r.left - b, r.top - b, r.right + b, r.bottom + b + e.bottomPad * s)
             val cp = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                color = if (e.border > 0) color(e.borderColor, d, spec) else Color.BLACK
+                color = if (e.border > 0) tint(e.borderColor, d, spec) else Color.BLACK
                 if (e.shadow > 0) setShadowLayer(e.shadow * s, 0f, e.shadow * s * 0.45f, 0x4D000000)
             }
             val outer = when {
@@ -388,13 +388,13 @@ object DesignRenderer {
             typeface = DesignFonts.get(e.font)
             textSize = e.size * s
             letterSpacing = e.track
-            color = color(e.color, d, spec)
+            color = tint(e.color, d, spec)
             if (e.stroke > 0) { style = Paint.Style.STROKE; strokeWidth = e.stroke * s; strokeJoin = Paint.Join.ROUND }
             if (e.shadow) setShadowLayer(e.size * s * 0.08f, 0f, e.size * s * 0.03f, 0x73000000)
         }
         val p2 = if (e.font2 != null || e.color2 != null) Paint(p).apply {
             typeface = DesignFonts.get(e.font2 ?: e.font)
-            color = color(e.color2 ?: e.color, d, spec)
+            color = tint(e.color2 ?: e.color, d, spec)
         } else null
         val avail = r.width() - 2 * e.pad * s
         val lines = if (e.wrap) wrap(txt, p, avail) else txt.split('\n')
@@ -427,9 +427,9 @@ object DesignRenderer {
                 val hh = lp.textSize * 0.62f + e.pad * s * 0.55f
                 val pr = RectF(x - e.pad * s, cy - hh, x + lw + e.pad * s, cy + hh)
                 val rr = if (e.square) 0f else hh
-                c.drawRoundRect(pr, rr, rr, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = color(e.pill, d, spec); this.alpha = (alpha * 255).toInt() })
+                c.drawRoundRect(pr, rr, rr, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = tint(e.pill, d, spec); this.alpha = (alpha * 255).toInt() })
             }
-            lp.alpha = (alpha * Color.alpha(color(if (lp === p2) e.color2 ?: e.color else e.color, d, spec))).toInt()
+            lp.alpha = (alpha * Color.alpha(tint(if (lp === p2) e.color2 ?: e.color else e.color, d, spec))).toInt()
             c.drawText(line, x, base, lp)
         }
         c.restore()
@@ -439,9 +439,9 @@ object DesignRenderer {
 
     private fun drawRect(c: Canvas, d: Design, e: DRect, r: RectF, s: Float, spec: CollageSpec) {
         val p = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = color(e.color, d, spec)
+            color = tint(e.color, d, spec)
             if (e.stroke > 0) { style = Paint.Style.STROKE; strokeWidth = e.stroke * s }
-            if (e.grad.isNotEmpty()) shader = LinearGradient(0f, r.top, 0f, r.bottom, e.grad.map { color(it.second, d, spec) }.toIntArray(), e.grad.map { it.first }.toFloatArray(), Shader.TileMode.CLAMP)
+            if (e.grad.isNotEmpty()) shader = LinearGradient(0f, r.top, 0f, r.bottom, e.grad.map { tint(it.second, d, spec) }.toIntArray(), e.grad.map { it.first }.toFloatArray(), Shader.TileMode.CLAMP)
             if (e.shadow > 0) setShadowLayer(e.shadow * s, 0f, e.shadow * s * 0.45f, 0x40000000)
         }
         c.save()
@@ -497,9 +497,9 @@ object DesignRenderer {
         }
         c.save()
         if (e.rot != 0f) c.rotate(e.rot, r.centerX(), r.centerY())
-        if (e.fill != null && u >= 1f) c.drawPath(path, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = color(e.fill, d, spec) })
+        if (e.fill != null && u >= 1f) c.drawPath(path, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = tint(e.fill, d, spec) })
         if (e.stroke != null) c.drawPath(path, Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            style = Paint.Style.STROKE; strokeWidth = e.width * s; color = color(e.stroke, d, spec)
+            style = Paint.Style.STROKE; strokeWidth = e.width * s; color = tint(e.stroke, d, spec)
             strokeCap = Paint.Cap.ROUND; strokeJoin = Paint.Join.ROUND
             if (e.dash.isNotEmpty()) pathEffect = DashPathEffect(e.dash.map { it * s }.toFloatArray(), 0f)
         })
@@ -507,7 +507,7 @@ object DesignRenderer {
     }
 
     private fun drawPattern(c: Canvas, d: Design, e: DPattern, r: RectF, s: Float, spec: CollageSpec) {
-        val p = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = color(e.color, d, spec) }
+        val p = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = tint(e.color, d, spec) }
         c.save()
         if (e.rot != 0f) c.rotate(e.rot, r.centerX(), r.centerY())
         when (e.kind) {
@@ -535,7 +535,7 @@ object DesignRenderer {
         val bars = intArrayOf(3, 1, 2, 1, 1, 3, 2, 1, 1, 2, 3, 1, 2, 1, 3, 1, 1, 2, 1, 3, 2, 1, 1, 2, 1, 3, 1, 2)
         val total = bars.indices.sumOf { bars[it] + (it % 3) + 1 }.toFloat()
         val unit = r.width() / total
-        val p = Paint().apply { color = color(e.color, d, spec) }
+        val p = Paint().apply { color = tint(e.color, d, spec) }
         var x = r.left
         bars.forEachIndexed { i, b -> c.drawRect(x, r.top, x + b * unit, r.bottom, p); x += (b + (i % 3) + 1) * unit }
     }
@@ -584,7 +584,7 @@ object DesignRenderer {
         if (cols.isEmpty()) return
         val gap = 8 * s
         val cw = (r.width() - gap * (e.count - 1)) / e.count
-        val label = Paint(Paint.ANTI_ALIAS_FLAG).apply { typeface = DesignFonts.get(DFont.MONO); textSize = 10 * s; color = color(e.color, d, spec) }
+        val label = Paint(Paint.ANTI_ALIAS_FLAG).apply { typeface = DesignFonts.get(DFont.MONO); textSize = 10 * s; color = tint(e.color, d, spec) }
         val lh = 13 * s
         cols.forEachIndexed { i, col ->
             val uu = ((u * cols.size) - i).coerceIn(0f, 1f)
