@@ -368,7 +368,7 @@ object Designs {
         )
         val els = arrayListOf<DEl>(
             DText(b(64, 60, 800, 136), "title", "Titolo", "Interrail", DFont.GROTESK, 170f, ink, line = 0.8f, track = -0.047f, bottom = true),
-            DText(b(859, 160, 200, 30), "year", "Anno", "{ANNO}", DFont.MONO_BOLD, 24f, ink, DAlign.RIGHT),
+            DText(b(859, 156, 200, 36), "year", "Anno", "{ANNO}", DFont.MONO_BOLD, 32f, ink, DAlign.RIGHT),
             DPath(b(0, 0, 1123, 1587, F), "M215 455 C500 420 700 500 745 645 C790 800 400 780 275 955 C170 1100 600 1150 785 1205", 1123f, 1587f,
                 stroke = ACC2, width = 7f, dash = listOf(1f, 20f), draw = true),
         )
@@ -377,14 +377,14 @@ object Designs {
             els += DPhoto(b(px, py, 234, 234, K), i, DShape.CIRCLE, border = 8f, shadow = 10f)
             val al = if (right) DAlign.RIGHT else DAlign.LEFT
             val w = if (right) 320 else 400
-            els += DText(b(lx, ly, w, 22, K), "", "", "0${i + 1}", DFont.MONO_BOLD, 18f, ACC2, al)
-            els += DText(b(lx, ly + 26, w, 52, K), "c$i", "Tappa ${i + 1}", "{luogo$i|${st[5]}}", DFont.GROTESK, 56f, ink, al, line = 0.9f)
-            els += DText(b(lx, ly + 82, w, 20, K), "d$i", "Giorni tappa ${i + 1}", st[6] as String, DFont.MONO, 16f, ink, al)
+            els += DText(b(lx, ly - 8, w, 30, K), "", "", "0${i + 1}", DFont.MONO_BOLD, 26f, ACC2, al)
+            els += DText(b(lx, ly + 26, w, 56, K), "c$i", "Tappa ${i + 1}", "{luogo$i|${st[5]}}", DFont.GROTESK, 62f, ink, al, line = 0.9f)
+            els += DText(b(lx, ly + 90, w, 28, K), "d$i", "Giorni tappa ${i + 1}", st[6] as String, DFont.MONO, 24f, ink, al)
         }
         els += DRect(b(64, 1481, 995, 3, E), ink)
-        els += DText(b(64, 1502, 330, 26, E), "f1", "Piede sinistra", "{n_luoghi|4} città", DFont.MONO, 20f, ink)
-        els += DText(b(396, 1502, 330, 26, E), "f2", "Piede centro", "{giorni|11} giorni", DFont.MONO, 20f, ink, DAlign.CENTER)
-        els += DText(b(729, 1502, 330, 26, E), "f3", "Piede destra", "2.134 km in treno", DFont.MONO, 20f, ink, DAlign.RIGHT)
+        els += DText(b(64, 1502, 330, 32, E), "f1", "Piede sinistra", "{n_luoghi|4} città", DFont.MONO, 26f, ink)
+        els += DText(b(396, 1502, 330, 32, E), "f2", "Piede centro", "{giorni|11} giorni", DFont.MONO, 26f, ink, DAlign.CENTER)
+        els += DText(b(729, 1502, 330, 32, E), "f3", "Piede destra", "2.134 km in treno", DFont.MONO, 26f, ink, DAlign.RIGHT)
         return Design("x-route", "Itinerario", DesignFamily.THEMES, DOrient.PORTRAIT, 1123f, 1587f, ACC,
             accents = listOf(0xFFE6EEE3, WHITE, 0xFFF6E7D8, 0xFFDBE7F5), accents2 = listOf(0xFFE8452C, 0xFF1D4ED8, ink),
             els = els, motion = CollageMotion.CASCADE, hint = "Le tappe del viaggio unite dal percorso a puntini (che si disegna nel video); i nomi li prende dalle foto")
