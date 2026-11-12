@@ -11,7 +11,7 @@ class DesignTest {
         DesignTexts.cal(0).apply { set(y, m - 1, d, h, min, 0) }.timeInMillis
 
     @Test fun everyDesignIsComplete() {
-        assertEquals(18, Designs.all.size)
+        assertEquals(34, Designs.all.size)
         assertEquals(Designs.all.size, Designs.all.map { it.id }.toSet().size)
         for (d in Designs.all) {
             assertTrue("${d.id}: almeno una foto", d.slots >= 1)
@@ -32,7 +32,7 @@ class DesignTest {
         assertEquals(Designs.all.count { it.orient == DOrient.SQUARE }, CollageTemplates.designs(CollageAspect.SQUARE).size)
         assertTrue(CollageTemplates.designs(CollageAspect.PHOTO_LAND).any { it.id == "x-ticket" })
         // I modelli grafici vanno bene con qualsiasi numero di foto.
-        for (n in 1..9) assertTrue(CollageTemplates.forCount(n, CollageAspect.PAPER).count { it.design != null } == 14)
+        for (n in 1..9) assertEquals(Designs.all.count { it.orient == DOrient.PORTRAIT }, CollageTemplates.forCount(n, CollageAspect.PAPER).count { it.design != null })
     }
 
     @Test fun anchorsFollowTheSheet() {

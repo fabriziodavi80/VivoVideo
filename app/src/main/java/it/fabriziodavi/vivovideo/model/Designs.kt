@@ -18,7 +18,9 @@ import it.fabriziodavi.vivovideo.model.DColor.WHITE
  */
 object Designs {
     val all: List<Design> by lazy {
-        listOf(cover(), reportage(), letters(), bentoTrip(), bentoRide(), year(), scrap(), stickers(), mood(), duotone(), pop(), glass(),
+        listOf(paperTrip(), paperNews(), paperLove(), paperRecipe(), paperWall(), paperRansom(), paperSticker(), paperRiso(),
+            notes(), chrome(), leak(), blue(), pearls(), thenNow(), windows(), dump(),
+            cover(), reportage(), letters(), bentoTrip(), bentoRide(), year(), scrap(), stickers(), mood(), duotone(), pop(), glass(),
             sport(), love(), ticket(), route(), street(), food())
     }
 
@@ -30,6 +32,369 @@ object Designs {
     private fun pts(vararg v: Float) = v.toList().chunked(2).map { Pt(it[0], it[1]) }
 
     private const val TAPE = 0xB8FFD666L
+
+    /** Riquadro che sale e scende in proporzione al foglio (i collage di carta si stendono su tutta la pagina). */
+    private fun bk(x: Number, y: Number, w: Number, h: Number, ax: Anchor = S) = b(x, y, w, h, K, ax)
+
+    private const val SPARKLE = "M50 0 C54 36 64 46 100 50 C64 54 54 64 50 100 C46 64 36 54 0 50 C36 46 46 36 50 0 Z"
+
+    // T1 -----------------------------------------------------------------------------------------------
+    private fun notes(): Design {
+        val grey = 0xFF8E8E93L
+        val items = listOf("tuffo all'alba", "gelato doppio", "tramonto dal pontile", "tornare l'anno prossimo")
+        val els = arrayListOf<DEl>(
+            DText(bk(28, 30, 200, 26), "", "", "‹ Note", DFont.SANS, 20f, ACC),
+            DText(bk(372, 30, 200, 26), "", "", "Fine", DFont.SANS, 20f, ACC, DAlign.RIGHT),
+            DText(bk(28, 80, 544, 18), "date", "Data", "{giorno} alle {ora|18:42}", DFont.SANS, 14f, grey, DAlign.CENTER),
+            DText(bk(28, 112, 544, 54), "title", "Titolo", "{luogo|Weekend al lago}", DFont.GROTESK, 44f, BLACK),
+        )
+        items.forEachIndexed { i, t ->
+            val y = 186 + i * 40
+            val done = i < 3
+            els += if (done) DRect(bk(30, y + 4, 22, 22), ACC, circle = true) else DRect(bk(30, y + 4, 22, 22), grey, circle = true, stroke = 2f)
+            if (done) els += DPath(bk(30, y + 4, 22, 22), "M6 11 L10 15 L16 7", 22f, 22f, stroke = WHITE, width = 2.5f, draw = true)
+            els += DText(bk(62, y, 500, 30), "c$i", "Cosa ${i + 1}", t, DFont.SANS, 22f, if (done) grey else BLACK)
+        }
+        els += DPhoto(bk(28, 360, 544, 300), 0, radius = 14f)
+        els += DPhoto(bk(28, 672, 266, 200), 1, radius = 14f)
+        els += DPhoto(bk(306, 672, 266, 200), 2, radius = 14f)
+        return Design("x-notes", "Appunti", DesignFamily.TREND, DOrient.PORTRAIT, 600f, 900f, 0xFFFFFDF5,
+            accents = listOf(0xFFE8A317, 0xFF2F5BFF, 0xFFFF4F79), els = els, motion = CollageMotion.SLIDE,
+            hint = "Il ricordo come una nota del telefono: lista spuntata, data e foto incollate (il «Notes App Chic» del 2026)")
+    }
+
+    // T2 -----------------------------------------------------------------------------------------------
+    private fun chrome(): Design {
+        val metal = listOf(0xFFFFFFFFL, 0xFF9AA4B5L, 0xFFF4F6FAL, 0xFF5E6878L, 0xFFE9EDF3L)
+        val frame = 0xFFD9DEE7L
+        return Design(
+            "x-chrome", "Cromo Y2K", DesignFamily.TREND, DOrient.PORTRAIT, 794f, 1123f, ACC2,
+            accents = listOf(0xFFFF4FD8, 0xFF7CFFCB, 0xFF7AA2FF), accents2 = listOf(0xFF0B0B1A, 0xFF1A0B2E, 0xFF111111),
+            motion = CollageMotion.CASCADE, hint = "Titolo in metallo lucido, foto in bolle cromate, stelline che brillano: lo stile Y2K",
+            els = listOf(
+                DRect(b(-200, 100, 1194, 900, F), 0, radial = true, grad = listOf(0f to 0x66FFFFFFL, 1f to 0L)),
+                DRect(b(-200, 100, 1194, 900, F), ACC, radial = true, grad = listOf(0f to 0x55FFFFFFL, 0.6f to 0x22FFFFFFL, 1f to 0L)),
+                DText(bk(30, 50, 734, 220), "title", "Titolo", "{stagione|estate}", DFont.ARCHIVO, 170f, WHITE, DAlign.CENTER, line = 0.9f, shadow = true, gradient = metal),
+                DPhoto(bk(80, 300, 300, 480), 0, DShape.PILL, border = 8f, borderColor = frame, shadow = 20f),
+                DPhoto(bk(420, 330, 300, 300), 1, DShape.CIRCLE, border = 8f, borderColor = frame, shadow = 20f),
+                DPhoto(bk(400, 670, 320, 180), 2, DShape.PILL, border = 8f, borderColor = frame, shadow = 20f),
+                DPath(bk(360, 262, 70, 70), SPARKLE, 100f, 100f, fill = WHITE),
+                DPath(bk(704, 280, 50, 50), SPARKLE, 100f, 100f, fill = ACC),
+                DPath(bk(60, 820, 60, 60), SPARKLE, 100f, 100f, fill = WHITE),
+                DPath(bk(640, 880, 80, 80), SPARKLE, 100f, 100f, fill = WHITE),
+                DPath(bk(330, 900, 40, 40), SPARKLE, 100f, 100f, fill = ACC),
+                DText(bk(40, 990, 714, 60), "sub", "Sottotitolo", "{luogo|Riccione} · {ANNO}", DFont.MONO_BOLD, 28f, ACC, DAlign.CENTER, track = 0.2f, upper = true),
+            ),
+        )
+    }
+
+    // T3 -----------------------------------------------------------------------------------------------
+    private fun leak(): Design {
+        val ink = 0xFF333333L
+        return Design(
+            "x-leak", "Luce calda", DesignFamily.TREND, DOrient.PORTRAIT, 794f, 1123f, 0xFFEFE6D8,
+            accents = listOf(0xFF3B2A1A, 0xFF8E3B4E, 0xFF1F3A68), motion = CollageMotion.DROP, grain = true,
+            hint = "Polaroid sbiadite con le macchie di luce arancio della pellicola: il fascino del rullino vecchio",
+            els = listOf(
+                DPhoto(bk(70, 90, 420, 420), 0, rot = -4f, border = 18f, bottomPad = 70f, shadow = 14f),
+                DText(bk(90, 526, 420, 44), "c0", "Didascalia 1", "{luogo|Positano}", DFont.HAND, 40f, ink, DAlign.CENTER, rot = -4f),
+                DPhoto(bk(420, 420, 320, 320), 1, rot = 6f, border = 16f, bottomPad = 56f, shadow = 14f),
+                DText(bk(390, 748, 320, 40), "c1", "Didascalia 2", "{data}", DFont.HAND, 34f, ink, DAlign.CENTER, rot = 6f),
+                DPhoto(bk(110, 640, 300, 300), 2, rot = -2f, border = 14f, bottomPad = 50f, shadow = 14f),
+                DRect(b(380, -120, 560, 560), 0, radial = true, grad = listOf(0f to 0x99FF6A00L, 0.5f to 0x40FF2E00L, 1f to 0L)),
+                DRect(b(-200, 700, 560, 560, E), 0, radial = true, grad = listOf(0f to 0x88FFB000L, 1f to 0L)),
+                DText(bk(440, 860, 320, 140), "title", "Titolo", "{stagione|estate}\n{ANNO}", DFont.SERIF_IT, 64f, ACC, DAlign.RIGHT, line = 1f),
+            ),
+        )
+    }
+
+    // T4 -----------------------------------------------------------------------------------------------
+    private fun blue() = Design(
+        "x-blue", "Blu", DesignFamily.TREND, DOrient.PORTRAIT, 794f, 1123f, ACC,
+        accents = listOf(0xFF1F4FA8, 0xFF2E5E8C, 0xFF3A3F8F, 0xFF1D6E73), motion = CollageMotion.SLIDE,
+        hint = "Fondo blu con la grana del denim e le nuvole, foto con il filo bianco e una scritta pulita",
+        els = listOf(
+            DRect(b(-200, -100, 1194, 1300, F), 0, radial = true, grad = listOf(0f to 0x33FFFFFFL, 1f to 0L)),
+            DPattern(b(0, 0, 794, 1123, F), DPatternKind.PAPER, 0x22FFFFFF, 0f),
+            DText(bk(60, 70, 674, 90), "title", "Titolo", "{luogo|Mare d'inverno}", DFont.SERIF, 80f, WHITE, DAlign.CENTER),
+            DText(bk(60, 172, 674, 20), "sub", "Sottotitolo", "{dal_al|Dicembre 2026}", DFont.MONO, 14f, WHITE, DAlign.CENTER, track = 0.3f, upper = true),
+            DPhoto(bk(60, 230, 674, 420), 0, border = 4f),
+            DPhoto(bk(60, 670, 327, 380), 1, border = 4f),
+            DPhoto(bk(407, 670, 327, 380), 2, border = 4f),
+            DText(bk(60, 1072, 674, 20), "foot", "Piede", "fotografie e ricordi · {ANNO}", DFont.MONO, 13f, WHITE, DAlign.CENTER, track = 0.2f),
+        ),
+    )
+
+    // T5 -----------------------------------------------------------------------------------------------
+    private fun pearls(): Design {
+        val pearl = 0xFFF3EEE4L
+        return Design(
+            "x-pearls", "Perle", DesignFamily.TREND, DOrient.PORTRAIT, 480f, 672f, ACC,
+            accents = listOf(0xFF1C1A24, 0xFF14213D, 0xFF3A1F2B, 0xFF2F3E46), motion = CollageMotion.WIPE,
+            hint = "Elegante: titolo serif e un filo di perle attorno alla foto ad arco (che si infila nel video)",
+            els = listOf(
+                DPhoto(b(110, 80, 260, 330, C), 0, DShape.ARCH),
+                DPath(b(96, 66, 288, 358, C), "M0 358 L0 144 C0 64 64 0 144 0 C224 0 288 64 288 144 L288 358", 288f, 358f, stroke = pearl, width = 9f, dash = listOf(0.1f, 16f), draw = true),
+                DText(b(20, 440, 440, 60, C), "names", "Nomi", "Sofia & Luca", DFont.SERIF_IT, 50f, pearl, DAlign.CENTER),
+                DPath(b(150, 510, 180, 10, C), "M0 5 L180 5", 180f, 10f, stroke = pearl, width = 7f, dash = listOf(0.1f, 14f), draw = true),
+                DText(b(20, 530, 440, 18, C), "date", "Data", "{data_romana}", DFont.SANS, 12f, 0xFFD9CBB0, DAlign.CENTER, track = 0.42f),
+                DPhoto(b(130, 566, 90, 90, C), 1, DShape.CIRCLE, border = 3f, borderColor = pearl),
+                DPhoto(b(260, 566, 90, 90, C), 2, DShape.CIRCLE, border = 3f, borderColor = pearl),
+            ),
+        )
+    }
+
+    // T6 -----------------------------------------------------------------------------------------------
+    private fun thenNow() = Design(
+        "x-then-now", "Allora e adesso", DesignFamily.TREND, DOrient.PORTRAIT, 600f, 900f, 0xFF111111,
+        accents = listOf(0xFFFFD23F, 0xFFFF4FD8, 0xFF7CFFCB), motion = CollageMotion.WIPE,
+        hint = "Due foto a confronto, una di allora e una di adesso, con gli anni: nel video si scoprono una dopo l'altra",
+        els = listOf(
+            DPhoto(bk(0, 0, 600, 450), 0),
+            DPhoto(bk(0, 450, 600, 450), 1),
+            DRect(bk(0, 446, 600, 8), ACC),
+            DText(bk(24, 24, 300, 70), "y0", "Anno di allora", "2016", DFont.ANTON, 64f, WHITE, shadow = true),
+            DText(bk(34, 100, 300, 20), "l0", "Etichetta 1", "allora", DFont.MONO_BOLD, 16f, WHITE, pill = 0x99000000, pad = 10f),
+            DText(bk(24, 474, 300, 70), "y1", "Anno di adesso", "{ANNO}", DFont.ANTON, 64f, ACC, shadow = true, count = true),
+            DText(bk(34, 550, 300, 20), "l1", "Etichetta 2", "adesso", DFont.MONO_BOLD, 16f, WHITE, pill = 0x99000000, pad = 10f),
+            DText(bk(276, 846, 300, 40), "hand", "Scritta a mano", "siamo sempre noi", DFont.HAND, 34f, WHITE, DAlign.RIGHT, rot = -3f, shadow = true),
+        ),
+    )
+
+    // T7 -----------------------------------------------------------------------------------------------
+    private fun windows(): Design {
+        val grey = 0xFFC0C0C0L
+        val els = arrayListOf<DEl>()
+        fun window(x: Int, y: Int, w: Int, h: Int, id: String, label: String, title: String, slot: Int) {
+            els += DRect(bk(x, y, w, h), grey, shadow = 14f)
+            els += DRect(bk(x, y, w, h), 0xFF404040, stroke = 2f)
+            els += DRect(bk(x + 6, y + 6, w - 12, 30), ACC2)
+            els += DText(bk(x + 14, y + 12, w - 110, 18), id, label, title, DFont.MONO_BOLD, 14f, WHITE)
+            for (k in 0 until 3) els += DRect(bk(x + w - 88 + k * 26, y + 10, 22, 22), grey)
+            els += DText(bk(x + w - 36, y + 12, 22, 18), "", "", "×", DFont.MONO_BOLD, 16f, BLACK, DAlign.CENTER)
+            els += DPhoto(bk(x + 12, y + 42, w - 24, h - 54), slot)
+        }
+        window(60, 90, 460, 400, "w0", "Finestra 1", "ricordi_{ANNO}.jpg", 0)
+        window(360, 420, 380, 330, "w1", "Finestra 2", "{luogo|spiaggia}.jpg", 1)
+        window(90, 620, 300, 260, "w2", "Finestra 3", "noi.jpg", 2)
+        els += DRect(bk(220, 900, 400, 170), grey, shadow = 14f)
+        els += DRect(bk(220, 900, 400, 170), 0xFF404040, stroke = 2f)
+        els += DRect(bk(226, 906, 388, 30), ACC2)
+        els += DText(bk(236, 912, 300, 18), "", "", "Domanda", DFont.MONO_BOLD, 14f, WHITE)
+        els += DText(bk(240, 950, 360, 30), "ask", "Domanda", "Salvare questi ricordi?", DFont.SANS, 22f, BLACK, DAlign.CENTER)
+        for ((k, x) in listOf(270, 440).withIndex()) {
+            els += DRect(bk(x, 1010, 130, 38), grey)
+            els += DRect(bk(x, 1010, 130, 38), 0xFF404040, stroke = 2f)
+            els += DText(bk(x, 1018, 130, 22), "b$k", "Pulsante ${k + 1}", "Sì", DFont.SANS, 18f, BLACK, DAlign.CENTER)
+        }
+        els += DPath(bk(540, 1030, 34, 52), "M0 0 L0 40 L10 30 L18 50 L25 47 L17 28 L32 28 Z", 34f, 52f, stroke = BLACK, width = 2f, fill = WHITE)
+        return Design("x-windows", "Finestre", DesignFamily.TREND, DOrient.PORTRAIT, 794f, 1123f, ACC,
+            accents = listOf(0xFF008080, 0xFF3A6EA5, 0xFFB565A7), accents2 = listOf(0xFF000080, 0xFF6B0F6B, 0xFF1F1F1F),
+            els = els, motion = CollageMotion.CASCADE, hint = "Le foto aperte in finestre di un vecchio computer, con il puntatore e la domanda «Salvare questi ricordi?»")
+    }
+
+    // T8 -----------------------------------------------------------------------------------------------
+    private fun dump(): Design {
+        val els = arrayListOf<DEl>(
+            DText(bk(30, 26, 470, 76), "title", "Titolo", "{mese} dump", DFont.HAND, 72f, BLACK),
+            DText(bk(32, 106, 540, 18), "sub", "Sottotitolo", "{foto} foto · {ANNO}", DFont.MONO, 13f, BLACK, track = 0.15f, upper = true),
+            DPath(bk(500, 34, 56, 56), SPARKLE, 100f, 100f, fill = ACC),
+            DPath(bk(548, 96, 26, 26), SPARKLE, 100f, 100f, fill = ACC),
+        )
+        val rots = listOf(-1.5f, 1f, -0.5f, 2f, -2f, 0.5f, 1.5f, -1f, 0.8f)
+        for (i in 0 until 9) {
+            val x = 30 + (i % 3) * 183; val y = 140 + (i / 3) * 240
+            els += DPhoto(bk(x, y, 174, 232), i, radius = 8f, rot = rots[i])
+        }
+        els += DPath(bk(210, 250, 60, 60), "M30 4 C38 22 40 24 56 30 C40 36 38 38 30 56 C22 38 20 36 4 30 C20 24 22 22 30 4 Z", 60f, 60f, stroke = ACC, width = 4f, draw = true)
+        els += DPath(bk(330, 846, 120, 40), "M110 30 C80 10 50 6 14 20 M28 8 L12 20 L28 32", 120f, 40f, stroke = ACC, width = 4f, draw = true)
+        els += DText(bk(30, 860, 300, 34), "note", "Nota", "il migliore? il quinto", DFont.HAND, 30f, ACC)
+        return Design("x-dump", "Dump del mese", DesignFamily.TREND, DOrient.PORTRAIT, 600f, 900f, 0xFFFAF7F2,
+            accents = listOf(0xFFFF4F79, 0xFF2F5BFF, 0xFFFF8C00), els = els, motion = CollageMotion.CASCADE,
+            hint = "Nove foto fitte, un po' storte, con stelline e frecce a mano: il photo dump del mese che entra a ritmo")
+    }
+
+    // C1 -----------------------------------------------------------------------------------------------
+    private fun paperTrip(): Design {
+        val cream = 0xFFF3EBDDL; val kraft = 0xFFC8A57AL
+        return Design(
+            "x-paper-trip", "Viaggio di carta", DesignFamily.PAPER, DOrient.PORTRAIT, 794f, 1123f, kraft,
+            accents = listOf(0xFF2A7F86, 0xFFE07A5F, 0xFF3D405B, 0xFF81B29A), motion = CollageMotion.SLIDE,
+            hint = "Carta kraft, una striscia colorata strappata col nome del posto, etichetta da valigia e timbro del passaporto",
+            els = listOf(
+                DPattern(b(0, 0, 794, 1123, F), DPatternKind.PAPER, 0x22FFFFFF, 0f),
+                DTorn(bk(30, 46, 734, 668), cream, rot = -2f, seed = 3),
+                DPhoto(bk(70, 86, 654, 520), 0, DShape.TORN, rot = -2f, border = 6f, seed = 4),
+                DRect(bk(330, 30, 130, 36), TAPE, rot = 3f),
+                DTorn(bk(-40, 560, 560, 120), ACC, rot = -4f, seed = 9),
+                DText(bk(30, 576, 480, 90), "title", "Titolo", "{luogo|Lisbona}", DFont.SERIF, 86f, WHITE, line = 0.95f, rot = -4f),
+                DPhoto(bk(440, 650, 310, 290), 1, DShape.TORN, rot = 5f, border = 6f, shadow = 8f, seed = 7),
+                DRect(bk(560, 630, 100, 32), TAPE, rot = -30f),
+                DPath(bk(70, 690, 60, 110), "M30 0 C10 40 50 70 36 110", 60f, 110f, stroke = 0xFF7A5C3A, width = 2.5f),
+                DRect(bk(66, 760, 300, 160), cream, radius = 14f, rot = -6f, shadow = 8f),
+                DRect(bk(84, 825, 26, 26), kraft, circle = true),
+                DText(bk(126, 784, 220, 16), "tagL", "Etichetta", "Bagaglio · {ANNO}", DFont.MONO, 12f, BLACK, track = 0.15f, upper = true, rot = -6f),
+                DText(bk(126, 806, 230, 90), "tag", "Destinazione", "{luogo|LIS}", DFont.ANTON, 84f, BLACK, line = 0.9f, upper = true, rot = -6f),
+                DText(bk(70, 975, 440, 66), "hand", "Scritta a mano", "{Mese} {ANNO}", DFont.HAND, 54f, 0xFF3B2A1A, rot = -3f),
+                DStamp(bk(540, 940, 200, 200), "stamp", "Timbro", "{luogo|Lisbona}\n{data}", 0xFFC2412D, rot = 12f),
+            ),
+        )
+    }
+
+    // C2 -----------------------------------------------------------------------------------------------
+    private fun paperNews(): Design {
+        val news = 0xFFEFEBE3L
+        return Design(
+            "x-paper-news", "Prima pagina", DesignFamily.PAPER, DOrient.PORTRAIT, 794f, 1123f, 0xFF1C1C1C,
+            accents = listOf(0xFFE63946, 0xFF1D4ED8, 0xFFFF8C00), motion = CollageMotion.WIPE,
+            hint = "La tua impresa sportiva in prima pagina: titolone, foto a retino da giornale, colonne e numeri",
+            els = listOf(
+                DTorn(bk(18, 18, 758, 1087), news, seed = 11, shadow = 10f),
+                DText(bk(50, 52, 694, 64), "mast", "Testata", "Cronaca della Domenica", DFont.SERIF, 62f, BLACK, DAlign.CENTER),
+                DRect(bk(50, 124, 694, 3), BLACK),
+                DText(bk(50, 134, 694, 18), "edition", "Sottotestata", "{giorno} · Edizione speciale · {luogo|Lombardia}", DFont.MONO, 12f, BLACK, DAlign.CENTER, track = 0.1f, upper = true),
+                DRect(bk(50, 160, 694, 2), BLACK),
+                DText(bk(50, 176, 694, 220), "title", "Titolo", "Impresa\nsul colle!", DFont.ANTON, 118f, BLACK, line = 0.88f, upper = true),
+                DPhoto(bk(50, 410, 694, 420), 0, filter = DFilter.HALFTONE, ink = BLACK, paper = news),
+                DText(bk(50, 838, 694, 22), "cap", "Didascalia", "Il gruppo all'attacco dell'ultima salita", DFont.SERIF_IT, 17f, BLACK),
+                DPattern(bk(50, 872, 450, 200), DPatternKind.TEXTLINES, 0xFF8C8A85, 11f),
+                DRect(bk(520, 872, 224, 200), BLACK),
+                DText(bk(538, 888, 190, 14), "l1", "Etichetta 1", "Distanza", DFont.MONO, 11f, WHITE, track = 0.18f, upper = true),
+                DText(bk(538, 904, 190, 48), "s1", "Distanza", "142 km", DFont.ANTON, 44f, WHITE, count = true),
+                DText(bk(538, 960, 190, 14), "l2", "Etichetta 2", "Dislivello", DFont.MONO, 11f, WHITE, track = 0.18f, upper = true),
+                DText(bk(538, 976, 190, 48), "s2", "Dislivello", "2.340 m", DFont.ANTON, 44f, ACC, count = true),
+                DText(bk(538, 1034, 190, 22), "s3", "Tempo", "Tempo 5:12", DFont.MONO_BOLD, 16f, WHITE),
+                DTorn(bk(470, 330, 300, 84), ACC, rot = -8f, seed = 21),
+                DText(bk(480, 346, 280, 52), "badge", "Bollino", "Record!", DFont.ANTON, 46f, WHITE, DAlign.CENTER, upper = true, rot = -8f),
+                DPhoto(bk(560, 600, 200, 170), 1, DShape.TORN, rot = 4f, border = 6f, shadow = 8f, seed = 23),
+            ),
+        )
+    }
+
+    // C3 -----------------------------------------------------------------------------------------------
+    private fun paperLove(): Design {
+        val rose = 0xFF8E3B4EL
+        return Design(
+            "x-paper-love", "Carta pastello", DesignFamily.PAPER, DOrient.PORTRAIT, 480f, 672f, 0xFFF7EFE9,
+            accents = listOf(0xFFF4C6C9, 0xFFFFD6A5, 0xFFCDB4DB, 0xFFBDE0FE), motion = CollageMotion.DROP,
+            hint = "Carte pastello strappate a strati, i nomi scritti a mano e un cuore che si disegna",
+            els = listOf(
+                DTorn(bk(-30, -30, 540, 250), ACC, rot = -5f, seed = 31, edges = 4),
+                DTorn(bk(-30, 440, 540, 280), 0xFFCFDDC8, rot = 4f, seed = 33, edges = 1),
+                DTorn(bk(300, 330, 220, 170), 0xFFF3E3C8, rot = 10f, seed = 35),
+                DPhoto(bk(60, 70, 330, 380), 0, DShape.TORN, rot = -3f, border = 6f, shadow = 8f, seed = 37),
+                DRect(bk(170, 52, 110, 30), TAPE, rot = -4f),
+                DPhoto(bk(290, 360, 150, 150), 1, DShape.TORN, rot = 7f, border = 5f, shadow = 8f, seed = 39),
+                DText(bk(24, 500, 432, 64), "names", "Nomi", "Giulia & Marco", DFont.HAND, 58f, rose, DAlign.CENTER, rot = -2f),
+                DText(bk(24, 572, 432, 18), "date", "Data", "{data_romana}", DFont.SANS, 12f, 0xFF5A3A3A, DAlign.CENTER, track = 0.42f),
+                DPath(bk(388, 452, 66, 58), "M33 54 C10 38 2 24 6 14 C10 4 24 2 33 14 C42 2 56 4 60 14 C64 24 56 38 33 54 Z", 66f, 58f, stroke = rose, width = 3f, draw = true),
+            ),
+        )
+    }
+
+    // C4 -----------------------------------------------------------------------------------------------
+    private fun paperRecipe(): Design {
+        val ink = 0xFF2B2B2BL
+        return Design(
+            "x-paper-recipe", "Ricetta", DesignFamily.PAPER, DOrient.PORTRAIT, 794f, 1123f, 0xFFB98B5E,
+            accents = listOf(0xFFC0392B, 0xFF2B59FF, 0xFF2D6A4F), motion = CollageMotion.DROP,
+            hint = "Il foglio del quaderno strappato, le foto col nastro, ingredienti e procedimento scritti a mano",
+            els = listOf(
+                DPattern(b(0, 0, 794, 1123, F), DPatternKind.PAPER, 0x22FFFFFF, 0f),
+                DTorn(bk(36, 40, 722, 1050), 0xFFFBF8F0, rot = -1f, seed = 41, edges = 1, shadow = 12f),
+                DPattern(bk(36, 40, 722, 1050), DPatternKind.LINES, 0x552B6CB0, 34f, rot = -1f),
+                DText(bk(110, 80, 560, 190), "title", "Titolo", "La pasta\ndella nonna", DFont.HAND, 86f, ACC, line = 0.95f),
+                DPhoto(bk(430, 240, 290, 290), 0, rot = 5f, border = 10f, bottomPad = 34f, shadow = 12f),
+                DRect(bk(520, 224, 110, 32), TAPE, rot = -6f),
+                DText(bk(110, 300, 300, 40), "ingL", "Etichetta", "Ingredienti", DFont.SERIF_IT, 34f, BLACK),
+                DText(bk(110, 346, 300, 200), "ing", "Ingredienti", "· 400 g di farina\n· 4 uova\n· un pizzico di sale\n· tanta pazienza", DFont.HAND, 34f, ink, line = 1.2f),
+                DPhoto(bk(110, 620, 280, 220), 1, rot = -4f, border = 10f, shadow = 12f),
+                DRect(bk(190, 604, 100, 30), TAPE, rot = 5f),
+                DText(bk(430, 600, 300, 40), "stepL", "Etichetta 2", "Procedimento", DFont.SERIF_IT, 34f, BLACK),
+                DText(bk(430, 646, 300, 330), "steps", "Procedimento", "Fontana di farina, uova al centro, impasta finché è liscia. Riposo mezz'ora, poi tira la sfoglia sottile.",
+                    DFont.HAND, 30f, ink, line = 1.15f, wrap = true),
+                DStamp(bk(110, 880, 170, 170), "stamp", "Timbro", "Fatto in casa\n{ANNO}", ACC, rot = -10f),
+            ),
+        )
+    }
+
+    // C5 -----------------------------------------------------------------------------------------------
+    private fun paperWall() = Design(
+        "x-paper-wall", "Manifesti", DesignFamily.PAPER, DOrient.PORTRAIT, 794f, 1123f, 0xFF8F8C86,
+        accents = listOf(0xFFD93A2B, 0xFF1D4ED8, 0xFF16A34A, 0xFFE91E63), motion = CollageMotion.SLIDE, grain = true,
+        hint = "Manifesti incollati al muro e strappati, uno sopra l'altro: città, concerti, notti fuori",
+        els = listOf(
+            DPattern(b(0, 0, 794, 1123, F), DPatternKind.PAPER, 0x22000000, 0f),
+            DTorn(bk(560, 40, 160, 60), 0xFFEDE7DA, rot = 8f, seed = 61),
+            DTorn(bk(-30, 30, 560, 560), 0xFFF2C230, rot = -3f, seed = 51),
+            DText(bk(20, 70, 470, 300), "title", "Titolo", "Sabato\nnotte", DFont.ANTON, 150f, BLACK, line = 0.86f, upper = true, rot = -3f),
+            DPhoto(bk(330, 110, 500, 620), 0, DShape.TORN, rot = 2f, border = 7f, shadow = 10f, filter = DFilter.BW, seed = 53),
+            DTorn(bk(-40, 610, 620, 230), ACC, rot = 4f, seed = 55),
+            DText(bk(10, 650, 520, 90), "city", "Città", "{luogo|Milano}", DFont.ARCHIVO, 84f, WHITE, upper = true, rot = 4f),
+            DText(bk(14, 748, 520, 24), "info", "Informazioni", "{data} · ingresso libero", DFont.MONO_BOLD, 18f, WHITE, track = 0.1f, rot = 4f),
+            DPhoto(bk(430, 700, 340, 340), 1, DShape.TORN, rot = -5f, border = 7f, shadow = 10f, seed = 57),
+            DPhoto(bk(40, 860, 340, 230), 2, DShape.TORN, rot = -2f, border = 7f, shadow = 10f, filter = DFilter.BW, seed = 59),
+            DTorn(bk(370, 1040, 170, 60), 0xFFF2C230, rot = -6f, seed = 63),
+        ),
+    )
+
+    // C6 -----------------------------------------------------------------------------------------------
+    private fun paperRansom() = Design(
+        "x-paper-ransom", "Lettere ritagliate", DesignFamily.PAPER, DOrient.PORTRAIT, 794f, 1123f, 0xFFF2EFE8,
+        accents = listOf(0xFFE63946, 0xFF1D4ED8, 0xFF111111), motion = CollageMotion.DROP,
+        hint = "La scritta fatta di lettere ritagliate da giornali diversi: ogni lettera arriva da sola nel video",
+        els = listOf(
+            DPattern(b(0, 0, 794, 1123, F), DPatternKind.PAPER, 0x14000000, 0f),
+            DRansom(bk(40, 60, 714, 380), "title", "Lettere ritagliate", "Ciao da\n{luogo|Roma}"),
+            DPhoto(bk(60, 470, 420, 540), 0, DShape.TORN, rot = -3f, border = 7f, shadow = 10f, seed = 71),
+            DRect(bk(210, 452, 120, 34), TAPE, rot = -5f),
+            DPhoto(bk(440, 520, 310, 400), 1, DShape.TORN, rot = 5f, border = 7f, shadow = 10f, seed = 73),
+            DPath(bk(520, 920, 200, 120), "M10 100 C60 60 120 50 180 20 M160 12 L182 20 L172 42", 200f, 120f, stroke = ACC, width = 5f, draw = true),
+            DText(bk(470, 1000, 300, 70), "hand", "Scritta a mano", "baci, {ANNO}", DFont.HAND, 54f, ACC, rot = -4f),
+        ),
+    )
+
+    // C7 -----------------------------------------------------------------------------------------------
+    private fun paperSticker() = Design(
+        "x-paper-sticker", "Adesivo", DesignFamily.PAPER, DOrient.PORTRAIT, 794f, 1123f, ACC,
+        accents = listOf(0xFFFF6B35, 0xFF2F5BFF, 0xFFFFC300, 0xFFEF476F), accents2 = listOf(0xFF1B998B, 0xFF111111, 0xFF7B2CBF, 0xFFF7F3EA),
+        motion = CollageMotion.CASCADE,
+        hint = "La persona scontornata come un adesivo col bordo bianco, sopra carte colorate strappate e un titolo enorme",
+        els = listOf(
+            DTorn(bk(-40, 560, 880, 600), ACC2, rot = -6f, seed = 81, edges = 1),
+            DTorn(bk(-40, -40, 520, 150), 0xFFF7F3EA, rot = 3f, seed = 83, edges = 6),
+            DText(bk(40, 44, 420, 30), "kicker", "Rubrica", "Diario · {Mese} {ANNO}", DFont.MONO_BOLD, 16f, BLACK, track = 0.15f, upper = true, rot = 3f),
+            DText(bk(20, 130, 754, 260), "title", "Titolo", "{stagione|estate}", DFont.ANTON, 250f, WHITE, DAlign.CENTER, line = 0.85f, upper = true),
+            DPhoto(bk(110, 230, 574, 760), 0, radius = 30f, border = 16f, shadow = 12f, cutout = true),
+            DText(bk(470, 980, 300, 44), "tag", "Etichetta", "{luogo|Puglia}", DFont.GROTESK, 30f, BLACK, rot = -4f, pill = WHITE, pad = 18f),
+            DText(bk(60, 1000, 400, 70), "hand", "Scritta a mano", "noi, così.", DFont.HAND, 58f, WHITE, rot = -3f),
+            DPath(bk(640, 250, 70, 70), SPARKLE, 100f, 100f, fill = WHITE),
+            DPath(bk(84, 330, 50, 50), SPARKLE, 100f, 100f, fill = WHITE),
+            DPath(bk(560, 900, 170, 44), "M0 22 C20 0 40 44 60 22 C80 0 100 44 120 22 C140 0 160 44 170 22", 170f, 44f, stroke = WHITE, width = 5f, draw = true),
+            DPath(bk(70, 860, 120, 110), "M10 10 C40 60 70 80 110 96 M92 80 L112 98 L88 104", 120f, 110f, stroke = WHITE, width = 5f, draw = true),
+        ),
+    )
+
+    // C8 -----------------------------------------------------------------------------------------------
+    private fun paperRiso(): Design {
+        val paper = 0xFFF4EFE6L
+        return Design(
+            "x-paper-riso", "Riso", DesignFamily.PAPER, DOrient.PORTRAIT, 794f, 1123f, paper,
+            accents = listOf(0xFFFF48B0, 0xFFFF6C2F, 0xFFFFE800), accents2 = listOf(0xFF0078BF, 0xFF00A95C, 0xFF3D2B56),
+            motion = CollageMotion.WIPE, grain = true,
+            hint = "Poster stampato in risografia: due inchiostri a retino un po' fuori registro, carta con la grana",
+            els = listOf(
+                DPattern(b(0, 0, 794, 1123, F), DPatternKind.PAPER, 0x1A000000, 0f),
+                DText(bk(50, 40, 700, 150), "title", "Titolo", "{luogo|Tokyo}", DFont.GROTESK, 150f, ACC2, line = 0.85f, track = -0.04f),
+                DPhoto(bk(60, 190, 674, 640), 0, filter = DFilter.HALFTONE, ink = ACC, paper = paper),
+                DPhoto(bk(60, 190, 674, 640), 0, filter = DFilter.HALFTONE, ink = ACC2, paper = 0L, multiply = true, shiftX = 5f, shiftY = 4f),
+                DText(bk(54, 846, 520, 40), "sub", "Sottotitolo", "Notti al neon, {Mese} {ANNO}", DFont.MONO_BOLD, 22f, ACC, upper = true, track = 0.08f),
+                DPhoto(bk(60, 900, 200, 200), 1, DShape.CIRCLE, filter = DFilter.HALFTONE, ink = ACC2, paper = 0xFFFFD6E8),
+                DText(bk(280, 958, 220, 90), "info", "Informazioni", "{giorni|3} giorni\n2 persone\n1 rullino", DFont.MONO, 16f, ACC2, line = 1.5f),
+                DText(bk(470, 860, 280, 220), "num", "Numero grande", "{AA}", DFont.ANTON, 230f, ACC2, DAlign.RIGHT, line = 0.9f, stroke = 3f),
+            ),
+        )
+    }
 
     // 1 ------------------------------------------------------------------------------------------------
     private fun cover() = Design(

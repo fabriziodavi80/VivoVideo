@@ -24,12 +24,15 @@ enum class DOrient { PORTRAIT, SQUARE, LANDSCAPE }
 enum class DAlign { LEFT, CENTER, RIGHT }
 
 /** Contorno di una foto. */
-enum class DShape { RECT, CIRCLE, ARCH, PILL, TORN_BOTTOM, TORN_TOP }
+/** [TORN] = strappata su tutti i lati (con la fibra bianca se ha il bordo). */
+enum class DShape { RECT, CIRCLE, ARCH, PILL, TORN_BOTTOM, TORN_TOP, TORN }
 
 /** Filtro sulla foto: bianco e nero, due colori (quelli del modello), sfocata. */
-enum class DFilter { NONE, BW, DUOTONE, BLUR }
+/** [HALFTONE] = retino di punti (giornale, risografia) con l'inchiostro [DPhoto.ink] sulla carta [DPhoto.paper]. */
+enum class DFilter { NONE, BW, DUOTONE, BLUR, HALFTONE }
 
-enum class DPatternKind { GRID, SPROCKETS }
+/** Carta a quadretti, fori della pellicola, grana della carta, righe del quaderno, colonne di testo di giornale. */
+enum class DPatternKind { GRID, SPROCKETS, PAPER, LINES, TEXTLINES }
 
 /** Riquadro sul foglio di riferimento, con gli ancoraggi orizzontale e verticale. */
 data class DBox(val x: Float, val y: Float, val w: Float, val h: Float, val ax: Anchor = Anchor.START, val ay: Anchor = Anchor.START)
@@ -66,7 +69,36 @@ data class DPhoto(
     val outline: Float = 0f,
     /** Angoli arrotondati: bit 1 alto-sinistra, 2 alto-destra, 4 basso-destra, 8 basso-sinistra. */
     val corners: Int = 15,
+    /** Retino: colore dei punti e della carta (trasparente = solo punti), punti "moltiplicati" sopra quello che c'è sotto. */
+    val ink: Long = DColor.BLACK,
+    val paper: Long = DColor.WHITE,
+    val multiply: Boolean = false,
+    /** Solo la persona scontornata, con il bordo bianco da adesivo ([border]) attorno alla sagoma. */
+    val cutout: Boolean = false,
+    /** Variante dello strappo. */
+    val seed: Int = 1,
+    /** Spostamento del retino (pixel del foglio), per il fuori registro della risografia. */
+    val shiftX: Float = 0f,
+    val shiftY: Float = 0f,
 ) : DEl
+
+/** Pezzo di carta strappata: bordo irregolare sui lati [edges] (1 sopra, 2 destra, 4 sotto, 8 sinistra) con la fibra bianca e la grana. */
+data class DTorn(
+    override val box: DBox,
+    val color: Long,
+    override val rot: Float = 0f,
+    val seed: Int = 1,
+    val edges: Int = 15,
+    val fiber: Boolean = true,
+    val grain: Boolean = true,
+    val shadow: Float = 6f,
+) : DEl
+
+/** Scritta a lettere ritagliate da giornali diversi (ogni lettera un font, un colore, un pezzo di carta). */
+data class DRansom(override val box: DBox, val id: String, val label: String, val text: String, val seed: Int = 7, override val rot: Float = 0f) : DEl
+
+/** Timbro rotondo (passaporto, "fatto in casa"): due righe dentro un doppio cerchio. */
+data class DStamp(override val box: DBox, val id: String, val label: String, val text: String, val color: Long, override val rot: Float = 0f) : DEl
 
 data class DText(
     override val box: DBox,
@@ -107,6 +139,8 @@ data class DText(
     val slotMonth: Int = -1,
     /** Le righe si allineano in basso al riquadro. */
     val bottom: Boolean = false,
+    /** Lettere sfumate dall'alto in basso (cromo, metallo): i colori, uguali distanze. */
+    val gradient: List<Long> = emptyList(),
 ) : DEl
 
 /** Una parola con una foto dentro ogni lettera. */
@@ -133,6 +167,8 @@ data class DRect(
     /** Sfumatura dall'alto in basso: (posizione 0..1, colore). */
     val grad: List<Pair<Float, Long>> = emptyList(),
     val shadow: Float = 0f,
+    /** La sfumatura parte dal centro verso fuori (macchie di luce). */
+    val radial: Boolean = false,
 ) : DEl
 
 /** Tratto o forma da un percorso SVG semplice (M L C Q Z, assoluti) in un sistema [vw]×[vh] steso sul riquadro. */
@@ -158,6 +194,8 @@ data class DBarcode(override val box: DBox, val color: Long, override val rot: F
 data class DPalette(override val box: DBox, val count: Int, val color: Long, override val rot: Float = 0f) : DEl
 
 enum class DesignFamily(val label: String, val hint: String) {
+    PAPER("Carta", "Carta strappata con la fibra bianca, lettere ritagliate, retino, la persona ritagliata come un adesivo"),
+    TREND("Tendenze", "I formati più usati del 2026: nota del telefono, cromo Y2K, luce calda, allora e adesso, finestre retrò, dump del mese"),
     MAGAZINE("Rivista", "Scritte grandi come una copertina: la persona può passare davanti al titolo"),
     BENTO("Bento", "Riquadri con numeri grandi, date e luoghi presi dalle foto"),
     SCRAP("Ritagliato", "Carta strappata, nastro adesivo, scritte a mano e adesivi"),
@@ -192,6 +230,13 @@ data class Design(
 
     val texts: List<DText> get() = els.filterIsInstance<DText>().filter { it.label.isNotEmpty() }
     val hasBehind: Boolean get() = els.any { it is DText && it.behind >= 0 }
+    /** Le foto da scontornare: quelle davanti al titolo e quelle ritagliate come adesivi. */
+    val maskSlots: List<Int> get() = (els.filterIsInstance<DText>().filter { it.behind >= 0 }.map { it.behind } +
+        els.filterIsInstance<DPhoto>().filter { it.cutout }.map { it.slot }).distinct()
+    /** Scritte a lettere ritagliate e timbri (si cambiano come le altre scritte). */
+    val extraTexts: List<Triple<String, String, String>> get() = els.mapNotNull { e ->
+        when (e) { is DRansom -> Triple(e.id, e.label, e.text); is DStamp -> Triple(e.id, e.label, e.text); else -> null }
+    }
     val words: List<DPhotoWord> get() = els.filterIsInstance<DPhotoWord>()
 }
 

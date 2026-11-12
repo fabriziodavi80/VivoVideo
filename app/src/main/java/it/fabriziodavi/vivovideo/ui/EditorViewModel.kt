@@ -1946,6 +1946,11 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         }.getOrNull()
     }
 
+    /** Esito di un salvataggio del collage (immagine o stampa): titolo, spiegazione e il file da condividere o aprire. */
+    data class CollageResult(val title: String, val text: String, val uri: Uri)
+
+    var collageResult by mutableStateOf<CollageResult?>(null)
+
     /** Rilegge data e luogo delle foto (dopo aver dato il permesso per il luogo). */
     fun refreshCollagePlaces() {
         val s0 = collage ?: return
@@ -1971,8 +1976,8 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     private fun ensureCollageMasks() {
         val s = collage ?: return
         val d = CollageTemplates.byId(s.templateId, s.aspect)?.design ?: return
-        if (!s.behind) return
-        val slots = d.els.filterIsInstance<it.fabriziodavi.vivovideo.model.DText>().filter { it.behind >= 0 }.map { it.behind }
+        val cutouts = d.els.filterIsInstance<it.fabriziodavi.vivovideo.model.DPhoto>().filter { it.cutout }.map { it.slot }
+        val slots = d.maskSlots.filter { it in cutouts || s.behind }
         val ctx = getApplication<Application>()
         for (slot in slots) {
             val item = s.items.getOrNull(CollagePlan.itemFor(slot, s.items.size)) ?: continue
@@ -2057,12 +2062,18 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         val ctx = getApplication<Application>()
         viewModelScope.launch {
             busy = "Preparo la stampa ${fmt.label}…"
-            val r = withContext(Dispatchers.Default) { runCatching { CollageRenderer.savePrint(ctx, spec, fmt, shop, collageFace(ctx)) } }
-            busy = null
-            r.onSuccess { (_, w, h) ->
+            collageProgress = 0f
+            val r = withContext(Dispatchers.Default) {
+                runCatching { CollageRenderer.savePrint(ctx, spec, fmt, shop, collageFace(ctx)) { step, f -> handler.post { busy = step; collageProgress = f } } }
+            }
+            busy = null; collageProgress = null
+            r.onSuccess { (uri, w, h) ->
                 val dpi = fmt.pixels(shop).third
-                message = "Pronto da stampare ${fmt.label}: ${w}×$h pixel a $dpi dpi (Immagini → VivoVideo)." +
-                    if (shop) " Ha 3 mm di margine di taglio per lato: al negozio scegli «al vivo» o «senza bordo»." else " Ha un bordo bianco di 4 mm per la stampante di casa."
+                collageResult = CollageResult("Pronto da stampare: ${fmt.label}",
+                    "${w}×$h pixel a $dpi dpi, in Galleria → Immagini → VivoVideo.\n\n" +
+                        (if (shop) "Ha 3 mm di margine di taglio per lato: al negozio o sul sito scegli la stampa «al vivo» o «senza bordo» nel formato ${fmt.label}."
+                        else "Ha un bordo bianco di 4 mm, perché la stampante di casa non arriva al bordo del foglio. Stampa al 100% (senza «adatta alla pagina») su carta ${fmt.label}.") +
+                        "\n\nCon «Condividi» lo mandi all'app del fotografo, a Drive o per email.", uri)
                 Diary.log("Collage per la stampa: ${spec.templateId}, ${fmt.label}, ${if (shop) "negozio" else "casa"}, ${w}×$h a $dpi dpi.")
             }.onFailure { message = "Stampa non preparata: ${it.message ?: it.javaClass.simpleName}" }
         }
@@ -2138,7 +2149,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             busy = "Salvo l'immagine…"
             val r = withContext(Dispatchers.Default) { runCatching { CollageRenderer.saveImage(ctx, spec, collageFace(ctx)) } }
             busy = null
-            r.onSuccess { message = "Collage salvato nella galleria (Immagini → VivoVideo)." ; Diary.log("Collage salvato come immagine: ${spec.templateId}, ${spec.items.size} foto, ${spec.aspect.label}.") }
+            r.onSuccess { uri -> collageResult = CollageResult("Immagine salvata", "Lato corto 2160 pixel, in Galleria → Immagini → VivoVideo. Pronta per i social: con «Condividi» la mandi dove vuoi.", uri); Diary.log("Collage salvato come immagine: ${spec.templateId}, ${spec.items.size} foto, ${spec.aspect.label}.") }
                 .onFailure { message = "Immagine non salvata: ${it.message ?: it.javaClass.simpleName}" }
         }
     }

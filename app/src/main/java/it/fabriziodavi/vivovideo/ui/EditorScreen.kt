@@ -669,7 +669,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
         }
     }
 
-    vm.message?.let { msg ->
+    if (vm.collage == null) vm.message?.let { msg ->
         AlertDialog(
             onDismissRequest = { vm.message = null },
             containerColor = VV.Raised,

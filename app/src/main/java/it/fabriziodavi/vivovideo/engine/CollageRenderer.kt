@@ -488,14 +488,21 @@ object CollageRenderer {
      * altrimenti stampante di casa (bordo bianco di 4 mm). JPEG alla risoluzione giusta (scritta nel file) in Immagini/VivoVideo.
      * Restituisce dove è stato salvato e la misura in pixel.
      */
-    fun savePrint(ctx: Context, spec: CollageSpec, fmt: PrintFormat, shop: Boolean, caption: Typeface?): Triple<Uri, Int, Int> {
+    fun savePrint(
+        ctx: Context, spec: CollageSpec, fmt: PrintFormat, shop: Boolean, caption: Typeface?,
+        onStep: (String, Float) -> Unit = { _, _ -> },
+    ): Triple<Uri, Int, Int> {
         DesignFonts.init(ctx)
         val t = CollageTemplates.byId(spec.templateId, spec.aspect) ?: error("modello non trovato")
         val (w, h, dpi) = fmt.pixels(shop)
         val m = if (shop) 0 else (PrintFormat.HOME_MARGIN_MM / 25.4f * dpi).toInt()
         val iw = w - 2 * m; val ih = h - 2 * m
         // Foto grandi quanto serve, ma non oltre 3600 pixel (la memoria del telefono non è infinita).
-        val photos = spec.items.indices.map { i -> load(ctx, spec.items[i], neededSide(t, spec, i, iw, ih).coerceAtMost(3600), 0) }
+        val photos = spec.items.indices.map { i ->
+            onStep("Carico le foto in alta qualità (${i + 1} di ${spec.items.size})…", 0.6f * i / spec.items.size.coerceAtLeast(1))
+            load(ctx, spec.items[i], neededSide(t, spec, i, iw, ih).coerceAtMost(3600), 0)
+        }
+        onStep("Disegno il foglio ${fmt.label} (${w}×$h pixel)…", 0.65f)
         val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
         try {
             val c = Canvas(bmp)
@@ -505,6 +512,7 @@ object CollageRenderer {
             draw(c, iw, ih, t, spec, spec.durationUs, true, { i, _ -> photos.getOrNull(i) }, caption)
             val name = "VivoVideo_Stampa_${fmt.label.replace("×", "x").replace(" ", "").replace(".", "")}_" +
                 SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ITALY).format(Date()) + ".jpg"
+            onStep("Salvo il file per la stampa…", 0.85f)
             val tmp = File(ctx.cacheDir, name)
             tmp.outputStream().use { bmp.compress(Bitmap.CompressFormat.JPEG, 95, it) }
             // La risoluzione nel file: il negozio stampa alla misura giusta senza chiedere.

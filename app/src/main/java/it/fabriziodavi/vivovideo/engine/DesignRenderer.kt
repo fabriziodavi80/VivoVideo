@@ -12,6 +12,7 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.PathMeasure
 import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.graphics.PorterDuffXfermode
 import android.graphics.Rect
 import android.graphics.RectF
@@ -38,7 +39,10 @@ import it.fabriziodavi.vivovideo.model.DPatternKind
 import it.fabriziodavi.vivovideo.model.DPhoto
 import it.fabriziodavi.vivovideo.model.DPhotoWord
 import it.fabriziodavi.vivovideo.model.DRect
+import it.fabriziodavi.vivovideo.model.DRansom
 import it.fabriziodavi.vivovideo.model.DShape
+import it.fabriziodavi.vivovideo.model.DStamp
+import it.fabriziodavi.vivovideo.model.DTorn
 import it.fabriziodavi.vivovideo.model.DText
 import it.fabriziodavi.vivovideo.model.Design
 import it.fabriziodavi.vivovideo.model.DesignCount
@@ -121,8 +125,9 @@ object DesignRenderer {
         c.translate(w / 2f, h / 2f); c.scale(cam.scale, cam.scale); c.translate(-cam.cx * w, -cam.cy * h)
 
         val photos = d.els.count { it is DPhoto } + d.words.sumOf { DesignTexts.word(it, spec, meta).length }
-        val late = d.els.count { it !is DPhoto && it !is DPhotoWord }
-        var pi = 0; var li = 0
+        val late = d.els.count { it !is DPhoto && it !is DPhotoWord && it !is DTorn }
+        val torns = d.els.count { it is DTorn }
+        var pi = 0; var li = 0; var ti = 0
         for (e in d.els) {
             val r = rectOf(d, e, w, h)
             when (e) {
@@ -151,6 +156,19 @@ object DesignRenderer {
                 is DPattern -> drawPattern(c, d, e, r, s, spec)
                 is DBarcode -> { val u = lateU(li++, late, tUs, dur, still); if (u > 0f) withPop(c, r, u) { drawBarcode(c, d, e, r, spec) } }
                 is DPalette -> { val u = lateU(li++, late, tUs, dur, still); if (u > 0f) drawPalette(c, d, e, r, s, spec, frames, tUs, u) }
+                is DTorn -> {
+                    // I pezzi di carta entrano per primi, a strappo, alternando sinistra e destra.
+                    val k = ti++
+                    val u = if (still) 1f else ((tUs - k * min(110_000f, dur * 0.25f / torns.coerceAtLeast(1))) / min(500_000f, dur * 0.2f)).coerceIn(0f, 1f)
+                    if (u > 0f) {
+                        c.save()
+                        c.translate((if (k % 2 == 0) -1 else 1) * (1 - CollageAnim.outCubic(u)) * w * 0.8f, 0f)
+                        drawTorn(c, d, e, r, s, spec, w, h)
+                        c.restore()
+                    }
+                }
+                is DRansom -> { val u = lateU(li++, late, tUs, dur, still); if (u > 0f) drawRansom(c, d, e, r, s, spec, meta, tUs, still) }
+                is DStamp -> { val u = lateU(li++, late, tUs, dur, still); if (u > 0f) withPop(c, r, u) { drawStamp(c, d, e, r, s, spec, meta) } }
             }
         }
         c.restore()
@@ -203,6 +221,7 @@ object DesignRenderer {
             e.shape == DShape.PILL -> { val rr = min(r.width(), r.height()) / 2; p.addRoundRect(r, rr, rr, Path.Direction.CW) }
             e.shape == DShape.TORN_BOTTOM -> return torn(r, false)
             e.shape == DShape.TORN_TOP -> return torn(r, true)
+            e.shape == DShape.TORN -> return tornPath(r, e.seed, 15, 6f * s)
             e.radius > 0 -> {
                 val k = e.radius * s
                 fun on(bit: Int) = if (e.corners and bit != 0) k else 0f
@@ -261,6 +280,19 @@ object DesignRenderer {
         val layer = if (pose.alpha < 0.999f) c.saveLayerAlpha(null, (pose.alpha * 255).toInt()) else -1
         if (pose.reveal < 0.999f) c.clipRect(RectF(r.left - w, r.top - h, r.left + (r.width() + w * 0.05f) * pose.reveal, r.bottom + h))
         val path = shape(e, r, s)
+        if (e.cutout && !subjectOnly) {
+            val item = CollagePlan.itemFor(e.slot, spec.items.size)
+            val bmp = if (item >= 0) frames.get(item, tUs) else null
+            val it = spec.items.getOrNull(item)
+            val mask = if (it == null || it.video) null else frames.mask(item) ?: SubjectMasks.get(it.uri)
+            if (bmp != null && !bmp.isRecycled && mask != null) {
+                drawCutout(c, d, e, r, s, spec, bmp, mask, cover(bmp.width.toFloat(), bmp.height.toFloat(), r, it!!.zoom.coerceAtLeast(1f) * pose.inner, it.panX, it.panY))
+                if (selected) c.drawRect(r, Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeWidth = max(3f, 4f * s); color = 0xFFFFC83D.toInt() })
+                if (layer >= 0) c.restoreToCount(layer)
+                c.restore()
+                return
+            }
+        }
         if (!subjectOnly && (e.border > 0 || e.shadow > 0)) {
             val b = e.border * s
             val card = RectF(r.left - b, r.top - b, r.right + b, r.bottom + b + e.bottomPad * s)
@@ -269,6 +301,7 @@ object DesignRenderer {
                 if (e.shadow > 0) setShadowLayer(e.shadow * s, 0f, e.shadow * s * 0.45f, 0x4D000000)
             }
             val outer = when {
+                e.shape == DShape.TORN -> tornPath(card, e.seed + 3, 15, 6f * s)
                 e.poly.isNotEmpty() || e.shape == DShape.TORN_BOTTOM || e.shape == DShape.TORN_TOP -> shape(e, card, s)
                 e.shape == DShape.RECT && e.radius > 0 -> shape(e.copy(radius = e.radius + e.border), card, s)
                 else -> shape(e.copy(radius = e.radius + e.border), card, s)
@@ -294,12 +327,208 @@ object DesignRenderer {
                     c.drawBitmap(mask, null, dst, Paint(Paint.FILTER_BITMAP_FLAG).apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.DST_IN) })
                     c.restoreToCount(l)
                 }
+            } else if (e.filter == DFilter.HALFTONE) {
+                halftone(c, src, dst, bounds, max(1.6f, 4.5f * s), tint(e.ink, d, spec), tint(e.paper, d, spec), e.multiply, e.shiftX * s, e.shiftY * s)
             } else c.drawBitmap(src, null, dst, filterPaint(e.filter, d, spec))
         }
         c.restore()
         if (!subjectOnly && e.outline > 0) c.drawPath(path, Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeWidth = e.outline * s; color = DColor.BLACK.toInt() })
         if (selected && !subjectOnly) c.drawPath(path, Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeWidth = max(3f, 4f * s); color = 0xFFFFC83D.toInt() })
         if (layer >= 0) c.restoreToCount(layer)
+        c.restore()
+    }
+
+    // ---------------- Carta strappata, retino, adesivo, lettere ritagliate, timbro ----------------
+
+    private fun rnd(i: Int, seed: Int): Float {
+        var x = i * 374761393 + seed * 668265263
+        x = (x xor (x ushr 13)) * 1274126177
+        x = x xor (x ushr 16)
+        return (x and 0xFFFF) / 65535f
+    }
+
+    /**
+     * Contorno di carta strappata: sui lati [edges] (1 sopra, 2 destra, 4 sotto, 8 sinistra) il bordo entra
+     * di 0…[amp] in modo irregolare (rumore a due scale, come le fibre vere); gli altri lati restano dritti.
+     */
+    fun tornPath(r: RectF, seed: Int, edges: Int, amp: Float): Path {
+        val p = Path()
+        val step = max(2f, amp * 0.8f)
+        var first = true
+        fun edge(ax: Float, ay: Float, bx: Float, by: Float, nx: Float, ny: Float, torn: Boolean, base: Int) {
+            val len = kotlin.math.hypot(bx - ax, by - ay)
+            val n = if (torn) (len / step).toInt().coerceIn(1, 600) else 1
+            for (k in 0..n) {
+                if (k == 0 && !first) continue
+                val t = k.toFloat() / n
+                val coarse = rnd(base + k / 5, seed + 17) * (1 - (k % 5) / 5f) + rnd(base + k / 5 + 1, seed + 17) * ((k % 5) / 5f)
+                val off = if (torn && k in 1 until n) amp * (0.45f * rnd(base + k, seed) + 0.55f * coarse) else 0f
+                val x = ax + (bx - ax) * t + nx * off; val y = ay + (by - ay) * t + ny * off
+                if (first) { p.moveTo(x, y); first = false } else p.lineTo(x, y)
+            }
+        }
+        edge(r.left, r.top, r.right, r.top, 0f, 1f, edges and 1 != 0, 0)
+        edge(r.right, r.top, r.right, r.bottom, -1f, 0f, edges and 2 != 0, 10_000)
+        edge(r.right, r.bottom, r.left, r.bottom, 0f, -1f, edges and 4 != 0, 20_000)
+        edge(r.left, r.bottom, r.left, r.top, 1f, 0f, edges and 8 != 0, 30_000)
+        p.close()
+        return p
+    }
+
+    private fun drawTorn(c: Canvas, d: Design, e: DTorn, r: RectF, s: Float, spec: CollageSpec, w: Int, h: Int) {
+        c.save()
+        if (e.rot != 0f) c.rotate(e.rot, r.centerX(), r.centerY())
+        val amp = 7f * s
+        val rim = tornPath(r, e.seed, e.edges, amp)
+        val shadow = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = if (e.fiber) 0xFFFBF8F1.toInt() else tint(e.color, d, spec)
+            if (e.shadow > 0) setShadowLayer(e.shadow * s, 0f, e.shadow * s * 0.4f, 0x40000000)
+        }
+        c.drawPath(rim, shadow)
+        val body = if (e.fiber) {
+            // Il colore sta un po' più dentro, con uno strappo suo: fra i due si vede la fibra bianca della carta.
+            val k = amp * 0.55f
+            val inner = RectF(r.left + if (e.edges and 8 != 0) k else 0f, r.top + if (e.edges and 1 != 0) k else 0f,
+                r.right - if (e.edges and 2 != 0) k else 0f, r.bottom - if (e.edges and 4 != 0) k else 0f)
+            tornPath(inner, e.seed + 5, e.edges, amp).also { c.drawPath(it, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = tint(e.color, d, spec) }) }
+        } else rim
+        if (e.grain) {
+            c.save(); c.clipPath(body)
+            CollageRenderer.grain(c, w, h, e.seed, 28)
+            c.restore()
+        }
+        c.restore()
+    }
+
+    /** Foto a retino: un punto per cella, grande quanto è scuro quel punto della foto. */
+    private fun halftone(c: Canvas, src: Bitmap, dst: RectF, area: RectF, cell: Float, ink: Int, paper: Int, multiply: Boolean, sx: Float, sy: Float) {
+        if (Color.alpha(paper) > 0) c.drawColor(paper)
+        val cols = (dst.width() / cell).toInt().coerceIn(2, 600)
+        val rows = (dst.height() / cell).toInt().coerceIn(2, 600)
+        val sm = Bitmap.createScaledBitmap(src, cols, rows, true)
+        val px = IntArray(cols * rows); sm.getPixels(px, 0, cols, 0, 0, cols, rows)
+        if (sm !== src) sm.recycle()
+        val cw = dst.width() / cols; val ch = dst.height() / rows
+        val p = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = ink; if (multiply) xfermode = PorterDuffXfermode(PorterDuff.Mode.MULTIPLY) }
+        for (j in 0 until rows) {
+            val cy = dst.top + (j + 0.5f) * ch + sy
+            if (cy < area.top - ch || cy > area.bottom + ch) continue
+            for (i in 0 until cols) {
+                val cx = dst.left + (i + 0.5f) * cw + sx
+                if (cx < area.left - cw || cx > area.right + cw) continue
+                val v = px[j * cols + i]
+                val lum = (0.299f * Color.red(v) + 0.587f * Color.green(v) + 0.114f * Color.blue(v)) / 255f
+                val rad = min(cw, ch) * 0.64f * kotlin.math.sqrt((1 - lum).coerceAtLeast(0f))
+                if (rad > 0.25f) c.drawCircle(cx, cy, rad, p)
+            }
+        }
+    }
+
+    /** La persona ritagliata come un adesivo: bordo bianco attorno alla sagoma, ombra, poi la persona. */
+    private fun drawCutout(c: Canvas, d: Design, e: DPhoto, r: RectF, s: Float, spec: CollageSpec, src: Bitmap, mask: Bitmap, dst: RectF) {
+        val b = max(1f, e.border * s)
+        c.save()
+        c.clipRect(r.left - b * 2, r.top - b * 2, r.right + b * 2, r.bottom + b * 2)
+        val shadow = Paint(Paint.FILTER_BITMAP_FLAG).apply { colorFilter = PorterDuffColorFilter(0x47000000, PorterDuff.Mode.SRC_IN) }
+        c.drawBitmap(mask, null, RectF(dst).apply { offset(b * 0.3f, b * 0.9f + e.shadow * s * 0.3f) }, shadow)
+        val edge = Paint(Paint.FILTER_BITMAP_FLAG).apply { colorFilter = PorterDuffColorFilter(tint(e.borderColor, d, spec), PorterDuff.Mode.SRC_IN) }
+        for (ring in listOf(1f, 0.5f)) for (k in 0 until 16) {
+            val a = (2 * Math.PI * k / 16).toFloat()
+            c.drawBitmap(mask, null, RectF(dst).apply { offset(kotlin.math.cos(a) * b * ring, kotlin.math.sin(a) * b * ring) }, edge)
+        }
+        val l = c.saveLayer(RectF(r.left - b * 2, r.top - b * 2, r.right + b * 2, r.bottom + b * 2), null)
+        c.drawBitmap(src, null, dst, filterPaint(e.filter, d, spec))
+        c.drawBitmap(mask, null, dst, Paint(Paint.FILTER_BITMAP_FLAG).apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.DST_IN) })
+        c.restoreToCount(l)
+        c.restore()
+    }
+
+    private val ransomFonts = listOf(DFont.ANTON, DFont.SERIF, DFont.ARCHIVO, DFont.MONO_BOLD, DFont.GROTESK, DFont.SERIF_IT)
+    private val ransomPapers = listOf(
+        0xFFF7F3EA to 0xFF111111, 0xFF111111 to 0xFFFFFFFF, 0xFFFFD23F to 0xFF111111, 0xFFE63946 to 0xFFFFFFFF,
+        0xFFC8A57A to 0xFF1B1B1B, 0xFF1D4ED8 to 0xFFFFFFFF, 0xFFFFFFFF to 0xFFE63946,
+    )
+
+    /** Lettere ritagliate: ognuna su un pezzetto di carta suo, con un font e un colore suoi, un po' storta. */
+    private fun drawRansom(c: Canvas, d: Design, e: DRansom, r: RectF, s: Float, spec: CollageSpec, meta: DesignMeta, tUs: Long, still: Boolean) {
+        val text = (spec.texts[e.id] ?: DesignTexts.fill(e.text, meta)).uppercase(java.util.Locale.ITALY).trim()
+        if (text.isEmpty()) return
+        val lines = text.split('\n').map { it.trim() }.filter { it.isNotEmpty() }
+        val p = Paint(Paint.ANTI_ALIAS_FLAG)
+        class G(val ch: Char, val font: DFont, val sc: Float, val rot: Float, val bg: Long, val fg: Long, val w100: Float)
+        var idx = 0
+        val rows = lines.map { line ->
+            line.map { ch ->
+                val k = idx++ + e.seed * 31
+                if (ch == ' ') G(ch, DFont.SANS, 1f, 0f, 0L, 0L, 38f) else {
+                    val f = ransomFonts[(rnd(k, 3) * ransomFonts.size).toInt().coerceAtMost(ransomFonts.size - 1)]
+                    val sc = 0.86f + 0.28f * rnd(k, 5)
+                    p.typeface = DesignFonts.get(f); p.textSize = 100f * sc
+                    val (bg, fg) = ransomPapers[(rnd(k, 7) * ransomPapers.size).toInt().coerceAtMost(ransomPapers.size - 1)]
+                    G(ch, f, sc, (rnd(k, 11) - 0.5f) * 14f, bg, fg, p.measureText(ch.toString()) + 28f * sc)
+                }
+            }
+        }
+        val gap = 6f
+        val rowW = rows.map { row -> row.sumOf { it.w100.toDouble() }.toFloat() + gap * (row.size - 1) }
+        val rowH = rows.map { row -> 125f * (row.maxOfOrNull { it.sc } ?: 1f) }
+        val k = min(r.width() / rowW.max(), r.height() / (rowH.sum() + gap * 2 * (rows.size - 1)))
+        var y = r.top + (r.height() - (rowH.sum() + gap * 2 * (rows.size - 1)) * k) / 2
+        var n = 0
+        c.save()
+        if (e.rot != 0f) c.rotate(e.rot, r.centerX(), r.centerY())
+        rows.forEachIndexed { ri, row ->
+            var x = r.left + (r.width() - rowW[ri] * k) / 2
+            val cyRow = y + rowH[ri] * k / 2
+            for (g in row) {
+                val gw = g.w100 * k
+                if (g.ch != ' ') {
+                    val u = if (still) 1f else ((tUs - spec.durationUs * 0.25f - n * 90_000f) / 260_000f).coerceIn(0f, 1f)
+                    n++
+                    if (u > 0f) {
+                        val ph = 112f * g.sc * k
+                        val piece = RectF(x, cyRow - ph / 2, x + gw, cyRow + ph / 2)
+                        c.save()
+                        c.rotate(g.rot, piece.centerX(), piece.centerY())
+                        val pop = 0.5f + 0.5f * CollageAnim.outBack(u)
+                        c.scale(pop, pop, piece.centerX(), piece.centerY())
+                        c.drawPath(tornPath(piece, n * 7 + e.seed, 15, 2.2f * s), Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                            color = g.bg.toInt(); setShadowLayer(3f * s, 0f, 1.5f * s, 0x33000000)
+                        })
+                        p.typeface = DesignFonts.get(g.font); p.textSize = 100f * g.sc * k; p.color = g.fg.toInt()
+                        val fm = p.fontMetrics
+                        c.drawText(g.ch.toString(), piece.centerX() - p.measureText(g.ch.toString()) / 2, piece.centerY() - (fm.ascent + fm.descent) / 2, p)
+                        c.restore()
+                    }
+                }
+                x += gw + gap * k
+            }
+            y += rowH[ri] * k + gap * 2 * k
+        }
+        c.restore()
+    }
+
+    private fun drawStamp(c: Canvas, d: Design, e: DStamp, r: RectF, s: Float, spec: CollageSpec, meta: DesignMeta) {
+        val text = (spec.texts[e.id] ?: DesignTexts.fill(e.text, meta)).uppercase(java.util.Locale.ITALY)
+        val lines = text.split('\n').take(2)
+        val col = tint(e.color, d, spec)
+        val rad = min(r.width(), r.height()) / 2
+        c.save()
+        if (e.rot != 0f) c.rotate(e.rot, r.centerX(), r.centerY())
+        val ring = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; color = col; alpha = 215; strokeWidth = rad * 0.055f }
+        c.drawCircle(r.centerX(), r.centerY(), rad - ring.strokeWidth, ring)
+        ring.strokeWidth = rad * 0.025f
+        c.drawCircle(r.centerX(), r.centerY(), rad * 0.8f, ring)
+        val p = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = col; alpha = 225; textAlign = Paint.Align.CENTER }
+        lines.forEachIndexed { i, line ->
+            p.typeface = DesignFonts.get(if (i == 0) DFont.MONO_BOLD else DFont.MONO)
+            p.textSize = rad * (if (i == 0) 0.3f else 0.18f)
+            val tw = p.measureText(line)
+            if (tw > rad * 1.35f) p.textSize *= rad * 1.35f / tw
+            val fm = p.fontMetrics
+            val cy = r.centerY() + if (lines.size == 1) 0f else if (i == 0) -rad * 0.12f else rad * 0.24f
+            c.drawText(line, r.centerX(), cy - (fm.ascent + fm.descent) / 2, p)
+        }
         c.restore()
     }
 
@@ -430,7 +659,12 @@ object DesignRenderer {
                 c.drawRoundRect(pr, rr, rr, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = tint(e.pill, d, spec); this.alpha = (alpha * 255).toInt() })
             }
             lp.alpha = (alpha * Color.alpha(tint(if (lp === p2) e.color2 ?: e.color else e.color, d, spec))).toInt()
+            if (e.gradient.size >= 2) {
+                // Metallo: sfumatura sulla riga, con il riflesso chiaro a metà.
+                lp.shader = LinearGradient(0f, base + fm.ascent, 0f, base + fm.descent, e.gradient.map { tint(it, d, spec) }.toIntArray(), null, Shader.TileMode.CLAMP)
+            }
             c.drawText(line, x, base, lp)
+            lp.shader = null
         }
         c.restore()
     }
@@ -441,7 +675,9 @@ object DesignRenderer {
         val p = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = tint(e.color, d, spec)
             if (e.stroke > 0) { style = Paint.Style.STROKE; strokeWidth = e.stroke * s }
-            if (e.grad.isNotEmpty()) shader = LinearGradient(0f, r.top, 0f, r.bottom, e.grad.map { tint(it.second, d, spec) }.toIntArray(), e.grad.map { it.first }.toFloatArray(), Shader.TileMode.CLAMP)
+            if (e.grad.isNotEmpty()) shader = if (e.radial) android.graphics.RadialGradient(r.centerX(), r.centerY(), max(1f, max(r.width(), r.height()) / 2),
+                e.grad.map { tint(it.second, d, spec) }.toIntArray(), e.grad.map { it.first }.toFloatArray(), Shader.TileMode.CLAMP)
+                else LinearGradient(0f, r.top, 0f, r.bottom, e.grad.map { tint(it.second, d, spec) }.toIntArray(), e.grad.map { it.first }.toFloatArray(), Shader.TileMode.CLAMP)
             if (e.shadow > 0) setShadowLayer(e.shadow * s, 0f, e.shadow * s * 0.45f, 0x40000000)
         }
         c.save()
@@ -516,6 +752,42 @@ object DesignRenderer {
                 val step = e.step * s
                 var x = r.left; while (x <= r.right) { c.drawLine(x, r.top, x, r.bottom, p); x += step }
                 var y = r.top; while (y <= r.bottom) { c.drawLine(r.left, y, r.right, y, p); y += step }
+            }
+            DPatternKind.PAPER -> {
+                // Grana della carta e qualche fibra.
+                c.save(); c.clipRect(r)
+                CollageRenderer.grain(c, (r.right + 1).toInt(), (r.bottom + 1).toInt(), 3, 30)
+                val f = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = tint(e.color, d, spec); strokeWidth = max(1f, 0.8f * s); style = Paint.Style.STROKE }
+                for (i in 0 until 90) {
+                    val x = r.left + rnd(i, 41) * r.width(); val y = r.top + rnd(i, 43) * r.height()
+                    val a = rnd(i, 47) * 6.28f; val len = (6f + 14f * rnd(i, 53)) * s
+                    c.drawLine(x, y, x + kotlin.math.cos(a) * len, y + kotlin.math.sin(a) * len, f)
+                }
+                c.restore()
+            }
+            DPatternKind.LINES -> {
+                // Quaderno: righe e margine rosso.
+                p.strokeWidth = max(1f, 1.2f * s)
+                var y = r.top + e.step * s * 2.5f
+                while (y < r.bottom - 4 * s) { c.drawLine(r.left, y, r.right, y, p); y += e.step * s }
+                c.drawLine(r.left + 64 * s, r.top, r.left + 64 * s, r.bottom, Paint(p).apply { color = 0x88E63946.toInt() })
+            }
+            DPatternKind.TEXTLINES -> {
+                // Colonne di testo di giornale (righe grigie, l'ultima di ogni paragrafo più corta).
+                val colGap = 18 * s; val cols = 3
+                val cw = (r.width() - colGap * (cols - 1)) / cols
+                val lh = e.step * s; val bh = lh * 0.42f
+                for (ci in 0 until cols) {
+                    val x0 = r.left + ci * (cw + colGap)
+                    var y = r.top; var line = 0; var para = 6 + (rnd(ci, 61) * 6).toInt()
+                    while (y + bh <= r.bottom) {
+                        val last = line == para
+                        val wl = if (last) cw * (0.3f + 0.5f * rnd(ci * 100 + line, 67)) else cw * (0.94f + 0.06f * rnd(ci * 100 + line, 71))
+                        c.drawRect(x0, y, x0 + wl, y + bh, p)
+                        y += lh; line++
+                        if (last) { y += lh * 0.6f; line = 0; para = 5 + (rnd(ci * 100 + line + y.toInt(), 73) * 7).toInt() }
+                    }
+                }
             }
             DPatternKind.SPROCKETS -> {
                 // Fori della pellicola sopra e sotto.

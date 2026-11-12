@@ -179,6 +179,42 @@ fun CollageScreen(vm: EditorViewModel) {
         }
     }
     if (printing) PrintDialog(spec, onDismiss = { printing = false }) { fmt, shop -> printing = false; vm.printCollage(fmt, shop) }
+    // Esito del salvataggio: dove è finito il file, come stamparlo, e i pulsanti per mandarlo o vederlo.
+    vm.collageResult?.let { res ->
+        AlertDialog(
+            onDismissRequest = { vm.collageResult = null },
+            containerColor = VV.Raised,
+            title = { Text(res.title, style = MaterialTheme.typography.titleSmall) },
+            text = { Text(res.text, style = MaterialTheme.typography.bodyMedium) },
+            confirmButton = {
+                Row {
+                    TextButton(onClick = {
+                        val send = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                            type = "image/jpeg"; putExtra(android.content.Intent.EXTRA_STREAM, res.uri)
+                            addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        }
+                        runCatching { ctx.startActivity(android.content.Intent.createChooser(send, "Condividi il collage")) }
+                    }) { Text("Condividi", color = VV.Tally) }
+                    TextButton(onClick = {
+                        val view = android.content.Intent(android.content.Intent.ACTION_VIEW).apply {
+                            setDataAndType(res.uri, "image/jpeg"); addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        }
+                        runCatching { ctx.startActivity(view) }
+                    }) { Text("Apri", color = VV.Tally) }
+                }
+            },
+            dismissButton = { TextButton(onClick = { vm.collageResult = null }) { Text("OK", color = VV.Dim) } },
+        )
+    }
+    // Avvisi ed errori (prima finivano solo nell'editor e qui non si vedevano).
+    if (vm.collageResult == null) vm.message?.let { msg ->
+        AlertDialog(
+            onDismissRequest = { vm.message = null },
+            containerColor = VV.Raised,
+            text = { Text(msg, style = MaterialTheme.typography.bodyMedium) },
+            confirmButton = { TextButton(onClick = { vm.message = null }) { Text("OK", color = VV.Tally) } },
+        )
+    }
 }
 
 /** Formato di stampa e dove si stampa. */
@@ -239,6 +275,14 @@ private fun DesignPanel(vm: EditorViewModel, spec: CollageSpec, d: Design) {
             var text by remember(spec.templateId, w.id) { mutableStateOf(spec.texts[w.id] ?: DesignTexts.word(w, spec, meta)) }
             OutlinedTextField(value = text, onValueChange = { v -> text = v.take(9); vm.setCollageText(w.id, text) }, singleLine = true, colors = colors,
                 modifier = Modifier.fillMaxWidth(), label = { Text("${w.label} (una foto per lettera)", color = VV.Dim) })
+        }
+        d.extraTexts.forEach { (id, label, def) ->
+            val proposed = DesignTexts.fill(def, meta)
+            var text by remember(spec.templateId, id) { mutableStateOf(spec.texts[id] ?: proposed) }
+            OutlinedTextField(
+                value = text, onValueChange = { v -> text = v.take(60); vm.setCollageText(id, if (text == proposed) "" else text) },
+                singleLine = false, colors = colors, modifier = Modifier.fillMaxWidth(), label = { Text(label, color = VV.Dim) },
+            )
         }
         d.texts.forEach { t ->
             val proposed = DesignTexts.fill(t.text, meta)
