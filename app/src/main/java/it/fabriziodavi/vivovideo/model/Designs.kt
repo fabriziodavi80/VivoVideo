@@ -154,7 +154,7 @@ object Designs {
         els += DText(bk(36, 730, 190, 18), "", "", "km/h", DFont.MONO_BOLD, 13f, WHITE, DAlign.CENTER, track = 0.2f, upper = true)
         els += DText(bk(330, 650, 234, 16), "l1", "Etichetta 1", "Quota", DFont.MONO, 12f, WHITE, DAlign.RIGHT, track = 0.18f, upper = true)
         els += DText(bk(330, 668, 234, 44), "alt", "Quota", "1.775 m", DFont.ANTON, 40f, WHITE, DAlign.RIGHT, count = true, shadow = true)
-        els += DPath(bk(420, 724, 26, 24), "M13 22 C4 15 1 10 2 6 C3 2 9 1 13 6 C17 1 23 2 24 6 C25 10 22 15 13 22 Z", 26f, 24f, fill = 0xFFFF2D55)
+        els += DPath(bk(482, 727, 26, 24), "M13 22 C4 15 1 10 2 6 C3 2 9 1 13 6 C17 1 23 2 24 6 C25 10 22 15 13 22 Z", 26f, 24f, fill = 0xFFFF2D55)
         els += DText(bk(450, 720, 114, 32), "hr", "Battito", "162", DFont.ANTON, 30f, WHITE, DAlign.RIGHT, count = true, shadow = true)
         els += DText(bk(40, 864, 520, 18), "place", "Luogo", "{luogo|Bike park} · gps fix", DFont.MONO, 12f, WHITE, DAlign.CENTER, track = 0.15f, upper = true)
         return Design("x-hud", "Casco", DesignFamily.ACTION, DOrient.PORTRAIT, 600f, 900f, BLACK,
