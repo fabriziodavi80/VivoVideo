@@ -94,7 +94,8 @@ class DesignRenderTest {
             // Non è un foglio vuoto: tanti colori diversi.
             val seen = HashSet<Int>()
             for (y in 0 until b.height step 9) for (x in 0 until b.width step 9) seen += b.getPixel(x, y) and 0xF0F0F0
-            assertTrue("${d.id}: troppo uniforme (${seen.size} colori)", seen.size > 40)
+            // Il duotono ha per forza pochi colori.
+            assertTrue("${d.id}: troppo uniforme (${seen.size} colori)", seen.size > if (d.id == "x-duo") 12 else 40)
             save(b, "design_%02d_%s".format(i + 1, d.id))
             // Nel video, a metà dell'entrata (per controllare il movimento a occhio).
             if (d.id in setOf("x-cover", "x-bento-ride", "x-route", "x-letters")) save(render(t, s, 480, 1_300_000, still = false), "design_%02d_%s_video".format(i + 1, d.id))
