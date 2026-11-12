@@ -88,6 +88,41 @@ class HesitationsTest {
         assertNull(Hesitations.locate(fr, Span(ehStart + 900_000, ehStart + 1_200_000)))
     }
 
+    @Test fun ehmRightAfterAWordIsFoundButADrawnWordIsNot() {
+        // "…problematiche" · un soffio · ehm più piano e più basso · pausa · "allora".
+        val v = VoiceSynth(7)
+        val word = v.say(pause(400) + word("problematiche"), f0 = 115.0, fall = 1.0)
+        val ehm = v.say(listOf(Ph('f', 90), Ph('e', 380), Ph('m', 220)), f0 = 86.0, fall = 0.5, amp = 0.13f)
+        val rest = v.say(pause(500) + word("allora andiamo") + pause(400), f0 = 112.0)
+        val fr = Hesitations.analyze(word + ehm + rest)
+        val ehStart = word.size * 1_000_000L / 16_000
+        val got = Hesitations.detect(fr)
+        assertTrue("$got", got.any { it.sure && it.span.startUs >= ehStart && it.span.startUs < ehStart + 200_000 && it.span.endUs >= ehStart + 600_000 })
+        // Parola allungata ("cosìiii…", "funzioneee…") senza interruzione della voce: resta.
+        listOf("cos" to 'i', "funzion" to 'e').forEach { (w, last) ->
+            val drawn = VoiceSynth(7).say(pause(400) + word("allora") + pause(300) + word(w) + Ph(last, 600) + pause(500) + word("ecco") + pause(400), f0 = 105.0)
+            assertTrue("$w$last…", Hesitations.detect(Hesitations.analyze(drawn)).none { it.sure })
+        }
+    }
+
+    @Test fun realRecordingOfTheCollaudo() {
+        // Ripresa vera (11/11/2026), solo i numeri dell'analisi. Chi parla ha detto gli ehm a 6, 13, 19 e 26 s;
+        // a 4,7 e 23,1 s ci sono parole allungate, a 11,7 s e 17,4 s parole: non vanno tagliate.
+        val frames = javaClass.classLoader!!.getResourceAsStream("ehm_collaudo.txt")!!.bufferedReader().readLines()
+            .filter { !it.startsWith("#") && it.isNotBlank() }
+            .map { l -> l.split(' ').let { Hesitations.Frame(it[0].toFloat(), it[1] == "1", it[2].toFloat(), it[3].toFloat()) } }
+        val got = Hesitations.detect(frames)
+        val cut = got.filter { it.sure }.map { it.span }
+        fun s(x: Double) = (x * 1_000_000).toLong()
+        for (at in listOf(13.3, 18.3, 26.0)) assertTrue("ehm a $at s: $cut", cut.any { at.let(::s) in it.startUs..it.endUs })
+        for (word in listOf(4.9, 11.9, 12.5, 17.6, 23.4)) assertTrue("parola a $word s tagliata: $cut", cut.none { s(word) in it.startUs..it.endUs })
+        // L'ehm a 19 s comincia dopo la parola (17,9 s), quello a 13 s dopo la parola allungata (12,7 s).
+        assertTrue("$cut", cut.none { it.startUs < s(17.95) && it.endUs > s(17.95) } && cut.none { it.startUs < s(12.72) && it.endUs > s(12.72) })
+        // L'ehm a 6 s lo sente il riconoscimento vocale ("M") e qui si ritrova nel suono.
+        val m = Hesitations.locate(frames, Span(s(5.6), s(6.1)))
+        assertTrue("$m", m != null && s(6.0) in m.startUs..m.endUs)
+    }
+
     private fun video(lenUs: Long) = Clip(id = "v", uri = "content://v/v", sourceDurationUs = 60_000_000, trimEndUs = lenUs, width = 1920, height = 1080, fps = 30f)
 
     @Test fun planListsFillersToReviewAndToggle() {

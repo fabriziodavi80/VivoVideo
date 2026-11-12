@@ -154,6 +154,11 @@ object Hesitations {
         if (tones.size < 50) return emptyList()
         val base = tones[tones.size / 2]
         val near = held(frames, minFrames = 15)
+        // Silenzio vero del file (come per le pause): fra il fondo e il livello del parlato.
+        val dbs = frames.map { it.db }.sorted()
+        val floorDb = dbs[(dbs.size * 0.1).toInt()]
+        val speechDb = dbs[(dbs.size * 0.9).toInt().coerceAtMost(dbs.size - 1)]
+        val silence = floorDb + 0.3f * (speechDb - floorDb)
         fun toneOf(r: IntRange) = r.filter { frames[it].voiced }.map { frames[it].semitone }.sorted().let { it[it.size / 2] }
         val found = held(frames, minFrames = 35).filter { r -> r.last - r.first < 250 }.mapNotNull { r ->
             // "Pausa" rispetto al suono tenuto: almeno 6 dB sotto il suo livello (le stanze hanno un fondo che non è silenzio).
@@ -161,6 +166,8 @@ object Hesitations {
             val o = onset(frames, r, quiet)
             val quietBefore = (maxOf(0, o - 12) until o).count { frames[it].db < quiet }
             if (r.first - o > 6 || quietBefore < 8) return@mapNotNull null
+            // Prima ci vuole una pausa vera, non una consonante leggera ("s", "f", "c" di "problematiche"): se no si mozza una parola.
+            if ((maxOf(0, o - 15) until o).none { frames[it].db < silence }) return@mapNotNull null
             val v = r.filter { frames[it].voiced }.map { frames[it].semitone }
             val tone = v.sorted()[v.size / 2]
             val q = v.size / 4
@@ -178,13 +185,42 @@ object Hesitations {
         }
         // Due suoni tenuti di fila (con i margini che si toccano) sono un ehm solo.
         val out = ArrayList<Found>()
-        found.forEach { f ->
+        (found + glued(frames, base, silence)).sortedBy { it.span.startUs }.forEach { f ->
             val l = out.lastOrNull()
             if (l != null && f.span.startUs <= l.span.endUs) out[out.lastIndex] = Found(Span(l.span.startUs, maxOf(l.span.endUs, f.span.endUs)), l.sure || f.sure)
             else out += f
         }
         return out
     }
+
+    /**
+     * Ehm attaccati alla parola prima, senza pausa ("…delle problematiche ehm"): provati sulla ripresa vera del collaudo.
+     * Dopo la parola la voce si interrompe un attimo (almeno 50 ms senza voce negli ultimi 150 ms: una parola allungata,
+     * "così…", invece prosegue senza interruzioni), poi un suono tenuto più piano della parola (3 dB o più), sul tono basso
+     * di chi parla (un semitono e mezzo sotto) e che non sale, e subito dopo (entro mezzo secondo, senza nulla di più forte)
+     * una pausa vera di almeno 100 ms. Si toglie dal suono tenuto fino alla pausa.
+     */
+    private fun glued(frames: List<Frame>, base: Float, silence: Float): List<Found> =
+        held(frames, minFrames = 30).filter { r -> r.last - r.first < 250 }.mapNotNull { r ->
+            val lv = level(frames, r)
+            val pre = maxOf(0, r.first - 15) until r.first
+            if (pre.count { !frames[it].voiced } < 5) return@mapNotNull null
+            if (pre.any { frames[it].db < silence }) return@mapNotNull null // dopo una pausa vera: è l'altro caso
+            val word = (maxOf(0, r.first - 60) until r.first - 2).filter { frames[it].voiced && frames[it].db > lv - 15 }.map { frames[it].db }.sorted()
+            if (word.size < 10 || word[word.size / 2] < lv + 3f) return@mapNotNull null
+            val v = r.filter { frames[it].voiced }.map { frames[it].semitone }
+            val tone = v.sorted()[v.size / 2]
+            val q = (v.size / 4).coerceAtLeast(1)
+            if (tone > base - 1.5f || v.takeLast(q).average() - v.take(q).average() > 0.5) return@mapNotNull null
+            val stop = lv - 15f
+            var k = r.last + 1
+            while (k < frames.size && frames[k].db >= stop) {
+                if (frames[k].db > lv + 2f || k - r.last > 50) return@mapNotNull null
+                k++
+            }
+            if ((k until minOf(frames.size, k + 10)).any { frames[it].db >= stop }) return@mapNotNull null
+            Found(Span((r.first - 3).coerceAtLeast(0) * HOP_US, (k + 3).coerceAtMost(frames.size) * HOP_US), sure = true)
+        }
 
     /**
      * Dove sta davvero l'ehm che il riconoscimento vocale ha messo in [heard] (i suoi tempi sbagliano anche di qualche
