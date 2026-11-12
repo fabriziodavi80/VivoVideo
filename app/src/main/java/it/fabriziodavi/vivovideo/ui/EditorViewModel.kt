@@ -131,6 +131,16 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import java.io.File
+import it.fabriziodavi.vivovideo.engine.CollageRenderer
+import it.fabriziodavi.vivovideo.engine.TextRenderer
+import it.fabriziodavi.vivovideo.model.TextFont
+import it.fabriziodavi.vivovideo.model.CollageAspect
+import it.fabriziodavi.vivovideo.model.CollageBg
+import it.fabriziodavi.vivovideo.model.CollageItem
+import it.fabriziodavi.vivovideo.model.CollagePlan
+import it.fabriziodavi.vivovideo.model.CollageSpec
+import it.fabriziodavi.vivovideo.model.CollageTemplate
+import it.fabriziodavi.vivovideo.model.CollageTemplates
 
 private const val SNAP_US = 150_000L
 
@@ -1895,6 +1905,195 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                 message = "Intervista pronta: ${qas.size} domande, ${formatTime(p.durationUs)}. Ritocca quello che vuoi ed esporta." +
                     if (o.format == InterviewFormat.SPLIT) " Nello schermo diviso l'anteprima prepara i tratti con i due video dopo qualche secondo." else ""
             }.onFailure { message = "Intervista non riuscita: ${it.message ?: it.javaClass.simpleName}" }
+        }
+    }
+
+    // ---------------- Collage ----------------
+
+    /** Dove va il collage finito: un progetto nuovo, il progetto aperto, o al posto di una clip-collage già fatta. */
+    sealed interface CollageTarget { data object NewProject : CollageTarget; data object Add : CollageTarget; data class Edit(val clipId: String) : CollageTarget }
+
+    /** Il collage che si sta componendo (non null = schermata del collage aperta). */
+    var collage by mutableStateOf<CollageSpec?>(null)
+        private set
+    var collageTarget by mutableStateOf<CollageTarget>(CollageTarget.NewProject)
+        private set
+    /** Anteprime delle foto e dei video (lato lungo ~720 px), per disegnare il collage nella schermata. */
+    var collageThumbs by mutableStateOf<Map<String, android.graphics.Bitmap>>(emptyMap())
+        private set
+    var collageProgress by mutableStateOf<Float?>(null)
+        private set
+
+    fun collageTemplate(): CollageTemplate? = collage?.let { CollageTemplates.byId(it.templateId, it.aspect) }
+
+    /** Foto e video scelti → elementi del collage (le foto raddrizzate nella cartella dell'app). */
+    private fun collageItems(ctx: Application, uris: List<Uri>): List<CollageItem> = uris.mapNotNull { u ->
+        runCatching { ctx.contentResolver.takePersistableUriPermission(u, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
+        if (ctx.contentResolver.getType(u)?.startsWith("image/") == true) runCatching {
+            val ph = importPhoto(ctx, u)
+            CollageItem(Uri.fromFile(ph.file).toString(), width = ph.width, height = ph.height)
+        }.getOrNull() else runCatching {
+            val info = readVideoInfo(ctx, u)
+            CollageItem(u.toString(), video = true, width = info.displayWidth, height = info.displayHeight, sourceDurationUs = info.durationMs * 1000)
+        }.getOrNull()
+    }
+
+    private suspend fun loadCollageThumbs(ctx: Application, items: List<CollageItem>) {
+        val have = collageThumbs
+        val add = withContext(Dispatchers.IO) {
+            items.filter { it.uri !in have }.mapNotNull { it2 -> CollageRenderer.load(ctx, it2, 720, 0)?.let { b -> it2.uri to b } }.toMap()
+        }
+        collageThumbs = have + add
+    }
+
+    /** Apre il collage con le foto e i video scelti: per un progetto nuovo o da aggiungere a quello aperto. */
+    fun openCollage(uris: List<Uri>, intoProject: Boolean) {
+        if (uris.isEmpty()) return
+        val ctx = getApplication<Application>()
+        viewModelScope.launch {
+            busy = "Preparo le foto per il collage…"
+            val items = withContext(Dispatchers.IO) { collageItems(ctx, uris.take(CollageSpec.MAX_ITEMS)) }
+            if (items.isEmpty()) { busy = null; message = "Non sono riuscito a leggere le foto scelte."; return@launch }
+            loadCollageThumbs(ctx, items)
+            busy = null
+            val aspect = project?.takeIf { intoProject }?.let { p -> factory.outputSize(p, null).let { (w, h) -> CollageAspect.closest(w, h) } } ?: CollageAspect.STORY
+            val t = CollageTemplates.forCount(items.size, aspect).first()
+            collageTarget = if (intoProject) CollageTarget.Add else CollageTarget.NewProject
+            collage = CollageSpec(t.id, aspect, items, t.style, t.motion)
+            if (uris.size > CollageSpec.MAX_ITEMS) message = "Il collage tiene al massimo ${CollageSpec.MAX_ITEMS} foto: ho preso le prime ${CollageSpec.MAX_ITEMS}."
+        }
+    }
+
+    /** Riapre il collage della clip [clipId] per modificarlo. */
+    fun editCollage(clipId: String) {
+        val spec = project?.clips?.firstOrNull { it.id == clipId }?.collage ?: return
+        val ctx = getApplication<Application>()
+        pause()
+        viewModelScope.launch {
+            loadCollageThumbs(ctx, spec.items)
+            collageTarget = CollageTarget.Edit(clipId)
+            collage = spec
+        }
+    }
+
+    fun closeCollage() { collage = null; collageProgress = null }
+
+    fun updateCollage(f: (CollageSpec) -> CollageSpec) { collage = collage?.let(f) }
+
+    /** Modello scelto: prende il suo stile e il suo movimento (lo sfondo sfocato resta, se l'avevi scelto). */
+    fun chooseCollageTemplate(t: CollageTemplate) = updateCollage { s ->
+        s.copy(templateId = t.id, style = if (s.style.bg == CollageBg.BLUR) t.style.copy(bg = CollageBg.BLUR) else t.style, motion = t.motion)
+    }
+
+    /** Altro formato: lo stesso modello se c'è, altrimenti il primo per quel numero di foto. */
+    fun setCollageAspect(a: CollageAspect) = updateCollage { s ->
+        val t = CollageTemplates.byId(s.templateId, a) ?: CollageTemplates.forCount(s.items.size, a).first()
+        s.copy(aspect = a, templateId = t.id)
+    }
+
+    /** Foto aggiunte: si passa a un modello con il nuovo numero di celle, della stessa famiglia se possibile. */
+    fun addCollageMedia(uris: List<Uri>) {
+        val s0 = collage ?: return
+        val ctx = getApplication<Application>()
+        viewModelScope.launch {
+            busy = "Preparo le foto…"
+            val room = CollageSpec.MAX_ITEMS - s0.items.size
+            val more = withContext(Dispatchers.IO) { collageItems(ctx, uris.take(room.coerceAtLeast(0))) }
+            loadCollageThumbs(ctx, more)
+            busy = null
+            if (more.isEmpty()) return@launch
+            setCollageItems(s0.items + more)
+        }
+    }
+
+    fun removeCollageItem(i: Int) {
+        val s = collage ?: return
+        if (s.items.size <= 1) return
+        setCollageItems(s.items.filterIndexed { k, _ -> k != i })
+    }
+
+    private fun setCollageItems(items: List<CollageItem>) = updateCollage { s ->
+        val fam = CollageTemplates.byId(s.templateId, s.aspect)?.family
+        val options = CollageTemplates.forCount(items.size, s.aspect)
+        val t = options.firstOrNull { it.family == fam } ?: options.first()
+        s.copy(items = items, templateId = t.id, style = if (t.family == fam) s.style else t.style, motion = if (t.family == fam) s.motion else t.motion)
+    }
+
+    /** Scambia le foto delle celle [a] e [b]. */
+    fun swapCollageCells(a: Int, b: Int) = updateCollage { s ->
+        val ia = CollagePlan.itemFor(a, s.items.size); val ib = CollagePlan.itemFor(b, s.items.size)
+        if (ia < 0 || ib < 0 || ia == ib) s else s.copy(items = s.items.toMutableList().also { l -> val x = l[ia]; l[ia] = l[ib]; l[ib] = x })
+    }
+
+    /** Sposta o ingrandisce l'inquadratura della foto nella cella [cell]. */
+    fun frameCollageCell(cell: Int, dx: Float = 0f, dy: Float = 0f, zoom: Float? = null) = updateCollage { s ->
+        val i = CollagePlan.itemFor(cell, s.items.size)
+        if (i < 0) s else s.copy(items = s.items.mapIndexed { k, it ->
+            if (k != i) it else it.copy(panX = (it.panX + dx).coerceIn(-1f, 1f), panY = (it.panY + dy).coerceIn(-1f, 1f), zoom = zoom ?: it.zoom)
+        })
+    }
+
+    private fun collageFace(ctx: Application) = TextRenderer.typeface(ctx, TextFont.ELEGANTE)
+
+    /** Salva il collage come immagine nella galleria. */
+    fun saveCollageImage() {
+        val spec = collage ?: return
+        val ctx = getApplication<Application>()
+        viewModelScope.launch {
+            busy = "Salvo l'immagine…"
+            val r = withContext(Dispatchers.Default) { runCatching { CollageRenderer.saveImage(ctx, spec, collageFace(ctx)) } }
+            busy = null
+            r.onSuccess { message = "Collage salvato nella galleria (Immagini → VivoVideo)." ; Diary.log("Collage salvato come immagine: ${spec.templateId}, ${spec.items.size} foto, ${spec.aspect.label}.") }
+                .onFailure { message = "Immagine non salvata: ${it.message ?: it.javaClass.simpleName}" }
+        }
+    }
+
+    /** Prepara il collage come video e lo mette nel montaggio (progetto nuovo, in coda alla clip scelta, o al posto della vecchia). */
+    fun finishCollageVideo() {
+        val spec = collage ?: return
+        val target = collageTarget
+        val ctx = getApplication<Application>()
+        viewModelScope.launch {
+            busy = "Preparo il collage… 0%"
+            collageProgress = 0f
+            val out = File(File(ctx.filesDir, "collage").apply { mkdirs() }, "collage_${System.currentTimeMillis()}.mp4")
+            val r = withContext(Dispatchers.Default) {
+                runCatching {
+                    CollageRenderer.renderVideo(ctx, spec, out, collageFace(ctx)) { f -> handler.post { collageProgress = f; busy = "Preparo il collage… ${(f * 100).toInt()}%" } }
+                }
+            }
+            busy = null; collageProgress = null
+            val (w, h) = r.getOrElse {
+                out.delete()
+                message = "Collage non riuscito: ${it.message ?: it.javaClass.simpleName}"
+                return@launch
+            }
+            Diary.log("Collage video: ${spec.templateId}, ${spec.items.size} elementi, ${spec.motion.label}, ${w}×$h, ${spec.durationUs / 1000} ms.")
+            val clip = Clip(
+                uri = Uri.fromFile(out).toString(), sourceDurationUs = spec.durationUs, trimEndUs = spec.durationUs,
+                width = w, height = h, fps = CollageRenderer.FPS.toFloat(), collage = spec, fileName = out.name, fileSize = out.length(),
+            )
+            collage = null
+            when (target) {
+                CollageTarget.NewProject -> {
+                    val fmt = when (spec.aspect) { CollageAspect.LANDSCAPE -> VideoFormat.HORIZONTAL; CollageAspect.SQUARE -> VideoFormat.SQUARE; else -> VideoFormat.VERTICAL }
+                    val p = Project(name = "Collage ${projects.size + 1}", format = fmt).addClips(listOf(clip)).copy(originals = listOf(clip))
+                    store.save(p)
+                    openProject(p)
+                    message = "Collage pronto nel video (${formatTime(spec.durationUs)}). Aggiungi musica, testi o altre clip, poi esporta. Per cambiarlo: tocca la clip → Modifica collage."
+                }
+                CollageTarget.Add -> {
+                    val p = project ?: return@launch
+                    val at = p.clips.indexOfFirst { it.id == selectedClipId }.let { if (it < 0) p.clips.size else it + 1 }
+                    update { it.addClips(listOf(clip), at) }
+                    selectedClipId = clip.id
+                }
+                is CollageTarget.Edit -> {
+                    update { p -> p.copy(clips = p.clips.map { c -> if (c.id != target.clipId) c else clip.copy(id = c.id, transitionOut = c.transitionOut, fx = c.fx, grade = c.grade,
+                        fadeInUs = c.fadeInUs, fadeOutUs = c.fadeOutUs, fadeColor = c.fadeColor) }) }
+                    selectedClipId = target.clipId
+                }
+            }
         }
     }
 

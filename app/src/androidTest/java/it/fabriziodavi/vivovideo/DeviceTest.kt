@@ -19,6 +19,13 @@ import it.fabriziodavi.vivovideo.model.Mix
 import it.fabriziodavi.vivovideo.engine.VoiceChain
 import it.fabriziodavi.vivovideo.engine.VoiceRecorder
 import it.fabriziodavi.vivovideo.engine.Decoders
+import it.fabriziodavi.vivovideo.engine.CollageRenderer
+import it.fabriziodavi.vivovideo.model.CollageAspect
+import it.fabriziodavi.vivovideo.model.CollageItem
+import it.fabriziodavi.vivovideo.model.CollageMotion
+import it.fabriziodavi.vivovideo.model.CollageSpec
+import it.fabriziodavi.vivovideo.model.CollageStyle
+import it.fabriziodavi.vivovideo.model.CollageTemplates
 import it.fabriziodavi.vivovideo.engine.Whisper
 import it.fabriziodavi.vivovideo.model.TeleItem
 import it.fabriziodavi.vivovideo.model.TeleLayout
@@ -584,6 +591,51 @@ class DeviceTest {
         exportAndCheck(fullProject(), listOf(Layer(uri = videoC.toString(), name = "pip", width = W, height = H, isVideo = true,
             sourceDurationUs = 6_000_000, sourceStartUs = 1_000_000, startUs = 2_000_000, durationUs = 4_000_000,
             pose = Transform(x = -0.25f, y = -0.25f, scale = 0.4f), mask = LayerMask.ROUNDED, key = KeyColor.GREEN, volume = 0.5f)))
+    }
+
+    @Test fun collageVideoAndImage() {
+        // Collage con una foto e due video nelle celle: il video preparato dura giusto, ha i video veri nelle celle
+        // e poi si esporta come una clip qualsiasi. L'immagine finisce nella galleria.
+        val items = listOf(
+            CollageItem(photo.toString(), width = 800, height = 600),
+            CollageItem(videoA.toString(), video = true, width = W, height = H, sourceDurationUs = 6_000_000),
+            CollageItem(videoB.toString(), video = true, width = W, height = H, sourceDurationUs = 6_000_000, startUs = 1_000_000),
+        )
+        val spec = CollageSpec("g-r-12", CollageAspect.STORY, items, CollageStyle(gap = 0.02f), CollageMotion.CASCADE, durationUs = 3_000_000, caption = "Prova")
+        val out = File(dir(), "collage.mp4").apply { delete() }
+        val (w, h) = CollageRenderer.renderVideo(ctx, spec, out, null) {}
+        assertTrue("misura $w×$h", h > w && w >= 720)
+        val r = MediaMetadataRetriever()
+        try {
+            r.setDataSource(out.absolutePath)
+            val ms = r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)!!.toLong()
+            assertTrue("durata $ms ms", abs(ms - 3000) < 200)
+            assertEquals("yes", r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_HAS_AUDIO))
+            val f = r.getFrameAtTime(2_500_000, MediaMetadataRetriever.OPTION_CLOSEST)!!
+            val t = CollageTemplates.byId("g-r-12", CollageAspect.STORY)!!
+            fun at(cell: Int): Int {
+                val rc = CollageRenderer.cellRect(t, t.cells[cell], spec.style.gap, f.width, f.height)
+                return f.getPixel(rc.centerX().toInt(), (rc.top + rc.height() * 0.12f).toInt())
+            }
+            val photoPx = at(0); val aPx = at(1); val bPx = at(2)
+            assertTrue("foto gialla: ${Integer.toHexString(photoPx)}", Color.red(photoPx) > 150 && Color.green(photoPx) > 150 && Color.blue(photoPx) < 100)
+            assertTrue("video A rosso: ${Integer.toHexString(aPx)}", Color.red(aPx) > 120 && Color.green(aPx) < 90 && Color.blue(aPx) < 90)
+            assertTrue("video B blu: ${Integer.toHexString(bPx)}", Color.blue(bPx) > 120 && Color.red(bPx) < 90 && Color.green(bPx) < 90)
+            // All'inizio le foto entrano una dopo l'altra: la terza cella è ancora vuota.
+            val f0 = r.getFrameAtTime(0, MediaMetadataRetriever.OPTION_CLOSEST)!!
+            val rc = CollageRenderer.cellRect(t, t.cells[2], spec.style.gap, f0.width, f0.height)
+            val p0 = f0.getPixel(rc.centerX().toInt(), rc.centerY().toInt())
+            assertTrue("sfondo all'inizio: ${Integer.toHexString(p0)}", Color.red(p0) > 200 && Color.green(p0) > 200 && Color.blue(p0) > 200)
+        } finally { r.release() }
+        // Nel montaggio è una clip come le altre.
+        val clip = Clip(id = "col", uri = Uri.fromFile(out).toString(), sourceDurationUs = 3_000_000, trimEndUs = 3_000_000, width = w, height = h, fps = 30f, collage = spec)
+        exportAndCheck(Project(name = "collage", clips = listOf(clip, video("a", videoA, e = 2_000_000))))
+        // Immagine nella galleria, grande (lato corto 2160).
+        val img = CollageRenderer.saveImage(ctx, spec, null)
+        val o = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        ctx.contentResolver.openInputStream(img)!!.use { android.graphics.BitmapFactory.decodeStream(it, null, o) }
+        assertEquals(2160 to 3840, o.outWidth to o.outHeight)
+        ctx.contentResolver.delete(img, null, null)
     }
 
     // ---- Prove mirate per isolare i blocchi ----

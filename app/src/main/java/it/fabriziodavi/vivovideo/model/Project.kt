@@ -297,6 +297,8 @@ data class Clip(
     val redact: Redaction? = null,
     /** Pezzo di un jump cut: inquadratura cambiata a ogni taglio e audio con micro-dissolvenze sui bordi. */
     val jumpCut: Boolean = false,
+    /** Collage preparato dall'app (video): come rifarlo, per modificarlo dopo. */
+    val collage: CollageSpec? = null,
     /** Nome e dimensione del file originale: servono a ritrovarlo se viene spostato. */
     val fileName: String = "",
     val fileSize: Long = 0,

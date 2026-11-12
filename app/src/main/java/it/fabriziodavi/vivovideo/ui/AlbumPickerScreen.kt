@@ -122,7 +122,7 @@ fun AlbumPickerScreen(vm: EditorViewModel) {
 
 /** Da dove prendere foto e video: scelta singola o album interi. */
 @Composable
-fun AddMediaDialog(onPick: () -> Unit, onAlbums: () -> Unit, onDismiss: () -> Unit) {
+fun AddMediaDialog(onPick: () -> Unit, onAlbums: () -> Unit, onDismiss: () -> Unit, onCollage: (() -> Unit)? = null) {
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = VV.Raised,
@@ -131,6 +131,7 @@ fun AddMediaDialog(onPick: () -> Unit, onAlbums: () -> Unit, onDismiss: () -> Un
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 PrimaryButton("Scegli foto e video", Modifier.fillMaxWidth()) { onDismiss(); onPick() }
                 SecondaryButton("Album interi", Modifier.fillMaxWidth(), onClick = { onDismiss(); onAlbums() })
+                if (onCollage != null) SecondaryButton("Collage di foto", Modifier.fillMaxWidth(), onClick = { onDismiss(); onCollage() })
             }
         },
         confirmButton = { TextButton(onClick = onDismiss) { Text("Annulla", color = VV.Dim) } },

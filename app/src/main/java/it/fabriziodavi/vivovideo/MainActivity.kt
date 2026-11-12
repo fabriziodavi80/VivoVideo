@@ -10,6 +10,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.LaunchedEffect
 import it.fabriziodavi.vivovideo.engine.ExportState
 import it.fabriziodavi.vivovideo.ui.EditorScreen
+import it.fabriziodavi.vivovideo.ui.CollageScreen
 import it.fabriziodavi.vivovideo.ui.AutoScreen
 import it.fabriziodavi.vivovideo.ui.InterviewScreen
 import it.fabriziodavi.vivovideo.ui.LibraryScreen
@@ -85,6 +86,7 @@ class MainActivity : ComponentActivity() {
                     if (vm.showCredits && vm.project != null) CreditsScreen(vm)
                     if (vm.showMixer && vm.project != null) MixerScreen(vm)
                     if (vm.objectPick != null && vm.project != null) ObjectPickScreen(vm)
+                    if (vm.collage != null) CollageScreen(vm)
                 }
             }
         }

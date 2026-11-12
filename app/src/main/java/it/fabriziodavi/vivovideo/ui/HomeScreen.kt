@@ -46,6 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import it.fabriziodavi.vivovideo.describeEncoders
+import it.fabriziodavi.vivovideo.model.CollageSpec
 import it.fabriziodavi.vivovideo.model.Project
 import it.fabriziodavi.vivovideo.model.Template
 import java.text.SimpleDateFormat
@@ -59,6 +60,9 @@ fun HomeScreen(vm: EditorViewModel) {
     var askNew by remember { mutableStateOf(false) }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(100)) { uris ->
         if (uris.isNotEmpty()) vm.newProject(uris)
+    }
+    val collagePicker = rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(CollageSpec.MAX_ITEMS)) { uris ->
+        if (uris.isNotEmpty()) vm.openCollage(uris, intoProject = false)
     }
     var askTemplate by remember { mutableStateOf(false) }
     var chosenTemplate by remember { mutableStateOf<Template?>(null) }
@@ -90,8 +94,14 @@ fun HomeScreen(vm: EditorViewModel) {
             CreateCard(VVIcons.Copy, "Da un modello", "Un montaggio salvato, con foto nuove.", primary = false,
                 modifier = Modifier.weight(1f).fillMaxHeight()) { askTemplate = true }
         }
-        CreateCard(VVIcons.Movie, "Intervista doppia", "Due persone, le stesse domande: risposte alternate o a schermo diviso.",
-            primary = false, modifier = Modifier.fillMaxWidth().padding(bottom = 18.dp)) { vm.showInterview = true }
+        Row(Modifier.fillMaxWidth().height(androidx.compose.foundation.layout.IntrinsicSize.Min).padding(bottom = 18.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            CreateCard(VVIcons.Movie, "Intervista doppia", "Due persone, le stesse domande: risposte alternate o a schermo diviso.",
+                primary = false, modifier = Modifier.weight(1f).fillMaxHeight()) { vm.showInterview = true }
+            CreateCard(VVIcons.Copy, "Collage", "Foto e video in centinaia di modelli: immagine o video animato.",
+                primary = false, modifier = Modifier.weight(1f).fillMaxHeight()) {
+                collagePicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
+            }
+        }
         if (vm.projects.isEmpty()) {
             Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
                 Text(

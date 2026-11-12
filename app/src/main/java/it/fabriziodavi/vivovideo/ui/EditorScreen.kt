@@ -1,5 +1,6 @@
 package it.fabriziodavi.vivovideo.ui
 
+import it.fabriziodavi.vivovideo.model.CollageSpec
 import it.fabriziodavi.vivovideo.model.creditsRoll
 import it.fabriziodavi.vivovideo.model.FadeColor
 import it.fabriziodavi.vivovideo.model.AutoStyle
@@ -258,6 +259,9 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
     }
 
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(100)) { vm.addClips(it) }
+    val collagePicker = rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(CollageSpec.MAX_ITEMS)) { uris ->
+        if (uris.isNotEmpty()) vm.openCollage(uris, intoProject = true)
+    }
     val lutPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) vm.importLut(uri)
     }
@@ -678,6 +682,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
             onPick = { picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo)) },
             onAlbums = { vm.openAlbumPicker(newProject = false) },
             onDismiss = { askAdd = false },
+            onCollage = { collagePicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo)) },
         )
     }
     if (clipMenu) {
@@ -695,6 +700,7 @@ fun EditorScreen(vm: EditorViewModel, initialTool: Tool? = null, initialTab: Int
                         MenuRow(VVIcons.MoveRight, "Sposta dopo", enabled = idx < project.clips.lastIndex) { act { vm.moveSelected(+1) } }
                         MenuRow(VVIcons.Copy, "Duplica") { act { vm.duplicateSelected() } }
                         MenuRow(VVIcons.Split, "Dividi all'indicatore") { act { vm.splitAtPlayhead() } }
+                        if (c.collage != null) MenuRow(VVIcons.Copy, "Modifica collage") { act { vm.editCollage(c.id) } }
                         if (!c.isPhoto) {
                             MenuRow(VVIcons.Pause, "Fermo immagine all'indicatore") { act { vm.freezeFrame() } }
                             MenuRow(VVIcons.Effects, "Momento migliore") { act { vm.bestMoment() } }

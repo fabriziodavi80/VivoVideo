@@ -296,7 +296,7 @@ object Reverser {
         return ShortArray(bb.remaining()).also { bb.get(it) }
     }
 
-    private fun encodeAac(pcm: ShortArray, rate: Int, ch: Int): Pair<MediaFormat, List<Pair<ByteArray, MediaCodec.BufferInfo>>> {
+    internal fun encodeAac(pcm: ShortArray, rate: Int, ch: Int): Pair<MediaFormat, List<Pair<ByteArray, MediaCodec.BufferInfo>>> {
         val fmt = MediaFormat.createAudioFormat(MediaFormat.MIMETYPE_AUDIO_AAC, rate, ch).apply {
             setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC)
             setInteger(MediaFormat.KEY_BIT_RATE, 192_000)
