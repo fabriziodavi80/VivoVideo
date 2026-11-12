@@ -266,7 +266,7 @@ object Reverser {
         } finally { ex.release() }
     }
 
-    private fun decodePcm(ex: MediaExtractor, f: MediaFormat): ShortArray {
+    internal fun decodePcm(ex: MediaExtractor, f: MediaFormat): ShortArray {
         val dec = MediaCodec.createDecoderByType(f.getString(MediaFormat.KEY_MIME)!!)
         dec.configure(f, null, null, 0); dec.start()
         val out = java.io.ByteArrayOutputStream()

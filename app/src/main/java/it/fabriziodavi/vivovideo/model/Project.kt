@@ -299,6 +299,8 @@ data class Clip(
     val jumpCut: Boolean = false,
     /** Collage preparato dall'app (video): come rifarlo, per modificarlo dopo. */
     val collage: CollageSpec? = null,
+    /** Time-lapse preparato dall'app: l'originale e le scelte, per tornare indietro o rifarlo. */
+    val timelapse: TimelapseInfo? = null,
     /** Nome e dimensione del file originale: servono a ritrovarlo se viene spostato. */
     val fileName: String = "",
     val fileSize: Long = 0,

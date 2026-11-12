@@ -7,6 +7,31 @@ import kotlin.math.exp
 import kotlin.math.max
 import kotlin.math.roundToInt
 
+/** Scie del time-lapse: quanti fotogrammi dell'originale si mescolano in ognuno del risultato. */
+@Serializable
+enum class TimelapseTrails(val label: String, val samples: Int) { NONE("Nessuna", 1), LIGHT("Leggere", 3), LONG("Lunghe", 8) }
+
+/**
+ * Conti del time-lapse: [speed] volte più veloce, 30 fotogrammi al secondo. Ogni fotogramma del risultato copre
+ * [spanUs] dell'originale e ne mescola [samples] presi a passo [stepUs].
+ */
+data class TimelapsePlan(val trimmedUs: Long, val speed: Int, val srcFps: Float, val trails: TimelapseTrails) {
+    val outputUs: Long get() = trimmedUs / speed.coerceAtLeast(1)
+    val outFrames: Int get() = (outputUs * 30 / 1_000_000).toInt()
+    val spanUs: Double get() = speed * 1_000_000.0 / 30
+    /** Non più dei fotogrammi che ci sono davvero nell'intervallo. */
+    val samples: Int get() = trails.samples.coerceAtMost((spanUs / (1_000_000.0 / srcFps.coerceAtLeast(1f))).toInt().coerceAtLeast(1))
+    val stepUs: Long get() = (spanUs / samples).toLong().coerceAtLeast(1)
+    /** Gruppo (fotogramma del risultato) di un campione al tempo [relUs] dall'inizio; mezzo passo di tolleranza per i tempi dei fotogrammi veri. */
+    fun groupOf(relUs: Long): Int = ((relUs + stepUs / 2) / spanUs).toInt()
+
+    companion object { val SPEEDS = listOf(5, 10, 20, 50, 100) }
+}
+
+/** Clip trasformata in time-lapse: l'originale (per tornare indietro) e le scelte fatte. */
+@Serializable
+data class TimelapseInfo(val source: ReversedSource, val speed: Int, val trails: TimelapseTrails, val ambient: Boolean = false, val moving: Boolean = false)
+
 /** Il video originale di una clip messa al contrario. */
 @Serializable
 data class ReversedSource(
@@ -320,6 +345,21 @@ object ClipTools {
             speedPoints = c.speedPoints.map { SpeedPoint(1f - it.t, it.speed) }.sortedBy { it.t },
             reversed = null,
         )
+    }
+
+    /** La clip diventa il time-lapse [uri] (lungo [durUs]); l'originale resta in [TimelapseInfo.source]. */
+    fun timelapsed(c: Clip, uri: String, durUs: Long, w: Int, h: Int, speed: Int, trails: TimelapseTrails, ambient: Boolean, moving: Boolean): Clip = c.copy(
+        uri = uri, sourceDurationUs = durUs, trimStartUs = 0, trimEndUs = durUs, width = w, height = h, hdr = 0, fps = 30f,
+        speed = ClipSpeed.NORMAL, speedPoints = emptyList(), keyframes = emptyList(), muted = !ambient,
+        timelapse = TimelapseInfo(c.timelapse?.source ?: ReversedSource(c.uri, c.sourceDurationUs, c.trimStartUs, c.trimEndUs, c.width, c.height, c.hdr), speed, trails, ambient, moving),
+        stab = null, reframe = null, person = null, reversed = null,
+    )
+
+    /** Torna al video originale (velocità normale). */
+    fun untimelapsed(c: Clip): Clip {
+        val o = c.timelapse?.source ?: return c
+        return c.copy(uri = o.uri, sourceDurationUs = o.sourceDurationUs, trimStartUs = o.trimStartUs, trimEndUs = o.trimEndUs,
+            width = o.width, height = o.height, hdr = o.hdr, muted = false, timelapse = null, stab = null)
     }
 
     /** Fermo immagine: una foto da [uri] lunga [durUs], con l'aspetto della clip [from]. */

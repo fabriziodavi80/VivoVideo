@@ -193,7 +193,11 @@ object PersonMasks {
  * Funziona anche con i video a 10 bit (si prende il byte alto).
  */
 object FrameReader {
-    suspend fun read(ctx: Context, uri: String, fromUs: Long, toUs: Long, rate: Int, size: Int, onFrame: suspend (Bitmap, Long) -> Unit) {
+    suspend fun read(ctx: Context, uri: String, fromUs: Long, toUs: Long, rate: Int, size: Int, onFrame: suspend (Bitmap, Long) -> Unit) =
+        readStep(ctx, uri, fromUs, toUs, 1_000_000L / rate.coerceAtLeast(1), size, onFrame)
+
+    /** Come [read], con il passo fra un campione e l'altro in µs (anche più di un secondo: time-lapse veloci). */
+    suspend fun readStep(ctx: Context, uri: String, fromUs: Long, toUs: Long, stepUs: Long, size: Int, onFrame: suspend (Bitmap, Long) -> Unit) {
         val ex = MediaExtractor()
         ex.setDataSource(ctx, Uri.parse(uri), null)
         val vt = (0 until ex.trackCount).firstOrNull { ex.getTrackFormat(it).getString(MediaFormat.KEY_MIME)?.startsWith("video/") == true }
@@ -214,7 +218,7 @@ object FrameReader {
         val info = MediaCodec.BufferInfo()
         var inDone = false
         var next = fromUs
-        val step = 1_000_000L / rate
+        val step = stepUs.coerceAtLeast(1)
         try {
             while (true) {
                 coroutineContext.ensureActive()

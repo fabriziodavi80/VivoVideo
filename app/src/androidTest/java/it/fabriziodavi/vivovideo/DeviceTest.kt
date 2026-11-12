@@ -676,6 +676,23 @@ class DeviceTest {
         ctx.contentResolver.delete(home, null, null)
     }
 
+    @Test fun timelapseWithTrails() {
+        // 6 secondi a 5× con le scie lunghe: 1,2 secondi, 30 fotogrammi al secondo, con l'audio (muto) e poi nel montaggio.
+        val c = video("tl", videoA, e = 6_000_000)
+        val r = kotlinx.coroutines.runBlocking { it.fabriziodavi.vivovideo.engine.Timelapse.render(ctx, c, 5, it.fabriziodavi.vivovideo.model.TimelapseTrails.LONG, ambient = true) {} }
+        val m = MediaMetadataRetriever()
+        try {
+            m.setDataSource(r.file.absolutePath)
+            val ms = m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)!!.toLong()
+            assertTrue("durata $ms ms", abs(ms - 1200) < 200)
+            assertEquals("yes", m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_HAS_AUDIO))
+            assertTrue(m.getFrameAtTime(600_000, MediaMetadataRetriever.OPTION_CLOSEST) != null)
+        } finally { m.release() }
+        val tl = it.fabriziodavi.vivovideo.model.ClipTools.timelapsed(c, Uri.fromFile(r.file).toString(), r.durationUs, r.width, r.height, 5,
+            it.fabriziodavi.vivovideo.model.TimelapseTrails.LONG, ambient = true, moving = false)
+        exportAndCheck(Project(name = "timelapse", clips = listOf(tl, video("b", videoB, e = 2_000_000))))
+    }
+
     // ---- Prove mirate per isolare i blocchi ----
 
     @Test fun bisectEffectsOnly() {

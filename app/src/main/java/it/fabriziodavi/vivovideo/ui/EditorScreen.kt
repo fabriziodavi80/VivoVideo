@@ -1105,6 +1105,39 @@ private fun SpeedPanel(vm: EditorViewModel, running: Boolean) {
             } + "  Durata: " + formatTime(clip.outputUs)
         )
     }
+    TimelapseSection(vm, clip, running)
+}
+
+/**
+ * Time-lapse: la clip da 5 a 100 volte più veloce, con le scie dei passanti (più fotogrammi mescolati in uno),
+ * stabilizzata se ripresa camminando, con l'audio del posto e un lampo per uscire sulla scena dopo.
+ */
+@Composable
+private fun TimelapseSection(vm: EditorViewModel, clip: it.fabriziodavi.vivovideo.model.Clip, running: Boolean) {
+    if (clip.isPhoto) return
+    PanelLabel("Time-lapse")
+    val tl = clip.timelapse
+    if (tl != null) {
+        Hint("Time-lapse ${tl.speed}× · scie ${tl.trails.label.lowercase()}${if (tl.moving) " · stabilizzato" else ""}${if (tl.ambient) " · audio del posto" else ""}. Durata: ${formatTime(clip.outputUs)}.")
+        SecondaryButton("Torna al video originale", Modifier.fillMaxWidth()) { vm.undoTimelapse() }
+    }
+    val srcUs = tl?.source?.let { it.trimEndUs - it.trimStartUs } ?: clip.trimmedUs
+    var speed by remember(clip.id) { mutableIntStateOf(tl?.speed ?: 20) }
+    var trails by remember(clip.id) { mutableStateOf(tl?.trails ?: it.fabriziodavi.vivovideo.model.TimelapseTrails.LONG) }
+    var moving by remember(clip.id) { mutableStateOf(tl?.moving ?: false) }
+    var ambient by remember(clip.id) { mutableStateOf(tl?.ambient ?: false) }
+    var flash by remember(clip.id) { mutableStateOf(false) }
+    PillRow(it.fabriziodavi.vivovideo.model.TimelapsePlan.SPEEDS, speed, { "$it×" }, !running) { speed = it }
+    Hint("${formatTime(srcUs)} diventano ${formatTime(srcUs / speed)}." + if (srcUs / speed < 1_000_000) " Troppo corto: scegli meno velocità." else "")
+    Text("Scie di chi si muove", style = MaterialTheme.typography.labelMedium, color = VV.Dim)
+    Segmented(it.fabriziodavi.vivovideo.model.TimelapseTrails.entries, trails, { it.label }, !running) { trails = it }
+    ToggleRow("Ripresa camminando o in auto (stabilizza: hyperlapse)", moving, !running) { moving = it }
+    ToggleRow("Tieni il suono del posto, basso", ambient, !running) { ambient = it }
+    ToggleRow("Esci con un lampo sulla scena dopo", flash, !running) { flash = it }
+    PrimaryButton(if (tl == null) "Crea il time-lapse" else "Rifai il time-lapse", Modifier.fillMaxWidth(), enabled = !running && srcUs / speed >= 500_000) {
+        vm.makeTimelapse(speed, trails, ambient, moving, flash)
+    }
+    Hint("Per l'effetto «passanti che diventano scie»: telefono fermo (meglio su un appoggio), una strada o una piazza, almeno un minuto di ripresa, 20× o 50× con scie lunghe.")
 }
 
 /** Gesto in corso sul video, mostrato subito; il keyframe si salva quando si alzano le dita. */

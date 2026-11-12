@@ -8,6 +8,7 @@ import it.fabriziodavi.vivovideo.engine.TeleStore
 import it.fabriziodavi.vivovideo.model.TextAnim
 import it.fabriziodavi.vivovideo.model.TextItem
 import it.fabriziodavi.vivovideo.model.TransitionSpec
+import it.fabriziodavi.vivovideo.model.TransitionType
 import it.fabriziodavi.vivovideo.model.Clip
 import it.fabriziodavi.vivovideo.model.SubStyle
 import it.fabriziodavi.vivovideo.model.SubPosition
@@ -1459,6 +1460,39 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             update { it.replaceClip(ClipTools.reversed(now, Uri.fromFile(r.file).toString(), r.durationUs, r.width, r.height)) }
             message = "Clip al contrario. Si torna indietro da qui o con Annulla."
         }
+    }
+
+    /**
+     * Time-lapse della clip selezionata: [speed] volte più veloce con le scie [trails]; [ambient] tiene il suono del posto,
+     * basso; [moving] = ripresa camminando (hyperlapse): dopo si stabilizza forte; [flash] = esce con un lampo sulla clip dopo.
+     */
+    fun makeTimelapse(speed: Int, trails: it.fabriziodavi.vivovideo.model.TimelapseTrails, ambient: Boolean, moving: Boolean, flash: Boolean) {
+        val c0 = workClip() ?: return
+        if (c0.isPhoto) { message = "Il time-lapse è per i video."; return }
+        // Se è già un time-lapse si riparte dall'originale.
+        val c = if (c0.timelapse != null) ClipTools.untimelapsed(c0) else c0
+        val plan = it.fabriziodavi.vivovideo.model.TimelapsePlan(c.trimmedUs, speed, c.fps, trails)
+        if (plan.outFrames < 15) { message = "La clip è troppo corta per $speed×: verrebbe meno di mezzo secondo. Scegli meno velocità o una clip più lunga."; return }
+        val ctx = getApplication<Application>()
+        runClipWork("Preparo il time-lapse $speed×…") { prog ->
+            val r = it.fabriziodavi.vivovideo.engine.Timelapse.render(ctx, c, speed, trails, ambient) { f -> prog(if (moving) f * 0.75f else f) }
+            val now = project?.clips?.firstOrNull { it.id == c0.id }
+            if (now == null || now.uri != c0.uri) { r.file.delete(); return@runClipWork }
+            var tl = ClipTools.timelapsed(now, Uri.fromFile(r.file).toString(), r.durationUs, r.width, r.height, speed, trails, ambient, moving)
+            if (flash) tl = tl.copy(transitionOut = TransitionSpec(TransitionType.FLASH, 300_000))
+            if (moving) runCatching { Stabilizer.analyze(ctx, tl, 0.9f) { f -> prog(0.75f + f * 0.25f) } }.onSuccess { st -> tl = tl.copy(stab = st) }
+            update { it.replaceClip(tl) }
+            Diary.log("Time-lapse: ${speed}×, scie ${trails.label}, ${formatTime(c.trimmedUs)} → ${formatTime(r.durationUs)}, ${r.width}×${r.height}${if (moving) ", stabilizzato" else ""}.")
+            message = "Time-lapse $speed× pronto: ${formatTime(c.trimmedUs)} diventano ${formatTime(r.durationUs)}. Per tornare indietro: Velocità → Torna al video originale."
+        }
+    }
+
+    /** Toglie il time-lapse: torna la clip originale. */
+    fun undoTimelapse() {
+        val c = workClip() ?: return
+        if (c.timelapse == null) return
+        update { it.replaceClip(ClipTools.untimelapsed(c)) }
+        message = "Clip di nuovo a velocità normale."
     }
 
     /** Misura il movimento della clip e lo leviga. */
