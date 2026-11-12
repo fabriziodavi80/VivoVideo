@@ -16,6 +16,7 @@ import android.graphics.RadialGradient
 import android.graphics.RectF
 import android.graphics.Shader
 import android.graphics.Typeface
+import android.media.ExifInterface
 import android.media.MediaCodec
 import android.media.MediaCodecInfo
 import android.media.MediaCodecList
@@ -37,6 +38,7 @@ import it.fabriziodavi.vivovideo.model.CollagePlan
 import it.fabriziodavi.vivovideo.model.CollageSpec
 import it.fabriziodavi.vivovideo.model.CollageTemplate
 import it.fabriziodavi.vivovideo.model.CollageTemplates
+import it.fabriziodavi.vivovideo.model.PrintFormat
 import it.fabriziodavi.vivovideo.model.Pt
 import it.fabriziodavi.vivovideo.model.blobPoints
 import java.io.File
@@ -53,7 +55,11 @@ import kotlin.math.min
  */
 object CollageRenderer {
     /** La foto (o il fotogramma del video) numero [item] all'istante [tUs] del collage. */
-    fun interface Frames { fun get(item: Int, tUs: Long): Bitmap? }
+    fun interface Frames {
+        fun get(item: Int, tUs: Long): Bitmap?
+        /** La persona scontornata della foto [item] (maschera allineata alla foto), se c'è. */
+        fun mask(item: Int): Bitmap? = null
+    }
 
     /** Grana: rumore grigio ripetuto, spostato a ogni fotogramma (come la pellicola). */
     private val noise: Bitmap by lazy {
@@ -66,7 +72,7 @@ object CollageRenderer {
     /** Sfondi sfocati già pronti (per la foto da cui vengono). */
     private val blurCache = java.util.WeakHashMap<Bitmap, Bitmap>()
 
-    private fun blurred(b: Bitmap): Bitmap = synchronized(blurCache) {
+    internal fun blurred(b: Bitmap): Bitmap = synchronized(blurCache) {
         blurCache.getOrPut(b) {
             // Rimpicciolita due volte e ingrandita con il filtro: una sfocatura morbida e leggerissima.
             val k = 48f / max(b.width, b.height)
@@ -171,6 +177,7 @@ object CollageRenderer {
         c: Canvas, w: Int, h: Int, t: CollageTemplate, spec: CollageSpec, tUs: Long, still: Boolean,
         frames: Frames, caption: Typeface?, selected: Int = -1,
     ) {
+        if (t.design != null) { DesignRenderer.draw(c, w, h, t, spec, tUs, still, frames, selected); return }
         val st = spec.style
         val short = min(w, h).toFloat()
         val dur = spec.durationUs
@@ -255,7 +262,7 @@ object CollageRenderer {
         if (st.grain) grain(c, w, h, (tUs / 33_333L).toInt(), 20)
     }
 
-    private fun grain(c: Canvas, w: Int, h: Int, frame: Int, alpha: Int) {
+    internal fun grain(c: Canvas, w: Int, h: Int, frame: Int, alpha: Int) {
         val p = Paint().apply {
             val sh = BitmapShader(noise, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT)
             // Grana grande quanto un granello di pellicola anche in 4K.
@@ -448,6 +455,7 @@ object CollageRenderer {
 
     /** Salva il collage come immagine (JPEG, lato corto 2160 pixel) nella galleria, in Immagini/VivoVideo. */
     fun saveImage(ctx: Context, spec: CollageSpec, caption: Typeface?): Uri {
+        DesignFonts.init(ctx)
         val t = CollageTemplates.byId(spec.templateId, spec.aspect) ?: error("modello non trovato")
         val (w, h) = spec.aspect.size(2160)
         val photos = spec.items.indices.map { i -> load(ctx, spec.items[i], neededSide(t, spec, i, w, h), 0) }
@@ -475,6 +483,64 @@ object CollageRenderer {
         }
     }
 
+    /**
+     * Collage da stampare nel formato [fmt]: [shop] = negozio o sito (margine di taglio di 3 mm, il fondo va oltre il bordo),
+     * altrimenti stampante di casa (bordo bianco di 4 mm). JPEG alla risoluzione giusta (scritta nel file) in Immagini/VivoVideo.
+     * Restituisce dove è stato salvato e la misura in pixel.
+     */
+    fun savePrint(ctx: Context, spec: CollageSpec, fmt: PrintFormat, shop: Boolean, caption: Typeface?): Triple<Uri, Int, Int> {
+        DesignFonts.init(ctx)
+        val t = CollageTemplates.byId(spec.templateId, spec.aspect) ?: error("modello non trovato")
+        val (w, h, dpi) = fmt.pixels(shop)
+        val m = if (shop) 0 else (PrintFormat.HOME_MARGIN_MM / 25.4f * dpi).toInt()
+        val iw = w - 2 * m; val ih = h - 2 * m
+        // Foto grandi quanto serve, ma non oltre 3600 pixel (la memoria del telefono non è infinita).
+        val photos = spec.items.indices.map { i -> load(ctx, spec.items[i], neededSide(t, spec, i, iw, ih).coerceAtMost(3600), 0) }
+        val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        try {
+            val c = Canvas(bmp)
+            c.drawColor(Color.WHITE)
+            c.translate(m.toFloat(), m.toFloat())
+            c.clipRect(0, 0, iw, ih)
+            draw(c, iw, ih, t, spec, spec.durationUs, true, { i, _ -> photos.getOrNull(i) }, caption)
+            val name = "VivoVideo_Stampa_${fmt.label.replace("×", "x").replace(" ", "").replace(".", "")}_" +
+                SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ITALY).format(Date()) + ".jpg"
+            val tmp = File(ctx.cacheDir, name)
+            tmp.outputStream().use { bmp.compress(Bitmap.CompressFormat.JPEG, 95, it) }
+            // La risoluzione nel file: il negozio stampa alla misura giusta senza chiedere.
+            runCatching {
+                val ex = ExifInterface(tmp.absolutePath)
+                ex.setAttribute(ExifInterface.TAG_X_RESOLUTION, "$dpi/1")
+                ex.setAttribute(ExifInterface.TAG_Y_RESOLUTION, "$dpi/1")
+                ex.setAttribute(ExifInterface.TAG_RESOLUTION_UNIT, "2")
+                ex.setAttribute(ExifInterface.TAG_SOFTWARE, "VivoVideo")
+                ex.saveAttributes()
+            }
+            try { return Triple(insertImage(ctx, name) { out -> tmp.inputStream().use { it.copyTo(out) } }, w, h) } finally { tmp.delete() }
+        } finally {
+            bmp.recycle()
+            photos.forEach { it?.recycle() }
+        }
+    }
+
+    /** Mette un'immagine nella galleria (Immagini/VivoVideo) scrivendola con [write]. */
+    private fun insertImage(ctx: Context, name: String, write: (java.io.OutputStream) -> Unit): Uri {
+        val values = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, name)
+            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/VivoVideo")
+            put(MediaStore.Images.Media.IS_PENDING, 1)
+        }
+        val cr = ctx.contentResolver
+        val uri = cr.insert(MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY), values) ?: error("galleria non disponibile")
+        try {
+            cr.openOutputStream(uri)!!.use(write)
+            values.clear(); values.put(MediaStore.Images.Media.IS_PENDING, 0)
+            cr.update(uri, values, null, null)
+        } catch (e: Exception) { cr.delete(uri, null, null); throw e }
+        return uri
+    }
+
     /** La foto, o il fotogramma del video all'istante [tUs], ridotti a [side]. */
     fun load(ctx: Context, item: CollageItem, side: Int, tUs: Long): Bitmap? =
         if (item.video) videoFrame(ctx, item, CollagePlan.videoTimeUs(item, tUs), side) else loadPhoto(ctx, item.uri, side)
@@ -498,6 +564,7 @@ object CollageRenderer {
      * in anteprima e nel video esportato. Restituisce la misura in pixel.
      */
     fun renderVideo(ctx: Context, spec: CollageSpec, out: File, caption: Typeface?, onProgress: (Float) -> Unit): Pair<Int, Int> {
+        DesignFonts.init(ctx)
         val t = CollageTemplates.byId(spec.templateId, spec.aspect) ?: error("modello non trovato")
         val (w, h) = videoSize(spec)
         val frameUs = 1_000_000L / FPS

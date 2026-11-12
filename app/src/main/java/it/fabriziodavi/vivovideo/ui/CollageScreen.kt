@@ -62,7 +62,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
 import it.fabriziodavi.vivovideo.engine.CollageRenderer
+import it.fabriziodavi.vivovideo.engine.DesignFonts
+import it.fabriziodavi.vivovideo.media.PhotoPlace
+import it.fabriziodavi.vivovideo.model.DOrient
+import it.fabriziodavi.vivovideo.model.DText
+import it.fabriziodavi.vivovideo.model.Design
+import it.fabriziodavi.vivovideo.model.DesignMeta
+import it.fabriziodavi.vivovideo.model.DesignTexts
+import it.fabriziodavi.vivovideo.model.PrintFormat
 import it.fabriziodavi.vivovideo.engine.TextRenderer
 import it.fabriziodavi.vivovideo.model.CollageAspect
 import it.fabriziodavi.vivovideo.model.CollageBg
@@ -80,6 +90,9 @@ import kotlinx.coroutines.withContext
 
 private enum class CollageTab(val label: String) { MODELS("Modelli"), STYLE("Stile"), MOTION("Movimento"), PHOTOS("Foto e formato") }
 
+/** Le famiglie in ordine: prima quelle grafiche (nuove), poi quelle a celle. */
+private fun familyOrder(t: CollageTemplate): Int = t.design?.family?.ordinal ?: (100 + t.family.ordinal)
+
 /**
  * Collage di foto e video: si sceglie il modello (centinaia, divisi per famiglia, già con le tue foto dentro), lo stile,
  * il movimento e il formato; si tocca una foto per scambiarla con un'altra o spostarla nella cella.
@@ -93,7 +106,8 @@ fun CollageScreen(vm: EditorViewModel) {
     BackHandler(enabled = busy == null) { vm.closeCollage() }
     val template = vm.collageTemplate() ?: CollageTemplates.forCount(spec.items.size, spec.aspect).first()
     val thumbs = vm.collageThumbs
-    val face = remember { TextRenderer.typeface(ctx, TextFont.ELEGANTE) }
+    val face = remember { DesignFonts.init(ctx); TextRenderer.typeface(ctx, TextFont.ELEGANTE) }
+    var printing by remember { mutableStateOf(false) }
     var tab by remember { mutableStateOf(CollageTab.MODELS) }
     var selected by remember { mutableIntStateOf(-1) }
     var playing by remember { mutableStateOf(false) }
@@ -110,7 +124,7 @@ fun CollageScreen(vm: EditorViewModel) {
 
         // Anteprima: grande quanto lo spazio lo permette, con il formato giusto.
         Box(Modifier.fillMaxWidth().weight(1f).padding(horizontal = 12.dp), contentAlignment = Alignment.Center) {
-            CollagePreview(spec, template, thumbs, face, selected, playing, frames(),
+            CollagePreview(spec, template, thumbs, face, selected, playing, frames(), vm.collageMaskTick,
                 onTap = { cell ->
                     when {
                         cell < 0 -> selected = -1
@@ -133,12 +147,12 @@ fun CollageScreen(vm: EditorViewModel) {
 
         // Schede.
         Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp)) {
-            Segmented(CollageTab.entries, tab, { it.label }, enabled = busy == null) { tab = it }
+            Segmented(CollageTab.entries, tab, { if (it == CollageTab.STYLE && template.design != null) "Scritte" else it.label }, enabled = busy == null) { tab = it }
         }
         Box(Modifier.fillMaxWidth().height(250.dp).padding(horizontal = 12.dp)) {
             when (tab) {
                 CollageTab.MODELS -> ModelsPanel(spec, template, thumbs, face, busy == null) { vm.chooseCollageTemplate(it); selected = -1 }
-                CollageTab.STYLE -> StylePanel(vm, spec)
+                CollageTab.STYLE -> if (template.design != null) DesignPanel(vm, spec, template.design) else StylePanel(vm, spec)
                 CollageTab.MOTION -> MotionPanel(vm, spec)
                 CollageTab.PHOTOS -> PhotosPanel(vm, spec, thumbs, onAdd = { adder.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo)) })
             }
@@ -154,13 +168,98 @@ fun CollageScreen(vm: EditorViewModel) {
             }
         } else {
             Row(Modifier.fillMaxWidth().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                SecondaryButton("Salva immagine", Modifier.weight(1f)) { vm.saveCollageImage() }
+                SecondaryButton("Immagine", Modifier.weight(0.8f)) { vm.saveCollageImage() }
+                SecondaryButton("Stampa", Modifier.weight(0.7f)) { playing = false; printing = true }
                 PrimaryButton(when (vm.collageTarget) {
                     is EditorViewModel.CollageTarget.Edit -> "Aggiorna nel video"
                     EditorViewModel.CollageTarget.Add -> "Aggiungi al video"
                     EditorViewModel.CollageTarget.NewProject -> "Crea il video"
-                }, Modifier.weight(1f)) { playing = false; vm.finishCollageVideo() }
+                }, Modifier.weight(1.2f)) { playing = false; vm.finishCollageVideo() }
             }
+        }
+    }
+    if (printing) PrintDialog(spec, onDismiss = { printing = false }) { fmt, shop -> printing = false; vm.printCollage(fmt, shop) }
+}
+
+/** Formato di stampa e dove si stampa. */
+@Composable
+private fun PrintDialog(spec: CollageSpec, onDismiss: () -> Unit, onPrint: (PrintFormat, Boolean) -> Unit) {
+    val formats = remember(spec.aspect) { PrintFormat.forAspect(spec.aspect) }
+    var fmt by remember { mutableStateOf(formats.firstOrNull { it == PrintFormat.A4 || it == PrintFormat.S20 || it == PrintFormat.L15x10 } ?: formats.first()) }
+    var shop by remember { mutableStateOf(true) }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = VV.Raised,
+        title = { Text("Pronto da stampare", style = MaterialTheme.typography.titleSmall) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                PanelLabel("Formato")
+                Row(Modifier.horizontalScroll(rememberScrollState())) { PillRow(formats, fmt, { it.label }) { fmt = it } }
+                PanelLabel("Dove lo stampi")
+                Segmented(listOf(true, false), shop, { if (it) "Negozio o sito" else "Stampante di casa" }) { shop = it }
+                val (w, h, dpi) = fmt.pixels(shop)
+                Hint(if (shop) "$w×$h pixel a $dpi dpi, con 3 mm di margine di taglio per lato: al negozio scegli «al vivo» o «senza bordo»."
+                    else "$w×$h pixel a $dpi dpi, con un bordo bianco di 4 mm: la stampante di casa non arriva al bordo del foglio.")
+                if (spec.aspect.orient == DOrient.PORTRAIT && spec.aspect != CollageAspect.PHOTO && spec.aspect != CollageAspect.PAPER)
+                    Hint("Il modello si adatta al foglio: per vedere prima com'è, scegli il formato 10×15 o A4 in «Foto e formato».")
+            }
+        },
+        confirmButton = { TextButton(onClick = { onPrint(fmt, shop) }) { Text("Salva per la stampa", color = VV.Tally) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Annulla", color = VV.Dim) } },
+    )
+}
+
+/** Scritte (tutte modificabili, con data e luogo già presi dalle foto), colori e persona davanti al titolo. */
+@Composable
+private fun DesignPanel(vm: EditorViewModel, spec: CollageSpec, d: Design) {
+    val ctx = LocalContext.current
+    val colors = OutlinedTextFieldDefaults.colors(
+        focusedBorderColor = VV.Tally, unfocusedBorderColor = VV.Line, cursorColor = VV.Tally, focusedTextColor = VV.Text, unfocusedTextColor = VV.Text,
+    )
+    val meta = remember(spec.items) { DesignMeta.of(spec.items) }
+    var locTick by remember { mutableIntStateOf(0) }
+    val locLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { ok -> locTick++; if (ok) vm.refreshCollagePlaces() }
+    val wantsPlace = remember(d) { d.els.any { e -> (e is DText && e.text.contains("{luogo")) } }
+    val locMissing = remember(locTick) { !PhotoPlace.locationAllowed(ctx) }
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        if (d.hint.isNotEmpty()) Hint(d.hint)
+        if (wantsPlace && locMissing) {
+            SecondaryButton("Usa il luogo delle foto (GPS)", Modifier.fillMaxWidth()) { locLauncher.launch(android.Manifest.permission.ACCESS_MEDIA_LOCATION) }
+        }
+        PanelLabel("Colore")
+        ColorDots(d.accents, spec.accent ?: d.accents.first()) { vm.setCollageAccent(it) }
+        if (d.accents2.isNotEmpty()) {
+            PanelLabel("Secondo colore")
+            ColorDots(d.accents2, spec.accent2 ?: d.accents2.first()) { vm.setCollageAccent(it, second = true) }
+        }
+        if (d.hasBehind) ToggleRow("La persona davanti al titolo", spec.behind) { vm.setCollageBehind(it) }
+        ToggleRow("Grana della pellicola", spec.style.grain || d.grain, enabled = !d.grain) { on -> vm.updateCollage { it.copy(style = it.style.copy(grain = on)) } }
+        PanelLabel("Scritte · vuota = torna quella proposta")
+        d.words.forEach { w ->
+            var text by remember(spec.templateId, w.id) { mutableStateOf(spec.texts[w.id] ?: DesignTexts.word(w, spec, meta)) }
+            OutlinedTextField(value = text, onValueChange = { v -> text = v.take(9); vm.setCollageText(w.id, text) }, singleLine = true, colors = colors,
+                modifier = Modifier.fillMaxWidth(), label = { Text("${w.label} (una foto per lettera)", color = VV.Dim) })
+        }
+        d.texts.forEach { t ->
+            val proposed = DesignTexts.fill(t.text, meta)
+            var text by remember(spec.templateId, t.id) { mutableStateOf(spec.texts[t.id] ?: proposed) }
+            OutlinedTextField(
+                value = text, onValueChange = { v -> text = v.take(120); vm.setCollageText(t.id, if (text == proposed) "" else text) },
+                singleLine = !t.text.contains('\n') && !t.wrap, colors = colors, modifier = Modifier.fillMaxWidth(),
+                label = { Text(t.label, color = VV.Dim) },
+            )
+        }
+        Spacer(Modifier.height(4.dp))
+    }
+}
+
+@Composable
+private fun ColorDots(options: List<Long>, current: Long, onPick: (Long) -> Unit) {
+    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        options.forEach { c ->
+            val on = c == current
+            Box(Modifier.size(36.dp).clip(CircleShape).background(Color(c.toInt())).border(if (on) 3.dp else 1.dp, if (on) VV.Tally else VV.Line, CircleShape)
+                .clickable { onPick(c) }.semantics { contentDescription = "Colore" })
         }
     }
 }
@@ -169,7 +268,7 @@ fun CollageScreen(vm: EditorViewModel) {
 @Composable
 private fun CollagePreview(
     spec: CollageSpec, template: CollageTemplate, thumbs: Map<String, Bitmap>, face: android.graphics.Typeface?, selected: Int, playing: Boolean,
-    frames: CollageRenderer.Frames, onTap: (Int) -> Unit, onDrag: (Float, Float) -> Unit,
+    frames: CollageRenderer.Frames, maskTick: Int, onTap: (Int) -> Unit, onDrag: (Float, Float) -> Unit,
 ) {
     var box by remember { mutableStateOf(IntSize.Zero) }
     val ratio = spec.aspect.ratio
@@ -178,7 +277,7 @@ private fun CollagePreview(
     val curOnTap by rememberUpdatedState(onTap)
     val curOnDrag by rememberUpdatedState(onDrag)
     // Immagine ferma, rifatta a ogni modifica.
-    val still by produceState<Bitmap?>(null, spec, template, thumbs, selected, box) {
+    val still by produceState<Bitmap?>(null, spec, template, thumbs, selected, box, maskTick) {
         if (box.width <= 0) return@produceState
         value = withContext(Dispatchers.Default) {
             val (w, h) = previewSize(spec.aspect, box)
@@ -250,14 +349,15 @@ private fun ModelsPanel(
     spec: CollageSpec, current: CollageTemplate, thumbs: Map<String, Bitmap>, face: android.graphics.Typeface?, enabled: Boolean,
     onPick: (CollageTemplate) -> Unit,
 ) {
-    val all = remember(spec.items.size, spec.aspect) { CollageTemplates.forCount(spec.items.size, spec.aspect) }
-    val families = remember(all) { all.map { it.family }.distinct() }
-    var fam by remember(families) { mutableStateOf(if (current.family in families) current.family else families.first()) }
+    val all = remember(spec.items.size, spec.aspect) { CollageTemplates.forCount(spec.items.size, spec.aspect).sortedBy { familyOrder(it) } }
+    val families = remember(all) { all.map { it.familyLabel }.distinct() }
+    var fam by remember(families) { mutableStateOf(if (current.familyLabel in families) current.familyLabel else families.first()) }
+    val shown = all.filter { it.familyLabel == fam }
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        PillRow(families, fam, { "${it.label} ${all.count { t -> t.family == it }}" }, enabled) { fam = it }
-        Hint(fam.hint)
+        PillRow(families, fam, { f -> "$f ${all.count { it.familyLabel == f }}" }, enabled) { fam = it }
+        Hint(shown.firstOrNull()?.design?.family?.hint ?: shown.firstOrNull()?.family?.hint ?: "")
         LazyVerticalGrid(GridCells.Adaptive(76.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(all.filter { it.family == fam }, key = { it.id }) { t ->
+            items(shown, key = { it.id }) { t ->
                 TemplateThumb(t, spec, thumbs, face, t.id == current.id, enabled) { onPick(t) }
             }
         }
@@ -271,7 +371,8 @@ private fun TemplateThumb(t: CollageTemplate, spec: CollageSpec, thumbs: Map<Str
         value = withContext(Dispatchers.Default) {
             val r = spec.aspect.ratio
             val (w, h) = if (r < 1) (150 * r).toInt() to 150 else 150 to (150 / r).toInt()
-            val s = spec.copy(templateId = t.id, style = if (spec.style.bg == CollageBg.BLUR) t.style.copy(bg = CollageBg.BLUR) else t.style, motion = t.motion)
+            val s = spec.copy(templateId = t.id, style = if (spec.style.bg == CollageBg.BLUR && t.design == null) t.style.copy(bg = CollageBg.BLUR) else t.style,
+                motion = t.motion, accent = null, accent2 = null)
             Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888).also { b ->
                 CollageRenderer.draw(Canvas(b), w, h, t, s, s.durationUs, true, { i, _ -> s.items.getOrNull(i)?.let { thumbs[it.uri] } }, face)
             }

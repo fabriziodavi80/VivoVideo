@@ -23,8 +23,8 @@ data class GalleryItem(
 /** Lettura di album e contenuti dalla galleria del telefono (MediaStore). */
 object Gallery {
     val permissions: Array<String> = if (Build.VERSION.SDK_INT >= 34)
-        arrayOf(Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO, Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED)
-    else arrayOf(Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO)
+        arrayOf(Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO, Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED, Manifest.permission.ACCESS_MEDIA_LOCATION)
+    else arrayOf(Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO, Manifest.permission.ACCESS_MEDIA_LOCATION)
 
     /** Accesso completo (tutti gli album) o solo ad alcune foto scelte. */
     fun fullAccess(ctx: Context): Boolean =

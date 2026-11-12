@@ -24,6 +24,7 @@ import it.fabriziodavi.vivovideo.model.CollageAspect
 import it.fabriziodavi.vivovideo.model.CollageItem
 import it.fabriziodavi.vivovideo.model.CollageMotion
 import it.fabriziodavi.vivovideo.model.CollageSpec
+import it.fabriziodavi.vivovideo.model.PrintFormat
 import it.fabriziodavi.vivovideo.model.CollageStyle
 import it.fabriziodavi.vivovideo.model.CollageTemplates
 import it.fabriziodavi.vivovideo.engine.Whisper
@@ -636,6 +637,43 @@ class DeviceTest {
         ctx.contentResolver.openInputStream(img)!!.use { android.graphics.BitmapFactory.decodeStream(it, null, o) }
         assertEquals(2160 to 3840, o.outWidth to o.outHeight)
         ctx.contentResolver.delete(img, null, null)
+    }
+
+    @Test fun graphicCollagePrintAndVideo() {
+        // Modello grafico "Uscita in bici" (quadrato) con una foto e un video: il video ha i numeri che contano e dura giusto;
+        // la copertina A4 per il negozio esce a 300 dpi con il margine di taglio, la risoluzione scritta nel file.
+        val items = listOf(
+            CollageItem(photo.toString(), width = 800, height = 600),
+            CollageItem(videoA.toString(), video = true, width = W, height = H, sourceDurationUs = 6_000_000),
+        )
+        val ride = CollageSpec("x-bento-ride", CollageAspect.SQUARE, items, motion = CollageMotion.CASCADE, durationUs = 3_000_000, texts = mapOf("title" to "Prova"))
+        val out = File(dir(), "collage_design.mp4").apply { delete() }
+        val (w, h) = CollageRenderer.renderVideo(ctx, ride, out, null) {}
+        assertEquals("quadrato", w, h)
+        val r = MediaMetadataRetriever()
+        try {
+            r.setDataSource(out.absolutePath)
+            val ms = r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)!!.toLong()
+            assertTrue("durata $ms ms", abs(ms - 3000) < 200)
+            // A fine video il riquadro dei km è arancione (il colore del modello).
+            val f = r.getFrameAtTime(2_900_000, MediaMetadataRetriever.OPTION_CLOSEST)!!
+            val px = f.getPixel((f.width * 0.93f).toInt(), (f.height * 0.09f).toInt())
+            assertTrue("riquadro arancione: ${Integer.toHexString(px)}", Color.red(px) > 200 && Color.green(px) in 70..150 && Color.blue(px) < 80)
+        } finally { r.release() }
+        val cover = CollageSpec("x-cover", CollageAspect.PAPER, items.take(1))
+        val (uri, pw, ph) = CollageRenderer.savePrint(ctx, cover, PrintFormat.A4, shop = true, caption = null)
+        assertEquals(PrintFormat.A4.pixels(true).let { it.first to it.second }, pw to ph)
+        val o = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        ctx.contentResolver.openInputStream(uri)!!.use { android.graphics.BitmapFactory.decodeStream(it, null, o) }
+        assertEquals(pw to ph, o.outWidth to o.outHeight)
+        ctx.contentResolver.openInputStream(uri)!!.use { s -> assertEquals("300/1", android.media.ExifInterface(s).getAttribute(android.media.ExifInterface.TAG_X_RESOLUTION)) }
+        ctx.contentResolver.delete(uri, null, null)
+        // Stampante di casa: bordo bianco attorno.
+        val (home, hw, hh) = CollageRenderer.savePrint(ctx, cover, PrintFormat.P10x15, shop = false, caption = null)
+        val bmp = ctx.contentResolver.openInputStream(home)!!.use { android.graphics.BitmapFactory.decodeStream(it) }
+        assertEquals(hw to hh, bmp.width to bmp.height)
+        assertTrue("bordo bianco", Color.red(bmp.getPixel(5, hh / 2)) > 240 && Color.blue(bmp.getPixel(5, hh / 2)) > 240)
+        ctx.contentResolver.delete(home, null, null)
     }
 
     // ---- Prove mirate per isolare i blocchi ----

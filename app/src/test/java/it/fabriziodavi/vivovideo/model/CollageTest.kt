@@ -33,7 +33,7 @@ class CollageTest {
     }
 
     @Test fun cellsStayInsideTheFrame() {
-        for (asp in CollageAspect.entries) for (t in CollageTemplates.all(asp)) for (c in t.cells) {
+        for (asp in CollageAspect.entries) for (t in CollageTemplates.all(asp).filter { it.design == null }) for (c in t.cells) {
             // Le polaroid hanno la cornice attorno (larga 1,15 e alta 1,3 volte la foto) e sono un po' storte.
             val fw = if (c.frame == CellFrame.NONE) c.w else c.w * 1.15f
             val fh = if (c.frame == CellFrame.NONE) c.h else c.h * 1.3f
@@ -80,7 +80,7 @@ class CollageTest {
 
     @Test fun everythingIsInPlaceAtTheEnd() {
         val dur = 4_000_000L
-        for (m in CollageMotion.entries) for (t in CollageTemplates.forCount(6, CollageAspect.STORY)) {
+        for (m in CollageMotion.entries) for (t in CollageTemplates.forCount(6, CollageAspect.STORY).filter { it.design == null }) {
             t.cells.forEachIndexed { i, c ->
                 val p = CollageAnim.pose(m, i, t.count, c, (dur * 0.7).toLong(), dur, kenBurns = false)
                 assertTrue("$m ${t.id} $i: $p", abs(p.alpha - 1) < 1e-3 && abs(p.scale - 1) < 1e-2 && abs(p.dx) < 1e-3 && abs(p.dy) < 1e-3 && abs(p.rot) < 1e-2 && p.reveal > 0.999f)
@@ -88,7 +88,7 @@ class CollageTest {
             }
         }
         // All'inizio le foto non ci sono ancora (tranne con i movimenti senza entrata).
-        val c = CollageTemplates.forCount(4, CollageAspect.STORY).first().cells[3]
+        val c = CollageTemplates.forCount(4, CollageAspect.STORY).first { it.design == null }.cells[3]
         assertEquals(0f, CollageAnim.pose(CollageMotion.CASCADE, 3, 4, c, 0, dur, true).alpha, 1e-6f)
         assertEquals(0f, CollageAnim.pose(CollageMotion.WIPE, 3, 4, c, 0, dur, true).reveal, 1e-6f)
         assertTrue(CollageAnim.pose(CollageMotion.DROP, 0, 4, c, 0, dur, true).dy < -1f)

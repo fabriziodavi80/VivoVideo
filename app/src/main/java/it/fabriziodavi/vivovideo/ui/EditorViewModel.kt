@@ -132,6 +132,11 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import java.io.File
 import it.fabriziodavi.vivovideo.engine.CollageRenderer
+import it.fabriziodavi.vivovideo.engine.DesignFonts
+import it.fabriziodavi.vivovideo.engine.SubjectMasks
+import it.fabriziodavi.vivovideo.model.DOrient
+import it.fabriziodavi.vivovideo.model.PrintFormat
+import it.fabriziodavi.vivovideo.media.PhotoPlace
 import it.fabriziodavi.vivovideo.engine.TextRenderer
 import it.fabriziodavi.vivovideo.model.TextFont
 import it.fabriziodavi.vivovideo.model.CollageAspect
@@ -1929,13 +1934,54 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     /** Foto e video scelti → elementi del collage (le foto raddrizzate nella cartella dell'app). */
     private fun collageItems(ctx: Application, uris: List<Uri>): List<CollageItem> = uris.mapNotNull { u ->
         runCatching { ctx.contentResolver.takePersistableUriPermission(u, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
-        if (ctx.contentResolver.getType(u)?.startsWith("image/") == true) runCatching {
+        val photo = ctx.contentResolver.getType(u)?.startsWith("image/") == true
+        // Quando e dove (dalla foto originale): servono alle scritte automatiche dei modelli grafici.
+        val (taken, place) = PhotoPlace.read(ctx, u, photo)
+        if (photo) runCatching {
             val ph = importPhoto(ctx, u)
-            CollageItem(Uri.fromFile(ph.file).toString(), width = ph.width, height = ph.height)
+            CollageItem(Uri.fromFile(ph.file).toString(), width = ph.width, height = ph.height, takenMs = taken, place = place, source = u.toString())
         }.getOrNull() else runCatching {
             val info = readVideoInfo(ctx, u)
-            CollageItem(u.toString(), video = true, width = info.displayWidth, height = info.displayHeight, sourceDurationUs = info.durationMs * 1000)
+            CollageItem(u.toString(), video = true, width = info.displayWidth, height = info.displayHeight, sourceDurationUs = info.durationMs * 1000, takenMs = taken, place = place)
         }.getOrNull()
+    }
+
+    /** Rilegge data e luogo delle foto (dopo aver dato il permesso per il luogo). */
+    fun refreshCollagePlaces() {
+        val s0 = collage ?: return
+        val ctx = getApplication<Application>()
+        viewModelScope.launch {
+            val items = withContext(Dispatchers.IO) {
+                s0.items.map { it2 ->
+                    val src = it2.source.ifEmpty { it2.uri }
+                    if (src.startsWith("file:")) it2 else PhotoPlace.read(ctx, Uri.parse(src), !it2.video).let { (t, pl) -> it2.copy(takenMs = if (t > 0) t else it2.takenMs, place = pl.ifEmpty { it2.place }) }
+                }
+            }
+            updateCollage { s -> s.copy(items = s.items.map { cur -> items.firstOrNull { it.uri == cur.uri }?.let { cur.copy(takenMs = it.takenMs, place = it.place) } ?: cur }) }
+            val found = items.count { it.place.isNotEmpty() }
+            message = if (found > 0) "Luoghi trovati in $found foto: le scritte si sono aggiornate." else "Queste foto non hanno il luogo (GPS) salvato."
+        }
+    }
+
+    /** Cresce quando arriva lo scontorno di una foto (per ridisegnare l'anteprima con la persona davanti al titolo). */
+    var collageMaskTick by mutableStateOf(0)
+        private set
+
+    /** Scontorna le foto che il modello grafico vuole davanti al titolo (una volta per foto, in sottofondo). */
+    private fun ensureCollageMasks() {
+        val s = collage ?: return
+        val d = CollageTemplates.byId(s.templateId, s.aspect)?.design ?: return
+        if (!s.behind) return
+        val slots = d.els.filterIsInstance<it.fabriziodavi.vivovideo.model.DText>().filter { it.behind >= 0 }.map { it.behind }
+        val ctx = getApplication<Application>()
+        for (slot in slots) {
+            val item = s.items.getOrNull(CollagePlan.itemFor(slot, s.items.size)) ?: continue
+            if (item.video || SubjectMasks.has(item.uri)) continue
+            val thumb = collageThumbs[item.uri] ?: continue
+            viewModelScope.launch {
+                if (SubjectMasks.compute(ctx, item.uri, thumb)) collageMaskTick++
+            }
+        }
     }
 
     private suspend fun loadCollageThumbs(ctx: Application, items: List<CollageItem>) {
@@ -1957,9 +2003,13 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             loadCollageThumbs(ctx, items)
             busy = null
             val aspect = project?.takeIf { intoProject }?.let { p -> factory.outputSize(p, null).let { (w, h) -> CollageAspect.closest(w, h) } } ?: CollageAspect.STORY
-            val t = CollageTemplates.forCount(items.size, aspect).first()
+            DesignFonts.init(ctx)
+            // Si parte da un modello grafico con tante foto quante ne hai scelte (se c'è).
+            val options = CollageTemplates.forCount(items.size, aspect)
+            val t = options.firstOrNull { it.design?.slots == items.size } ?: options.first()
             collageTarget = if (intoProject) CollageTarget.Add else CollageTarget.NewProject
             collage = CollageSpec(t.id, aspect, items, t.style, t.motion)
+            ensureCollageMasks()
             if (uris.size > CollageSpec.MAX_ITEMS) message = "Il collage tiene al massimo ${CollageSpec.MAX_ITEMS} foto: ho preso le prime ${CollageSpec.MAX_ITEMS}."
         }
     }
@@ -1970,9 +2020,11 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         val ctx = getApplication<Application>()
         pause()
         viewModelScope.launch {
+            DesignFonts.init(ctx)
             loadCollageThumbs(ctx, spec.items)
             collageTarget = CollageTarget.Edit(clipId)
             collage = spec
+            ensureCollageMasks()
         }
     }
 
@@ -1981,14 +2033,51 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     fun updateCollage(f: (CollageSpec) -> CollageSpec) { collage = collage?.let(f) }
 
     /** Modello scelto: prende il suo stile e il suo movimento (lo sfondo sfocato resta, se l'avevi scelto). */
-    fun chooseCollageTemplate(t: CollageTemplate) = updateCollage { s ->
-        s.copy(templateId = t.id, style = if (s.style.bg == CollageBg.BLUR) t.style.copy(bg = CollageBg.BLUR) else t.style, motion = t.motion)
+    fun chooseCollageTemplate(t: CollageTemplate) {
+        updateCollage { s ->
+            // Le scritte cambiate restano (se il nuovo modello ha le stesse), i colori ripartono da quelli del modello.
+            s.copy(templateId = t.id, style = if (s.style.bg == CollageBg.BLUR && t.design == null) t.style.copy(bg = CollageBg.BLUR) else t.style,
+                motion = t.motion, accent = null, accent2 = null)
+        }
+        ensureCollageMasks()
+    }
+
+    /** Cambia una scritta del modello grafico (vuota = torna quella del modello). */
+    fun setCollageText(id: String, text: String) = updateCollage { s ->
+        s.copy(texts = if (text.isEmpty()) s.texts - id else s.texts + (id to text))
+    }
+
+    fun setCollageAccent(c: Long?, second: Boolean = false) = updateCollage { s -> if (second) s.copy(accent2 = c) else s.copy(accent = c) }
+
+    fun setCollageBehind(on: Boolean) { updateCollage { it.copy(behind = on) }; ensureCollageMasks() }
+
+    /** Salva il collage pronto da stampare nel formato [fmt] (negozio con margine di taglio, o stampante di casa). */
+    fun printCollage(fmt: PrintFormat, shop: Boolean) {
+        val spec = collage ?: return
+        val ctx = getApplication<Application>()
+        viewModelScope.launch {
+            busy = "Preparo la stampa ${fmt.label}…"
+            val r = withContext(Dispatchers.Default) { runCatching { CollageRenderer.savePrint(ctx, spec, fmt, shop, collageFace(ctx)) } }
+            busy = null
+            r.onSuccess { (_, w, h) ->
+                val dpi = fmt.pixels(shop).third
+                message = "Pronto da stampare ${fmt.label}: ${w}×$h pixel a $dpi dpi (Immagini → VivoVideo)." +
+                    if (shop) " Ha 3 mm di margine di taglio per lato: al negozio scegli «al vivo» o «senza bordo»." else " Ha un bordo bianco di 4 mm per la stampante di casa."
+                Diary.log("Collage per la stampa: ${spec.templateId}, ${fmt.label}, ${if (shop) "negozio" else "casa"}, ${w}×$h a $dpi dpi.")
+            }.onFailure { message = "Stampa non preparata: ${it.message ?: it.javaClass.simpleName}" }
+        }
     }
 
     /** Altro formato: lo stesso modello se c'è, altrimenti il primo per quel numero di foto. */
     fun setCollageAspect(a: CollageAspect) = updateCollage { s ->
-        val t = CollageTemplates.byId(s.templateId, a) ?: CollageTemplates.forCount(s.items.size, a).first()
-        s.copy(aspect = a, templateId = t.id)
+        val old = CollageTemplates.byId(s.templateId, s.aspect)
+        val options = CollageTemplates.forCount(s.items.size, a)
+        // Lo stesso modello se va bene per il nuovo formato, altrimenti uno della stessa famiglia.
+        val t = CollageTemplates.byId(s.templateId, a)
+            ?: options.firstOrNull { old?.design != null && it.design?.family == old.design.family }
+            ?: options.firstOrNull { old?.design == null && it.design == null && it.family == old?.family }
+            ?: options.first()
+        if (t.id == s.templateId) s.copy(aspect = a) else s.copy(aspect = a, templateId = t.id, style = t.style, motion = t.motion, accent = null, accent2 = null)
     }
 
     /** Foto aggiunte: si passa a un modello con il nuovo numero di celle, della stessa famiglia se possibile. */
@@ -2003,6 +2092,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             busy = null
             if (more.isEmpty()) return@launch
             setCollageItems(s0.items + more)
+            ensureCollageMasks()
         }
     }
 
@@ -2013,6 +2103,8 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private fun setCollageItems(items: List<CollageItem>) = updateCollage { s ->
+        // I modelli grafici vanno bene con qualsiasi numero di foto.
+        if (CollageTemplates.byId(s.templateId, s.aspect)?.design != null) return@updateCollage s.copy(items = items)
         val fam = CollageTemplates.byId(s.templateId, s.aspect)?.family
         val options = CollageTemplates.forCount(items.size, s.aspect)
         val t = options.firstOrNull { it.family == fam } ?: options.first()
@@ -2020,9 +2112,12 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /** Scambia le foto delle celle [a] e [b]. */
-    fun swapCollageCells(a: Int, b: Int) = updateCollage { s ->
-        val ia = CollagePlan.itemFor(a, s.items.size); val ib = CollagePlan.itemFor(b, s.items.size)
-        if (ia < 0 || ib < 0 || ia == ib) s else s.copy(items = s.items.toMutableList().also { l -> val x = l[ia]; l[ia] = l[ib]; l[ib] = x })
+    fun swapCollageCells(a: Int, b: Int) {
+        updateCollage { s ->
+            val ia = CollagePlan.itemFor(a, s.items.size); val ib = CollagePlan.itemFor(b, s.items.size)
+            if (ia < 0 || ib < 0 || ia == ib) s else s.copy(items = s.items.toMutableList().also { l -> val x = l[ia]; l[ia] = l[ib]; l[ib] = x })
+        }
+        ensureCollageMasks()
     }
 
     /** Sposta o ingrandisce l'inquadratura della foto nella cella [cell]. */
@@ -2076,7 +2171,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             collage = null
             when (target) {
                 CollageTarget.NewProject -> {
-                    val fmt = when (spec.aspect) { CollageAspect.LANDSCAPE -> VideoFormat.HORIZONTAL; CollageAspect.SQUARE -> VideoFormat.SQUARE; else -> VideoFormat.VERTICAL }
+                    val fmt = when (spec.aspect.orient) { DOrient.LANDSCAPE -> VideoFormat.HORIZONTAL; DOrient.SQUARE -> VideoFormat.SQUARE; else -> VideoFormat.VERTICAL }
                     val p = Project(name = "Collage ${projects.size + 1}", format = fmt).addClips(listOf(clip)).copy(originals = listOf(clip))
                     store.save(p)
                     openProject(p)

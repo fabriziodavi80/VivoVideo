@@ -22,7 +22,12 @@ import kotlin.math.sqrt
 
 @Serializable
 enum class CollageAspect(val label: String, val w: Int, val h: Int) {
-    STORY("9:16", 9, 16), PORTRAIT("4:5", 4, 5), SQUARE("1:1", 1, 1), LANDSCAPE("16:9", 16, 9);
+    STORY("9:16", 9, 16), PORTRAIT("4:5", 4, 5), SQUARE("1:1", 1, 1), LANDSCAPE("16:9", 16, 9),
+    /** Formati da stampa: 10×15 (anche 20×30, 30×45), A4 (anche A3), 15×10 orizzontale. */
+    PHOTO("10×15", 2, 3), PAPER("A4", 1000, 1414), PHOTO_LAND("15×10", 3, 2);
+
+    /** Verticale, quadrato o orizzontale (per i modelli grafici). */
+    val orient: DOrient get() = when { w < h -> DOrient.PORTRAIT; w == h -> DOrient.SQUARE; else -> DOrient.LANDSCAPE }
 
     /** Larghezza / altezza. */
     val ratio: Float get() = w.toFloat() / h
@@ -71,7 +76,7 @@ data class CollageCell(
 @Serializable
 enum class CollageFamily(val label: String, val hint: String) {
     GRID("Griglie", "Tutte le griglie, con lo spazio fra le foto che scegli tu"),
-    HERO("Rivista", "Una foto grande e le altre piccole, come una pagina di rivista"),
+    HERO("Grande e piccole", "Una foto grande e le altre piccole"),
     DIAGONAL("Tagli diagonali", "Foto separate da tagli obliqui, dinamiche"),
     SHAPES("Forme", "Archi, cerchi, cuore, esagoni e forme morbide su un fondo colorato"),
     POLAROID("Polaroid", "Photo dump: polaroid sparse sulla carta, con il nastro adesivo"),
@@ -146,8 +151,12 @@ data class CollageTemplate(
     val motion: CollageMotion,
     val decor: CollageDecor = CollageDecor.NONE,
     val captionY: Float = 0.92f,
+    /** Modello grafico (pagina composta con scritte e decorazioni): lo disegna [DesignRenderer]. */
+    val design: Design? = null,
 ) {
     val count: Int get() = cells.size
+    /** Nome della famiglia (quelle grafiche e quelle a celle). */
+    val familyLabel: String get() = design?.family?.label ?: family.label
 }
 
 /** Una foto o un video del collage: [panX]/[panY] spostano l'inquadratura nella cella (-1..1), [zoom] ≥ 1. */
@@ -163,6 +172,11 @@ data class CollageItem(
     val panX: Float = 0f,
     val panY: Float = 0f,
     val zoom: Float = 1f,
+    /** Quando è stata scattata (millisecondi, 0 = non si sa) e dove (nome del posto, vuoto = non si sa). */
+    val takenMs: Long = 0,
+    val place: String = "",
+    /** Da dove viene la foto (galleria): per rileggere data e luogo. */
+    val source: String = "",
 )
 
 /** Tutto quello che serve per rifare il collage (resta nella clip, per modificarlo dopo). */
@@ -177,6 +191,11 @@ data class CollageSpec(
     val kenBurns: Boolean = true,
     val durationUs: Long = 4_000_000,
     val caption: String = "",
+    /** Modelli grafici: le scritte cambiate da te (per chiave), il colore e il secondo colore scelti, la persona davanti al titolo. */
+    val texts: Map<String, String> = emptyMap(),
+    val accent: Long? = null,
+    val accent2: Long? = null,
+    val behind: Boolean = true,
 ) {
     companion object {
         val DURATIONS = listOf(3_000_000L, 4_000_000L, 6_000_000L, 8_000_000L)
@@ -316,10 +335,24 @@ object CollageTemplates {
     private val cache = HashMap<CollageAspect, List<CollageTemplate>>()
 
     fun all(aspect: CollageAspect): List<CollageTemplate> = synchronized(cache) {
-        cache.getOrPut(aspect) { build(aspect.ratio) }
+        cache.getOrPut(aspect) { designs(aspect) + build(aspect.ratio) }
     }
 
-    fun forCount(n: Int, aspect: CollageAspect): List<CollageTemplate> = all(aspect).filter { it.count == n }
+    /** I modelli grafici per questo formato (verticali, quadrati o orizzontali). */
+    fun designs(aspect: CollageAspect): List<CollageTemplate> = Designs.all.filter { fits(it, aspect) }.map { d ->
+        CollageTemplate(d.id, CollageFamily.EDITORIAL, d.name, DLayout.cells(d, aspect.ratio), spaced = false,
+            style = CollageStyle(gap = 0f, bg = CollageBg.CLOUD, grain = d.grain), motion = d.motion, design = d)
+    }
+
+    /** Un modello grafico verticale va bene per 9:16, 4:5, 10×15 e A4; i quadrati anche per 4:5. */
+    fun fits(d: Design, aspect: CollageAspect): Boolean = when (d.orient) {
+        DOrient.PORTRAIT -> aspect.orient == DOrient.PORTRAIT
+        DOrient.SQUARE -> aspect == CollageAspect.SQUARE || aspect == CollageAspect.PORTRAIT
+        DOrient.LANDSCAPE -> aspect.orient == DOrient.LANDSCAPE
+    }
+
+    /** I modelli a celle per [n] foto, più tutti i modelli grafici (le foto in meno si ripetono). */
+    fun forCount(n: Int, aspect: CollageAspect): List<CollageTemplate> = all(aspect).filter { it.design != null || it.count == n }
 
     fun byId(id: String, aspect: CollageAspect): CollageTemplate? = all(aspect).firstOrNull { it.id == id }
 

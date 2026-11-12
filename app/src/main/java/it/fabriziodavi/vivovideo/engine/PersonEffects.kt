@@ -123,7 +123,7 @@ object PersonMasks {
      * Prepara il modello di scontorno di Google (servizi Google Play): se manca lo fa scaricare e aspetta
      * fino a 3 minuti. Restituisce il segmentatore pronto o null (niente servizi Google, niente internet…).
      */
-    private suspend fun preciseSegmenter(ctx: Context, onStatus: (String) -> Unit): SubjectSegmenter? = runCatching {
+    internal suspend fun preciseSegmenter(ctx: Context, onStatus: (String) -> Unit): SubjectSegmenter? = runCatching {
         val seg = SubjectSegmentation.getClient(SubjectSegmenterOptions.Builder().enableForegroundConfidenceMask().build())
         val modules = ModuleInstall.getClient(ctx)
         fun ready() = Tasks.await(modules.areModulesAvailable(seg), 20, TimeUnit.SECONDS).areModulesAvailable()
