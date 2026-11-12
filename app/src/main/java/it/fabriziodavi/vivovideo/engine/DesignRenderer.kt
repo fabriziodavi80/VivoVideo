@@ -675,6 +675,8 @@ object DesignRenderer {
         val p = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = tint(e.color, d, spec)
             if (e.stroke > 0) { style = Paint.Style.STROKE; strokeWidth = e.stroke * s }
+            // Con la sfumatura il colore pieno non conta, ma la sua trasparenza sì: deve essere opaco.
+            if (e.grad.isNotEmpty()) color = Color.BLACK
             if (e.grad.isNotEmpty()) shader = if (e.radial) android.graphics.RadialGradient(r.centerX(), r.centerY(), max(1f, max(r.width(), r.height()) / 2),
                 e.grad.map { tint(it.second, d, spec) }.toIntArray(), e.grad.map { it.first }.toFloatArray(), Shader.TileMode.CLAMP)
                 else LinearGradient(0f, r.top, 0f, r.bottom, e.grad.map { tint(it.second, d, spec) }.toIntArray(), e.grad.map { it.first }.toFloatArray(), Shader.TileMode.CLAMP)
