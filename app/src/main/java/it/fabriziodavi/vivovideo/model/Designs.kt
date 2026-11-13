@@ -726,8 +726,8 @@ object Designs {
         val gold = listOf(0xFFFFF0B8L, 0xFFD9A93BL, 0xFFFFE08AL, 0xFF9A6D16L, 0xFFF0CB66L)
         val els = arrayListOf<DEl>(
             DPattern(b(0, 0, 794, 1123, F), DPatternKind.WALL, BLACK, 0f),
-            DTorn(bk(40, -20, 330, 1030), paper, seed = 3, edges = 4, fiber = false, shadow = 14f),
-            DTorn(bk(424, 110, 330, 1040), paper, seed = 8, edges = 1, fiber = false, shadow = 14f),
+            DTorn(bk(40, -20, 330, 1030), paper, seed = 3, edges = 4, shadow = 16f),
+            DTorn(bk(424, 110, 330, 1040), paper, seed = 8, edges = 1, shadow = 16f),
         )
         for (i in 0 until 3) els += DPhoto(bk(62, 18 + i * 318, 286, 300), i)
         for (i in 0 until 3) els += DPhoto(bk(446, 150 + i * 318, 286, 300), 3 + i)
@@ -735,7 +735,7 @@ object Designs {
             DRect(bk(530, 88, 120, 40), tape, rot = -6f),
             DRect(bk(150, 985, 120, 40), tape, rot = 5f),
             DText(bk(62, 972, 286, 22), "date", "Data", "{data}", DFont.MONO_BOLD, 15f, 0xFF6B6660, DAlign.CENTER, track = 0.2f),
-            DText(bk(10, 360, 774, 400), "title", "Dedica", "80 volte auguri,\nVecio!!!", DFont.SCRIPT, 130f, WHITE, DAlign.CENTER,
+            DText(bk(-20, 340, 834, 440), "title", "Dedica", "80 volte auguri,\nVecio!!!", DFont.SCRIPT, 150f, WHITE, DAlign.CENTER,
                 line = 1.05f, rot = -18f, gradient = gold, shadow = true, count = true),
         )
         return Design("x-paper-strips", "Strisce sul muro", DesignFamily.PAPER, DOrient.PORTRAIT, 794f, 1123f, ACC,
