@@ -13,7 +13,7 @@ import kotlin.math.min
  */
 
 /** Font dei modelli grafici (file in assets/fonts, licenza OFL). */
-enum class DFont { SERIF, SERIF_IT, GROTESK, GROTESK_MED, ANTON, ARCHIVO, MONO, MONO_BOLD, HAND, SANS }
+enum class DFont { SERIF, SERIF_IT, GROTESK, GROTESK_MED, ANTON, ARCHIVO, MONO, MONO_BOLD, HAND, SANS, SCRIPT }
 
 /** Come un elemento segue il foglio quando cambia formato, su un asse. */
 /** [SCALE]: posizione e misura crescono in proporzione (griglie che riempiono il foglio). */
@@ -32,8 +32,8 @@ enum class DShape { RECT, CIRCLE, ARCH, PILL, TORN_BOTTOM, TORN_TOP, TORN }
 enum class DFilter { NONE, BW, DUOTONE, BLUR, HALFTONE }
 
 /** Carta a quadretti, fori della pellicola, grana della carta, righe del quaderno, colonne di testo di giornale. */
-/** ... [CONFETTI] coriandoli (cadono nel video), [QR] quadretti tipo codice QR (decorativo), [DISCO] palla a specchi. */
-enum class DPatternKind { GRID, SPROCKETS, PAPER, LINES, TEXTLINES, TOPO, SPEED, CONFETTI, QR, DISCO }
+/** ... [CONFETTI] coriandoli (cadono nel video), [QR] quadretti tipo codice QR (decorativo), [DISCO] palla a specchi, [WALL] muro d'intonaco rovinato sopra il colore di fondo. */
+enum class DPatternKind { GRID, SPROCKETS, PAPER, LINES, TEXTLINES, TOPO, SPEED, CONFETTI, QR, DISCO, WALL }
 
 /** Riquadro sul foglio di riferimento, con gli ancoraggi orizzontale e verticale. */
 data class DBox(val x: Float, val y: Float, val w: Float, val h: Float, val ax: Anchor = Anchor.START, val ay: Anchor = Anchor.START)

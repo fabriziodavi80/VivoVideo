@@ -20,7 +20,7 @@ object Designs {
     val all: List<Design> by lazy {
         listOf(wedding(), saveDate(), booth(), flash(), balloons(), disco(), vip(), laurea(), baby(), badge(), speaker(),
             bib(), topo(), speed(), mud(), hud(), record(), sequence(), skipass(),
-            paperTrip(), paperNews(), paperLove(), paperRecipe(), paperWall(), paperRansom(), paperSticker(), paperRiso(),
+            paperTrip(), paperNews(), paperLove(), paperRecipe(), paperStrips(), paperWall(), paperRansom(), paperSticker(), paperRiso(),
             notes(), chrome(), leak(), blue(), pearls(), thenNow(), windows(), dump(),
             cover(), reportage(), letters(), bentoTrip(), bentoRide(), year(), scrap(), stickers(), mood(), duotone(), pop(), glass(),
             sport(), love(), ticket(), route(), street(), food())
@@ -72,11 +72,11 @@ object Designs {
         accents = listOf(0xFF2340D9L, 0xFFE5432DL, 0xFFFF6FB5L, 0xFF1E4D3AL), accents2 = listOf(CREAM, BUTTER, WHITE),
         motion = CollageMotion.DROP, hint = "Save the date a colore pieno: la foto come una stampa appoggiata storta, la data gigante e un cuore a mano",
         els = listOf(
-            DPhoto(bk(127, 150, 540, 600), 0, radius = 18f, rot = 3f, border = 16f, borderColor = CREAM, shadow = 24f),
+            DPhoto(bk(152, 150, 490, 530), 0, radius = 18f, rot = 3f, border = 16f, borderColor = CREAM, shadow = 24f),
             DText(bk(40, 40, 560, 120), "kicker", "Rubrica", "Save the date", DFont.HAND, 92f, BUTTER, rot = -6f),
             DPath(bk(610, 70, 150, 140), HEART, 100f, 100f, stroke = BUTTER, width = 5f, draw = true),
-            DText(bk(0, 760, 794, 280, F), "day", "Giorno", "{gg|20}.{mese_n|06}", DFont.ANTON, 300f, ACC2, DAlign.CENTER, line = 0.9f),
-            DText(bk(40, 1000, 714, 70), "names", "Nomi", "Anna & Luca", DFont.SERIF_IT, 66f, ACC2, DAlign.CENTER),
+            DText(bk(0, 730, 794, 240, F), "day", "Giorno", "{gg|20}.{mese_n|06}", DFont.ANTON, 250f, ACC2, DAlign.CENTER, line = 0.9f),
+            DText(bk(40, 990, 714, 70), "names", "Nomi", "Anna & Luca", DFont.SERIF_IT, 66f, ACC2, DAlign.CENTER),
             DText(bk(40, 1075, 714, 26), "place", "Luogo", "{ANNO} · {luogo|Villa sul lago}", DFont.MONO_BOLD, 20f, ACC2, DAlign.CENTER, track = 0.25f, upper = true),
         ))
 
@@ -134,9 +134,9 @@ object Designs {
             DPattern(b(0, 0, 794, 1123, F), DPatternKind.CONFETTI, 0, 0f),
             DText(bk(197, 60, 400, 56), "kicker", "Rubrica", "Buon compleanno", DFont.MONO_BOLD, 24f, CREAM, DAlign.CENTER, pill = BLACK, pad = 24f, upper = true, track = 0.15f),
             DPhotoWord(bk(30, 140, 734, 610), "age", "Anni (foto dentro)", "40", DFont.ARCHIVO, 0, gap = 16f),
-            DText(bk(40, 770, 520, 220), "name", "Nome", "Marta!", DFont.SERIF_IT, 200f, BLACK, rot = -5f),
-            DPhoto(bk(560, 800, 200, 200), 2, DShape.CIRCLE, border = 10f, borderColor = WHITE, shadow = 14f, rot = 8f),
-            DPath(bk(520, 760, 70, 70), SPARKLE, 100f, 100f, fill = BLACK),
+            DText(bk(40, 780, 500, 200), "name", "Nome", "Marta!", DFont.SERIF_IT, 170f, BLACK, rot = -5f),
+            DPhoto(bk(574, 850, 190, 190), 2, DShape.CIRCLE, border = 10f, borderColor = WHITE, shadow = 14f, rot = 8f),
+            DPath(bk(560, 780, 60, 60), SPARKLE, 100f, 100f, fill = BLACK),
             DPath(bk(60, 120, 50, 50), SPARKLE, 100f, 100f, fill = BLACK),
             DText(bk(40, 1050, 714, 30), "date", "Data", "{data} · {luogo|Milano}", DFont.MONO_BOLD, 20f, BLACK, DAlign.CENTER, track = 0.2f, upper = true),
         ))
@@ -720,6 +720,29 @@ object Designs {
     }
 
     // C5 -----------------------------------------------------------------------------------------------
+    /** Due strisce di carta strappata sfalsate sul muro, le foto dentro e una dedica in corsivo dorato di traverso. */
+    private fun paperStrips(): Design {
+        val paper = 0xFFEEEBE4L; val tape = 0xC8F4F1EAL
+        val gold = listOf(0xFFFFF0B8L, 0xFFD9A93BL, 0xFFFFE08AL, 0xFF9A6D16L, 0xFFF0CB66L)
+        val els = arrayListOf<DEl>(
+            DPattern(b(0, 0, 794, 1123, F), DPatternKind.WALL, BLACK, 0f),
+            DTorn(bk(40, -20, 330, 1030), paper, seed = 3, edges = 4, fiber = false, shadow = 14f),
+            DTorn(bk(424, 110, 330, 1040), paper, seed = 8, edges = 1, fiber = false, shadow = 14f),
+        )
+        for (i in 0 until 3) els += DPhoto(bk(62, 18 + i * 318, 286, 300), i)
+        for (i in 0 until 3) els += DPhoto(bk(446, 150 + i * 318, 286, 300), 3 + i)
+        els += listOf(
+            DRect(bk(530, 88, 120, 40), tape, rot = -6f),
+            DRect(bk(150, 985, 120, 40), tape, rot = 5f),
+            DText(bk(62, 972, 286, 22), "date", "Data", "{data}", DFont.MONO_BOLD, 15f, 0xFF6B6660, DAlign.CENTER, track = 0.2f),
+            DText(bk(10, 360, 774, 400), "title", "Dedica", "80 volte auguri,\nVecio!!!", DFont.SCRIPT, 130f, WHITE, DAlign.CENTER,
+                line = 1.05f, rot = -18f, gradient = gold, shadow = true, count = true),
+        )
+        return Design("x-paper-strips", "Strisce sul muro", DesignFamily.PAPER, DOrient.PORTRAIT, 794f, 1123f, ACC,
+            accents = listOf(0xFF6E8584L, 0xFF8A7F74L, 0xFF3A3F47L, 0xFFB7A694L, 0xFF7A5C5CL), els = els, motion = CollageMotion.CASCADE,
+            hint = "Compleanni e anniversari: due strisce di carta strappata con sei foto sul muro e la dedica in corsivo dorato di traverso (gli anni contano nel video)")
+    }
+
     private fun paperWall() = Design(
         "x-paper-wall", "Manifesti", DesignFamily.PAPER, DOrient.PORTRAIT, 794f, 1123f, 0xFF8F8C86,
         accents = listOf(0xFFD93A2B, 0xFF1D4ED8, 0xFF16A34A, 0xFFE91E63), motion = CollageMotion.SLIDE, grain = true,

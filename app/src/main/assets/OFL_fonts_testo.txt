@@ -7,6 +7,7 @@ Font per i testi inclusi nell'app:
 - Permanent Marker (c) 2010 Font Diner, Inc. — Apache License 2.0
 - Instrument Serif (c) 2022 The Instrument Serif Project Authors — SIL Open Font License 1.1
 - Caveat (c) 2014 The Caveat Project Authors — SIL Open Font License 1.1
+- Great Vibes (c) 2012 The Great Vibes Project Authors — SIL Open Font License 1.1
 - Space Mono (c) 2016 The Space Mono Project Authors — SIL Open Font License 1.1
 - Bricolage Grotesque (c) 2022 The Bricolage Grotesque Project Authors — SIL Open Font License 1.1
 Testo completo delle licenze: https://openfontlicense.org e https://www.apache.org/licenses/LICENSE-2.0

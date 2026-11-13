@@ -14,6 +14,7 @@ import android.graphics.PathMeasure
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.graphics.PorterDuffXfermode
+import android.graphics.RadialGradient
 import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.Shader
@@ -80,6 +81,7 @@ object DesignFonts {
             DFont.MONO -> asset("space_mono.ttf")
             DFont.MONO_BOLD -> asset("space_mono_bold.ttf")
             DFont.HAND -> asset("caveat.ttf", "'wght' 700")
+            DFont.SCRIPT -> asset("great_vibes.ttf")
             DFont.SANS -> TextRenderer.typeface(ctx, TextFont.MODERNO)
         } ?: fallback(f)
     }
@@ -928,6 +930,28 @@ object DesignRenderer {
                     val px = cx + kotlin.math.cos(a) * rad * 0.55f; val py = cy + kotlin.math.sin(a) * rad * 0.55f
                     c.drawCircle(px, py, rad * 0.06f, Paint(p).apply { color = 0xFFFFFFFF.toInt(); setShadowLayer(rad * 0.15f, 0f, 0f, 0xFFFFFFFF.toInt()) })
                 }
+            }
+            DPatternKind.WALL -> {
+                // Intonaco: macchie chiare e scure sfumate, grana grossa, qualche graffio e i bordi più scuri.
+                c.save(); c.clipRect(r)
+                val big = max(r.width(), r.height())
+                for (i in 0 until 70) {
+                    val x = r.left + rnd(i, 61) * r.width(); val y = r.top + rnd(i, 67) * r.height()
+                    val rad = big * (0.04f + 0.2f * rnd(i, 71))
+                    val col = if (i % 2 == 0) Color.argb((18 + 30 * rnd(i, 73)).toInt(), 255, 255, 255) else Color.argb((20 + 34 * rnd(i, 79)).toInt(), 0, 0, 0)
+                    c.drawCircle(x, y, rad, Paint(Paint.ANTI_ALIAS_FLAG).apply { shader = RadialGradient(x, y, rad, col, col and 0x00FFFFFF, Shader.TileMode.CLAMP) })
+                }
+                CollageRenderer.grain(c, (r.right + 1).toInt(), (r.bottom + 1).toInt(), 5, 70)
+                CollageRenderer.grain(c, (r.right + 1).toInt(), (r.bottom + 1).toInt(), 11, 40)
+                val sc = Paint(Paint.ANTI_ALIAS_FLAG).apply { strokeWidth = max(1f, 0.9f * s); style = Paint.Style.STROKE }
+                for (i in 0 until 60) {
+                    val x = r.left + rnd(i, 83) * r.width(); val y = r.top + rnd(i, 89) * r.height()
+                    val a = rnd(i, 97) * 6.28f; val len = (8f + 40f * rnd(i, 101)) * s
+                    sc.color = if (i % 3 == 0) 0x30FFFFFF else 0x26000000
+                    c.drawLine(x, y, x + kotlin.math.cos(a) * len, y + kotlin.math.sin(a) * len, sc)
+                }
+                c.drawRect(r, Paint().apply { shader = RadialGradient(r.centerX(), r.centerY(), big * 0.75f, intArrayOf(0, 0, 0x66000000), floatArrayOf(0f, 0.55f, 1f), Shader.TileMode.CLAMP) })
+                c.restore()
             }
             DPatternKind.PAPER -> {
                 // Grana della carta e qualche fibra.
