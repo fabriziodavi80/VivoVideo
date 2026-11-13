@@ -225,7 +225,7 @@ fun CollageScreen(vm: EditorViewModel) {
 
 /** Formato di stampa e dove si stampa. */
 @Composable
-private fun PrintDialog(spec: CollageSpec, onDismiss: () -> Unit, onPrint: (PrintFormat, Boolean) -> Unit) {
+internal fun PrintDialog(spec: CollageSpec, onDismiss: () -> Unit, onPrint: (PrintFormat, Boolean) -> Unit) {
     val formats = remember(spec.aspect) { PrintFormat.forAspect(spec.aspect) }
     var fmt by remember { mutableStateOf(formats.firstOrNull { it == PrintFormat.A4 || it == PrintFormat.S20 || it == PrintFormat.L15x10 } ?: formats.first()) }
     var shop by remember { mutableStateOf(true) }
@@ -236,7 +236,7 @@ private fun PrintDialog(spec: CollageSpec, onDismiss: () -> Unit, onPrint: (Prin
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 PanelLabel("Formato")
-                Row(Modifier.horizontalScroll(rememberScrollState())) { PillRow(formats, fmt, { it.label }) { fmt = it } }
+                PillRow(formats, fmt, { it.label }) { fmt = it }
                 PanelLabel("Dove lo stampi")
                 Segmented(listOf(true, false), shop, { if (it) "Negozio o sito" else "Stampante di casa" }) { shop = it }
                 val (w, h, dpi) = fmt.pixels(shop)
