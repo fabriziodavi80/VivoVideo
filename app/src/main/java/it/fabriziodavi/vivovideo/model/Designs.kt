@@ -46,7 +46,7 @@ object Designs {
 
     // Effetto wow: la persona che esce dalla foto, la doppia esposizione, oro con i brillantini, olografico ----------
     private val GOLD = listOf(0xFFFFF3C4L, 0xFFD9A93BL, 0xFFFFE597L, 0xFF946615L, 0xFFF2CF6CL)
-    private val CHROME = listOf(0xFFFFFFFFL, 0xFF8E97A8L, 0xFFF1F4F8L, 0xFF4B5363L, 0xFFC9D0DBL)
+    private val CHROME = listOf(0xFFF4F6FAL, 0xFF5D6577L, 0xFFE3E7EEL, 0xFF1E2330L, 0xFF9AA3B3L)
 
     // W1 -----------------------------------------------------------------------------------------------
     private fun wowPop() = Design("x-wow-pop", "Esce dalla foto", DesignFamily.WOW, DOrient.PORTRAIT, 794f, 1123f, ACC,
@@ -93,7 +93,7 @@ object Designs {
         hint = "Fondo olografico che cambia colore, la scritta cromata con il riflesso e la persona scontornata come un adesivo lucido",
         els = listOf(
             DPattern(b(0, 0, 794, 1123, F), DPatternKind.HOLO, 0, 0f),
-            DText(bk(0, 40, 794, 300, F), "title", "Titolo", "Weekend", DFont.ARCHIVO, 200f, WHITE, DAlign.CENTER, gradient = CHROME, shine = true, shadow = true, upper = true, skew = -0.06f),
+            DText(bk(0, 40, 794, 300, F), "title", "Titolo", "Weekend", DFont.ARCHIVO, 200f, WHITE, DAlign.CENTER, gradient = CHROME, shine = true, glow = 0x99FFFFFFL, upper = true, skew = -0.06f),
             DPhoto(bk(122, 250, 550, 730), 0, cutout = true, border = 16f, shadow = 26f),
             DPath(bk(70, 330, 70, 70), SPARKLE, 100f, 100f, fill = WHITE),
             DPath(bk(660, 780, 90, 90), SPARKLE, 100f, 100f, fill = WHITE),
