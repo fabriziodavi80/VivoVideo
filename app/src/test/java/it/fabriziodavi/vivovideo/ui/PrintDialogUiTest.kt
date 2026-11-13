@@ -1,5 +1,9 @@
 package it.fabriziodavi.vivovideo.ui
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -23,9 +27,12 @@ class PrintDialogUiTest {
     @get:Rule val compose = createComposeRule()
 
     @Test fun opensForEveryAspectAndPrints() {
+        var aspect by mutableStateOf(CollageAspect.STORY)
+        var got: Pair<PrintFormat, Boolean>? = null
+        compose.setContent { VivoTheme { key(aspect) { PrintDialog(CollageSpec("x-cover", aspect), {}) { f, s -> got = f to s } } } }
         for (a in CollageAspect.entries) {
-            var got: Pair<PrintFormat, Boolean>? = null
-            compose.setContent { VivoTheme { PrintDialog(CollageSpec("x-cover", a), {}) { f, s -> got = f to s } } }
+            aspect = a; got = null
+            compose.waitForIdle()
             compose.onNodeWithText("Pronto da stampare").assertIsDisplayed()
             compose.onNodeWithText("Stampante di casa").performClick()
             compose.onNodeWithText("Salva per la stampa").performClick()
