@@ -238,10 +238,10 @@ internal fun PrintDialog(spec: CollageSpec, onDismiss: () -> Unit, onPrint: (Pri
                 PanelLabel("Formato")
                 PillRow(formats, fmt, { it.label }) { fmt = it }
                 PanelLabel("Dove lo stampi")
-                Segmented(listOf(true, false), shop, { if (it) "Negozio o sito" else "Stampante di casa" }) { shop = it }
+                Segmented(listOf(true, false), shop, { if (it) "Negozio" else "A casa" }) { shop = it }
                 val (w, h, dpi) = fmt.pixels(shop)
-                Hint(if (shop) "$w×$h pixel a $dpi dpi, con 3 mm di margine di taglio per lato: al negozio scegli «al vivo» o «senza bordo»."
-                    else "$w×$h pixel a $dpi dpi, con un bordo bianco di 4 mm: la stampante di casa non arriva al bordo del foglio.")
+                Hint(if (shop) "Negozio o sito di stampa: $w×$h pixel a $dpi dpi, con 3 mm di margine di taglio per lato: al negozio scegli «al vivo» o «senza bordo»."
+                    else "Stampante di casa: $w×$h pixel a $dpi dpi, con un bordo bianco di 4 mm: la stampante di casa non arriva al bordo del foglio.")
                 if (spec.aspect.orient == DOrient.PORTRAIT && spec.aspect != CollageAspect.PHOTO && spec.aspect != CollageAspect.PAPER)
                     Hint("Il modello si adatta al foglio: per vedere prima com'è, scegli il formato 10×15 o A4 in «Foto e formato».")
             }

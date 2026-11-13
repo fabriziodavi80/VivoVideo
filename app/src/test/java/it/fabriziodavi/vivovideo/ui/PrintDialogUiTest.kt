@@ -34,7 +34,7 @@ class PrintDialogUiTest {
             aspect = a; got = null
             compose.waitForIdle()
             compose.onNodeWithText("Pronto da stampare").assertIsDisplayed()
-            compose.onNodeWithText("Stampante di casa").performClick()
+            compose.onNodeWithText("A casa").performClick()
             compose.onNodeWithText("Salva per la stampa").performClick()
             assertEquals("aspetto $a", false, got?.second)
         }
