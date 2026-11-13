@@ -205,7 +205,7 @@ data class DBarcode(override val box: DBox, val color: Long, override val rot: F
 data class DPalette(override val box: DBox, val count: Int, val color: Long, override val rot: Float = 0f) : DEl
 
 enum class DesignFamily(val label: String, val hint: String) {
-    EVENTS("Eventi", "Matrimoni, compleanni, feste, lauree, nascite, convegni: save the date, palloncini, disco, pass VIP, badge, relatore"),
+    EVENTS("Eventi", "Matrimoni, compleanni, feste, lauree, nascite, convegni: sposi da rivista, save the date, cabina foto, usa e getta, anni con le foto, disco, pass VIP, badge, relatore"),
     ACTION("Azione", "Sport d'azione: MTB, bici, corsa, sci, surf. Pettorale, mappa, velocità, fango, action cam, record, sequenza, skipass"),
     PAPER("Carta", "Carta strappata con la fibra bianca, lettere ritagliate, retino, la persona ritagliata come un adesivo"),
     TREND("Tendenze", "I formati più usati del 2026: nota del telefono, cromo Y2K, luce calda, allora e adesso, finestre retrò, dump del mese"),
@@ -328,7 +328,7 @@ data class DesignMeta(val dates: List<Long> = emptyList(), val places: List<Stri
 /**
  * Segnaposto nelle scritte, riempiti con la data e il luogo delle foto (o con il testo dopo "|" se non si sanno):
  * {ANNO} 2026 · {AA} 26 · {MESE} AGOSTO · {Mese} Agosto · {mese_n} 08 · {data} 14.09.2026 · {giorno} Domenica 14 settembre ·
- * {giorno_breve} 14 SET · {data_romana} 14 · IX · 2026 · {dal_al} 03 → 05.06.2026 · {giorni} 3 · {ora} 18:42 ·
+ * {giorno_breve} 14 SET · {gg} 14 · {data_romana} 14 · IX · 2026 · {dal_al} 03 → 05.06.2026 · {giorni} 3 · {ora} 18:42 ·
  * {stagione} estate · {foto} 9 · {luogo} il posto della prima foto · {luogoN} quello della foto N · {luoghi} tutti, separati da " · ".
  */
 object DesignTexts {
@@ -367,6 +367,7 @@ object DesignTexts {
             "Mese" -> cap(months[mo])
             "mese" -> months[mo]
             "mese_n" -> two(mo + 1)
+            "gg" -> two(d)
             "data" -> "${two(d)}.${two(mo + 1)}.$y"
             "giorno" -> "${cap(days[c.get(Calendar.DAY_OF_WEEK) - 1])} $d ${months[mo]}"
             "giorno_breve" -> "${two(d)} ${months[mo].take(3).uppercase(Locale.ITALY)}"

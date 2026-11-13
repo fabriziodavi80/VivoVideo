@@ -18,7 +18,7 @@ import it.fabriziodavi.vivovideo.model.DColor.WHITE
  */
 object Designs {
     val all: List<Design> by lazy {
-        listOf(saveDate(), flowers(), monogram(), balloons(), disco(), vip(), badge(), speaker(), laurea(), baby(),
+        listOf(wedding(), saveDate(), booth(), flash(), balloons(), disco(), vip(), laurea(), baby(), badge(), speaker(),
             bib(), topo(), speed(), mud(), hud(), record(), sequence(), skipass(),
             paperTrip(), paperNews(), paperLove(), paperRecipe(), paperWall(), paperRansom(), paperSticker(), paperRiso(),
             notes(), chrome(), leak(), blue(), pearls(), thenNow(), windows(), dump(),
@@ -42,111 +42,106 @@ object Designs {
 
     private const val MUD = 0xF0553A24L
 
-    /**
-     * Ramo con le foglie lungo i punti [pts] (percorso SVG): il gambo e, ogni [every] punti, due foglie a punta
-     * lunghe [len] inclinate di 50°. Serve per fiori a tratto e corone d'alloro.
-     */
-    private fun leafy(pts: List<Pair<Float, Float>>, len: Float, every: Int = 2, stem: Boolean = true): String {
-        val sb = StringBuilder()
-        fun f(v: Float) = "%.1f".format(java.util.Locale.ROOT, v)
-        if (stem) { sb.append("M ${f(pts[0].first)} ${f(pts[0].second)} "); pts.drop(1).forEach { sb.append("L ${f(it.first)} ${f(it.second)} ") } }
-        for (i in 1 until pts.size - 1 step every) {
-            val (x, y) = pts[i]
-            var tx = pts[i + 1].first - pts[i - 1].first; var ty = pts[i + 1].second - pts[i - 1].second
-            val l = kotlin.math.hypot(tx, ty).coerceAtLeast(1e-3f); tx /= l; ty /= l
-            for (side in listOf(1f, -1f)) {
-                val a = Math.toRadians(50.0 * side).toFloat()
-                val dx = tx * kotlin.math.cos(a) - ty * kotlin.math.sin(a); val dy = tx * kotlin.math.sin(a) + ty * kotlin.math.cos(a)
-                val k = len * (0.75f + 0.25f * ((i * 7) % 5) / 4f)
-                val px = x + dx * k; val py = y + dy * k
-                val nx = -dy * k * 0.3f; val ny = dx * k * 0.3f
-                sb.append("M ${f(x)} ${f(y)} Q ${f(x + dx * k * 0.5f + nx)} ${f(y + dy * k * 0.5f + ny)} ${f(px)} ${f(py)} Q ${f(x + dx * k * 0.5f - nx)} ${f(y + dy * k * 0.5f - ny)} ${f(x)} ${f(y)} Z ")
-            }
+
+    // Eventi: colori pieni, foto grandi, scritte enormi e adesivi (niente avorio e rametti da partecipazione).
+    private const val CREAM = 0xFFFFF4E2L
+    private const val BUTTER = 0xFFFFE14DL
+    private const val HEART = "M50 88 C12 62 0 34 18 16 C34 2 48 14 50 30 C52 14 66 2 82 16 C100 34 88 62 50 88"
+
+    // E1 ---------------------------------------------------------------------------------------------
+    private fun wedding(): Design {
+        val wave = "M0 60 C130 0 260 0 397 45 C534 90 664 90 794 30 L794 120 L0 120 Z"
+        return Design("x-wed", "Sposi!", DesignFamily.EVENTS, DOrient.PORTRAIT, 794f, 1123f, ACC,
+            accents = listOf(0xFFE5432DL, 0xFF2340D9L, 0xFF111111L, 0xFFFF6FB5L), accents2 = listOf(CREAM, BUTTER, WHITE),
+            motion = CollageMotion.ZOOM, hint = "Matrimonio da rivista: la foto a tutta pagina, «Sposi!» enorme dietro di voi e un'onda di colore pieno",
+            els = listOf(
+                DPhoto(bk(0, 0, 794, 820, F), 0),
+                DText(bk(0, 30, 794, 330, F), "title", "Titolo", "Sposi!", DFont.SERIF_IT, 300f, ACC2, DAlign.CENTER, line = 0.9f, behind = 0, shadow = true),
+                DPath(bk(0, 730, 794, 120, F), wave, 794f, 120f, fill = ACC),
+                DText(bk(540, 690, 220, 80), "sticker", "Adesivo", "Evviva!", DFont.HAND, 48f, BLACK, DAlign.CENTER, rot = -8f, pill = BUTTER, pad = 22f),
+                DPath(bk(60, 870, 70, 70), SPARKLE, 100f, 100f, fill = ACC2),
+                DPath(bk(670, 1000, 50, 50), SPARKLE, 100f, 100f, fill = ACC2),
+                DText(bk(40, 850, 714, 120), "names", "Nomi", "Anna & Luca", DFont.SERIF, 104f, ACC2, DAlign.CENTER),
+                DText(bk(40, 985, 714, 34), "date", "Data", "{data|20.06.2027}", DFont.MONO_BOLD, 26f, ACC2, DAlign.CENTER, track = 0.3f),
+                DText(bk(40, 1035, 714, 50), "place", "Luogo", "{luogo|Villa sul lago}", DFont.SERIF_IT, 40f, ACC2, DAlign.CENTER),
+            ))
+    }
+
+    // E2 ---------------------------------------------------------------------------------------------
+    private fun saveDate() = Design("x-save-date", "Save the date", DesignFamily.EVENTS, DOrient.PORTRAIT, 794f, 1123f, ACC,
+        accents = listOf(0xFF2340D9L, 0xFFE5432DL, 0xFFFF6FB5L, 0xFF1E4D3AL), accents2 = listOf(CREAM, BUTTER, WHITE),
+        motion = CollageMotion.DROP, hint = "Save the date a colore pieno: la foto come una stampa appoggiata storta, la data gigante e un cuore a mano",
+        els = listOf(
+            DPhoto(bk(127, 150, 540, 600), 0, radius = 18f, rot = 3f, border = 16f, borderColor = CREAM, shadow = 24f),
+            DText(bk(40, 40, 560, 120), "kicker", "Rubrica", "Save the date", DFont.HAND, 92f, BUTTER, rot = -6f),
+            DPath(bk(610, 70, 150, 140), HEART, 100f, 100f, stroke = BUTTER, width = 5f, draw = true),
+            DText(bk(0, 760, 794, 280, F), "day", "Giorno", "{gg|20}.{mese_n|06}", DFont.ANTON, 300f, ACC2, DAlign.CENTER, line = 0.9f),
+            DText(bk(40, 1000, 714, 70), "names", "Nomi", "Anna & Luca", DFont.SERIF_IT, 66f, ACC2, DAlign.CENTER),
+            DText(bk(40, 1075, 714, 26), "place", "Luogo", "{ANNO} · {luogo|Villa sul lago}", DFont.MONO_BOLD, 20f, ACC2, DAlign.CENTER, track = 0.25f, upper = true),
+        ))
+
+    // E3 ---------------------------------------------------------------------------------------------
+    private fun booth(): Design {
+        // La striscia della cabina fototessere, storta: le foto girano attorno al centro della striscia.
+        val rot = -4f; val cx = 230f; val cy = 565f
+        val a = Math.toRadians(rot.toDouble()); val sn = kotlin.math.sin(a).toFloat(); val cs = kotlin.math.cos(a).toFloat()
+        val els = arrayListOf<DEl>(
+            DPattern(b(0, 0, 794, 1123, F), DPatternKind.CONFETTI, 0, 0f),
+            DRect(bk(70, 70, 320, 990), CREAM, rot = rot, shadow = 22f),
+        )
+        for (i in 0 until 4) {
+            val dy = 200f + i * 235f - cy
+            val px = cx - dy * sn; val py = cy + dy * cs
+            els += DPhoto(bk(px - 140, py - 105, 280, 210), i, rot = rot)
         }
-        return sb.toString()
+        val sy = 1025f - cy
+        els += DText(bk(cx - sy * sn - 140, cy + sy * cs - 15, 280, 30), "stamp", "Sotto le foto", "{giorno_breve} {ANNO}", DFont.MONO_BOLD, 18f, BLACK, DAlign.CENTER, track = 0.2f, rot = rot)
+        els += listOf(
+            DText(bk(420, 80, 350, 420), "title", "Titolo", "Che\nfesta!", DFont.ANTON, 190f, ACC2, line = 0.88f, upper = true),
+            DPath(bk(640, 470, 120, 120), SPARKLE, 100f, 100f, fill = BUTTER),
+            DText(bk(430, 560, 330, 60), "tag", "Etichetta", "{luogo|Milano}", DFont.MONO_BOLD, 24f, BLACK, rot = 5f, pill = BUTTER, pad = 18f, upper = true, track = 0.1f),
+            DText(bk(430, 650, 340, 90), "note", "Frase", "si balla fino all'alba", DFont.HAND, 52f, ACC2, rot = -4f, wrap = true),
+            DPhoto(bk(460, 790, 280, 280), 4, DShape.CIRCLE, rot = 6f, border = 12f, borderColor = CREAM, shadow = 16f),
+        )
+        return Design("x-booth", "Cabina foto", DesignFamily.EVENTS, DOrient.PORTRAIT, 794f, 1123f, ACC,
+            accents = listOf(0xFFE8322BL, 0xFFFF5FA2L, 0xFF2340D9L, 0xFF111111L), accents2 = listOf(CREAM, BUTTER, WHITE),
+            motion = CollageMotion.CASCADE, els = els,
+            hint = "Festa, matrimonio, addio al celibato: la striscia della cabina fototessere con quattro scatti, scritte grosse e adesivi")
     }
 
-    /** Punti su un arco di cerchio (gradi: 0 = destra, 90 = in basso). */
-    private fun arc(cx: Float, cy: Float, r: Float, from: Float, to: Float, n: Int) = (0..n).map { i ->
-        val a = Math.toRadians((from + (to - from) * i / n).toDouble())
-        (cx + r * kotlin.math.cos(a)).toFloat() to (cy + r * kotlin.math.sin(a)).toFloat()
-    }
-
-    private const val CLOUD = "M20 80 C0 80 0 50 25 48 C25 20 60 12 75 35 C85 10 130 12 130 45 C160 40 170 80 140 80 Z"
-
-    // E1 -----------------------------------------------------------------------------------------------
-    private fun saveDate(): Design {
-        val ink = 0xFF2B2B2BL
-        return Design("x-save-date", "Save the date", DesignFamily.EVENTS, DOrient.PORTRAIT, 480f, 672f, 0xFFF5F1EA,
-            accents = listOf(0xFFB0485B, 0xFF2F5BFF, 0xFF6B8F71), motion = CollageMotion.WIPE,
-            hint = "Matrimonio o festa: il calendario del mese con il giorno cerchiato a mano (scrivi la data nella scheda Scritte)",
+    // E4 ---------------------------------------------------------------------------------------------
+    private fun flash(): Design {
+        val stamp = "'{AA} {mese_n} {gg}"
+        return Design("x-flash", "Usa e getta", DesignFamily.EVENTS, DOrient.PORTRAIT, 794f, 1123f, 0xFF0E0E0E,
+            accents = listOf(0xFFFF8A1FL, 0xFFFF3B30L, 0xFFFFD60AL), motion = CollageMotion.CASCADE, grain = true,
+            hint = "Le foto col flash della macchinetta usa e getta, con la data arancione stampata nell'angolo: feste, cene, addii al nubilato",
             els = listOf(
-                DPhoto(b(150, 40, 180, 230, C), 0, DShape.ARCH),
-                DText(b(20, 286, 440, 60, C), "names", "Nomi", "Anna & Luca", DFont.SERIF, 52f, ink, DAlign.CENTER),
-                DText(b(20, 350, 440, 20, C), "kicker", "Rubrica", "Save the date", DFont.MONO, 13f, ink, DAlign.CENTER, track = 0.4f, upper = true),
-                DCalendar(b(70, 384, 340, 230, C), "when", "Data (gg.mm.aaaa)", "{data|20.06.2027}", ink, ACC),
-                DText(b(20, 626, 440, 22, C), "place", "Luogo", "{luogo|Villa sul lago}", DFont.SERIF_IT, 17f, ink, DAlign.CENTER),
+                DPhoto(bk(30, 30, 734, 640), 0, radius = 6f),
+                DPhoto(bk(30, 690, 357, 403), 1, radius = 6f),
+                DPhoto(bk(407, 690, 357, 403), 2, radius = 6f),
+                DText(bk(50, 560, 520, 90), "title", "Frase", "che serata", DFont.HAND, 76f, WHITE, rot = -3f, shadow = true),
+                DText(bk(430, 620, 314, 36), "stamp", "Data stampata", stamp, DFont.MONO_BOLD, 30f, ACC, DAlign.RIGHT, glow = ACC),
+                DText(bk(60, 1044, 307, 30), "", "", stamp, DFont.MONO_BOLD, 24f, ACC, DAlign.RIGHT, glow = ACC),
+                DText(bk(437, 1044, 307, 30), "", "", stamp, DFont.MONO_BOLD, 24f, ACC, DAlign.RIGHT, glow = ACC),
             ))
     }
 
-    // E2 -----------------------------------------------------------------------------------------------
-    private fun flowers(): Design {
-        val ink = 0xFF3A3A3AL
-        val left = leafy(arc(240f, 220f, 150f, 230f, 120f, 18), 26f)
-        val right = leafy(arc(240f, 220f, 150f, -50f, 60f, 18), 26f)
-        return Design("x-flowers", "Fiori", DesignFamily.EVENTS, DOrient.PORTRAIT, 480f, 672f, 0xFFFBF7F2,
-            accents = listOf(0xFF6B8F71, 0xFFB0485B, 0xFFC8A57A), motion = CollageMotion.WIPE,
-            hint = "Rami e foglie disegnati a tratto sottile attorno alla foto: nel video crescono",
-            els = listOf(
-                DPhoto(bk(110, 90, 260, 260), 0, DShape.CIRCLE),
-                DPath(bk(0, 0, 480, 672), left, 480f, 672f, stroke = ACC, width = 1.8f, draw = true),
-                DPath(bk(0, 0, 480, 672), right, 480f, 672f, stroke = ACC, width = 1.8f, draw = true),
-                DText(bk(20, 400, 440, 60), "names", "Nomi", "Chiara & Paolo", DFont.SERIF_IT, 48f, ink, DAlign.CENTER),
-                DText(bk(20, 466, 440, 18), "date", "Data", "{data_romana}", DFont.SANS, 12f, ink, DAlign.CENTER, track = 0.42f),
-                DPath(bk(140, 494, 200, 16), leafy(listOf(0f to 8f, 25f to 8f, 50f to 8f, 75f to 8f, 100f to 8f, 125f to 8f, 150f to 8f, 175f to 8f, 200f to 8f), 10f), 200f, 16f, stroke = ACC, width = 1.4f, draw = true),
-                DPhoto(bk(130, 528, 96, 96), 1, DShape.CIRCLE),
-                DPhoto(bk(254, 528, 96, 96), 2, DShape.CIRCLE),
-            ))
-    }
+    // E5 ---------------------------------------------------------------------------------------------
+    private fun balloons() = Design("x-balloons", "Compleanno", DesignFamily.EVENTS, DOrient.PORTRAIT, 794f, 1123f, ACC,
+        accents = listOf(0xFFC8F04AL, 0xFFFF6FB5L, 0xFFFF7A1AL, 0xFF7CC8FFL), motion = CollageMotion.CASCADE,
+        hint = "Compleanno: gli anni giganti con le foto dentro i numeri, il nome scritto grande e i coriandoli",
+        els = listOf(
+            DPattern(b(0, 0, 794, 1123, F), DPatternKind.CONFETTI, 0, 0f),
+            DText(bk(197, 60, 400, 56), "kicker", "Rubrica", "Buon compleanno", DFont.MONO_BOLD, 24f, CREAM, DAlign.CENTER, pill = BLACK, pad = 24f, upper = true, track = 0.15f),
+            DPhotoWord(bk(30, 140, 734, 610), "age", "Anni (foto dentro)", "40", DFont.ARCHIVO, 0, gap = 16f),
+            DText(bk(40, 770, 520, 220), "name", "Nome", "Marta!", DFont.SERIF_IT, 200f, BLACK, rot = -5f),
+            DPhoto(bk(560, 800, 200, 200), 2, DShape.CIRCLE, border = 10f, borderColor = WHITE, shadow = 14f, rot = 8f),
+            DPath(bk(520, 760, 70, 70), SPARKLE, 100f, 100f, fill = BLACK),
+            DPath(bk(60, 120, 50, 50), SPARKLE, 100f, 100f, fill = BLACK),
+            DText(bk(40, 1050, 714, 30), "date", "Data", "{data} · {luogo|Milano}", DFont.MONO_BOLD, 20f, BLACK, DAlign.CENTER, track = 0.2f, upper = true),
+        ))
 
-    // E3 -----------------------------------------------------------------------------------------------
-    private fun monogram(): Design {
-        val ink = 0xFF2B2B2BL
-        return Design("x-monogram", "Monogramma", DesignFamily.EVENTS, DOrient.PORTRAIT, 794f, 1123f, ACC,
-            accents = listOf(0xFFF6F1E8, WHITE, 0xFFEDE4F0, 0xFFE8EFE6), motion = CollageMotion.SLIDE,
-            hint = "Elegante e pulito: le iniziali dentro un doppio cerchio, tre foto in fila e una frase",
-            els = listOf(
-                DRect(bk(247, 80, 300, 300), ink, circle = true, stroke = 2f),
-                DRect(bk(262, 95, 270, 270), ink, circle = true, stroke = 1f),
-                DText(bk(247, 150, 300, 160), "mono", "Iniziali", "A&L", DFont.SERIF, 130f, ink, DAlign.CENTER),
-                DText(bk(60, 410, 674, 60), "names", "Nomi", "Anna e Luca", DFont.SERIF, 52f, ink, DAlign.CENTER),
-                DText(bk(60, 476, 674, 20), "date", "Data", "{data_romana}", DFont.SANS, 14f, ink, DAlign.CENTER, track = 0.4f),
-                DPhoto(bk(60, 540, 206, 300), 0),
-                DPhoto(bk(294, 540, 206, 300), 1),
-                DPhoto(bk(528, 540, 206, 300), 2),
-                DText(bk(80, 880, 634, 130), "quote", "Frase", "«E vissero felici, almeno fino a stasera.»", DFont.SERIF_IT, 32f, ink, DAlign.CENTER, wrap = true),
-                DText(bk(60, 1040, 674, 20), "place", "Luogo", "{luogo|Lago di Como}", DFont.MONO, 13f, ink, DAlign.CENTER, track = 0.3f, upper = true),
-            ))
-    }
-
-    // E4 -----------------------------------------------------------------------------------------------
-    private fun balloons(): Design {
-        val gold = listOf(0xFFFFF1C4L, 0xFFC9962FL, 0xFFFFE7A3L, 0xFF8C6316L, 0xFFF3D27AL)
-        return Design("x-balloons", "Palloncini", DesignFamily.EVENTS, DOrient.PORTRAIT, 794f, 1123f, ACC,
-            accents = listOf(0xFFFFE3EC, 0xFFE3F2FF, 0xFFFFF4D6, 0xFF1B1B2F), accents2 = listOf(0xFF3B2A4A, 0xFF1D4ED8, 0xFF111111, WHITE),
-            motion = CollageMotion.CASCADE, hint = "Compleanno: il numero degli anni gigante in metallo dorato, coriandoli che cadono e le foto nei cerchi",
-            els = listOf(
-                DPattern(b(0, 0, 794, 1123, F), DPatternKind.CONFETTI, 0, 0f),
-                DText(bk(30, 50, 734, 520), "age", "Anni", "40", DFont.ARCHIVO, 470f, WHITE, DAlign.CENTER, line = 0.95f, shadow = true, gradient = gold, count = true),
-                DText(bk(40, 570, 714, 90), "name", "Nome", "Buon compleanno, Marta!", DFont.HAND, 72f, ACC2, DAlign.CENTER),
-                DPhoto(bk(70, 680, 300, 300), 0, DShape.CIRCLE, border = 10f, shadow = 14f),
-                DPhoto(bk(420, 700, 260, 260), 1, DShape.CIRCLE, border = 10f, shadow = 14f),
-                DPhoto(bk(330, 900, 170, 170), 2, DShape.CIRCLE, border = 8f, shadow = 14f),
-                DText(bk(40, 1074, 714, 24), "date", "Data", "{data} · {luogo|Milano}", DFont.MONO_BOLD, 16f, ACC2, DAlign.CENTER, track = 0.2f, upper = true),
-            ))
-    }
-
-    // E5 -----------------------------------------------------------------------------------------------
+    // E6 ---------------------------------------------------------------------------------------------
     private fun disco() = Design(
         "x-disco", "Disco", DesignFamily.EVENTS, DOrient.PORTRAIT, 794f, 1123f, 0xFF0D0717,
         accents = listOf(0xFFFF3EA5, 0xFF00E5FF, 0xFFB388FF, 0xFFFFE600), motion = CollageMotion.CASCADE,
@@ -165,7 +160,7 @@ object Designs {
         ),
     )
 
-    // E6 -----------------------------------------------------------------------------------------------
+    // E7 ---------------------------------------------------------------------------------------------
     private fun vip(): Design {
         val ink = 0xFF101014L
         return Design("x-vip", "Pass VIP", DesignFamily.EVENTS, DOrient.PORTRAIT, 600f, 900f, ink,
@@ -184,7 +179,7 @@ object Designs {
             ))
     }
 
-    // E7 -----------------------------------------------------------------------------------------------
+    // E8 ---------------------------------------------------------------------------------------------
     private fun badge(): Design {
         val ink = 0xFF111827L
         return Design("x-badge", "Badge convegno", DesignFamily.EVENTS, DOrient.PORTRAIT, 600f, 900f, 0xFFE9ECF1,
@@ -206,7 +201,7 @@ object Designs {
             ))
     }
 
-    // E8 -----------------------------------------------------------------------------------------------
+    // E9 ---------------------------------------------------------------------------------------------
     private fun speaker() = Design(
         "x-speaker", "Relatore", DesignFamily.EVENTS, DOrient.PORTRAIT, 794f, 1123f, ACC2,
         accents = listOf(0xFFFFD60A, 0xFF7CFFCB, 0xFFFF5B14), accents2 = listOf(0xFF0F172A, 0xFF1A1033, 0xFF111111),
@@ -222,50 +217,37 @@ object Designs {
         ),
     )
 
-    // E9 -----------------------------------------------------------------------------------------------
-    private fun laurea(): Design {
-        val ink = 0xFF1F2937L; val leaf = 0xFF4E7D3AL
-        val left = leafy(arc(250f, 250f, 215f, 255f, 105f, 16), 34f, every = 1, stem = false)
-        val right = leafy(arc(250f, 250f, 215f, -75f, 75f, 16), 34f, every = 1, stem = false)
-        return Design("x-laurea", "Laurea", DesignFamily.EVENTS, DOrient.PORTRAIT, 794f, 1123f, WHITE,
-            accents = listOf(0xFFC8102E, 0xFF1D4ED8, 0xFF111111), accents2 = listOf(0xFFC8102E, 0xFFFFD23F, 0xFF2F5BFF), motion = CollageMotion.CASCADE,
-            hint = "Laurea: la corona d'alloro attorno alla foto, il corso, il voto che conta fino al 110 e i coriandoli",
-            els = listOf(
-                DPattern(b(0, 0, 794, 1123, F), DPatternKind.CONFETTI, 0, 0f),
-                DPhoto(bk(222, 140, 350, 350), 0, DShape.CIRCLE, border = 8f, shadow = 12f),
-                DPath(bk(147, 65, 500, 500), left, 500f, 500f, fill = leaf),
-                DPath(bk(147, 65, 500, 500), right, 500f, 500f, fill = leaf),
-                DPath(bk(347, 470, 100, 70), "M50 10 L10 0 L20 30 Z M50 10 L90 0 L80 30 Z M44 10 L30 70 L42 60 L50 70 L50 14 Z M56 10 L70 70 L58 60 L50 70 Z", 100f, 70f, fill = ACC),
-                DText(bk(40, 580, 714, 60), "kicker", "Rubrica", "Dottoressa in", DFont.SERIF_IT, 40f, ink, DAlign.CENTER),
-                DText(bk(40, 640, 714, 90), "field", "Corso", "Ingegneria", DFont.SERIF, 80f, ink, DAlign.CENTER),
-                DText(bk(40, 740, 714, 70), "name", "Nome", "Marta Bianchi", DFont.HAND, 64f, ACC, DAlign.CENTER),
-                DText(bk(40, 830, 714, 90), "grade", "Voto", "110 e lode", DFont.ANTON, 80f, ACC, DAlign.CENTER, count = true),
-                DText(bk(40, 932, 714, 24), "date", "Data", "{data} · {luogo|Politecnico}", DFont.MONO_BOLD, 16f, ink, DAlign.CENTER, track = 0.15f, upper = true),
-                DPhoto(bk(70, 980, 160, 110), 1, radius = 10f, rot = -4f, border = 6f, shadow = 10f),
-                DPhoto(bk(564, 980, 160, 110), 2, radius = 10f, rot = 4f, border = 6f, shadow = 10f),
-            ))
-    }
+    // E10 --------------------------------------------------------------------------------------------
+    private fun laurea() = Design("x-laurea", "Laurea", DesignFamily.EVENTS, DOrient.PORTRAIT, 794f, 1123f, ACC,
+        accents = listOf(0xFFC8102EL, 0xFF2340D9L, 0xFF111111L, 0xFF1E4D3AL), accents2 = listOf(CREAM, BUTTER, WHITE),
+        motion = CollageMotion.DROP,
+        hint = "Laurea: il voto enorme che conta fino al 110, tu scontornato come un adesivo davanti, il nome su un'etichetta gialla",
+        els = listOf(
+            DPattern(b(0, 0, 794, 1123, F), DPatternKind.CONFETTI, 0, 0f),
+            DText(bk(0, 40, 794, 640, F), "grade", "Voto", "110\ne lode", DFont.ANTON, 330f, ACC2, DAlign.CENTER, line = 0.86f, upper = true, count = true),
+            DPhoto(bk(147, 330, 500, 640), 0, cutout = true, border = 14f, shadow = 18f),
+            DPath(bk(70, 380, 80, 80), SPARKLE, 100f, 100f, fill = BUTTER),
+            DPath(bk(660, 300, 60, 60), SPARKLE, 100f, 100f, fill = BUTTER),
+            DText(bk(60, 930, 674, 100), "name", "Nome", "Dott.ssa Marta Bianchi", DFont.GROTESK, 50f, BLACK, DAlign.CENTER, rot = -3f, pill = BUTTER, pad = 26f),
+            DText(bk(40, 1060, 714, 30), "field", "Corso e luogo", "Ingegneria · {luogo|Politecnico} · {data}", DFont.MONO_BOLD, 20f, ACC2, DAlign.CENTER, track = 0.15f, upper = true),
+        ))
 
-    // E10 ----------------------------------------------------------------------------------------------
+    // E11 --------------------------------------------------------------------------------------------
     private fun baby(): Design {
-        val ink = 0xFF3A4A5EL
         val els = arrayListOf<DEl>(
-            DPath(bk(-20, 30, 220, 110), CLOUD, 170f, 90f, fill = WHITE),
-            DPath(bk(300, 70, 200, 95), CLOUD, 170f, 90f, fill = WHITE),
-            DPhoto(bk(110, 130, 260, 300), 0, DShape.ARCH, border = 8f),
-            DPath(bk(60, 300, 30, 30), SPARKLE, 100f, 100f, fill = WHITE),
-            DPath(bk(392, 360, 24, 24), SPARKLE, 100f, 100f, fill = WHITE),
-            DText(bk(20, 446, 440, 70), "title", "Titolo", "Benvenuta Sofia", DFont.HAND, 58f, ink, DAlign.CENTER),
-            DText(bk(20, 514, 440, 18), "date", "Data", "{giorno} · ore {ora|07:42}", DFont.MONO, 13f, ink, DAlign.CENTER, track = 0.15f),
+            DText(bk(30, 24, 420, 200), "title", "Titolo", "Ciao,\nSofia!", DFont.SERIF_IT, 104f, ACC2, line = 0.86f),
+            DPath(bk(370, 40, 80, 80), SPARKLE, 100f, 100f, fill = ACC2),
+            DPhoto(bk(170, 210, 280, 360), 0, DShape.PILL, rot = 4f, border = 10f, borderColor = WHITE, shadow = 14f),
+            DPath(bk(36, 520, 40, 40), SPARKLE, 100f, 100f, fill = ACC2),
+            DText(bk(30, 590, 420, 50), "date", "Data", "{giorno} · {luogo|Milano}", DFont.HAND, 38f, ACC2),
         )
-        listOf("Peso" to "3,250 kg", "Lunghezza" to "50 cm", "Ora" to "{ora|07:42}").forEachIndexed { i, (l, v) ->
-            val x = 40 + i * 135
-            els += DText(bk(x, 560, 130, 14), "l$i", "Etichetta ${i + 1}", l, DFont.MONO, 10f, ink, DAlign.CENTER, track = 0.18f, upper = true)
-            els += DText(bk(x, 578, 130, 36), "s$i", l, v, DFont.GROTESK, 28f, ink, DAlign.CENTER, count = true)
+        listOf(Triple("Peso", "3,250 kg", -6f), Triple("Lunghezza", "50 cm", 5f), Triple("Ora", "ore {ora|07:42}", -3f)).forEachIndexed { i, (l, v, r) ->
+            els += DText(bk(18, 250 + i * 100, 200, 56), "s$i", l, v, DFont.GROTESK, 30f, WHITE, rot = r, pill = ACC2, pad = 18f, count = true)
         }
         return Design("x-baby", "Benvenuto", DesignFamily.EVENTS, DOrient.PORTRAIT, 480f, 672f, ACC,
-            accents = listOf(0xFFE8F1FB, 0xFFFDEBF1, 0xFFFFF6DA, 0xFFE9F6EE), els = els, motion = CollageMotion.DROP,
-            hint = "Nascita o battesimo: nuvole e toni pastello, con peso, lunghezza e ora di nascita che contano nel video")
+            accents = listOf(0xFFFFE27AL, 0xFFBFE3FFL, 0xFFFFC7DDL, 0xFFC9F0D8L), accents2 = listOf(0xFF2340D9L, 0xFFE5432DL, 0xFF111111L),
+            els = els, motion = CollageMotion.DROP,
+            hint = "Nascita o battesimo: «Ciao, Sofia!» grande, la foto a pastiglia e peso, lunghezza e ora su etichette che contano nel video")
     }
 
     // A1 -----------------------------------------------------------------------------------------------
