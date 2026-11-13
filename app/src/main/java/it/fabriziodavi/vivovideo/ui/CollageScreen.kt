@@ -112,6 +112,7 @@ fun CollageScreen(vm: EditorViewModel) {
     var selected by remember { mutableIntStateOf(-1) }
     var playing by remember { mutableStateOf(false) }
     val adder = rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(CollageSpec.MAX_ITEMS)) { uris -> vm.addCollageMedia(uris) }
+    val replacer = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri -> if (uri != null && selected >= 0) vm.replaceCollageItem(selected, uri) }
     fun frames(): CollageRenderer.Frames = CollageRenderer.Frames { i, _ -> spec.items.getOrNull(i)?.let { thumbs[it.uri] } }
 
     Column(Modifier.fillMaxSize().background(VV.Canvas).safeDrawingPadding()) {
@@ -137,7 +138,12 @@ fun CollageScreen(vm: EditorViewModel) {
         }
         if (selected >= 0 && !playing) {
             Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)) {
-                Hint("Tocca un'altra foto per scambiarle. Trascina sulla foto per spostarla nella cella.")
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(Modifier.weight(1f)) { Hint("Tocca un'altra foto per scambiarle. Trascina sulla foto per spostarla nella cella.") }
+                    SecondaryButton("Cambia foto", Modifier.padding(start = 8.dp)) {
+                        replacer.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
+                    }
+                }
                 val item = spec.items.getOrNull(CollagePlan.itemFor(selected, spec.items.size))
                 LabeledSlider("Ingrandisci", null, (((item?.zoom ?: 1f) - 1f) * 100).toInt(), range = 0..150, format = { "${100 + it}%" }) { v ->
                     vm.frameCollageCell(selected, zoom = 1f + v / 100f)

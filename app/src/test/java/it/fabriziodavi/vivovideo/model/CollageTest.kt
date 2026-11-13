@@ -131,4 +131,12 @@ class CollageTest {
         assertEquals(1_500_000L, CollagePlan.videoTimeUs(v, 500_000))
         assertEquals(1_500_000L, CollagePlan.videoTimeUs(v, 2_500_000))
     }
+
+    @Test fun replacePhotoKeepsItsPlace() {
+        val s = CollageSpec("x-mud", items = listOf(CollageItem("a"), CollageItem("b", panX = 0.3f), CollageItem("c")))
+        val r = s.withItemReplaced(1, CollageItem("nuova"))
+        org.junit.Assert.assertEquals(listOf("a", "nuova", "c"), r.items.map { it.uri })
+        org.junit.Assert.assertEquals(0f, r.items[1].panX, 0f)
+        org.junit.Assert.assertEquals(listOf("a", "b", "c", "d"), s.withItemReplaced(-1, CollageItem("d")).items.map { it.uri })
+    }
 }

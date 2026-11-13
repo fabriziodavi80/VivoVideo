@@ -721,3 +721,8 @@ fun insideConvex(p: List<Pt>, x: Float, y: Float): Boolean {
     }
     return true
 }
+
+/** La foto in posizione [index] sostituita da [item]; se l'indice non c'è, si aggiunge in fondo. */
+fun CollageSpec.withItemReplaced(index: Int, item: CollageItem): CollageSpec =
+    if (index in items.indices) copy(items = items.toMutableList().also { it[index] = item })
+    else copy(items = (items + item).take(CollageSpec.MAX_ITEMS))

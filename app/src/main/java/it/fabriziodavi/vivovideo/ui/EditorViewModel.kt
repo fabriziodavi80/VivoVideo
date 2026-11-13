@@ -144,6 +144,7 @@ import it.fabriziodavi.vivovideo.model.CollageAspect
 import it.fabriziodavi.vivovideo.model.CollageBg
 import it.fabriziodavi.vivovideo.model.CollageItem
 import it.fabriziodavi.vivovideo.model.CollagePlan
+import it.fabriziodavi.vivovideo.model.withItemReplaced
 import it.fabriziodavi.vivovideo.model.CollageSpec
 import it.fabriziodavi.vivovideo.model.CollageTemplate
 import it.fabriziodavi.vivovideo.model.CollageTemplates
@@ -2137,6 +2138,20 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
             busy = null
             if (more.isEmpty()) return@launch
             setCollageItems(s0.items + more)
+            ensureCollageMasks()
+        }
+    }
+
+    /** «Cambia foto»: la foto della cella [cell] diventa [uri] (stesso posto, inquadratura da capo). */
+    fun replaceCollageItem(cell: Int, uri: Uri) {
+        val ctx = getApplication<Application>()
+        viewModelScope.launch {
+            busy = "Preparo la foto…"
+            val item = withContext(Dispatchers.IO) { collageItems(ctx, listOf(uri)) }.firstOrNull()
+            if (item != null) loadCollageThumbs(ctx, listOf(item))
+            busy = null
+            if (item == null) { message = "Non riesco ad aprire questa foto."; return@launch }
+            updateCollage { s -> s.withItemReplaced(CollagePlan.itemFor(cell, s.items.size), item) }
             ensureCollageMasks()
         }
     }
