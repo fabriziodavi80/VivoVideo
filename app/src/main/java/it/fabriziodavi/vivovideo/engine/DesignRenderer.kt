@@ -144,7 +144,7 @@ object DesignRenderer {
                 is DText -> {
                     val u = lateU(li++, late, tUs, dur, still)
                     if (u > 0f) {
-                        drawText(c, d, e, r, s, spec, meta, u)
+                        drawText(c, d, e, r, s, spec, meta, u, if (still) -1f else tUs / 1_000_000f)
                         if (e.behind >= 0 && spec.behind && u >= 1f) subject(c, d, e.behind, s, spec, frames, tUs, still, w, h, t)
                     }
                 }
@@ -316,6 +316,7 @@ object DesignRenderer {
         }
         val item = CollagePlan.itemFor(e.slot, spec.items.size)
         val bmp = if (item >= 0) frames.get(item, tUs) else null
+        var popSrc: Bitmap? = null; var popDst: RectF? = null
         c.save()
         c.clipPath(path)
         if (bmp == null || bmp.isRecycled) {
@@ -324,8 +325,25 @@ object DesignRenderer {
             val it = spec.items[item]
             val src = if (e.filter == DFilter.BLUR) CollageRenderer.blurred(bmp) else bmp
             val bounds = RectF().also { b -> path.computeBounds(b, true) }
-            val dst = cover(bmp.width.toFloat(), bmp.height.toFloat(), bounds, it.zoom.coerceAtLeast(1f) * pose.inner * (if (e.filter == DFilter.BLUR) 1.15f else 1f), it.panX, it.panY)
-            if (subjectOnly) {
+            // Con «esce dalla cornice» la foto copre un riquadro più alto: la testa finisce sopra il bordo.
+            val area = if (e.pop > 0f) RectF(bounds.left, bounds.top - bounds.height() * e.pop, bounds.right, bounds.bottom) else bounds
+            val dst = cover(bmp.width.toFloat(), bmp.height.toFloat(), area, it.zoom.coerceAtLeast(1f) * pose.inner * (if (e.filter == DFilter.BLUR) 1.15f else 1f), it.panX, it.panY)
+            if (e.pop > 0f) { popSrc = src; popDst = dst }
+            if (e.fill >= 0 && !subjectOnly) {
+                // Doppia esposizione: la persona in bianco e nero, la seconda foto "schiarita" sopra, tutto dentro la sagoma.
+                val mask = if (it.video) null else frames.mask(item) ?: SubjectMasks.get(it.uri)
+                val l = c.saveLayer(bounds, null)
+                c.drawBitmap(src, null, dst, filterPaint(DFilter.BW, d, spec))
+                val fi = CollagePlan.itemFor(e.fill, spec.items.size)
+                val fb = if (fi >= 0) frames.get(fi, tUs) else null
+                if (fb != null && !fb.isRecycled) {
+                    val fit = spec.items[fi]
+                    val fd = cover(fb.width.toFloat(), fb.height.toFloat(), bounds, fit.zoom.coerceAtLeast(1f) * pose.inner, fit.panX, fit.panY)
+                    c.drawBitmap(fb, null, fd, Paint(Paint.FILTER_BITMAP_FLAG).apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.SCREEN) })
+                }
+                if (mask != null) c.drawBitmap(mask, null, dst, Paint(Paint.FILTER_BITMAP_FLAG).apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.DST_IN) })
+                c.restoreToCount(l)
+            } else if (subjectOnly) {
                 val mask = if (it.video) null else frames.mask(item) ?: SubjectMasks.get(it.uri)
                 if (mask != null) {
                     val l = c.saveLayer(bounds, null)
@@ -338,6 +356,18 @@ object DesignRenderer {
             } else c.drawBitmap(src, null, dst, filterPaint(e.filter, d, spec))
         }
         c.restore()
+        // La persona scontornata sopra la cornice, fuori dal ritaglio: sembra uscire dalla foto.
+        val ps = popSrc; val pd = popDst
+        if (ps != null && pd != null && !subjectOnly && spec.behind) {
+            val it = spec.items[item]
+            val mask = if (it.video) null else frames.mask(item) ?: SubjectMasks.get(it.uri)
+            if (mask != null) {
+                val l = c.saveLayer(null, null)
+                c.drawBitmap(ps, null, pd, filterPaint(e.filter, d, spec))
+                c.drawBitmap(mask, null, pd, Paint(Paint.FILTER_BITMAP_FLAG).apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.DST_IN) })
+                c.restoreToCount(l)
+            }
+        }
         if (!subjectOnly && e.outline > 0) c.drawPath(path, Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeWidth = e.outline * s; color = DColor.BLACK.toInt() })
         if (selected && !subjectOnly) c.drawPath(path, Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeWidth = max(3f, 4f * s); color = 0xFFFFC83D.toInt() })
         if (layer >= 0) c.restoreToCount(layer)
@@ -692,7 +722,7 @@ object DesignRenderer {
         out
     }
 
-    fun drawText(c: Canvas, d: Design, e: DText, r: RectF, s: Float, spec: CollageSpec, meta: DesignMeta, u: Float) {
+    fun drawText(c: Canvas, d: Design, e: DText, r: RectF, s: Float, spec: CollageSpec, meta: DesignMeta, u: Float, sec: Float = -1f) {
         var txt = DesignTexts.text(e, spec, meta)
         if (txt.isBlank()) return
         if (e.count && u < 1f) txt = DesignCount.at(txt, CollageAnim.outCubic(u))
@@ -750,6 +780,17 @@ object DesignRenderer {
             }
             c.drawText(line, x, base, lp)
             if (e.glow != null) c.drawText(line, x, base, lp)
+            if (e.shine) {
+                // Il riflesso: una banda chiara inclinata che attraversa la riga (ferma a un terzo nell'immagine).
+                val ph = if (sec < 0f) 0.3f else ((sec + i * 0.15f) % 2.5f) / 2.5f * 1.8f - 0.4f
+                val bx = x + lw * ph; val band = lp.textSize * 0.9f
+                val sp = Paint(lp).apply {
+                    clearShadowLayer()
+                    shader = LinearGradient(bx - band, base + fm.ascent, bx + band * 0.4f, base + fm.descent,
+                        intArrayOf(0x00FFFFFF, 0xE6FFFFFF.toInt(), 0x00FFFFFF), floatArrayOf(0f, 0.5f, 1f), Shader.TileMode.CLAMP)
+                }
+                c.drawText(line, x, base, sp)
+            }
             lp.shader = null
         }
         c.restore()
@@ -930,6 +971,43 @@ object DesignRenderer {
                     val px = cx + kotlin.math.cos(a) * rad * 0.55f; val py = cy + kotlin.math.sin(a) * rad * 0.55f
                     c.drawCircle(px, py, rad * 0.06f, Paint(p).apply { color = 0xFFFFFFFF.toInt(); setShadowLayer(rad * 0.15f, 0f, 0f, 0xFFFFFFFF.toInt()) })
                 }
+            }
+            DPatternKind.GLITTER -> {
+                // Brillantini: tanti puntini dorati di misure diverse che si accendono e spengono, qualche stella a croce.
+                c.save(); c.clipRect(r)
+                val base = tint(e.color, d, spec)
+                val n = (r.width() * r.height() / (s * s) / 260f).toInt().coerceIn(200, 3500)
+                val gp = Paint(Paint.ANTI_ALIAS_FLAG)
+                for (i in 0 until n) {
+                    val x = r.left + rnd(i, 131) * r.width(); val y = r.top + rnd(i, 137) * r.height()
+                    val tw = 0.3f + 0.7f * kotlin.math.abs(kotlin.math.sin(sec * (2f + 3f * rnd(i, 139)) + i))
+                    val light = rnd(i, 149)
+                    gp.color = if (light > 0.8f) Color.WHITE else base
+                    gp.alpha = ((0.35f + 0.65f * rnd(i, 151)) * tw * 255).toInt()
+                    val rad = (0.5f + 2.2f * rnd(i, 157) * rnd(i, 163)) * s
+                    c.drawCircle(x, y, rad, gp)
+                    if (i % 37 == 0) {
+                        gp.strokeWidth = max(1f, 0.8f * s); gp.color = Color.WHITE; gp.alpha = (tw * 230).toInt()
+                        val l = rad * 6f * tw
+                        c.drawLine(x - l, y, x + l, y, gp); c.drawLine(x, y - l, x, y + l, gp)
+                    }
+                }
+                c.restore()
+            }
+            DPatternKind.HOLO -> {
+                // Olografico: macchie pastello iridescenti che scivolano piano, su una base perla.
+                c.save(); c.clipRect(r)
+                c.drawRect(r, Paint().apply { color = 0xFFEFEAF8.toInt() })
+                val cols = intArrayOf(0xFFFFB3E6.toInt(), 0xFF9FEFFF.toInt(), 0xFFC9B6FF.toInt(), 0xFFB8FFD9.toInt(), 0xFFFFE2A8.toInt(), 0xFFB3C7FF.toInt(), 0xFFFFC2C2.toInt())
+                val big = max(r.width(), r.height())
+                for (i in cols.indices) {
+                    val cx = r.left + (rnd(i, 171) + 0.08f * kotlin.math.sin(sec * 0.7f + i * 1.3f)) * r.width()
+                    val cy = r.top + (rnd(i, 173) + 0.06f * kotlin.math.cos(sec * 0.5f + i)) * r.height()
+                    val rad = big * (0.32f + 0.2f * rnd(i, 179))
+                    c.drawCircle(cx, cy, rad, Paint(Paint.ANTI_ALIAS_FLAG).apply { shader = RadialGradient(cx, cy, rad, cols[i], cols[i] and 0x00FFFFFF, Shader.TileMode.CLAMP) })
+                }
+                CollageRenderer.grain(c, (r.right + 1).toInt(), (r.bottom + 1).toInt(), 7, 22)
+                c.restore()
             }
             DPatternKind.WALL -> {
                 // Intonaco: macchie chiare e scure sfumate, grana grossa, qualche graffio e i bordi più scuri.

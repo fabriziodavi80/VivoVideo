@@ -274,7 +274,7 @@ private fun DesignPanel(vm: EditorViewModel, spec: CollageSpec, d: Design) {
             PanelLabel("Secondo colore")
             ColorDots(d.accents2, spec.accent2 ?: d.accents2.first()) { vm.setCollageAccent(it, second = true) }
         }
-        if (d.hasBehind) ToggleRow("La persona davanti al titolo", spec.behind) { vm.setCollageBehind(it) }
+        if (d.hasBehind) ToggleRow("La persona davanti (titolo e cornice)", spec.behind) { vm.setCollageBehind(it) }
         ToggleRow("Grana della pellicola", spec.style.grain || d.grain, enabled = !d.grain) { on -> vm.updateCollage { it.copy(style = it.style.copy(grain = on)) } }
         PanelLabel("Scritte · vuota = torna quella proposta")
         d.words.forEach { w ->

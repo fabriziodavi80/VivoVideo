@@ -18,7 +18,8 @@ import it.fabriziodavi.vivovideo.model.DColor.WHITE
  */
 object Designs {
     val all: List<Design> by lazy {
-        listOf(wedding(), saveDate(), booth(), flash(), balloons(), disco(), vip(), laurea(), baby(), badge(), speaker(),
+        listOf(wowPop(), wowDouble(), wowGold(), wowHolo(), wowAction(),
+            wedding(), saveDate(), booth(), flash(), balloons(), disco(), vip(), laurea(), baby(), badge(), speaker(),
             bib(), topo(), speed(), mud(), hud(), record(), sequence(), skipass(),
             paperTrip(), paperNews(), paperLove(), paperRecipe(), paperStrips(), paperWall(), paperRansom(), paperSticker(), paperRiso(),
             notes(), chrome(), leak(), blue(), pearls(), thenNow(), windows(), dump(),
@@ -42,6 +43,74 @@ object Designs {
 
     private const val MUD = 0xF0553A24L
 
+
+    // Effetto wow: la persona che esce dalla foto, la doppia esposizione, oro con i brillantini, olografico ----------
+    private val GOLD = listOf(0xFFFFF3C4L, 0xFFD9A93BL, 0xFFFFE597L, 0xFF946615L, 0xFFF2CF6CL)
+    private val CHROME = listOf(0xFFFFFFFFL, 0xFF8E97A8L, 0xFFF1F4F8L, 0xFF4B5363L, 0xFFC9D0DBL)
+
+    // W1 -----------------------------------------------------------------------------------------------
+    private fun wowPop() = Design("x-wow-pop", "Esce dalla foto", DesignFamily.WOW, DOrient.PORTRAIT, 794f, 1123f, ACC,
+        accents = listOf(0xFF1B2BD6L, 0xFFE5432DL, 0xFF111111L, 0xFFFF6FB5L, 0xFF0F7B5FL), accents2 = listOf(CREAM, BUTTER, WHITE),
+        motion = CollageMotion.DROP,
+        hint = "L'effetto 3D: la persona esce dal bordo della foto e passa davanti alla scritta gigante. Serve una foto con una persona intera o a mezzo busto",
+        els = listOf(
+            DText(bk(0, 30, 794, 330, F), "title", "Titolo", "Summer", DFont.ANTON, 330f, ACC2, DAlign.CENTER, line = 0.85f, upper = true),
+            DPhoto(bk(112, 330, 570, 640), 0, rot = -3f, border = 18f, borderColor = CREAM, shadow = 34f, pop = 0.34f),
+            DText(bk(470, 900, 300, 80), "sticker", "Adesivo", "best day ever", DFont.HAND, 46f, BLACK, DAlign.CENTER, rot = 7f, pill = BUTTER, pad = 22f),
+            DPath(bk(56, 300, 80, 80), SPARKLE, 100f, 100f, fill = BUTTER),
+            DPath(bk(690, 360, 54, 54), SPARKLE, 100f, 100f, fill = ACC2),
+            DText(bk(40, 1010, 714, 80), "place", "Luogo", "{luogo|Sardegna} · {ANNO}", DFont.HAND, 64f, ACC2, DAlign.CENTER, rot = -2f),
+        ))
+
+    // W2 -----------------------------------------------------------------------------------------------
+    private fun wowDouble() = Design("x-wow-double", "Doppia esposizione", DesignFamily.WOW, DOrient.PORTRAIT, 794f, 1123f, ACC,
+        accents = listOf(0xFFF3EEE6L, WHITE, 0xFFE9E4DAL, 0xFFDDE7EAL), accents2 = listOf(0xFF1A1A1AL, 0xFF2340D9L, 0xFF8A3B2EL),
+        motion = CollageMotion.ZOOM,
+        hint = "Doppia esposizione: la sagoma della persona (prima foto) riempita col paesaggio o la città (seconda foto), come nelle locandine dei film",
+        els = listOf(
+            DPhoto(bk(77, 70, 640, 800), 0, fill = 1),
+            DText(bk(30, 860, 734, 170), "title", "Titolo", "Wanderlust", DFont.SERIF_IT, 150f, ACC2, DAlign.CENTER),
+            DRect(bk(337, 1040, 120, 2), ACC2),
+            DText(bk(40, 1058, 714, 30), "place", "Luogo", "{luogo|Dolomiti} · {Mese} {ANNO}", DFont.MONO, 18f, ACC2, DAlign.CENTER, track = 0.3f, upper = true),
+        ))
+
+    // W3 -----------------------------------------------------------------------------------------------
+    private fun wowGold() = Design("x-wow-gold", "Oro e brillantini", DesignFamily.WOW, DOrient.PORTRAIT, 794f, 1123f, 0xFF0B0B0FL,
+        accents = listOf(0xFFE7C26BL, 0xFFE9E9F2L, 0xFFF2A7C8L), motion = CollageMotion.CASCADE,
+        hint = "Compleanni, anniversari, capodanno: brillantini che scintillano, scritte d'oro con il riflesso che passa e gli anni che contano",
+        els = listOf(
+            DPattern(b(0, 0, 794, 1123, F), DPatternKind.GLITTER, ACC, 0f),
+            DText(bk(0, 40, 794, 330, F), "title", "Titolo", "Buon\ncompleanno", DFont.SCRIPT, 160f, WHITE, DAlign.CENTER, line = 0.95f, gradient = GOLD, shine = true, shadow = true),
+            DPhoto(bk(167, 390, 460, 560), 0, DShape.ARCH, border = 8f, borderColor = 0xFFD9A93BL, shadow = 40f),
+            DText(bk(470, 800, 320, 300), "age", "Anni", "80", DFont.ANTON, 260f, WHITE, DAlign.CENTER, rot = -8f, gradient = GOLD, shine = true, shadow = true, count = true),
+            DText(bk(30, 970, 480, 90), "name", "Nome", "Vecio", DFont.SERIF_IT, 76f, CREAM),
+            DText(bk(30, 1062, 600, 26), "date", "Data", "{data} · {luogo|a casa}", DFont.MONO_BOLD, 18f, 0xFFD9A93BL, track = 0.25f, upper = true),
+        ))
+
+    // W4 -----------------------------------------------------------------------------------------------
+    private fun wowHolo() = Design("x-wow-holo", "Olografico", DesignFamily.WOW, DOrient.PORTRAIT, 794f, 1123f, 0xFFEFEAF8L,
+        accents = listOf(0xFF1A1033L, 0xFF2340D9L, 0xFFFF2E93L), motion = CollageMotion.DROP,
+        hint = "Fondo olografico che cambia colore, la scritta cromata con il riflesso e la persona scontornata come un adesivo lucido",
+        els = listOf(
+            DPattern(b(0, 0, 794, 1123, F), DPatternKind.HOLO, 0, 0f),
+            DText(bk(0, 40, 794, 300, F), "title", "Titolo", "Weekend", DFont.ARCHIVO, 200f, WHITE, DAlign.CENTER, gradient = CHROME, shine = true, shadow = true, upper = true, skew = -0.06f),
+            DPhoto(bk(122, 250, 550, 730), 0, cutout = true, border = 16f, shadow = 26f),
+            DPath(bk(70, 330, 70, 70), SPARKLE, 100f, 100f, fill = WHITE),
+            DPath(bk(660, 780, 90, 90), SPARKLE, 100f, 100f, fill = WHITE),
+            DText(bk(60, 990, 330, 56), "tag", "Etichetta", "{luogo|Milano}", DFont.MONO_BOLD, 22f, WHITE, rot = -4f, pill = ACC, pad = 18f, upper = true, track = 0.1f),
+            DText(bk(420, 1000, 330, 56), "tag2", "Etichetta 2", "{giorno_breve}", DFont.MONO_BOLD, 22f, BLACK, DAlign.RIGHT, rot = 5f, pill = WHITE, pad = 18f, upper = true, track = 0.1f),
+        ))
+
+    // W5 -----------------------------------------------------------------------------------------------
+    private fun wowAction() = Design("x-wow-action", "Polaroid 3D", DesignFamily.WOW, DOrient.PORTRAIT, 794f, 1123f, 0xFF0D0D0DL,
+        accents = listOf(0xFFC6FF3DL, 0xFFFF5B14L, 0xFF00E5FFL, 0xFFFFD60AL), motion = CollageMotion.DROP,
+        hint = "Sport e avventura: la polaroid storta da cui esce chi salta, corre o pedala, con le righe di velocità e la scritta che grida",
+        els = listOf(
+            DPattern(b(0, 0, 794, 1123, F), DPatternKind.SPEED, 0x33FFFFFFL, 0f),
+            DText(bk(0, 30, 794, 300, F), "title", "Titolo", "Send it", DFont.ANTON, 270f, ACC, DAlign.CENTER, upper = true, skew = -0.14f),
+            DPhoto(bk(137, 330, 520, 560), 0, rot = 5f, border = 22f, bottomPad = 110f, shadow = 36f, pop = 0.38f),
+            DText(bk(40, 1020, 714, 80), "place", "Luogo", "{luogo|Finale Ligure} · {giorno_breve}", DFont.HAND, 60f, WHITE, DAlign.CENTER, rot = -3f),
+        ))
 
     // Eventi: colori pieni, foto grandi, scritte enormi e adesivi (niente avorio e rametti da partecipazione).
     private const val CREAM = 0xFFFFF4E2L
@@ -736,7 +805,7 @@ object Designs {
             DRect(bk(150, 985, 120, 40), tape, rot = 5f),
             DText(bk(62, 972, 286, 22), "date", "Data", "{data}", DFont.MONO_BOLD, 15f, 0xFF6B6660, DAlign.CENTER, track = 0.2f),
             DText(bk(-20, 340, 834, 440), "title", "Dedica", "80 volte auguri,\nVecio!!!", DFont.SCRIPT, 150f, WHITE, DAlign.CENTER,
-                line = 1.05f, rot = -18f, gradient = gold, shadow = true, count = true),
+                line = 1.05f, rot = -18f, gradient = gold, shadow = true, count = true, shine = true),
         )
         return Design("x-paper-strips", "Strisce sul muro", DesignFamily.PAPER, DOrient.PORTRAIT, 794f, 1123f, ACC,
             accents = listOf(0xFF6E8584L, 0xFF8A7F74L, 0xFF3A3F47L, 0xFFB7A694L, 0xFF7A5C5CL), els = els, motion = CollageMotion.CASCADE,

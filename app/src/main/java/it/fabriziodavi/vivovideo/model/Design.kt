@@ -32,8 +32,8 @@ enum class DShape { RECT, CIRCLE, ARCH, PILL, TORN_BOTTOM, TORN_TOP, TORN }
 enum class DFilter { NONE, BW, DUOTONE, BLUR, HALFTONE }
 
 /** Carta a quadretti, fori della pellicola, grana della carta, righe del quaderno, colonne di testo di giornale. */
-/** ... [CONFETTI] coriandoli (cadono nel video), [QR] quadretti tipo codice QR (decorativo), [DISCO] palla a specchi, [WALL] muro d'intonaco rovinato sopra il colore di fondo. */
-enum class DPatternKind { GRID, SPROCKETS, PAPER, LINES, TEXTLINES, TOPO, SPEED, CONFETTI, QR, DISCO, WALL }
+/** ... [CONFETTI] coriandoli (cadono nel video), [QR] quadretti tipo codice QR (decorativo), [DISCO] palla a specchi, [WALL] muro d'intonaco rovinato sopra il colore di fondo, [GLITTER] brillantini che scintillano, [HOLO] fondo olografico iridescente che si muove. */
+enum class DPatternKind { GRID, SPROCKETS, PAPER, LINES, TEXTLINES, TOPO, SPEED, CONFETTI, QR, DISCO, WALL, GLITTER, HOLO }
 
 /** Riquadro sul foglio di riferimento, con gli ancoraggi orizzontale e verticale. */
 data class DBox(val x: Float, val y: Float, val w: Float, val h: Float, val ax: Anchor = Anchor.START, val ay: Anchor = Anchor.START)
@@ -81,6 +81,10 @@ data class DPhoto(
     /** Spostamento del retino (pixel del foglio), per il fuori registro della risografia. */
     val shiftX: Float = 0f,
     val shiftY: Float = 0f,
+    /** «Esce dalla cornice»: la persona scontornata sporge sopra il bordo alto di questa frazione dell'altezza (effetto 3D). */
+    val pop: Float = 0f,
+    /** Doppia esposizione: la sagoma della persona riempita con la foto [fill] (paesaggio, città). */
+    val fill: Int = -1,
 ) : DEl
 
 /** Pezzo di carta strappata: bordo irregolare sui lati [edges] (1 sopra, 2 destra, 4 sotto, 8 sinistra) con la fibra bianca e la grana. */
@@ -152,6 +156,8 @@ data class DText(
     val skew: Float = 0f,
     /** Alone luminoso di questo colore (neon). */
     val glow: Long? = null,
+    /** Riflesso di luce che passa sulle lettere (oro, cromo): nel video ogni due secondi e mezzo. */
+    val shine: Boolean = false,
 ) : DEl
 
 /** Una parola con una foto dentro ogni lettera. */
@@ -205,6 +211,7 @@ data class DBarcode(override val box: DBox, val color: Long, override val rot: F
 data class DPalette(override val box: DBox, val count: Int, val color: Long, override val rot: Float = 0f) : DEl
 
 enum class DesignFamily(val label: String, val hint: String) {
+    WOW("Effetto wow", "La persona che esce dalla foto, la doppia esposizione, oro con i brillantini, olografico, polaroid 3D"),
     EVENTS("Eventi", "Matrimoni, compleanni, feste, lauree, nascite, convegni: sposi da rivista, save the date, cabina foto, usa e getta, anni con le foto, disco, pass VIP, badge, relatore"),
     ACTION("Azione", "Sport d'azione: MTB, bici, corsa, sci, surf. Pettorale, mappa, velocità, fango, action cam, record, sequenza, skipass"),
     PAPER("Carta", "Carta strappata con la fibra bianca, lettere ritagliate, retino, la persona ritagliata come un adesivo"),
@@ -242,10 +249,10 @@ data class Design(
     }
 
     val texts: List<DText> get() = els.filterIsInstance<DText>().filter { it.label.isNotEmpty() }
-    val hasBehind: Boolean get() = els.any { it is DText && it.behind >= 0 }
+    val hasBehind: Boolean get() = els.any { (it is DText && it.behind >= 0) || (it is DPhoto && it.pop > 0f) }
     /** Le foto da scontornare: quelle davanti al titolo e quelle ritagliate come adesivi. */
     val maskSlots: List<Int> get() = (els.filterIsInstance<DText>().filter { it.behind >= 0 }.map { it.behind } +
-        els.filterIsInstance<DPhoto>().filter { it.cutout }.map { it.slot }).distinct()
+        els.filterIsInstance<DPhoto>().filter { it.cutout || it.pop > 0f || it.fill >= 0 }.map { it.slot }).distinct()
     /** Scritte a lettere ritagliate e timbri (si cambiano come le altre scritte). */
     val extraTexts: List<Triple<String, String, String>> get() = els.mapNotNull { e ->
         when (e) { is DRansom -> Triple(e.id, e.label, e.text); is DStamp -> Triple(e.id, e.label, e.text); is DCalendar -> Triple(e.id, e.label, e.text); else -> null }
