@@ -135,7 +135,7 @@ object Designs {
             DText(bk(0, 150, 794, 420, F), "title", "Titolo", "Dream", DFont.ANTON, 400f, ACC, DAlign.CENTER, upper = true, behind = 0),
             DText(bk(0, 150, 794, 420, F), "title", "", "Dream", DFont.ANTON, 400f, ACC, DAlign.CENTER, upper = true, stroke = 3f),
             DText(bk(40, 990, 714, 70), "line", "Sotto", "{luogo|Lisbona} — {Mese} {ANNO}", DFont.SERIF_IT, 54f, WHITE, DAlign.CENTER),
-            DText(bk(40, 1068, 714, 26), "small", "Piccolo", "{foto} foto · {giorni} giorni", DFont.MONO_BOLD, 18f, WHITE, DAlign.CENTER, track = 0.3f, upper = true),
+            DText(bk(40, 1068, 714, 26), "small", "Piccolo", "{foto} foto · {giorno_breve}", DFont.MONO_BOLD, 18f, WHITE, DAlign.CENTER, track = 0.3f, upper = true),
         ))
 
     // W8 -----------------------------------------------------------------------------------------------
@@ -184,7 +184,7 @@ object Designs {
         els = listOf(
             DText(bk(40, 40, 714, 34), "kicker", "Sopra", "{Mese} {ANNO}", DFont.MONO_BOLD, 22f, ACC2, DAlign.CENTER, track = 0.4f, upper = true),
             DPhotoWord(bk(30, 100, 734, 560), "letters", "Parola", "Estate", DFont.ANTON, 1, gap = 12f),
-            DPhoto(bk(160, 470, 474, 640), 0, cutout = true, border = 14f, shadow = 26f),
+            DPhoto(bk(207, 600, 380, 500), 0, cutout = true, border = 14f, shadow = 26f),
             DText(bk(40, 1050, 714, 50), "place", "Luogo", "{luogo|Puglia}", DFont.HAND, 54f, ACC2, DAlign.CENTER, rot = -3f),
         ))
 
@@ -197,7 +197,7 @@ object Designs {
             DText(bk(0, 24, 794, 230, F), "mast", "Testata", "Icona", DFont.SERIF, 250f, ACC2, DAlign.CENTER, line = 0.9f, upper = true),
             DPhoto(bk(60, 250, 674, 800), 0, pop = 0.22f, shadow = 20f),
             DText(bk(80, 600, 330, 200), "line1", "Titolo 1", "Speciale\n{Mese}", DFont.GROTESK, 56f, WHITE, line = 0.95f, shadow = true),
-            DText(bk(80, 830, 330, 120), "line2", "Titolo 2", "{n_luoghi} luoghi,\n{foto} ricordi", DFont.SERIF_IT, 40f, WHITE, shadow = true),
+            DText(bk(80, 830, 330, 120), "line2", "Titolo 2", "Il meglio\ndi {luogo|Roma}", DFont.SERIF_IT, 40f, WHITE, shadow = true),
             DText(bk(520, 920, 190, 110), "num", "Numero", "N°{mese_n}", DFont.ANTON, 80f, ACC, DAlign.CENTER, pill = WHITE, pad = 16f, rot = -6f),
             DText(bk(40, 1068, 714, 26), "small", "Piede", "{ANNO} · edizione speciale", DFont.MONO_BOLD, 18f, ACC2, DAlign.CENTER, track = 0.3f, upper = true),
         ))
