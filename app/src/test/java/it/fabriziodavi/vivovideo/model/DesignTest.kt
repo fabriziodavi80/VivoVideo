@@ -119,4 +119,11 @@ class DesignTest {
         assertEquals(listOf(PrintFormat.S15, PrintFormat.S20, PrintFormat.S30), PrintFormat.forAspect(CollageAspect.SQUARE))
         assertTrue(PrintFormat.forAspect(CollageAspect.PHOTO).containsAll(listOf(PrintFormat.P10x15, PrintFormat.A4, PrintFormat.P50x70)))
     }
+
+    @Test fun oneLineWordNeverBreaks() {
+        assertEquals(1 to 7, DLayout.wordGrid(7, oneLine = true))
+        assertEquals(3 to 3, DLayout.wordGrid(7))
+        val d = Designs.all.first { it.id == "x-wow-letters" }
+        assertTrue(d.words.single().oneLine)
+    }
 }

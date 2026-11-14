@@ -183,8 +183,8 @@ object Designs {
         hint = "Una parola a lettere-foto (una foto per lettera) e la persona della prima foto scontornata davanti, grande",
         els = listOf(
             DText(bk(40, 40, 714, 34), "kicker", "Sopra", "{Mese} {ANNO}", DFont.MONO_BOLD, 22f, ACC2, DAlign.CENTER, track = 0.4f, upper = true),
-            DPhotoWord(bk(30, 100, 734, 560), "letters", "Parola", "Estate", DFont.ANTON, 1, gap = 12f),
-            DPhoto(bk(207, 600, 380, 500), 0, cutout = true, border = 14f, shadow = 26f),
+            DPhotoWord(bk(20, 110, 754, 420), "letters", "Parola", "Estate", DFont.ANTON, 1, gap = 8f, oneLine = true),
+            DPhoto(bk(187, 440, 420, 590), 0, cutout = true, border = 14f, shadow = 26f),
             DText(bk(40, 1050, 714, 50), "place", "Luogo", "{luogo|Puglia}", DFont.HAND, 54f, ACC2, DAlign.CENTER, rot = -3f),
         ))
 

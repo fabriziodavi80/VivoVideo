@@ -722,7 +722,7 @@ object DesignRenderer {
         tUs: Long, still: Boolean, pi0: Int, photos: Int, w: Int, h: Int, selected: Int,
     ): Int {
         val word = DesignTexts.word(e, spec, meta)
-        val (rows, perRow) = DLayout.wordGrid(word.length)
+        val (rows, perRow) = DLayout.wordGrid(word.length, e.oneLine)
         val p = Paint(Paint.ANTI_ALIAS_FLAG).apply { typeface = DesignFonts.get(e.font); textSize = 100f; color = Color.BLACK }
         val gap = e.gap * s
         val bounds = word.map { ch -> Rect().also { p.getTextBounds(ch.toString(), 0, 1, it) } }

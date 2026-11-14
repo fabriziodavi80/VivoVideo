@@ -182,6 +182,8 @@ data class DPhotoWord(
     val firstSlot: Int,
     val gap: Float = 10f,
     override val rot: Float = 0f,
+    /** Tutta la parola su una riga (mai spezzata), anche se le lettere vengono più piccole. */
+    val oneLine: Boolean = false,
 ) : DEl
 
 data class DRect(
@@ -314,7 +316,7 @@ object DLayout {
                 is DPhotoWord -> {
                     val n = e.text.count { !it.isWhitespace() }
                     val r = rect(d, e.box, w, h)
-                    val (rows, perRow) = wordGrid(n)
+                    val (rows, perRow) = wordGrid(n, e.oneLine)
                     for (k in 0 until n) {
                         val slot = e.firstSlot + k
                         if (out[slot] != null) continue
@@ -329,7 +331,8 @@ object DLayout {
     }
 
     /** File e lettere per riga di una parola-foto di [n] lettere. */
-    fun wordGrid(n: Int): Pair<Int, Int> = when {
+    fun wordGrid(n: Int, oneLine: Boolean = false): Pair<Int, Int> = when {
+        oneLine -> 1 to max(1, n)
         n <= 3 -> 1 to max(1, n)
         n == 4 -> 2 to 2
         n <= 6 -> 2 to 3
