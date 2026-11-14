@@ -85,6 +85,16 @@ data class DPhoto(
     val pop: Float = 0f,
     /** Doppia esposizione: la sagoma della persona riempita con la foto [fill] (paesaggio, città). */
     val fill: Int = -1,
+    /** La foto dentro una parola gigante ([word], si cambia in Scritte con [wordId]) invece che in una forma. */
+    val word: String? = null,
+    val wordId: String = "word",
+    val wordFont: DFont = DFont.ANTON,
+    /** La persona scontornata ridisegnata intera sopra la sua foto (con [word]: esce dalle lettere). */
+    val front: Boolean = false,
+    /** Foto tagliata in [slices] strisce verticali sfalsate (nel video arrivano dall'alto e dal basso). */
+    val slices: Int = 0,
+    /** Scia: copie colorate della persona scontornata dietro di lei, come in una foto in movimento. */
+    val echo: Int = 0,
 ) : DEl
 
 /** Pezzo di carta strappata: bordo irregolare sui lati [edges] (1 sopra, 2 destra, 4 sotto, 8 sinistra) con la fibra bianca e la grana. */
@@ -158,6 +168,8 @@ data class DText(
     val glow: Long? = null,
     /** Riflesso di luce che passa sulle lettere (oro, cromo): nel video ogni due secondi e mezzo. */
     val shine: Boolean = false,
+    /** Scritta ripetuta lungo un cerchio dentro il riquadro, come un timbro; nel video gira piano. */
+    val arc: Boolean = false,
 ) : DEl
 
 /** Una parola con una foto dentro ogni lettera. */
@@ -249,13 +261,14 @@ data class Design(
     }
 
     val texts: List<DText> get() = els.filterIsInstance<DText>().filter { it.label.isNotEmpty() }
-    val hasBehind: Boolean get() = els.any { (it is DText && it.behind >= 0) || (it is DPhoto && it.pop > 0f) }
+    val hasBehind: Boolean get() = els.any { (it is DText && it.behind >= 0) || (it is DPhoto && (it.pop > 0f || it.front)) }
     /** Le foto da scontornare: quelle davanti al titolo e quelle ritagliate come adesivi. */
     val maskSlots: List<Int> get() = (els.filterIsInstance<DText>().filter { it.behind >= 0 }.map { it.behind } +
-        els.filterIsInstance<DPhoto>().filter { it.cutout || it.pop > 0f || it.fill >= 0 }.map { it.slot }).distinct()
+        els.filterIsInstance<DPhoto>().filter { it.cutout || it.pop > 0f || it.fill >= 0 || it.front }.map { it.slot }).distinct()
     /** Scritte a lettere ritagliate e timbri (si cambiano come le altre scritte). */
     val extraTexts: List<Triple<String, String, String>> get() = els.mapNotNull { e ->
-        when (e) { is DRansom -> Triple(e.id, e.label, e.text); is DStamp -> Triple(e.id, e.label, e.text); is DCalendar -> Triple(e.id, e.label, e.text); else -> null }
+        when (e) { is DRansom -> Triple(e.id, e.label, e.text); is DStamp -> Triple(e.id, e.label, e.text); is DCalendar -> Triple(e.id, e.label, e.text)
+            is DPhoto -> e.word?.let { Triple(e.wordId, "Parola (la foto dentro)", it) }; else -> null }
     }
     val words: List<DPhotoWord> get() = els.filterIsInstance<DPhotoWord>()
 }

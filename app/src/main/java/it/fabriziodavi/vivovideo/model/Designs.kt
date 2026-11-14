@@ -18,7 +18,7 @@ import it.fabriziodavi.vivovideo.model.DColor.WHITE
  */
 object Designs {
     val all: List<Design> by lazy {
-        listOf(wowPop(), wowDouble(), wowGold(), wowHolo(), wowAction(),
+        listOf(wowPop(), wowWord(), wowOutline(), wowCircle(), wowSlices(), wowEcho(), wowLetters(), wowCover(), wowDouble(), wowGold(), wowHolo(), wowAction(),
             wedding(), saveDate(), booth(), flash(), balloons(), disco(), vip(), laurea(), baby(), badge(), speaker(),
             bib(), topo(), speed(), mud(), hud(), record(), sequence(), skipass(),
             paperTrip(), paperNews(), paperLove(), paperRecipe(), paperStrips(), paperWall(), paperRansom(), paperSticker(), paperRiso(),
@@ -110,6 +110,96 @@ object Designs {
             DText(bk(0, 30, 794, 300, F), "title", "Titolo", "Send it", DFont.ANTON, 270f, ACC, DAlign.CENTER, upper = true, skew = -0.14f),
             DPhoto(bk(137, 330, 520, 560), 0, rot = 5f, border = 22f, bottomPad = 110f, shadow = 36f, pop = 0.38f),
             DText(bk(40, 1020, 714, 80), "place", "Luogo", "{luogo|Finale Ligure} · {giorno_breve}", DFont.HAND, 60f, WHITE, DAlign.CENTER, rot = -3f),
+        ))
+
+    // W6 -----------------------------------------------------------------------------------------------
+    private fun wowWord() = Design("x-wow-word", "Ritratto nella parola", DesignFamily.WOW, DOrient.PORTRAIT, 794f, 1123f, ACC,
+        accents = listOf(0xFFF2EDE4L, 0xFF111111L, 0xFF2340D9L, 0xFFE5432DL), accents2 = listOf(0xFF111111L, CREAM, BUTTER),
+        motion = CollageMotion.ZOOM,
+        hint = "La foto dentro una parola gigante e la persona che esce dalle lettere, intera davanti. Cambia la parola in Scritte (una città, un nome)",
+        els = listOf(
+            DText(bk(40, 50, 714, 34), "kicker", "Sopra", "{Mese} {ANNO} · {luogo|Roma}", DFont.MONO_BOLD, 22f, ACC2, DAlign.CENTER, track = 0.3f, upper = true),
+            DPhoto(bk(20, 150, 754, 720), 0, word = "Roma", wordFont = DFont.ANTON, front = true),
+            DText(bk(40, 900, 714, 120), "title", "Frase", "la città eterna", DFont.SERIF_IT, 96f, ACC2, DAlign.CENTER),
+            DPath(bk(90, 1040, 40, 40), SPARKLE, 100f, 100f, fill = ACC2),
+            DPath(bk(664, 1040, 40, 40), SPARKLE, 100f, 100f, fill = ACC2),
+        ))
+
+    // W7 -----------------------------------------------------------------------------------------------
+    private fun wowOutline() = Design("x-wow-outline", "Contorno davanti", DesignFamily.WOW, DOrient.PORTRAIT, 794f, 1123f, 0xFF111111L,
+        accents = listOf(WHITE, BUTTER, 0xFFFF6FB5L, 0xFFC6FF3DL), motion = CollageMotion.ZOOM,
+        hint = "La scritta enorme passa dietro la persona e il suo contorno le resta davanti: si legge tutta e sembra 3D",
+        els = listOf(
+            DPhoto(bk(0, 0, 794, 1123, F), 0),
+            DRect(bk(0, 760, 794, 363, F), 0, grad = listOf(0f to 0x00000000L, 1f to 0xB3000000L)),
+            DText(bk(0, 150, 794, 420, F), "title", "Titolo", "Dream", DFont.ANTON, 400f, ACC, DAlign.CENTER, upper = true, behind = 0),
+            DText(bk(0, 150, 794, 420, F), "title", "", "Dream", DFont.ANTON, 400f, ACC, DAlign.CENTER, upper = true, stroke = 3f),
+            DText(bk(40, 990, 714, 70), "line", "Sotto", "{luogo|Lisbona} — {Mese} {ANNO}", DFont.SERIF_IT, 54f, WHITE, DAlign.CENTER),
+            DText(bk(40, 1068, 714, 26), "small", "Piccolo", "{foto} foto · {giorni} giorni", DFont.MONO_BOLD, 18f, WHITE, DAlign.CENTER, track = 0.3f, upper = true),
+        ))
+
+    // W8 -----------------------------------------------------------------------------------------------
+    private fun wowSlices() = Design("x-wow-slices", "Foto a strisce", DesignFamily.WOW, DOrient.PORTRAIT, 794f, 1123f, ACC,
+        accents = listOf(0xFFFFE14DL, 0xFFC6F04AL, 0xFFFF9EC7L, 0xFF9FD8FFL, 0xFF111111L), accents2 = listOf(0xFF111111L, WHITE, 0xFF2340D9L),
+        motion = CollageMotion.ZOOM,
+        hint = "La foto tagliata in strisce sfalsate, come stampata e rimontata: nel video le strisce arrivano dall'alto e dal basso",
+        els = listOf(
+            DText(bk(40, 40, 714, 200), "title", "Titolo", "Good\nvibes", DFont.GROTESK, 110f, ACC2, line = 0.88f),
+            DPath(bk(660, 60, 90, 90), SPARKLE, 100f, 100f, fill = ACC2),
+            DPhoto(bk(60, 270, 674, 700), 0, slices = 7, shadow = 14f),
+            DText(bk(40, 1020, 400, 60), "tag", "Etichetta", "{luogo|Napoli}", DFont.MONO_BOLD, 24f, ACC, rot = -3f, pill = ACC2, pad = 20f, upper = true, track = 0.1f),
+            DText(bk(400, 1030, 354, 50), "date", "Data", "{data}", DFont.MONO_BOLD, 22f, ACC2, DAlign.RIGHT, track = 0.2f),
+        ))
+
+    // W9 -----------------------------------------------------------------------------------------------
+    private fun wowEcho() = Design("x-wow-echo", "Scia", DesignFamily.WOW, DOrient.PORTRAIT, 794f, 1123f, 0xFF0B0B0BL,
+        accents = listOf(0xFFC6FF3DL, 0xFFFF2E93L, 0xFF00E5FFL, 0xFFFF5B14L), motion = CollageMotion.DROP,
+        hint = "Sport e ballo: la persona scontornata con la scia colorata dietro, come una foto in movimento, e la scritta vuota gigante",
+        els = listOf(
+            DPattern(b(0, 0, 794, 1123, F), DPatternKind.SPEED, WHITE, 0f),
+            DText(bk(0, 40, 794, 330, F), "title", "Titolo", "Fast", DFont.ANTON, 360f, ACC, DAlign.CENTER, upper = true, stroke = 4f, skew = -0.12f),
+            DPhoto(bk(170, 260, 560, 760), 0, cutout = true, border = 10f, shadow = 20f, echo = 4),
+            DText(bk(40, 1040, 714, 50), "stats", "Dati", "{luogo|Pista} · {giorno_breve}", DFont.MONO_BOLD, 26f, WHITE, DAlign.CENTER, track = 0.25f, upper = true),
+        ))
+
+    // W10 ----------------------------------------------------------------------------------------------
+    private fun wowCircle() = Design("x-wow-circle", "Esce dal cerchio", DesignFamily.WOW, DOrient.PORTRAIT, 794f, 1123f, ACC,
+        accents = listOf(0xFFFF7A1AL, 0xFF2340D9L, 0xFF0F7B5FL, 0xFFE5432DL, 0xFF111111L), accents2 = listOf(CREAM, BUTTER, WHITE),
+        motion = CollageMotion.DROP,
+        hint = "La foto rotonda con la persona che sporge sopra, la scritta che gira attorno come un timbro e il titolo in corsivo",
+        els = listOf(
+            DText(bk(52, 160, 690, 690), "ring", "Scritta in cerchio", "Summer {ANNO} · {luogo|Sardegna}", DFont.MONO_BOLD, 30f, ACC2, track = 0.2f, upper = true, arc = true),
+            DPhoto(bk(127, 235, 540, 540), 0, DShape.CIRCLE, border = 14f, borderColor = CREAM, shadow = 30f, pop = 0.3f),
+            DText(bk(30, 860, 734, 150), "title", "Titolo", "Noi due", DFont.SERIF_IT, 140f, ACC2, DAlign.CENTER),
+            DPath(bk(80, 120, 70, 70), SPARKLE, 100f, 100f, fill = BUTTER),
+            DPath(bk(650, 800, 60, 60), SPARKLE, 100f, 100f, fill = ACC2),
+            DText(bk(40, 1030, 714, 30), "date", "Data", "{data}", DFont.MONO_BOLD, 20f, ACC2, DAlign.CENTER, track = 0.3f),
+        ))
+
+    // W11 ----------------------------------------------------------------------------------------------
+    private fun wowLetters() = Design("x-wow-letters", "Lettere e persona", DesignFamily.WOW, DOrient.PORTRAIT, 794f, 1123f, ACC,
+        accents = listOf(0xFF111111L, 0xFFF2EDE4L, 0xFF2340D9L, 0xFFFF6FB5L), accents2 = listOf(BUTTER, WHITE, 0xFF111111L),
+        motion = CollageMotion.CASCADE,
+        hint = "Una parola a lettere-foto (una foto per lettera) e la persona della prima foto scontornata davanti, grande",
+        els = listOf(
+            DText(bk(40, 40, 714, 34), "kicker", "Sopra", "{Mese} {ANNO}", DFont.MONO_BOLD, 22f, ACC2, DAlign.CENTER, track = 0.4f, upper = true),
+            DPhotoWord(bk(30, 100, 734, 560), "letters", "Parola", "Estate", DFont.ANTON, 1, gap = 12f),
+            DPhoto(bk(160, 470, 474, 640), 0, cutout = true, border = 14f, shadow = 26f),
+            DText(bk(40, 1050, 714, 50), "place", "Luogo", "{luogo|Puglia}", DFont.HAND, 54f, ACC2, DAlign.CENTER, rot = -3f),
+        ))
+
+    // W12 ----------------------------------------------------------------------------------------------
+    private fun wowCover() = Design("x-wow-cover", "Copertina 3D", DesignFamily.WOW, DOrient.PORTRAIT, 794f, 1123f, ACC,
+        accents = listOf(0xFFE10600L, 0xFF111111L, 0xFF2340D9L, 0xFFF2EDE4L), accents2 = listOf(WHITE, BUTTER, 0xFF111111L),
+        motion = CollageMotion.ZOOM,
+        hint = "Copertina di rivista con la foto incorniciata e la persona che esce sopra la testata, con i titoli ai lati",
+        els = listOf(
+            DText(bk(0, 24, 794, 230, F), "mast", "Testata", "Icona", DFont.SERIF, 250f, ACC2, DAlign.CENTER, line = 0.9f, upper = true),
+            DPhoto(bk(60, 250, 674, 800), 0, pop = 0.22f, shadow = 20f),
+            DText(bk(80, 600, 330, 200), "line1", "Titolo 1", "Speciale\n{Mese}", DFont.GROTESK, 56f, WHITE, line = 0.95f, shadow = true),
+            DText(bk(80, 830, 330, 120), "line2", "Titolo 2", "{n_luoghi} luoghi,\n{foto} ricordi", DFont.SERIF_IT, 40f, WHITE, shadow = true),
+            DText(bk(520, 920, 190, 110), "num", "Numero", "N°{mese_n}", DFont.ANTON, 80f, ACC, DAlign.CENTER, pill = WHITE, pad = 16f, rot = -6f),
+            DText(bk(40, 1068, 714, 26), "small", "Piede", "{ANNO} · edizione speciale", DFont.MONO_BOLD, 18f, ACC2, DAlign.CENTER, track = 0.3f, upper = true),
         ))
 
     // Eventi: colori pieni, foto grandi, scritte enormi e adesivi (niente avorio e rametti da partecipazione).

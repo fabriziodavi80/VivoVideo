@@ -210,6 +210,25 @@ object DesignRenderer {
         return p
     }
 
+    /** Le lettere di [txt] come un'unica forma, grande quanto entra in [r] e centrata (per la foto dentro la parola). */
+    private fun wordPath(txt: String, font: DFont, r: RectF): Path {
+        val p = Paint(Paint.ANTI_ALIAS_FLAG).apply { typeface = DesignFonts.get(font); textSize = 200f }
+        val lines = txt.split('\n').map { it.trim() }.filter { it.isNotEmpty() }.ifEmpty { listOf("A") }
+        val fm = p.fontMetrics
+        val lh = (fm.descent - fm.ascent) * 0.82f
+        val out = Path()
+        lines.forEachIndexed { i, l ->
+            val lp = Path(); p.getTextPath(l, -p.measureText(l) / 2, i * lh, lp); out.addPath(lp)
+        }
+        val b = RectF().also { out.computeBounds(it, true) }
+        if (b.width() <= 0f || b.height() <= 0f) return out
+        val k = min(r.width() / b.width(), r.height() / b.height())
+        val m = android.graphics.Matrix()
+        m.setTranslate(-b.centerX(), -b.centerY()); m.postScale(k, k); m.postTranslate(r.centerX(), r.centerY())
+        out.transform(m)
+        return out
+    }
+
     private fun shape(e: DPhoto, r: RectF, s: Float): Path {
         val p = Path()
         when {
@@ -285,7 +304,8 @@ object DesignRenderer {
         c.scale(pose.scale, pose.scale, r.centerX(), r.centerY())
         val layer = if (pose.alpha < 0.999f) c.saveLayerAlpha(null, (pose.alpha * 255).toInt()) else -1
         if (pose.reveal < 0.999f) c.clipRect(RectF(r.left - w, r.top - h, r.left + (r.width() + w * 0.05f) * pose.reveal, r.bottom + h))
-        val path = shape(e, r, s)
+        val wordTxt = e.word?.let { (spec.texts[e.wordId]?.takeIf { t -> t.isNotBlank() } ?: it).uppercase(java.util.Locale.ITALY) }
+        val path = if (wordTxt != null) wordPath(wordTxt, e.wordFont, r) else shape(e, r, s)
         if (e.cutout && !subjectOnly) {
             val item = CollagePlan.itemFor(e.slot, spec.items.size)
             val bmp = if (item >= 0) frames.get(item, tUs) else null
@@ -299,7 +319,16 @@ object DesignRenderer {
                 return
             }
         }
-        if (!subjectOnly && (e.border > 0 || e.shadow > 0)) {
+        if (!subjectOnly && wordTxt != null && (e.border > 0 || e.shadow > 0)) {
+            // Parola: il bordo segue le lettere.
+            c.drawPath(path, Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = if (e.border > 0) tint(e.borderColor, d, spec) else Color.BLACK
+                style = Paint.Style.FILL_AND_STROKE; strokeWidth = 2 * e.border * s; strokeJoin = Paint.Join.ROUND
+                if (e.shadow > 0) setShadowLayer(e.shadow * s, 0f, e.shadow * s * 0.45f, 0x4D000000)
+            })
+        } else if (!subjectOnly && e.slices > 1) {
+            // Strisce: l'ombra la fa ogni striscia per conto suo, più sotto.
+        } else if (!subjectOnly && (e.border > 0 || e.shadow > 0)) {
             val b = e.border * s
             val card = RectF(r.left - b, r.top - b, r.right + b, r.bottom + b + e.bottomPad * s)
             val cp = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -317,6 +346,29 @@ object DesignRenderer {
         val item = CollagePlan.itemFor(e.slot, spec.items.size)
         val bmp = if (item >= 0) frames.get(item, tUs) else null
         var popSrc: Bitmap? = null; var popDst: RectF? = null
+        if (e.slices > 1 && !subjectOnly && bmp != null && !bmp.isRecycled) {
+            // Foto a strisce sfalsate: ogni striscia è un pezzo della stessa foto, spostato su o giù.
+            val it = spec.items[item]
+            val dst = cover(bmp.width.toFloat(), bmp.height.toFloat(), r, it.zoom.coerceAtLeast(1f) * pose.inner, it.panX, it.panY)
+            val n = e.slices
+            val gap = 8f * s
+            val sw = (r.width() - gap * (n - 1)) / n
+            val u = if (still) 1f else CollageAnim.outCubic((tUs / 900_000f).coerceIn(0f, 1f))
+            val sh = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.BLACK; setShadowLayer(max(1f, e.shadow * s), 0f, e.shadow * s * 0.45f, 0x4D000000) }
+            val fp = filterPaint(e.filter, d, spec)
+            for (i in 0 until n) {
+                val sign = if (i % 2 == 0) -1f else 1f
+                val off = sign * (r.height() * 0.045f * (1 + i % 3) / 2f + (1 - u) * r.height() * 0.9f)
+                val x0 = r.left + i * (sw + gap)
+                val sr = RectF(x0, r.top + off, x0 + sw, r.bottom + off)
+                if (e.shadow > 0) c.drawRect(sr, sh)
+                c.save(); c.clipRect(sr); c.translate(0f, off); c.drawBitmap(bmp, null, dst, fp); c.restore()
+            }
+            if (selected) c.drawRect(r, Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeWidth = max(3f, 4f * s); color = 0xFFFFC83D.toInt() })
+            if (layer >= 0) c.restoreToCount(layer)
+            c.restore()
+            return
+        }
         c.save()
         c.clipPath(path)
         if (bmp == null || bmp.isRecycled) {
@@ -324,11 +376,11 @@ object DesignRenderer {
         } else {
             val it = spec.items[item]
             val src = if (e.filter == DFilter.BLUR) CollageRenderer.blurred(bmp) else bmp
-            val bounds = RectF().also { b -> path.computeBounds(b, true) }
+            val bounds = if (wordTxt != null) RectF(r) else RectF().also { b -> path.computeBounds(b, true) }
             // Con «esce dalla cornice» la foto copre un riquadro più alto: la testa finisce sopra il bordo.
             val area = if (e.pop > 0f) RectF(bounds.left, bounds.top - bounds.height() * e.pop, bounds.right, bounds.bottom) else bounds
             val dst = cover(bmp.width.toFloat(), bmp.height.toFloat(), area, it.zoom.coerceAtLeast(1f) * pose.inner * (if (e.filter == DFilter.BLUR) 1.15f else 1f), it.panX, it.panY)
-            if (e.pop > 0f) { popSrc = src; popDst = dst }
+            if (e.pop > 0f || e.front) { popSrc = src; popDst = dst }
             if (e.fill >= 0 && !subjectOnly) {
                 // Doppia esposizione: la persona in bianco e nero, la seconda foto "schiarita" sopra, tutto dentro la sagoma.
                 val mask = if (it.video) null else frames.mask(item) ?: SubjectMasks.get(it.uri)
@@ -464,6 +516,14 @@ object DesignRenderer {
     private fun drawCutout(c: Canvas, d: Design, e: DPhoto, r: RectF, s: Float, spec: CollageSpec, src: Bitmap, mask: Bitmap, dst: RectF) {
         val b = max(1f, e.border * s)
         c.save()
+        // Scia: copie della sagoma nel colore del modello, sempre più chiare, verso sinistra.
+        for (k in e.echo downTo 1) {
+            val ep = Paint(Paint.FILTER_BITMAP_FLAG).apply {
+                colorFilter = PorterDuffColorFilter(tint(DColor.ACC, d, spec), PorterDuff.Mode.SRC_IN)
+                alpha = (200f * (1f - k / (e.echo + 1f))).toInt()
+            }
+            c.drawBitmap(mask, null, RectF(dst).apply { offset(-k * dst.width() * 0.1f, k * dst.height() * 0.01f) }, ep)
+        }
         val shadow = Paint(Paint.FILTER_BITMAP_FLAG).apply { colorFilter = PorterDuffColorFilter(0x47000000, PorterDuff.Mode.SRC_IN) }
         c.drawBitmap(mask, null, RectF(dst).apply { offset(b * 0.3f, b * 0.9f + e.shadow * s * 0.3f) }, shadow)
         val edge = Paint(Paint.FILTER_BITMAP_FLAG).apply { colorFilter = PorterDuffColorFilter(tint(e.borderColor, d, spec), PorterDuff.Mode.SRC_IN) }
@@ -725,6 +785,7 @@ object DesignRenderer {
     fun drawText(c: Canvas, d: Design, e: DText, r: RectF, s: Float, spec: CollageSpec, meta: DesignMeta, u: Float, sec: Float = -1f) {
         var txt = DesignTexts.text(e, spec, meta)
         if (txt.isBlank()) return
+        if (e.arc) { drawArcText(c, d, e, r, s, spec, txt.replace('\n', ' '), u, sec); return }
         if (e.count && u < 1f) txt = DesignCount.at(txt, CollageAnim.outCubic(u))
         val p = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             typeface = DesignFonts.get(e.font)
@@ -793,6 +854,27 @@ object DesignRenderer {
             }
             lp.shader = null
         }
+        c.restore()
+    }
+
+    /** Scritta in cerchio, ripetuta finché fa il giro, con i puntini tra una e l'altra. */
+    private fun drawArcText(c: Canvas, d: Design, e: DText, r: RectF, s: Float, spec: CollageSpec, txt: String, u: Float, sec: Float) {
+        val p = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            typeface = DesignFonts.get(e.font); textSize = e.size * s; letterSpacing = e.track; color = tint(e.color, d, spec)
+            alpha = (min(1f, u * 1.6f) * Color.alpha(color)).toInt()
+        }
+        val t = (if (e.upper) txt.uppercase(java.util.Locale.ITALY) else txt).trim() + "  •  "
+        val rad = min(r.width(), r.height()) / 2 - p.textSize * 0.4f
+        val circ = (2 * Math.PI * rad).toFloat()
+        val one = p.measureText(t).coerceAtLeast(1f)
+        val reps = max(1, (circ / one).toInt())
+        // Spaziatura che chiude il giro senza buchi.
+        p.letterSpacing = e.track + (circ - one * reps) / reps / t.length / p.textSize
+        val path = Path().apply { addCircle(r.centerX(), r.centerY(), rad, Path.Direction.CW) }
+        c.save()
+        c.rotate(e.rot + (if (sec < 0f) 0f else sec * 12f) - (1 - CollageAnim.outCubic(u)) * 60f, r.centerX(), r.centerY())
+        val fm = p.fontMetrics
+        c.drawTextOnPath(t.repeat(reps), path, 0f, -(fm.ascent + fm.descent) / 2, p)
         c.restore()
     }
 

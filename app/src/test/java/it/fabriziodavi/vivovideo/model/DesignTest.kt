@@ -11,7 +11,7 @@ class DesignTest {
         DesignTexts.cal(0).apply { set(y, m - 1, d, h, min, 0) }.timeInMillis
 
     @Test fun everyDesignIsComplete() {
-        assertEquals(59, Designs.all.size)
+        assertEquals(66, Designs.all.size)
         assertEquals(Designs.all.size, Designs.all.map { it.id }.toSet().size)
         for (d in Designs.all) {
             assertTrue("${d.id}: almeno una foto", d.slots >= 1)
