@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.model.SubtitlesTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-11-14T09:57:52.460Z" hostname="runnervmccnms" time="0.006">
+  <properties/>
+  <testcase name="fillColorsTheTextAsItIsSpoken" classname="it.fabriziodavi.vivovideo.model.SubtitlesTest" time="0.001"/>
+  <testcase name="noWordIsLostInShortLines" classname="it.fabriziodavi.vivovideo.model.SubtitlesTest" time="0.001"/>
+  <testcase name="linesBreakOnLengthPausesAndSentences" classname="it.fabriziodavi.vivovideo.model.SubtitlesTest" time="0.0"/>
+  <testcase name="readsTheRecognizerOutput" classname="it.fabriziodavi.vivovideo.model.SubtitlesTest" time="0.001"/>
+  <testcase name="wordsStartingTogetherAllGetShown" classname="it.fabriziodavi.vivovideo.model.SubtitlesTest" time="0.0"/>
+  <testcase name="dropsNonSpeech" classname="it.fabriziodavi.vivovideo.model.SubtitlesTest" time="0.0"/>
+  <testcase name="fillStyleUsesTheChosenColor" classname="it.fabriziodavi.vivovideo.model.SubtitlesTest" time="0.001"/>
+  <testcase name="unclosedBracketDoesNotEatTheSpeech" classname="it.fabriziodavi.vivovideo.model.SubtitlesTest" time="0.0"/>
+  <testcase name="buildsTimedTextsInEveryStyle" classname="it.fabriziodavi.vivovideo.model.SubtitlesTest" time="0.001"/>
+  <testcase name="moreWordsThanTimesStillAppear" classname="it.fabriziodavi.vivovideo.model.SubtitlesTest" time="0.0"/>
+  <testcase name="wordAddedByHandGetsItsOwnTime" classname="it.fabriziodavi.vivovideo.model.SubtitlesTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

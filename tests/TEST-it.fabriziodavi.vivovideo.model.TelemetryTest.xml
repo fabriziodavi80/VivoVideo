@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.model.TelemetryTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-11-14T09:57:52.469Z" hostname="runnervmccnms" time="0.046">
+  <properties/>
+  <testcase name="fitCompressedTimestampAndGzip" classname="it.fabriziodavi.vivovideo.model.TelemetryTest" time="0.01"/>
+  <testcase name="timelineMapsThroughTrimSpeedAndOrder" classname="it.fabriziodavi.vivovideo.model.TelemetryTest" time="0.005"/>
+  <testcase name="widgetsStayInsideTheFrameAndDoNotOverlap" classname="it.fabriziodavi.vivovideo.model.TelemetryTest" time="0.012"/>
+  <testcase name="readsFitRecords" classname="it.fabriziodavi.vivovideo.model.TelemetryTest" time="0.001"/>
+  <testcase name="projectKeepsTelemetryInJson" classname="it.fabriziodavi.vivovideo.model.TelemetryTest" time="0.002"/>
+  <testcase name="readsTcx" classname="it.fabriziodavi.vivovideo.model.TelemetryTest" time="0.006"/>
+  <testcase name="refineStartFixesTimeZoneAndUsesPosition" classname="it.fabriziodavi.vivovideo.model.TelemetryTest" time="0.001"/>
+  <testcase name="zones" classname="it.fabriziodavi.vivovideo.model.TelemetryTest" time="0.001"/>
+  <testcase name="readsGpxWithExtensions" classname="it.fabriziodavi.vivovideo.model.TelemetryTest" time="0.006"/>
+  <testcase name="videoDateAndLocation" classname="it.fabriziodavi.vivovideo.model.TelemetryTest" time="0.001"/>
+  <testcase name="reversedClipReadsTheOriginalTimes" classname="it.fabriziodavi.vivovideo.model.TelemetryTest" time="0.0"/>
+  <testcase name="samplesInterpolateAndCountBeats" classname="it.fabriziodavi.vivovideo.model.TelemetryTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

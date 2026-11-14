@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.engine.DesignRenderTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-14T09:57:35.362Z" hostname="runnervmccnms" time="8.029">
+  <properties/>
+  <testcase name="duotonePaletteAndPhotoLetters" classname="it.fabriziodavi.vivovideo.engine.DesignRenderTest" time="0.234"/>
+  <testcase name="animationStartsEmptyAndEndsLikeTheImage" classname="it.fabriziodavi.vivovideo.engine.DesignRenderTest" time="0.17"/>
+  <testcase name="textsColorsAndBehind" classname="it.fabriziodavi.vivovideo.engine.DesignRenderTest" time="0.219"/>
+  <testcase name="everyDesignRendersAndIsSavedForReview" classname="it.fabriziodavi.vivovideo.engine.DesignRenderTest" time="7.405"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

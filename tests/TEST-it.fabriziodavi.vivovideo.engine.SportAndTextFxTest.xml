@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.engine.SportAndTextFxTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-14T09:57:48.478Z" hostname="runnervmccnms" time="1.187">
+  <properties/>
+  <testcase name="telemetryOverlaysOnAFrame" classname="it.fabriziodavi.vivovideo.engine.SportAndTextFxTest" time="0.508"/>
+  <testcase name="telemetryWidgetsInEveryStyle" classname="it.fabriziodavi.vivovideo.engine.SportAndTextFxTest" time="0.464"/>
+  <testcase name="textBehindPlacesLikeTheNormalOverlay" classname="it.fabriziodavi.vivovideo.engine.SportAndTextFxTest" time="0.014"/>
+  <testcase name="kineticTextsRenderAndMove" classname="it.fabriziodavi.vivovideo.engine.SportAndTextFxTest" time="0.188"/>
+  <testcase name="datamoshWindowsStartAtTheCut" classname="it.fabriziodavi.vivovideo.engine.SportAndTextFxTest" time="0.013"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

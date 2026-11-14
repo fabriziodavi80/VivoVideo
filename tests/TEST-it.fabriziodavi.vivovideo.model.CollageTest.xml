@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.model.CollageTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-11-14T09:57:50.658Z" hostname="runnervmccnms" time="0.342">
+  <properties/>
+  <testcase name="everythingIsInPlaceAtTheEnd" classname="it.fabriziodavi.vivovideo.model.CollageTest" time="0.084"/>
+  <testcase name="insetShrinksPolygonsEvenly" classname="it.fabriziodavi.vivovideo.model.CollageTest" time="0.001"/>
+  <testcase name="gridsCoverTheFrameWithoutHoles" classname="it.fabriziodavi.vivovideo.model.CollageTest" time="0.149"/>
+  <testcase name="cellsStayInsideTheFrame" classname="it.fabriziodavi.vivovideo.model.CollageTest" time="0.076"/>
+  <testcase name="zoomStartsOnTheFirstPhotoAndOpensOnTheCollage" classname="it.fabriziodavi.vivovideo.model.CollageTest" time="0.002"/>
+  <testcase name="replacePhotoKeepsItsPlace" classname="it.fabriziodavi.vivovideo.model.CollageTest" time="0.001"/>
+  <testcase name="roundShapesStayRoundInEveryFormat" classname="it.fabriziodavi.vivovideo.model.CollageTest" time="0.006"/>
+  <testcase name="manyTemplatesForEveryCountAndFormat" classname="it.fabriziodavi.vivovideo.model.CollageTest" time="0.02"/>
+  <testcase name="formatSizesAndPicking" classname="it.fabriziodavi.vivovideo.model.CollageTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

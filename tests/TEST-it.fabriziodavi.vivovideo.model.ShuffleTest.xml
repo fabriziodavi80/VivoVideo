@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.model.ShuffleTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-14T09:57:52.344Z" hostname="runnervmccnms" time="0.046">
+  <properties/>
+  <testcase name="onlyTheChosenClipsMoveAndTransitionsStayOnTheCuts" classname="it.fabriziodavi.vivovideo.model.ShuffleTest" time="0.001"/>
+  <testcase name="manyBeatPiecesAreFast" classname="it.fabriziodavi.vivovideo.model.ShuffleTest" time="0.043"/>
+  <testcase name="freeClipsGetANewOrderAndKeepTheirLength" classname="it.fabriziodavi.vivovideo.model.ShuffleTest" time="0.001"/>
+  <testcase name="tooFewClipsDoNothing" classname="it.fabriziodavi.vivovideo.model.ShuffleTest" time="0.0"/>
+  <testcase name="contentStretchedToALongerSlotStaysInsideItsFile" classname="it.fabriziodavi.vivovideo.model.ShuffleTest" time="0.0"/>
+  <testcase name="beatCutClipsShuffleTheContentAndKeepEveryCutOnTheBeat" classname="it.fabriziodavi.vivovideo.model.ShuffleTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.engine.NewTransitionsTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-11-14T09:57:47.940Z" hostname="runnervmccnms" time="0.192">
+  <properties/>
+  <testcase name="newestComeFirstInThePanel" classname="it.fabriziodavi.vivovideo.engine.NewTransitionsTest" time="0.043"/>
+  <testcase name="withoutTheCompositorSomethingSimilarOnOneClip" classname="it.fabriziodavi.vivovideo.engine.NewTransitionsTest" time="0.016"/>
+  <testcase name="twoClipTransitionsUseTheFramesBeyondTheCut" classname="it.fabriziodavi.vivovideo.engine.NewTransitionsTest" time="0.014"/>
+  <testcase name="exportPutsTheMaskOnTheClipAboveAndTheLightBelow" classname="it.fabriziodavi.vivovideo.engine.NewTransitionsTest" time="0.025"/>
+  <testcase name="newTransitionsStartWithAVisibleDuration" classname="it.fabriziodavi.vivovideo.engine.NewTransitionsTest" time="0.014"/>
+  <testcase name="progressCoversTheWholeTransitionWindow" classname="it.fabriziodavi.vivovideo.engine.NewTransitionsTest" time="0.014"/>
+  <testcase name="wholeClipsGetRoomForTheTransition" classname="it.fabriziodavi.vivovideo.engine.NewTransitionsTest" time="0.014"/>
+  <testcase name="masksGoFromNothingToEverythingWithoutJumps" classname="it.fabriziodavi.vivovideo.engine.NewTransitionsTest" time="0.023"/>
+  <testcase name="maskPassNeedsThePersonCutoutAndHappensAfterTheCut" classname="it.fabriziodavi.vivovideo.engine.NewTransitionsTest" time="0.012"/>
+  <testcase name="invisibleCutHidesTheCutInMotion" classname="it.fabriziodavi.vivovideo.engine.NewTransitionsTest" time="0.016"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

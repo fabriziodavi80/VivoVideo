@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.model.SnapToVoiceTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-11-14T09:57:52.394Z" hostname="runnervmccnms" time="0.029">
+  <properties/>
+  <testcase name="shortStopInsideSpeechIsNotAPause" classname="it.fabriziodavi.vivovideo.model.SnapToVoiceTest" time="0.006"/>
+  <testcase name="lateStartAfterAPauseMovesBackToTheVoice" classname="it.fabriziodavi.vivovideo.model.SnapToVoiceTest" time="0.011"/>
+  <testcase name="earlyStartMovesOntoTheVoice" classname="it.fabriziodavi.vivovideo.model.SnapToVoiceTest" time="0.004"/>
+  <testcase name="startsStayInOrder" classname="it.fabriziodavi.vivovideo.model.SnapToVoiceTest" time="0.0"/>
+  <testcase name="startDeepInSilenceBeyondHalfTheWordStays" classname="it.fabriziodavi.vivovideo.model.SnapToVoiceTest" time="0.002"/>
+  <testcase name="emptyInputs" classname="it.fabriziodavi.vivovideo.model.SnapToVoiceTest" time="0.002"/>
+  <testcase name="wordInsideTheSamePhraseDoesNotStealThePreviousOnset" classname="it.fabriziodavi.vivovideo.model.SnapToVoiceTest" time="0.002"/>
+  <testcase name="tooLateStaysPut" classname="it.fabriziodavi.vivovideo.model.SnapToVoiceTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

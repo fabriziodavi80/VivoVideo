@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.ui.PrintDialogUiTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-11-14T09:58:03.282Z" hostname="runnervmccnms" time="0.492">
+  <properties/>
+  <testcase name="opensForEveryAspectAndPrints" classname="it.fabriziodavi.vivovideo.ui.PrintDialogUiTest" time="0.492"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

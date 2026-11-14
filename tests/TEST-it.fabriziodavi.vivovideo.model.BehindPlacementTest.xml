@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.model.BehindPlacementTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-14T09:57:50.159Z" hostname="runnervmccnms" time="0.008">
+  <properties/>
+  <testcase name="textSitsAboveShouldersWithHeadCoveringOnlyItsLowerPart" classname="it.fabriziodavi.vivovideo.model.BehindPlacementTest" time="0.002"/>
+  <testcase name="movingPersonUsesTheHighestPoint" classname="it.fabriziodavi.vivovideo.model.BehindPlacementTest" time="0.002"/>
+  <testcase name="noRoomAboveHeadGoesTopAndShowsThrough" classname="it.fabriziodavi.vivovideo.model.BehindPlacementTest" time="0.002"/>
+  <testcase name="findsHeadTopAndCentre" classname="it.fabriziodavi.vivovideo.model.BehindPlacementTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
