@@ -1,0 +1,60 @@
+11-14 10:49:19.129  4596 13201 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:49:19.129  4596 13201 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:49:19.131  4596 13201 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:49:19.131  4596 13201 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:49:19.131  4596 13201 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:49:19.158  4596 13205 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+11-14 10:49:19.159  4596 13205 E EGL_emulation: tid 13205: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+11-14 10:49:19.174  4596 13207 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:49:19.181  4596 13207 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:49:19.181  4596 13207 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:49:19.185  4596 13207 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:49:19.185  4596 13207 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:49:19.185  4596 13207 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:49:19.186  4596 13207 W Codec2Client: query -- param skipped: index = 2684356609.
+11-14 10:49:19.194   473  2957 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:49:19.213  4596 13199 W SpeakerLayoutUtil: Built-in speaker's getSpeakerLayoutChannelMask not usable, defaulting to stereo.
+11-14 10:49:19.220   400   413 W AudioFlinger: createTrack_l(): mismatch between requested flags (00000008) and output flags (00000002)
+11-14 10:49:19.297  4596 13199 W SpeakerLayoutUtil: Built-in speaker's getSpeakerLayoutChannelMask not usable, defaulting to stereo.
+11-14 10:49:19.510  4596 13214 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+11-14 10:49:19.510  4596 13214 E EGL_emulation: tid 13214: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+11-14 10:49:19.532  4596 13216 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:49:19.542  4596 13216 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:49:19.542  4596 13216 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:49:19.550  4596 13216 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:49:19.550  4596 13216 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:49:19.550  4596 13216 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:49:19.551  4596 13216 W Codec2Client: query -- param skipped: index = 2684356609.
+11-14 10:49:19.555   473  2957 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:49:23.225  4596  4749 E Codec2-types: Failed to receive buffer from bufferpool -- resultStatus = 4.
+11-14 10:49:23.225  4596  4749 E Codec2-types: Invalid WorkBundle::baseBlocks[0].
+11-14 10:49:23.274   485 13202 W BufferPoolAccessor2.0: buffer status message processing failure - message : 4 connection : 2084853789478
+11-14 10:49:23.276  4596  4749 E Codec2-types: Failed to receive buffer from bufferpool -- resultStatus = 4.
+11-14 10:49:23.277  4596  4749 E Codec2-types: Invalid WorkBundle::baseBlocks[0].
+11-14 10:49:23.329   485 13202 W BufferPoolAccessor2.0: buffer status message processing failure - message : 4 connection : 2084853789478
+11-14 10:49:23.386  4596  4749 E Codec2-types: Failed to receive buffer from bufferpool -- resultStatus = 4.
+11-14 10:49:23.386  4596  4749 E Codec2-types: Invalid WorkBundle::baseBlocks[0].
+11-14 10:49:23.485   485   890 W BufferPoolAccessor2.0: buffer status message processing failure - message : 4 connection : 2084853789478
+11-14 10:49:23.805  4596 13199 W SpeakerLayoutUtil: Built-in speaker's getSpeakerLayoutChannelMask not usable, defaulting to stereo.
+11-14 10:49:24.216   367 13208 W C2BqBuffer: last successful dequeue was 507543 us ago, 16 consecutive failures
+11-14 10:49:24.618   367 13217 W C2BqBuffer: last successful dequeue was 560670 us ago, 46 consecutive failures
+11-14 10:49:26.004  4596 13201 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:49:26.004  4596 13201 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:49:26.005  4596 13201 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:49:26.716  4596 13206 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:49:26.716  4596 13206 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:49:26.716  4596 13206 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:49:26.726  4596 13220 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+11-14 10:49:26.726  4596 13220 E EGL_emulation: tid 13220: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+11-14 10:49:26.747  4596 13206 W MediaCodec: no metrics handle found
+11-14 10:49:26.827   367   384 W C2BqBuffer: get generationNumber failed 19739669692931
+11-14 10:49:29.621   367 13217 W C2BqBuffer: last successful dequeue was 5564106 us ago, 522 consecutive failures
+11-14 10:49:31.581  4596 13201 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:49:31.581  4596 13201 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:49:31.581  4596 13201 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:49:31.586  4596 13215 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:49:31.586  4596 13215 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:49:31.586  4596 13215 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:49:31.593  4596  4749 W Codec2-OutputBufferQueue: receiving stale buffer: generation 4706933 , diff 1 : slot 0
+11-14 10:49:31.900  4596 13215 W MediaCodec: no metrics handle found
+11-14 10:49:31.904  4596 13201 W MediaCodec: no metrics handle found

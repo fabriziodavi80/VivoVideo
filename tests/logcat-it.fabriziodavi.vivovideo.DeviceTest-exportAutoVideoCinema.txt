@@ -1,0 +1,272 @@
+11-14 10:21:25.571  4596  9744 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:21:25.572  4596  9744 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:21:25.572  4596  9744 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:21:25.695  4596  9744 W MediaCodec: no metrics handle found
+11-14 10:21:26.597  4596  9753 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:21:26.601  4596  9753 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:21:26.601  4596  9753 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:21:26.601  4596  9753 W Codec2Client: query -- param skipped: index = 3254792206.
+11-14 10:21:26.601  4596  9753 W Codec2Client: query -- param skipped: index = 3254792194.
+11-14 10:21:26.617  4596  9755 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+11-14 10:21:26.617  4596  9755 E EGL_emulation: tid 9755: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+11-14 10:21:26.636  4596  9757 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:21:26.647  4596  9757 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:21:26.648  4596  9757 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:21:26.651  4596  9757 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:21:26.651  4596  9757 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:21:26.651  4596  9757 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:21:26.651  4596  9757 W Codec2Client: query -- param skipped: index = 2684356609.
+11-14 10:21:26.667   473  3173 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:21:31.677   367  9758 W C2BqBuffer: last successful dequeue was 3653767 us ago, 355 consecutive failures
+11-14 10:21:35.651  4596  9760 W ColorUtils: expected specified color aspects (0:0:0:0)
+11-14 10:21:35.664  4596  9760 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:21:35.665  4596  9760 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:21:35.667   473  3173 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:21:42.250  4596  9756 W MediaCodec: no metrics handle found
+11-14 10:21:43.243  4596  9776 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:21:43.248  4596  9776 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:21:43.248  4596  9776 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:21:43.249  4596  9776 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:21:43.249  4596  9776 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:21:43.249  4596  9776 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:21:43.249  4596  9776 W Codec2Client: query -- param skipped: index = 2684356609.
+11-14 10:21:43.408   473  3173 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:21:47.682   367  8350 E Codec2-types: Failed to receive buffer from bufferpool -- resultStatus = 4.
+11-14 10:21:47.682   367  8350 E Codec2-types: Invalid WorkBundle::baseBlocks[0].
+11-14 10:21:47.686  4596  9775 W MediaCodec: Log queueInputBuffer error: -2147483648
+11-14 10:21:47.698  4596  9773 D DefaultCodec:   android.media.MediaCodec$CodecException:
+11-14 10:21:47.698  4596  9773 D DefaultCodec:       at androidx.media3.transformer.DefaultCodec.queueInputBuffer(DefaultCodec.java:242)
+11-14 10:21:47.698  4596  9773 D DefaultCodec:       at androidx.media3.transformer.ExoAssetLoaderBaseRenderer.feedDecoderFromInput(ExoAssetLoaderBaseRenderer.java:318)
+11-14 10:21:47.698  4596  9773 D DefaultCodec:       at androidx.media3.transformer.ExoAssetLoaderBaseRenderer.render(ExoAssetLoaderBaseRenderer.java:112)
+11-14 10:21:47.698  4596  9773 D DefaultCodec:       at androidx.media3.exoplayer.RendererHolder.render(RendererHolder.java:425)
+11-14 10:21:47.698  4596  9773 D DefaultCodec:       at androidx.media3.exoplayer.ExoPlayerImplInternal.doSomeWork(ExoPlayerImplInternal.java:1484)
+11-14 10:21:47.698  4596  9773 D DefaultCodec:       at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:765)
+11-14 10:21:47.701  4596  4749 W BufferPoolAccessor2.0: buffer status message processing failure - message : 4 connection : 19741464343186
+11-14 10:21:47.713  4596  9750 E ExoPlayerImplInternal: Playback error
+11-14 10:21:47.713  4596  9750 E ExoPlayerImplInternal:   androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-14 10:21:47.713  4596  9750 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:1005)
+11-14 10:21:47.713  4596  9750 E ExoPlayerImplInternal:       at android.os.Handler.dispatchMessage(Handler.java:102)
+11-14 10:21:47.713  4596  9750 E ExoPlayerImplInternal:       at android.os.Looper.loopOnce(Looper.java:205)
+11-14 10:21:47.713  4596  9750 E ExoPlayerImplInternal:       at android.os.Looper.loop(Looper.java:294)
+11-14 10:21:47.713  4596  9750 E ExoPlayerImplInternal:       at android.os.HandlerThread.run(HandlerThread.java:67)
+11-14 10:21:47.713  4596  9750 E ExoPlayerImplInternal:   Caused by: java.lang.IllegalStateException
+11-14 10:21:47.713  4596  9750 E ExoPlayerImplInternal:       at com.google.common.base.Preconditions.checkState(Preconditions.java:497)
+11-14 10:21:47.713  4596  9750 E ExoPlayerImplInternal:       at androidx.media3.transformer.AudioGraphInput.getInputBuffer(AudioGraphInput.java:238)
+11-14 10:21:47.713  4596  9750 E ExoPlayerImplInternal:       at androidx.media3.transformer.SequenceAssetLoader$SampleConsumerWrapper.getInputBuffer(SequenceAssetLoader.java:531)
+11-14 10:21:47.713  4596  9750 E ExoPlayerImplInternal:       at androidx.media3.transformer.ExoAssetLoaderBaseRenderer.feedConsumerFromInput(ExoAssetLoaderBaseRenderer.java:329)
+11-14 10:21:47.713  4596  9750 E ExoPlayerImplInternal:       at androidx.media3.transformer.ExoAssetLoaderBaseRenderer.render(ExoAssetLoaderBaseRenderer.java:116)
+11-14 10:21:47.713  4596  9750 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.RendererHolder.render(RendererHolder.java:425)
+11-14 10:21:47.713  4596  9750 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.ExoPlayerImplInternal.doSomeWork(ExoPlayerImplInternal.java:1484)
+11-14 10:21:47.713  4596  9750 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:765)
+11-14 10:21:47.713  4596  9750 E ExoPlayerImplInternal:       ... 4 more
+11-14 10:21:47.778  4596  9753 W MediaCodec: no metrics handle found
+11-14 10:21:48.212  4596  9755 E Surface : freeAllBuffers: 1 buffers were freed while being dequeued!
+11-14 10:21:48.214  4596  9755 W GraphicBufferSource: released unpopulated slots: [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63]
+11-14 10:21:48.214  4596  9755 E Surface : getSlotFromBufferLocked: unknown buffer: 0x0
+11-14 10:21:52.715  4596  9748 W TransformerInternal: Export error after export ended
+11-14 10:21:52.715  4596  9748 W TransformerInternal:   androidx.media3.transformer.ExportException: Video frame processing error
+11-14 10:21:52.715  4596  9748 W TransformerInternal:       at androidx.media3.transformer.VideoSampleExporter$VideoGraphWrapper.onError(VideoSampleExporter.java:333)
+11-14 10:21:52.715  4596  9748 W TransformerInternal:       at androidx.media3.effect.SingleInputVideoGraph$1.lambda$onError$3$androidx-media3-effect-SingleInputVideoGraph$1(SingleInputVideoGraph.java:181)
+11-14 10:21:52.715  4596  9748 W TransformerInternal:       at androidx.media3.effect.SingleInputVideoGraph$1$$ExternalSyntheticLambda3.run(D8$$SyntheticClass:0)
+11-14 10:21:52.715  4596  9748 W TransformerInternal:       at com.google.common.util.concurrent.DirectExecutor.execute(DirectExecutor.java:31)
+11-14 10:21:52.715  4596  9748 W TransformerInternal:       at androidx.media3.effect.SingleInputVideoGraph$1.onError(SingleInputVideoGraph.java:181)
+11-14 10:21:52.715  4596  9748 W TransformerInternal:       at androidx.media3.effect.DefaultVideoFrameProcessor$Factory$$ExternalSyntheticLambda0.onError(D8$$SyntheticClass:0)
+11-14 10:21:52.715  4596  9748 W TransformerInternal:       at androidx.media3.effect.VideoFrameProcessingTaskExecutor.release(VideoFrameProcessingTaskExecutor.java:240)
+11-14 10:21:52.715  4596  9748 W TransformerInternal:       at androidx.media3.effect.DefaultVideoFrameProcessor.release(DefaultVideoFrameProcessor.java:880)
+11-14 10:21:52.715  4596  9748 W TransformerInternal:       at androidx.media3.effect.SingleInputVideoGraph.release(SingleInputVideoGraph.java:309)
+11-14 10:21:52.715  4596  9748 W TransformerInternal:       at androidx.media3.transformer.VideoSampleExporter$VideoGraphWrapper.release(VideoSampleExporter.java:296)
+11-14 10:21:52.715  4596  9748 W TransformerInternal:       at androidx.media3.transformer.VideoSampleExporter.release(VideoSampleExporter.java:172)
+11-14 10:21:52.715  4596  9748 W TransformerInternal:       at androidx.media3.transformer.TransformerInternal.endInternal(TransformerInternal.java:461)
+11-14 10:21:52.715  4596  9748 W TransformerInternal:       at androidx.media3.transformer.TransformerInternal.handleMessage(TransformerInternal.java:391)
+11-14 10:21:52.715  4596  9748 W TransformerInternal:       at androidx.media3.transformer.TransformerInternal.$r8$lambda$bzZKK-tnQO9QOb4NEtMsm46hw_4(Unknown Source:0)
+11-14 10:21:52.715  4596  9748 W TransformerInternal:       at androidx.media3.transformer.TransformerInternal$$ExternalSyntheticLambda0.handleMessage(D8$$SyntheticClass:0)
+11-14 10:21:52.715  4596  9748 W TransformerInternal:       at android.os.Handler.dispatchMessage(Handler.java:102)
+11-14 10:21:52.715  4596  9748 W TransformerInternal:       at android.os.Looper.loopOnce(Looper.java:205)
+11-14 10:21:52.715  4596  9748 W TransformerInternal:       at android.os.Looper.loop(Looper.java:294)
+11-14 10:21:52.715  4596  9748 W TransformerInternal:       at android.os.HandlerThread.run(HandlerThread.java:67)
+11-14 10:21:52.715  4596  9748 W TransformerInternal:   Caused by: androidx.media3.common.VideoFrameProcessingException: Release timed out. OpenGL resources may not be cleaned up properly. @UNSET
+11-14 10:21:52.715  4596  9748 W TransformerInternal:       ... 13 more
+11-14 10:21:53.097  4596  9775 W MediaCodec: no metrics handle found
+11-14 10:21:53.171  4596  9759 W MediaCodec: no metrics handle found
+11-14 10:21:53.216  4596  9788 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:21:53.217  4596  9788 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:21:53.217  4596  9788 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:21:53.217  4596  9788 W Codec2Client: query -- param skipped: index = 3254792206.
+11-14 10:21:53.217  4596  9788 W Codec2Client: query -- param skipped: index = 3254792194.
+11-14 10:21:53.267  4596  9790 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+11-14 10:21:53.267  4596  9790 E EGL_emulation: tid 9790: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+11-14 10:21:53.287  4596  9792 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:21:53.292  4596  9792 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:21:53.293  4596  9792 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:21:53.301  4596  9792 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:21:53.301  4596  9792 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:21:53.301  4596  9792 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:21:53.302  4596  9792 W Codec2Client: query -- param skipped: index = 2684356609.
+11-14 10:21:53.311   473  3173 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:21:58.317   367  9793 W C2BqBuffer: last successful dequeue was 3641775 us ago, 355 consecutive failures
+11-14 10:22:00.042   853   853 W PageIndicator: Total number of pages invalid: 0. Assuming 1 page.
+11-14 10:22:03.322   367  9793 W C2BqBuffer: last successful dequeue was 8647586 us ago, 844 consecutive failures
+11-14 10:22:03.991  4596  9795 W ColorUtils: expected specified color aspects (0:0:0:0)
+11-14 10:22:03.999  4596  9795 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:22:03.999  4596  9795 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:22:04.002   473  3173 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:22:10.408  4596  9791 W MediaCodec: no metrics handle found
+11-14 10:22:11.320  4596  9811 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:22:11.333  4596  9811 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:22:11.334  4596  9811 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:22:11.337  4596  9811 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:22:11.337  4596  9811 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:22:11.337  4596  9811 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:22:11.338  4596  9811 W Codec2Client: query -- param skipped: index = 2684356609.
+11-14 10:22:11.453   473  3173 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:22:20.031  4596  4749 E Codec2-types: Failed to receive buffer from bufferpool -- resultStatus = 4.
+11-14 10:22:20.033  4596  4749 E Codec2-types: Invalid WorkBundle::baseBlocks[0].
+11-14 10:22:20.090  4596  4749 E Codec2-types: Failed to receive buffer from bufferpool -- resultStatus = 4.
+11-14 10:22:20.091  4596  4749 E Codec2-types: Invalid WorkBundle::baseBlocks[0].
+11-14 10:22:20.092  4596  4749 E Codec2-types: Failed to receive buffer from bufferpool -- resultStatus = 4.
+11-14 10:22:20.093  4596  4749 E Codec2-types: Invalid WorkBundle::baseBlocks[0].
+11-14 10:22:20.093  4596  4749 E Codec2-types: Failed to receive buffer from bufferpool -- resultStatus = 4.
+11-14 10:22:20.093  4596  4749 E Codec2-types: Invalid WorkBundle::baseBlocks[0].
+11-14 10:22:20.596  4596  4749 W BufferPoolAccessor2.0: buffer status message processing failure - message : 4 connection : 19741464343187
+11-14 10:22:20.597  4596  4749 W BufferPoolAccessor2.0: buffer status message processing failure - message : 4 connection : 19741464343187
+11-14 10:22:20.598  4596  4749 W BufferPoolAccessor2.0: buffer status message processing failure - message : 4 connection : 19741464343187
+11-14 10:22:20.598  4596  4749 W BufferPoolAccessor2.0: buffer status message processing failure - message : 4 connection : 19741464343187
+11-14 10:22:25.097   367  9812 W C2BqBuffer: last successful dequeue was 565659 us ago, 50 consecutive failures
+11-14 10:22:30.104   367  9812 W C2BqBuffer: last successful dequeue was 5572892 us ago, 525 consecutive failures
+11-14 10:22:35.110   367  9812 W C2BqBuffer: last successful dequeue was 10578833 us ago, 992 consecutive failures
+11-14 10:22:40.118   367  9812 W C2BqBuffer: last successful dequeue was 3090699 us ago, 301 consecutive failures
+11-14 10:22:51.496  4596  9810 W MediaCodec: no metrics handle found
+11-14 10:22:52.979  4596  9819 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:22:52.989  4596  9819 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:22:52.990  4596  9819 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:22:52.992  4596  9819 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:22:52.992  4596  9819 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:22:52.992  4596  9819 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:22:52.993  4596  9819 W Codec2Client: query -- param skipped: index = 2684356609.
+11-14 10:22:53.115   473   473 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:23:00.010   853   853 W PageIndicator: Total number of pages invalid: 0. Assuming 1 page.
+11-14 10:23:10.885   367  9820 W C2BqBuffer: last successful dequeue was 4151916 us ago, 389 consecutive failures
+11-14 10:23:15.895   367  9820 W C2BqBuffer: last successful dequeue was 512924 us ago, 49 consecutive failures
+11-14 10:23:20.903   367  9820 W C2BqBuffer: last successful dequeue was 5521336 us ago, 539 consecutive failures
+11-14 10:23:25.910   367  9820 W C2BqBuffer: last successful dequeue was 10527947 us ago, 1029 consecutive failures
+11-14 10:23:26.428  4596  9785 E ExoPlayerImplInternal: Playback error
+11-14 10:23:26.428  4596  9785 E ExoPlayerImplInternal:   androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-14 10:23:26.428  4596  9785 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:1005)
+11-14 10:23:26.428  4596  9785 E ExoPlayerImplInternal:       at android.os.Handler.dispatchMessage(Handler.java:102)
+11-14 10:23:26.428  4596  9785 E ExoPlayerImplInternal:       at android.os.Looper.loopOnce(Looper.java:205)
+11-14 10:23:26.428  4596  9785 E ExoPlayerImplInternal:       at android.os.Looper.loop(Looper.java:294)
+11-14 10:23:26.428  4596  9785 E ExoPlayerImplInternal:       at android.os.HandlerThread.run(HandlerThread.java:67)
+11-14 10:23:26.428  4596  9785 E ExoPlayerImplInternal:   Caused by: java.lang.IllegalStateException
+11-14 10:23:26.428  4596  9785 E ExoPlayerImplInternal:       at com.google.common.base.Preconditions.checkState(Preconditions.java:497)
+11-14 10:23:26.428  4596  9785 E ExoPlayerImplInternal:       at androidx.media3.transformer.AudioGraphInput.getInputBuffer(AudioGraphInput.java:238)
+11-14 10:23:26.428  4596  9785 E ExoPlayerImplInternal:       at androidx.media3.transformer.SequenceAssetLoader$SampleConsumerWrapper.getInputBuffer(SequenceAssetLoader.java:531)
+11-14 10:23:26.428  4596  9785 E ExoPlayerImplInternal:       at androidx.media3.transformer.ExoAssetLoaderBaseRenderer.feedConsumerFromInput(ExoAssetLoaderBaseRenderer.java:329)
+11-14 10:23:26.428  4596  9785 E ExoPlayerImplInternal:       at androidx.media3.transformer.ExoAssetLoaderBaseRenderer.render(ExoAssetLoaderBaseRenderer.java:116)
+11-14 10:23:26.428  4596  9785 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.RendererHolder.render(RendererHolder.java:425)
+11-14 10:23:26.428  4596  9785 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.ExoPlayerImplInternal.doSomeWork(ExoPlayerImplInternal.java:1484)
+11-14 10:23:26.428  4596  9785 E ExoPlayerImplInternal:       at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:765)
+11-14 10:23:26.428  4596  9785 E ExoPlayerImplInternal:       ... 4 more
+11-14 10:23:26.439  4596  9788 W MediaCodec: no metrics handle found
+11-14 10:23:27.624  4596  9790 E Surface : freeAllBuffers: 1 buffers were freed while being dequeued!
+11-14 10:23:27.626  4596  4749 E BufferQueueProducer: [SurfaceTexture-1-4596-84](id:11f4000000fa,api:3,p:4596,c:4596) dequeueBuffer: BufferQueue has been abandoned
+11-14 10:23:27.627   367  9820 E C2GoldfishAvcDec: fetchGraphicBlock for Output failed with status 22
+11-14 10:23:27.627  4596  9790 W GraphicBufferSource: released unpopulated slots: [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63]
+11-14 10:23:27.627  4596  9790 E Surface : getSlotFromBufferLocked: unknown buffer: 0x202c3434202c3334
+11-14 10:23:27.633  4596  9818 E MediaCodec: Codec reported err 0xe/14 (Unknown error -14), actionCode 0, while in state 6/STARTED
+11-14 10:23:27.637  4596  9818 E BufferQueueProducer: [SurfaceTexture-1-4596-84](id:11f4000000fa,api:3,p:4596,c:4596) cancelBuffer: BufferQueue has been abandoned
+11-14 10:23:27.637  4596  9818 E BufferQueueProducer: [SurfaceTexture-1-4596-84](id:11f4000000fa,api:3,p:4596,c:4596) cancelBuffer: BufferQueue has been abandoned
+11-14 10:23:27.637  4596  9818 E BufferQueueProducer: [SurfaceTexture-1-4596-84](id:11f4000000fa,api:3,p:4596,c:4596) cancelBuffer: BufferQueue has been abandoned
+11-14 10:23:27.637  4596  9818 E BufferQueueProducer: [SurfaceTexture-1-4596-84](id:11f4000000fa,api:3,p:4596,c:4596) cancelBuffer: BufferQueue has been abandoned
+11-14 10:23:27.637  4596  9818 E BufferQueueProducer: [SurfaceTexture-1-4596-84](id:11f4000000fa,api:3,p:4596,c:4596) cancelBuffer: BufferQueue has been abandoned
+11-14 10:23:27.637  4596  9818 E BufferQueueProducer: [SurfaceTexture-1-4596-84](id:11f4000000fa,api:3,p:4596,c:4596) cancelBuffer: BufferQueue has been abandoned
+11-14 10:23:27.638  4596  9818 E BufferQueueProducer: [SurfaceTexture-1-4596-84](id:11f4000000fa,api:3,p:4596,c:4596) cancelBuffer: BufferQueue has been abandoned
+11-14 10:23:27.638  4596  9818 E BufferQueueProducer: [SurfaceTexture-1-4596-84](id:11f4000000fa,api:3,p:4596,c:4596) cancelBuffer: BufferQueue has been abandoned
+11-14 10:23:27.638  4596  9818 E BufferQueueProducer: [SurfaceTexture-1-4596-84](id:11f4000000fa,api:3,p:4596,c:4596) cancelBuffer: BufferQueue has been abandoned
+11-14 10:23:27.638  4596  9818 E BufferQueueProducer: [SurfaceTexture-1-4596-84](id:11f4000000fa,api:3,p:4596,c:4596) cancelBuffer: BufferQueue has been abandoned
+11-14 10:23:27.638  4596  9818 E MediaCodec: Invalid to call at Released state; only valid in executing state
+11-14 10:23:27.638  4596  9818 E AMessage: trying to post a duplicate reply
+11-14 10:23:27.639  4596  9816 D DefaultCodec:   java.lang.IllegalStateException: Invalid to call at Released state; only valid in executing state
+11-14 10:23:27.639  4596  9816 D DefaultCodec:       at androidx.media3.transformer.DefaultCodec.maybeDequeueInputBuffer(DefaultCodec.java:194)
+11-14 10:23:27.639  4596  9816 D DefaultCodec:       at androidx.media3.transformer.ExoAssetLoaderBaseRenderer.feedDecoderFromInput(ExoAssetLoaderBaseRenderer.java:305)
+11-14 10:23:27.639  4596  9816 D DefaultCodec:       at androidx.media3.transformer.ExoAssetLoaderBaseRenderer.render(ExoAssetLoaderBaseRenderer.java:112)
+11-14 10:23:27.639  4596  9816 D DefaultCodec:       at androidx.media3.exoplayer.RendererHolder.render(RendererHolder.java:425)
+11-14 10:23:27.639  4596  9816 D DefaultCodec:       at androidx.media3.exoplayer.ExoPlayerImplInternal.doSomeWork(ExoPlayerImplInternal.java:1484)
+11-14 10:23:27.639  4596  9816 D DefaultCodec:       at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:765)
+11-14 10:23:27.645  4596  9816 W TransformerInternal: Export error after export ended
+11-14 10:23:27.645  4596  9816 W TransformerInternal:   androidx.media3.transformer.ExportException: Codec exception: CodecInfo{type=VideoDecoder, configurationFormat={exo-pixel-width-height-ratio-float=1.0, sar-width=1, allow-frame-drop=0, mime=video/avc, bitrate=196685, color-standard=1, color-transfer=3, sar-height=1, is-autoselect=0, is-default=0, color-range=2, frame-rate=30.0, max-input-size=13361, rotation-degrees=0, height=360, track-id=2, is-forced-subtitle=0, level=4096, profile=1, codecs-string=avc1.42C029, csd-1=java.nio.HeapByteBuffer[pos=0 lim=10 cap=10], encoder-delay=0, width=640, encoder-padding=0, csd-0=java.nio.HeapByteBuffer[pos=0 lim=22 cap=22]}, name=c2.goldfish.h264.decoder}
+11-14 10:23:27.645  4596  9816 W TransformerInternal:       at androidx.media3.transformer.DefaultCodec.createExportException(DefaultCodec.java:487)
+11-14 10:23:27.645  4596  9816 W TransformerInternal:       at androidx.media3.transformer.DefaultCodec.createExportException(DefaultCodec.java:465)
+11-14 10:23:27.645  4596  9816 W TransformerInternal:       at androidx.media3.transformer.DefaultCodec.maybeDequeueInputBuffer(DefaultCodec.java:197)
+11-14 10:23:27.645  4596  9816 W TransformerInternal:       at androidx.media3.transformer.ExoAssetLoaderBaseRenderer.feedDecoderFromInput(ExoAssetLoaderBaseRenderer.java:305)
+11-14 10:23:27.645  4596  9816 W TransformerInternal:       at androidx.media3.transformer.ExoAssetLoaderBaseRenderer.render(ExoAssetLoaderBaseRenderer.java:112)
+11-14 10:23:27.645  4596  9816 W TransformerInternal:       at androidx.media3.exoplayer.RendererHolder.render(RendererHolder.java:425)
+11-14 10:23:27.645  4596  9816 W TransformerInternal:       at androidx.media3.exoplayer.ExoPlayerImplInternal.doSomeWork(ExoPlayerImplInternal.java:1484)
+11-14 10:23:27.645  4596  9816 W TransformerInternal:       at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:765)
+11-14 10:23:27.645  4596  9816 W TransformerInternal:       at android.os.Handler.dispatchMessage(Handler.java:102)
+11-14 10:23:27.645  4596  9816 W TransformerInternal:       at android.os.Looper.loopOnce(Looper.java:205)
+11-14 10:23:27.645  4596  9816 W TransformerInternal:       at android.os.Looper.loop(Looper.java:294)
+11-14 10:23:27.645  4596  9816 W TransformerInternal:       at android.os.HandlerThread.run(HandlerThread.java:67)
+11-14 10:23:27.645  4596  9816 W TransformerInternal:   Caused by: java.lang.IllegalStateException: Invalid to call at Released state; only valid in executing state
+11-14 10:23:27.645  4596  9816 W TransformerInternal:
+11-14 10:23:27.645  4596  9816 W TransformerInternal:       at android.media.MediaCodec.native_dequeueInputBuffer(Native Method)
+11-14 10:23:27.645  4596  9816 W TransformerInternal:       at android.media.MediaCodec.dequeueInputBuffer(MediaCodec.java:3139)
+11-14 10:23:27.645  4596  9816 W TransformerInternal:       at androidx.media3.transformer.DefaultCodec.maybeDequeueInputBuffer(DefaultCodec.java:194)
+11-14 10:23:27.645  4596  9816 W TransformerInternal:       ... 9 more
+11-14 10:23:27.654  4596  9818 W MediaCodec: no metrics handle found
+11-14 10:23:27.686  4596  9794 W MediaCodec: no metrics handle found
+11-14 10:23:27.734  4596  9830 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+11-14 10:23:27.735  4596  9830 E EGL_emulation: tid 9830: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+11-14 10:23:27.751  4596  9833 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:23:27.755  4596  9831 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:23:27.759  4596  9831 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:23:27.759  4596  9831 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:23:27.759  4596  9831 W Codec2Client: query -- param skipped: index = 3254792206.
+11-14 10:23:27.759  4596  9831 W Codec2Client: query -- param skipped: index = 3254792194.
+11-14 10:23:27.760  4596  9833 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:23:27.760  4596  9833 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:23:27.761  4596  9833 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:23:27.761  4596  9833 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:23:27.761  4596  9833 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:23:27.761  4596  9833 W Codec2Client: query -- param skipped: index = 2684356609.
+11-14 10:23:27.764   473  3173 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:23:32.774   367  9835 W C2BqBuffer: last successful dequeue was 3677702 us ago, 358 consecutive failures
+11-14 10:23:36.718  4596  9837 W ColorUtils: expected specified color aspects (0:0:0:0)
+11-14 10:23:36.727  4596  9837 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:23:36.727  4596  9837 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:23:36.730   473  3173 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:23:37.780   367  9835 W C2BqBuffer: last successful dequeue was 72940 us ago, 7 consecutive failures
+11-14 10:23:43.148  4596  9832 W MediaCodec: no metrics handle found
+11-14 10:23:44.024  4596  9853 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:23:44.034  4596  9853 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:23:44.036  4596  9853 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:23:44.039  4596  9853 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:23:44.039  4596  9853 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:23:44.039  4596  9853 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:23:44.039  4596  9853 W Codec2Client: query -- param skipped: index = 2684356609.
+11-14 10:23:44.181   473  3173 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:23:59.341   367  9854 W C2BqBuffer: last successful dequeue was 3975698 us ago, 368 consecutive failures
+11-14 10:24:00.093   853   853 W PageIndicator: Total number of pages invalid: 0. Assuming 1 page.
+11-14 10:24:00.417   853   861 W ndroid.systemui: Reducing the number of considered missed Gc histogram windows from 120 to 100
+11-14 10:24:04.350   367  9854 W C2BqBuffer: last successful dequeue was 8984646 us ago, 828 consecutive failures
+11-14 10:24:09.351   367  9854 W C2BqBuffer: last successful dequeue was 818610 us ago, 80 consecutive failures
+11-14 10:24:14.355   367  9854 W C2BqBuffer: last successful dequeue was 5822697 us ago, 571 consecutive failures
+11-14 10:24:24.739  4596  9852 W MediaCodec: no metrics handle found
+11-14 10:24:26.167  4596  9860 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:24:26.182  4596  9860 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:24:26.183  4596  9860 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:24:26.186  4596  9860 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:24:26.186  4596  9860 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:24:26.186  4596  9860 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:24:26.187  4596  9860 W Codec2Client: query -- param skipped: index = 2684356609.
+11-14 10:24:26.355   473   473 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:24:41.708   367  9861 W C2BqBuffer: last successful dequeue was 3433920 us ago, 316 consecutive failures
+11-14 10:24:46.709   367  9861 W C2BqBuffer: last successful dequeue was 809612 us ago, 79 consecutive failures
+11-14 10:24:51.719   367  9861 W C2BqBuffer: last successful dequeue was 5819056 us ago, 567 consecutive failures
+11-14 10:24:56.728   367  9861 W C2BqBuffer: last successful dequeue was 63239 us ago, 6 consecutive failures
+11-14 10:24:59.398  4596  9830 E Surface : freeAllBuffers: 1 buffers were freed while being dequeued!
+11-14 10:24:59.401  4596  9830 W GraphicBufferSource: released unpopulated slots: [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63]
+11-14 10:24:59.401  4596  9830 E Surface : getSlotFromBufferLocked: unknown buffer: 0x0
+11-14 10:24:59.419  4596  9831 W MediaCodec: no metrics handle found
+11-14 10:24:59.419  4596  9836 W MediaCodec: no metrics handle found
+11-14 10:24:59.440  4596  9859 W MediaCodec: no metrics handle found
+11-14 10:24:59.465  1656  1732 W MediaProvider: isAppCloneUserPair for user 0: false

@@ -1,0 +1,108 @@
+11-14 10:46:49.163  4596 12581 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:46:49.163  4596 12581 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:46:49.164  4596 12581 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:46:49.164  4596 12581 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:46:49.164  4596 12581 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:46:49.307  4596 12581 W MediaCodec: no metrics handle found
+11-14 10:46:49.358  4596 12584 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:46:49.358  4596 12584 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:46:49.359  4596 12584 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:46:49.359  4596 12584 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:46:49.359  4596 12584 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:46:49.471  4596 12584 W MediaCodec: no metrics handle found
+11-14 10:46:50.068  4596 12597 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+11-14 10:46:50.069  4596 12597 E EGL_emulation: tid 12597: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+11-14 10:46:50.072  4596 12597 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+11-14 10:46:50.072  4596 12597 E EGL_emulation: tid 12597: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+11-14 10:46:50.097  4596 12598 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:46:50.100  4596 12598 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:46:50.101  4596 12598 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:46:50.102  4596 12598 W Codec2Client: query -- param skipped: index = 3254792206.
+11-14 10:46:50.102  4596 12598 W Codec2Client: query -- param skipped: index = 3254792194.
+11-14 10:46:50.112  4596 12600 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:46:50.115  4596 12600 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:46:50.115  4596 12600 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:46:50.116  4596 12600 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:46:50.116  4596 12600 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:46:50.116  4596 12600 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:46:50.116  4596 12600 W Codec2Client: query -- param skipped: index = 2684356609.
+11-14 10:46:50.121   473  3173 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:46:50.125  4596 12597 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+11-14 10:46:50.125  4596 12597 E EGL_emulation: tid 12597: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+11-14 10:46:50.295  4596 12597 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+11-14 10:46:50.295  4596 12597 E EGL_emulation: tid 12597: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+11-14 10:46:50.350  4596 12597 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+11-14 10:46:50.350  4596 12597 E EGL_emulation: tid 12597: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+11-14 10:46:50.360  4596 12604 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:46:50.457  4596 12604 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:46:50.457  4596 12604 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:46:50.458  4596 12604 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:46:50.458  4596 12604 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:46:50.459  4596 12604 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:46:50.459  4596 12604 W Codec2Client: query -- param skipped: index = 2684356609.
+11-14 10:46:50.615   473  3173 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:46:51.490  4596 12609 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:46:51.590  4596 12609 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:46:51.590  4596 12609 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:46:51.593  4596 12609 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:46:51.593  4596 12609 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:46:51.593  4596 12609 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:46:51.594  4596 12609 W Codec2Client: query -- param skipped: index = 2684356609.
+11-14 10:46:51.661   473  3173 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:46:54.826  4596 12613 W ColorUtils: expected specified color aspects (0:0:0:0)
+11-14 10:46:54.836  4596 12613 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:46:54.836  4596 12613 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:46:54.840   473  3173 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:46:55.128   367 12602 W C2BqBuffer: last successful dequeue was 153375 us ago, 14 consecutive failures
+11-14 10:46:56.713   367 12610 W C2BqBuffer: last successful dequeue was 3244882 us ago, 296 consecutive failures
+11-14 10:47:00.054   853   853 W PageIndicator: Total number of pages invalid: 0. Assuming 1 page.
+11-14 10:47:00.674   367 12605 W C2BqBuffer: last successful dequeue was 92413 us ago, 8 consecutive failures
+11-14 10:47:01.721   367 12610 W C2BqBuffer: last successful dequeue was 8252637 us ago, 738 consecutive failures
+11-14 10:47:05.143   367 12602 W C2BqBuffer: last successful dequeue was 88771 us ago, 8 consecutive failures
+11-14 10:47:05.682   367 12605 W C2BqBuffer: last successful dequeue was 137379 us ago, 12 consecutive failures
+11-14 10:47:06.736   367 12610 W C2BqBuffer: last successful dequeue was 13267612 us ago, 1186 consecutive failures
+11-14 10:47:10.147   367 12602 W C2BqBuffer: last successful dequeue was 128748 us ago, 10 consecutive failures
+11-14 10:47:11.742   367 12610 W C2BqBuffer: last successful dequeue was 18274114 us ago, 1624 consecutive failures
+11-14 10:47:11.958  4596 12603 W MediaCodec: no metrics handle found
+11-14 10:47:12.058  4596 12631 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:47:12.143  4596 12631 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:47:12.145  4596 12631 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:47:12.149  4596 12631 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:47:12.149  4596 12631 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:47:12.149  4596 12631 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:47:12.149  4596 12631 W Codec2Client: query -- param skipped: index = 2684356609.
+11-14 10:47:12.155   473  3173 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:47:12.160  4596 12599 W MediaCodec: no metrics handle found
+11-14 10:47:12.910  4596 12638 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:47:13.032  4596 12638 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:47:13.032  4596 12638 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:47:13.038  4596 12638 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:47:13.038  4596 12638 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:47:13.038  4596 12638 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:47:13.038  4596 12638 W Codec2Client: query -- param skipped: index = 2684356609.
+11-14 10:47:13.060   473   473 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:47:17.165   367 12632 W C2BqBuffer: last successful dequeue was 213608 us ago, 18 consecutive failures
+11-14 10:47:18.068   367 12640 W C2BqBuffer: last successful dequeue was 95193 us ago, 9 consecutive failures
+11-14 10:47:21.759   367 12610 W C2BqBuffer: last successful dequeue was 226601 us ago, 21 consecutive failures
+11-14 10:47:22.170   367 12632 W C2BqBuffer: last successful dequeue was 132048 us ago, 12 consecutive failures
+11-14 10:47:26.760   367 12610 W C2BqBuffer: last successful dequeue was 175870 us ago, 16 consecutive failures
+11-14 10:47:27.179   367 12632 W C2BqBuffer: last successful dequeue was 72771 us ago, 6 consecutive failures
+11-14 10:47:28.079   367 12640 W C2BqBuffer: last successful dequeue was 222445 us ago, 19 consecutive failures
+11-14 10:47:29.689  4596 12608 W MediaCodec: no metrics handle found
+11-14 10:47:31.664  1066  1097 W m.android.phone: Reducing the number of considered missed Gc histogram windows from 160 to 100
+11-14 10:47:33.969  4596 12598 W MediaCodec: no metrics handle found
+11-14 10:47:33.974  4596 12597 E Surface : freeAllBuffers: 1 buffers were freed while being dequeued!
+11-14 10:47:33.979  4596 12597 W GraphicBufferSource: released unpopulated slots: [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63]
+11-14 10:47:33.981  4596 12597 E Surface : getSlotFromBufferLocked: unknown buffer: 0x0
+11-14 10:47:33.992  4596 12612 W MediaCodec: no metrics handle found
+11-14 10:47:34.016  4596 12630 W MediaCodec: no metrics handle found
+11-14 10:47:34.021  4596 12637 W MediaCodec: no metrics handle found
+11-14 10:47:34.053  1656  1732 W MediaProvider: isAppCloneUserPair for user 0: false
+11-14 10:47:34.150   473 12648 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:47:34.161   473 12648 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:47:34.162   473 12648 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:47:34.162   473 12648 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:47:34.168   473 12648 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:47:34.169   473 12648 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:47:34.171   473 12648 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:47:34.175   473 12647 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0

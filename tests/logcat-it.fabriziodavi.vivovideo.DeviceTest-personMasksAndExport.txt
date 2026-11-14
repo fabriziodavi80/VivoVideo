@@ -1,0 +1,291 @@
+11-14 10:17:36.973  4596  8472 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:17:36.981  4596  8472 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:17:36.981  4596  8472 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:17:36.981  4596  8472 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:17:36.984  4596  8472 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:17:36.984  4596  8472 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:17:36.984  4596  8472 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:17:36.985  4596  8472 W Codec2Client: query -- param skipped: index = 2684356609.
+11-14 10:17:36.987   473  2957 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:17:37.047  4596  8469 W odavi.vivovideo: Accessing hidden method Ldalvik/system/VMStack;->getStackClass2()Ljava/lang/Class; (unsupported, reflection, allowed)
+11-14 10:17:41.399  4596  8471 W MediaCodec: no metrics handle found
+11-14 10:17:41.453  4596  8481 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:17:41.454  4596  8481 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:17:41.456  4596  8481 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:17:41.456  4596  8481 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:17:41.456  4596  8481 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:17:41.701  4596  8481 W MediaCodec: no metrics handle found
+11-14 10:17:41.766  4596  8484 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:17:41.766  4596  8484 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:17:41.767  4596  8484 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:17:41.767  4596  8484 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:17:41.767  4596  8484 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:17:41.985  4596  8484 W MediaCodec: no metrics handle found
+11-14 10:17:42.054  4596  8487 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:17:42.055  4596  8487 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:17:42.056  4596  8487 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:17:42.056  4596  8487 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:17:42.056  4596  8487 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:17:42.224  4596  8487 W MediaCodec: no metrics handle found
+11-14 10:17:43.038  4596  8498 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:17:43.042  4596  8498 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:17:43.042  4596  8498 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:17:43.042  4596  8498 W Codec2Client: query -- param skipped: index = 3254792206.
+11-14 10:17:43.043  4596  8498 W Codec2Client: query -- param skipped: index = 3254792194.
+11-14 10:17:43.059  4596  8500 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+11-14 10:17:43.059  4596  8500 E EGL_emulation: tid 8500: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+11-14 10:17:43.062  4596  8500 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+11-14 10:17:43.062  4596  8500 E EGL_emulation: tid 8500: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+11-14 10:17:43.071  4596  8502 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:17:43.076  4596  8502 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:17:43.076  4596  8502 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:17:43.077  4596  8502 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:17:43.077  4596  8502 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:17:43.077  4596  8502 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:17:43.077  4596  8502 W Codec2Client: query -- param skipped: index = 2684356609.
+11-14 10:17:43.080   473  2957 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:17:43.095  4596  8500 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+11-14 10:17:43.096  4596  8500 E EGL_emulation: tid 8500: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+11-14 10:17:43.269  4596  8505 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:17:43.374  4596  8505 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:17:43.374  4596  8505 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:17:43.431  4596  8505 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:17:43.431  4596  8505 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:17:43.432  4596  8505 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:17:43.433  4596  8505 W Codec2Client: query -- param skipped: index = 2684356609.
+11-14 10:17:43.604   473  2957 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:17:43.774  4596  8500 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+11-14 10:17:43.774  4596  8500 E EGL_emulation: tid 8500: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+11-14 10:17:45.048  4596  8510 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:17:45.053  4596  8510 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:17:45.053  4596  8510 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:17:45.054  4596  8510 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:17:45.054  4596  8510 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:17:45.054  4596  8510 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:17:45.054  4596  8510 W Codec2Client: query -- param skipped: index = 2684356609.
+11-14 10:17:45.828   473  2957 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:17:47.843  4596  8513 W ColorUtils: expected specified color aspects (0:0:0:0)
+11-14 10:17:47.851  4596  8513 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:17:47.852  4596  8513 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:17:47.855   473  2957 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:17:48.088   367  8503 W C2BqBuffer: last successful dequeue was 100085 us ago, 9 consecutive failures
+11-14 10:17:48.616   367  8506 W C2BqBuffer: last successful dequeue was 284145 us ago, 24 consecutive failures
+11-14 10:17:50.915   367  8511 W C2BqBuffer: last successful dequeue was 3742224 us ago, 326 consecutive failures
+11-14 10:17:53.098   367  8503 W C2BqBuffer: last successful dequeue was 733828 us ago, 71 consecutive failures
+11-14 10:17:53.625   367  8506 W C2BqBuffer: last successful dequeue was 201342 us ago, 18 consecutive failures
+11-14 10:17:55.919   367  8511 W C2BqBuffer: last successful dequeue was 247119 us ago, 23 consecutive failures
+11-14 10:17:58.628   367  8506 W C2BqBuffer: last successful dequeue was 198327 us ago, 17 consecutive failures
+11-14 10:18:00.107   853   853 W PageIndicator: Total number of pages invalid: 0. Assuming 1 page.
+11-14 10:18:00.922   367  8511 W C2BqBuffer: last successful dequeue was 229568 us ago, 20 consecutive failures
+11-14 10:18:03.104   367  8503 W C2BqBuffer: last successful dequeue was 152415 us ago, 14 consecutive failures
+11-14 10:18:03.638   367  8506 W C2BqBuffer: last successful dequeue was 84544 us ago, 8 consecutive failures
+11-14 10:18:05.932   367  8511 W C2BqBuffer: last successful dequeue was 90212 us ago, 8 consecutive failures
+11-14 10:18:08.114   367  8503 W C2BqBuffer: last successful dequeue was 114816 us ago, 10 consecutive failures
+11-14 10:18:13.115   367  8503 W C2BqBuffer: last successful dequeue was 81499 us ago, 7 consecutive failures
+11-14 10:18:13.450  4596  8509 W MediaCodec: no metrics handle found
+11-14 10:18:13.647   367  8506 W C2BqBuffer: last successful dequeue was 219516 us ago, 19 consecutive failures
+11-14 10:18:18.647   367  8506 W C2BqBuffer: last successful dequeue was 126707 us ago, 10 consecutive failures
+11-14 10:18:23.693  4596  8504 W MediaCodec: no metrics handle found
+11-14 10:18:23.719  4596  8501 W MediaCodec: no metrics handle found
+11-14 10:18:23.806  4596  8530 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:18:23.831  4596  8530 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:18:23.836  4596  8530 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:18:23.838  4596  8530 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:18:23.838  4596  8530 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:18:23.838  4596  8530 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:18:23.842  4596  8530 W Codec2Client: query -- param skipped: index = 2684356609.
+11-14 10:18:23.869  4596  8533 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:18:23.900  4596  8533 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:18:23.900  4596  8533 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:18:23.901   473   473 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:18:23.927  4596  8533 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:18:23.928  4596  8533 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:18:23.928  4596  8533 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:18:23.928  4596  8533 W Codec2Client: query -- param skipped: index = 2684356609.
+11-14 10:18:24.068   473   473 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:18:25.956  2684  2836 W TimedProcessReaper: Memory state is: 230
+11-14 10:18:26.009  6756  8239 W TapAndPay: NfcAdapter is null while obtaining CardEmulation instance. [CONTEXT service_id=79 ]
+11-14 10:18:26.009  6756  8239 W TapAndPay: java.lang.NullPointerException: NfcAdapter is null
+11-14 10:18:26.009  6756  8239 W TapAndPay: 	at android.nfc.cardemulation.CardEmulation.getInstance(CardEmulation.java:152)
+11-14 10:18:26.009  6756  8239 W TapAndPay: 	at cdoy.<init>(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+11-14 10:18:26.009  6756  8239 W TapAndPay: 	at com.google.android.gms.tapandpay.hce.task.TapAndPayAidRegistrationTaskOperation.a(:com.google.android.gms@231818047@23.18.18 (190800-535401451):5)
+11-14 10:18:26.009  6756  8239 W TapAndPay: 	at com.google.android.gms.tapandpay.gcmtask.TapAndPayGcmTaskChimeraService.a(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-14 10:18:26.009  6756  8239 W TapAndPay: 	at avzs.call(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-14 10:18:26.009  6756  8239 W TapAndPay: 	at java.util.concurrent.FutureTask.run(FutureTask.java:264)
+11-14 10:18:26.009  6756  8239 W TapAndPay: 	at aced.c(:com.google.android.gms@231818047@23.18.18 (190800-535401451):6)
+11-14 10:18:26.009  6756  8239 W TapAndPay: 	at aced.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):7)
+11-14 10:18:26.009  6756  8239 W TapAndPay: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-14 10:18:26.009  6756  8239 W TapAndPay: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-14 10:18:26.009  6756  8239 W TapAndPay: 	at acjn.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+11-14 10:18:26.009  6756  8239 W TapAndPay: 	at java.lang.Thread.run(Thread.java:1012)
+11-14 10:18:26.051  1776  8544 W LocationOracle: getBestLocation(): no location is available
+11-14 10:18:26.062  6812  6879 E constellation: [api_verify_phone_operation] Failed to generate Client Signature
+11-14 10:18:26.062  6812  6879 E constellation: acwp: Stored private key deleted
+11-14 10:18:26.062  6812  6879 E constellation: 	at acos.e(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-14 10:18:26.062  6812  6879 E constellation: 	at acos.d(:com.google.android.gms@231818047@23.18.18 (190800-535401451):1)
+11-14 10:18:26.062  6812  6879 E constellation: 	at acoa.c(:com.google.android.gms@231818047@23.18.18 (190800-535401451):22)
+11-14 10:18:26.062  6812  6879 E constellation: 	at acoa.f(:com.google.android.gms@231818047@23.18.18 (190800-535401451):12)
+11-14 10:18:26.062  6812  6879 E constellation: 	at avsy.eo(:com.google.android.gms@231818047@23.18.18 (190800-535401451):1)
+11-14 10:18:26.062  6812  6879 E constellation: 	at avtf.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):14)
+11-14 10:18:26.062  6812  6879 E constellation: 	at dfhf.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-14 10:18:26.062  6812  6879 E constellation: 	at aced.c(:com.google.android.gms@231818047@23.18.18 (190800-535401451):6)
+11-14 10:18:26.062  6812  6879 E constellation: 	at aced.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):7)
+11-14 10:18:26.062  6812  6879 E constellation: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-14 10:18:26.062  6812  6879 E constellation: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-14 10:18:26.062  6812  6879 E constellation: 	at acjn.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+11-14 10:18:26.062  6812  6879 E constellation: 	at java.lang.Thread.run(Thread.java:1012)
+11-14 10:18:26.065  2684  2850 W DialerVerifiedNumberProvider: com.android.dialer.businessvoice.verifiedcall.impl.constellation.VerifiedNumberProvider.lambda$getConstellationResponse$1:155 Failed to get constellation token.
+11-14 10:18:26.065  2684  2850 W DialerVerifiedNumberProvider: nkq: 5004:
+11-14 10:18:26.065  2684  2850 W DialerVerifiedNumberProvider: 	at nov.au(PG:1)
+11-14 10:18:26.065  2684  2850 W DialerVerifiedNumberProvider: 	at nnf.g(PG:2)
+11-14 10:18:26.065  2684  2850 W DialerVerifiedNumberProvider: 	at npo.a(Unknown Source:2)
+11-14 10:18:26.065  2684  2850 W DialerVerifiedNumberProvider: 	at npy.dm(PG:9)
+11-14 10:18:26.065  2684  2850 W DialerVerifiedNumberProvider: 	at ncz.onTransact(PG:4)
+11-14 10:18:26.065  2684  2850 W DialerVerifiedNumberProvider: 	at android.os.Binder.execTransactInternal(Binder.java:1344)
+11-14 10:18:26.065  2684  2850 W DialerVerifiedNumberProvider: 	at android.os.Binder.execTransact(Binder.java:1275)
+11-14 10:18:26.068  1776  2304 W CronetNetworkRqstWrppr: Upload request without a content type.
+11-14 10:18:26.070  2684  2850 W DialerConstellationSyncWorker: com.android.dialer.businessvoice.control.worker.ConstellationSyncWorker.lambda$syncConstellation$2:110 Constellation api request failed, status code: 5004
+11-14 10:18:26.098  6812  8539 W ZappDownloader: No successful module downloads for requested features [vision.ocr].
+11-14 10:18:26.108  6812  8539 W ChimeraConfigService: Retry attempt was throttled. [CONTEXT service_id=264 ]
+11-14 10:18:26.113  6812  8540 W Vision  : Request for optional module download of ocr failed. Request again.
+11-14 10:18:26.113  6812  8540 W Vision  : Would have logged:
+11-14 10:18:26.113  6812  8540 W Vision  : # dsae@37884fe7
+11-14 10:18:26.137  1776  2302 W LocationOracle: No location returned by GMS core getLastLocation()
+11-14 10:18:26.137  1776  1776 E A       : onError
+11-14 10:18:26.137  1776  1776 E A       : com.google.android.apps.gsa.shared.speech.a.m: errorCode: 65561, engine: 2
+11-14 10:18:26.137  1776  1776 E A       : 	at com.google.android.apps.gsa.staticplugins.dc.a.e.a(PG:3)
+11-14 10:18:26.137  1776  1776 E A       : 	at com.google.android.apps.gsa.s3.n.hh(PG:1)
+11-14 10:18:26.137  1776  1776 E A       : 	at com.google.cd.g.a.f.e(PG:2)
+11-14 10:18:26.137  1776  1776 E A       : 	at com.google.android.apps.gsa.speech.k.a.g.d(PG:22)
+11-14 10:18:26.137  1776  1776 E A       : 	at com.google.android.apps.gsa.speech.k.a.g.ks(PG:6)
+11-14 10:18:26.137  1776  1776 E A       : 	at com.google.android.apps.gsa.s3.o.e(PG:14)
+11-14 10:18:26.137  1776  1776 E A       : 	at com.google.android.apps.gsa.s3.p.run(PG:1)
+11-14 10:18:26.137  1776  1776 E A       : 	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:487)
+11-14 10:18:26.137  1776  1776 E A       : 	at java.util.concurrent.FutureTask.run(FutureTask.java:264)
+11-14 10:18:26.137  1776  1776 E A       : 	at com.google.android.apps.gsa.shared.util.c.a.e.run(PG:2)
+11-14 10:18:26.137  1776  1776 E A       : 	at com.google.android.apps.gsa.shared.util.c.a.bi.run(PG:1)
+11-14 10:18:26.137  1776  1776 E A       : 	at com.google.android.apps.gsa.shared.util.c.a.bi.run(PG:1)
+11-14 10:18:26.137  1776  1776 E A       : 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-14 10:18:26.137  1776  1776 E A       : 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-14 10:18:26.137  1776  1776 E A       : 	at java.lang.Thread.run(Thread.java:1012)
+11-14 10:18:26.137  1776  1776 E A       : 	at com.google.android.apps.gsa.shared.util.c.a.l.run(PG:5)
+11-14 10:18:26.137  1776  1776 E A       : Caused by: com.google.android.apps.gsa.shared.speech.a.o: errorCode: 65586, engine: 2
+11-14 10:18:26.137  1776  1776 E A       : 	... 15 more
+11-14 10:18:26.137  1776  1776 E A       : Caused by: com.google.android.apps.gsa.shared.speech.a.k: errorCode: 401, engine: 2
+11-14 10:18:26.137  1776  1776 E A       : 	at com.google.android.apps.gsa.assistant.shared.n.h.a(PG:5)
+11-14 10:18:26.137  1776  1776 E A       : 	at com.google.android.apps.gsa.s3.producers.j.hE(PG:2)
+11-14 10:18:26.137  1776  1776 E A       : 	at com.google.android.apps.gsa.speech.k.a.g.d(PG:16)
+11-14 10:18:26.137  1776  1776 E A       : 	... 12 more
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: Exception in upload method
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: com.google.android.apps.gsa.shared.r.d: Error code: 262182
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.android.apps.gsa.shared.ab.bk.d(PG:5)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.android.libraries.gsa.c.a.ar.d(PG:1)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.android.libraries.gsa.c.a.bo.b(PG:5)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.android.libraries.gsa.c.a.e.a(PG:2)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.android.libraries.gsa.c.a.a.run(PG:2)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.bf.execute(PG:1)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.d.i(PG:1)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.d.l(PG:12)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.d.cancel(PG:8)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.d.m(PG:2)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.j.a(PG:1)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.d.l(PG:3)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.d.cancel(PG:8)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.d.m(PG:2)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.j.a(PG:1)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.d.l(PG:3)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.d.cancel(PG:8)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.d.m(PG:2)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.j.a(PG:1)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.d.l(PG:3)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.d.cancel(PG:8)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.d.m(PG:2)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.j.a(PG:1)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.d.l(PG:3)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.d.cancel(PG:8)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.d.m(PG:2)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.c.a(PG:1)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.d.l(PG:3)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.d.cancel(PG:8)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.bu.cancel(PG:1)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.d.cancel(PG:17)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.android.apps.gsa.staticplugins.bk.b.h.run(PG:2)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.bf.execute(PG:1)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.d.i(PG:1)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.d.l(PG:12)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.d.cancel(PG:8)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.d.m(PG:2)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.j.a(PG:1)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.d.l(PG:3)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.d.cancel(PG:8)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.android.apps.gsa.shared.util.c.aj.a(PG:2)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.d.l(PG:3)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.d.cancel(PG:8)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.d.m(PG:2)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.c.a(PG:1)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.d.l(PG:3)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.common.util.concurrent.d.cancel(PG:8)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.android.apps.gsa.s3.o.c(PG:2)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.android.apps.gsa.s3.r.a(PG:1)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.android.apps.gsa.staticplugins.dc.a.c.e(PG:2)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.android.apps.gsa.staticplugins.dc.a.c.c(PG:3)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.android.apps.gsa.staticplugins.dc.a.e.a(PG:5)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.android.apps.gsa.s3.n.hh(PG:1)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.cd.g.a.f.e(PG:2)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.android.apps.gsa.speech.k.a.g.d(PG:22)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.android.apps.gsa.speech.k.a.g.ks(PG:6)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.android.apps.gsa.s3.o.e(PG:14)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.android.apps.gsa.s3.p.run(PG:1)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:487)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at java.util.concurrent.FutureTask.run(FutureTask.java:264)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.android.apps.gsa.shared.util.c.a.e.run(PG:2)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.android.apps.gsa.shared.util.c.a.bi.run(PG:1)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.android.apps.gsa.shared.util.c.a.bi.run(PG:1)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at java.lang.Thread.run(Thread.java:1012)
+11-14 10:18:26.138  1776  2335 E cr_CronetUrlRequestContext: 	at com.google.android.apps.gsa.shared.util.c.a.l.run(PG:5)
+11-14 10:18:26.148  1776  1776 W A       : Failed to sync device settings.
+11-14 10:18:26.150  1776  2332 W A       : Failed to get connectivityLock in 4000 ms
+11-14 10:18:26.150  1776  2332 W CronetNetworkRqstWrppr: Upload request without a content type.
+11-14 10:18:29.694  1776  8545 W A       : [Download] response code: 400
+11-14 10:18:33.502  4596  8500 E Surface : freeAllBuffers: 1 buffers were freed while being dequeued!
+11-14 10:18:33.505  4596  8498 W MediaCodec: no metrics handle found
+11-14 10:18:33.509  4596  8500 W GraphicBufferSource: released unpopulated slots: [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63]
+11-14 10:18:33.510  4596  8500 E Surface : getSlotFromBufferLocked: unknown buffer: 0x0
+11-14 10:18:33.526  4596  8512 W MediaCodec: no metrics handle found
+11-14 10:18:33.543  4596  8532 W MediaCodec: no metrics handle found
+11-14 10:18:33.551  4596  8529 W MediaCodec: no metrics handle found
+11-14 10:18:33.592  1656  1732 W MediaProvider: isAppCloneUserPair for user 0: false
+11-14 10:18:33.663  4596  8575 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:18:33.663  4596  8575 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:18:33.665  4596  8575 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:18:33.665  4596  8575 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:18:33.665  4596  8575 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:18:33.978  4596  8575 W MediaCodec: no metrics handle found
+11-14 10:18:34.622  4596  8584 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+11-14 10:18:34.622  4596  8584 E EGL_emulation: tid 8584: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+11-14 10:18:34.636  4596  8587 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:18:34.640  4596  8587 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:18:34.640  4596  8587 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:18:34.641  4596  8587 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:18:34.641  4596  8587 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:18:34.641  4596  8587 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:18:34.641  4596  8587 W Codec2Client: query -- param skipped: index = 2684356609.
+11-14 10:18:34.643   473   473 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:18:34.659  4596  8585 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:18:34.664  4596  8585 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:18:34.664  4596  8585 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:18:34.665  4596  8585 W Codec2Client: query -- param skipped: index = 3254792206.
+11-14 10:18:34.665  4596  8585 W Codec2Client: query -- param skipped: index = 3254792194.
+11-14 10:18:35.499  4596  8591 W ColorUtils: expected specified color aspects (0:0:0:0)
+11-14 10:18:35.504  4596  8591 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:18:35.504  4596  8591 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:18:35.504   473   473 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:18:40.599  4596  8584 E Surface : freeAllBuffers: 1 buffers were freed while being dequeued!
+11-14 10:18:40.603  4596  8584 W GraphicBufferSource: released unpopulated slots: [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63]
+11-14 10:18:40.603  4596  8584 E Surface : getSlotFromBufferLocked: unknown buffer: 0x0
+11-14 10:18:40.630  4596  8585 W MediaCodec: no metrics handle found
+11-14 10:18:40.630  4596  8586 W MediaCodec: no metrics handle found
+11-14 10:18:40.635  4596  8590 W MediaCodec: no metrics handle found
+11-14 10:18:40.667  1656  1732 W MediaProvider: isAppCloneUserPair for user 0: false

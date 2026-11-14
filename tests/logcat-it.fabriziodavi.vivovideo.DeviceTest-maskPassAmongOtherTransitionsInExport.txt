@@ -1,0 +1,300 @@
+11-14 10:02:36.230  6756  6938 W PhenotypeConfigurationU: bwix: No package exists for config package: com.google.lighter.android#com.google.android.gms
+11-14 10:02:36.230  6756  6938 W PhenotypeConfigurationU: 	at com.google.android.gms.platformconfigurator.PhenotypeConfigurationUpdateListener.b(:com.google.android.gms@231818047@23.18.18 (190800-535401451):6)
+11-14 10:02:36.230  6756  6938 W PhenotypeConfigurationU: 	at com.google.android.gms.platformconfigurator.PhenotypeConfigurationUpdateListener.a(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-14 10:02:36.230  6756  6938 W PhenotypeConfigurationU: 	at com.google.android.gms.platformconfigurator.PhenotypeConfigurationUpdateListener.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):21)
+11-14 10:02:36.230  6756  6938 W PhenotypeConfigurationU: 	at com.google.android.chimera.IntentOperation.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-14 10:02:36.230  6756  6938 W PhenotypeConfigurationU: 	at zhv.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-14 10:02:36.230  6756  6938 W PhenotypeConfigurationU: 	at hjm.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):3)
+11-14 10:02:36.230  6756  6938 W PhenotypeConfigurationU: 	at hjl.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):11)
+11-14 10:02:36.230  6756  6938 W PhenotypeConfigurationU: 	at dfhf.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-14 10:02:36.230  6756  6938 W PhenotypeConfigurationU: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-14 10:02:36.230  6756  6938 W PhenotypeConfigurationU: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-14 10:02:36.230  6756  6938 W PhenotypeConfigurationU: 	at java.lang.Thread.run(Thread.java:1012)
+11-14 10:02:36.246  6756  7094 W PhenotypeConfigurationU: Update for unknown DeviceConfig package com.google.android.gms.people [CONTEXT service_id=204 ]
+11-14 10:02:36.246  6756  7094 W PhenotypeConfigurationU: bwix: No package exists for config package: com.google.android.gms.people
+11-14 10:02:36.246  6756  7094 W PhenotypeConfigurationU: 	at com.google.android.gms.platformconfigurator.PhenotypeConfigurationUpdateListener.b(:com.google.android.gms@231818047@23.18.18 (190800-535401451):6)
+11-14 10:02:36.246  6756  7094 W PhenotypeConfigurationU: 	at com.google.android.gms.platformconfigurator.PhenotypeConfigurationUpdateListener.a(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-14 10:02:36.246  6756  7094 W PhenotypeConfigurationU: 	at com.google.android.gms.platformconfigurator.PhenotypeConfigurationUpdateListener.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):21)
+11-14 10:02:36.246  6756  7094 W PhenotypeConfigurationU: 	at com.google.android.chimera.IntentOperation.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-14 10:02:36.246  6756  7094 W PhenotypeConfigurationU: 	at zhv.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-14 10:02:36.246  6756  7094 W PhenotypeConfigurationU: 	at hjm.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):3)
+11-14 10:02:36.246  6756  7094 W PhenotypeConfigurationU: 	at hjl.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):11)
+11-14 10:02:36.246  6756  7094 W PhenotypeConfigurationU: 	at dfhf.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-14 10:02:36.246  6756  7094 W PhenotypeConfigurationU: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-14 10:02:36.246  6756  7094 W PhenotypeConfigurationU: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-14 10:02:36.246  6756  7094 W PhenotypeConfigurationU: 	at java.lang.Thread.run(Thread.java:1012)
+11-14 10:02:36.278  6756  7095 W PhenotypeConfigurationU: Update for unknown DeviceConfig package com.google.android.westworld [CONTEXT service_id=204 ]
+11-14 10:02:36.278  6756  7095 W PhenotypeConfigurationU: bwix: No package exists for config package: com.google.android.westworld
+11-14 10:02:36.278  6756  7095 W PhenotypeConfigurationU: 	at com.google.android.gms.platformconfigurator.PhenotypeConfigurationUpdateListener.b(:com.google.android.gms@231818047@23.18.18 (190800-535401451):6)
+11-14 10:02:36.278  6756  7095 W PhenotypeConfigurationU: 	at com.google.android.gms.platformconfigurator.PhenotypeConfigurationUpdateListener.a(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-14 10:02:36.278  6756  7095 W PhenotypeConfigurationU: 	at com.google.android.gms.platformconfigurator.PhenotypeConfigurationUpdateListener.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):21)
+11-14 10:02:36.278  6756  7095 W PhenotypeConfigurationU: 	at com.google.android.chimera.IntentOperation.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-14 10:02:36.278  6756  7095 W PhenotypeConfigurationU: 	at zhv.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-14 10:02:36.278  6756  7095 W PhenotypeConfigurationU: 	at hjm.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):3)
+11-14 10:02:36.278  6756  7095 W PhenotypeConfigurationU: 	at hjl.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):11)
+11-14 10:02:36.278  6756  7095 W PhenotypeConfigurationU: 	at dfhf.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-14 10:02:36.278  6756  7095 W PhenotypeConfigurationU: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-14 10:02:36.278  6756  7095 W PhenotypeConfigurationU: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-14 10:02:36.278  6756  7095 W PhenotypeConfigurationU: 	at java.lang.Thread.run(Thread.java:1012)
+11-14 10:02:36.789   367  7084 W C2BqBuffer: last successful dequeue was 13105747 us ago, 1089 consecutive failures
+11-14 10:02:37.908  4126  4230 W Bugle   : TextClassifierLibManagerImpl: Reclaiming memory at level: 40
+11-14 10:02:37.915  4126  4230 W Bugle   : TextClassifierLibManagerImpl: Reclaiming memory at level: 40
+11-14 10:02:37.931  4126  4245 W Bugle   : TextClassifierLibManagerImpl: Reclaiming memory at level: 40
+11-14 10:02:38.549  6756  6795 W BpBinder: Large outgoing transaction of 385636 bytes, interface descriptor , code 4
+11-14 10:02:38.751  4126  4656 W BugleRcsEngine: [81] bpxc.w: Unable to send diagnostic log
+11-14 10:02:38.754  4126  4659 W BugleRcsEngine: [84] bpxc.w: Unable to send diagnostic log
+11-14 10:02:38.758  4126  4653 W BugleAction: Null config in BugleSharedPrefs
+11-14 10:02:38.758  4126  4653 W BugleAction: Failed to get msisdn from Bugle
+11-14 10:02:38.758  4126  4653 W BugleAction: Failed to get msisdn from RcsProfileService
+11-14 10:02:38.758  4126  4653 W BugleAction: cksi: Jibe SDK Service not available. Is the Jibe SDK service running? Did you call connect() and wait for the notification before calling an API function?
+11-14 10:02:38.758  4126  4653 W BugleAction: 	at cksa.b(PG:2)
+11-14 10:02:38.758  4126  4653 W BugleAction: 	at com.google.android.rcs.client.profile.RcsProfileService.g(PG:1)
+11-14 10:02:38.758  4126  4653 W BugleAction: 	at com.google.android.rcs.client.profile.RcsProfileService.getMsisdn(PG:3)
+11-14 10:02:38.758  4126  4653 W BugleAction: 	at awsw.aj(PG:17)
+11-14 10:02:38.758  4126  4653 W BugleAction: 	at awsw.z(PG:2)
+11-14 10:02:38.758  4126  4653 W BugleAction: 	at aule.k(PG:1)
+11-14 10:02:38.758  4126  4653 W BugleAction: 	at aulc.call(Unknown Source:2)
+11-14 10:02:38.758  4126  4653 W BugleAction: 	at cnsg.a(PG:1)
+11-14 10:02:38.758  4126  4653 W BugleAction: 	at cnpm.a(PG:3)
+11-14 10:02:38.758  4126  4653 W BugleAction: 	at ctfv.a(PG:1)
+11-14 10:02:38.758  4126  4653 W BugleAction: 	at ctet.run(PG:4)
+11-14 10:02:38.758  4126  4653 W BugleAction: 	at ctfx.run(PG:1)
+11-14 10:02:38.758  4126  4653 W BugleAction: 	at bxfd.run(PG:1)
+11-14 10:02:38.758  4126  4653 W BugleAction: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-14 10:02:38.758  4126  4653 W BugleAction: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-14 10:02:38.758  4126  4653 W BugleAction: 	at bxef.run(PG:2)
+11-14 10:02:38.758  4126  4653 W BugleAction: 	at java.lang.Thread.run(Thread.java:1012)
+11-14 10:02:38.758  4126  4653 W BugleAction: 	at bxfj.run(PG:5)
+11-14 10:02:38.758  4126  4653 W SubscriptionMetadataUti: Bugle: SubscriptionMetadataUtils get: unexpected subId = -2, replacing with -1
+11-14 10:02:38.758  4126  4653 W SubscriptionMetadataUti: cpwb: FULL
+11-14 10:02:38.758  4126  4653 W SubscriptionMetadataUti: 	at bdsy.h(PG:6)
+11-14 10:02:38.758  4126  4653 W SubscriptionMetadataUti: 	at bdvp.a(PG:1)
+11-14 10:02:38.758  4126  4653 W SubscriptionMetadataUti: 	at bgit.<init>(PG:1)
+11-14 10:02:38.758  4126  4653 W SubscriptionMetadataUti: 	at bgiu.a(PG:1)
+11-14 10:02:38.758  4126  4653 W SubscriptionMetadataUti: 	at awsw.ai(PG:3)
+11-14 10:02:38.758  4126  4653 W SubscriptionMetadataUti: 	at awsw.aj(PG:25)
+11-14 10:02:38.758  4126  4653 W SubscriptionMetadataUti: 	at awsw.z(PG:2)
+11-14 10:02:38.758  4126  4653 W SubscriptionMetadataUti: 	at aule.k(PG:1)
+11-14 10:02:38.758  4126  4653 W SubscriptionMetadataUti: 	at aulc.call(Unknown Source:2)
+11-14 10:02:38.758  4126  4653 W SubscriptionMetadataUti: 	at cnsg.a(PG:1)
+11-14 10:02:38.758  4126  4653 W SubscriptionMetadataUti: 	at cnpm.a(PG:3)
+11-14 10:02:38.758  4126  4653 W SubscriptionMetadataUti: 	at ctfv.a(PG:1)
+11-14 10:02:38.758  4126  4653 W SubscriptionMetadataUti: 	at ctet.run(PG:4)
+11-14 10:02:38.758  4126  4653 W SubscriptionMetadataUti: 	at ctfx.run(PG:1)
+11-14 10:02:38.758  4126  4653 W SubscriptionMetadataUti: 	at bxfd.run(PG:1)
+11-14 10:02:38.758  4126  4653 W SubscriptionMetadataUti: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-14 10:02:38.758  4126  4653 W SubscriptionMetadataUti: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-14 10:02:38.758  4126  4653 W SubscriptionMetadataUti: 	at bxef.run(PG:2)
+11-14 10:02:38.758  4126  4653 W SubscriptionMetadataUti: 	at java.lang.Thread.run(Thread.java:1012)
+11-14 10:02:38.758  4126  4653 W SubscriptionMetadataUti: 	at bxfj.run(PG:5)
+11-14 10:02:38.759  4126  4653 W SubscriptionMetadataUti: Bugle: SubscriptionMetadataUtils get: unexpected subId = -2, replacing with -1
+11-14 10:02:38.759  4126  4653 W SubscriptionMetadataUti: cpwb: FULL
+11-14 10:02:38.759  4126  4653 W SubscriptionMetadataUti: 	at bdsy.h(PG:6)
+11-14 10:02:38.759  4126  4653 W SubscriptionMetadataUti: 	at bgit.<init>(PG:2)
+11-14 10:02:38.759  4126  4653 W SubscriptionMetadataUti: 	at bgiu.a(PG:1)
+11-14 10:02:38.759  4126  4653 W SubscriptionMetadataUti: 	at awsw.ai(PG:3)
+11-14 10:02:38.759  4126  4653 W SubscriptionMetadataUti: 	at awsw.aj(PG:25)
+11-14 10:02:38.759  4126  4653 W SubscriptionMetadataUti: 	at awsw.z(PG:2)
+11-14 10:02:38.759  4126  4653 W SubscriptionMetadataUti: 	at aule.k(PG:1)
+11-14 10:02:38.759  4126  4653 W SubscriptionMetadataUti: 	at aulc.call(Unknown Source:2)
+11-14 10:02:38.759  4126  4653 W SubscriptionMetadataUti: 	at cnsg.a(PG:1)
+11-14 10:02:38.759  4126  4653 W SubscriptionMetadataUti: 	at cnpm.a(PG:3)
+11-14 10:02:38.759  4126  4653 W SubscriptionMetadataUti: 	at ctfv.a(PG:1)
+11-14 10:02:38.759  4126  4653 W SubscriptionMetadataUti: 	at ctet.run(PG:4)
+11-14 10:02:38.759  4126  4653 W SubscriptionMetadataUti: 	at ctfx.run(PG:1)
+11-14 10:02:38.759  4126  4653 W SubscriptionMetadataUti: 	at bxfd.run(PG:1)
+11-14 10:02:38.759  4126  4653 W SubscriptionMetadataUti: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-14 10:02:38.759  4126  4653 W SubscriptionMetadataUti: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-14 10:02:38.759  4126  4653 W SubscriptionMetadataUti: 	at bxef.run(PG:2)
+11-14 10:02:38.759  4126  4653 W SubscriptionMetadataUti: 	at java.lang.Thread.run(Thread.java:1012)
+11-14 10:02:38.759  4126  4653 W SubscriptionMetadataUti: 	at bxfj.run(PG:5)
+11-14 10:02:38.760  4126  4653 W SubscriptionMetadataUti: Bugle: SubscriptionMetadataUtils get: unexpected subId = -2, replacing with -1
+11-14 10:02:38.760  4126  4653 W SubscriptionMetadataUti: cpwb: FULL
+11-14 10:02:38.760  4126  4653 W SubscriptionMetadataUti: 	at bdsy.h(PG:6)
+11-14 10:02:38.760  4126  4653 W SubscriptionMetadataUti: 	at awsw.ai(PG:18)
+11-14 10:02:38.760  4126  4653 W SubscriptionMetadataUti: 	at awsw.aj(PG:25)
+11-14 10:02:38.760  4126  4653 W SubscriptionMetadataUti: 	at awsw.z(PG:2)
+11-14 10:02:38.760  4126  4653 W SubscriptionMetadataUti: 	at aule.k(PG:1)
+11-14 10:02:38.760  4126  4653 W SubscriptionMetadataUti: 	at aulc.call(Unknown Source:2)
+11-14 10:02:38.760  4126  4653 W SubscriptionMetadataUti: 	at cnsg.a(PG:1)
+11-14 10:02:38.760  4126  4653 W SubscriptionMetadataUti: 	at cnpm.a(PG:3)
+11-14 10:02:38.760  4126  4653 W SubscriptionMetadataUti: 	at ctfv.a(PG:1)
+11-14 10:02:38.760  4126  4653 W SubscriptionMetadataUti: 	at ctet.run(PG:4)
+11-14 10:02:38.760  4126  4653 W SubscriptionMetadataUti: 	at ctfx.run(PG:1)
+11-14 10:02:38.760  4126  4653 W SubscriptionMetadataUti: 	at bxfd.run(PG:1)
+11-14 10:02:38.760  4126  4653 W SubscriptionMetadataUti: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-14 10:02:38.760  4126  4653 W SubscriptionMetadataUti: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-14 10:02:38.760  4126  4653 W SubscriptionMetadataUti: 	at bxef.run(PG:2)
+11-14 10:02:38.760  4126  4653 W SubscriptionMetadataUti: 	at java.lang.Thread.run(Thread.java:1012)
+11-14 10:02:38.760  4126  4653 W SubscriptionMetadataUti: 	at bxfj.run(PG:5)
+11-14 10:02:38.760  4126  4653 W Bugle   : SubscriptionUtilsAsOfLMR1: getSelfRawNumber: subInfo is null for subscription{id:-1}
+11-14 10:02:38.791  4126  4653 W BugleAction: No default number, returning empty msisdn
+11-14 10:02:38.796  4126  4653 W RcsClientLib: No CS.apk RCS service found. Is RCS running in Bugle?
+11-14 10:02:38.807  4636  5734 W BugleRcsEngine: [83] RcsEngineImpl.e: RcsEngineImpl[DUAL_REG]:[6d7c3762-e8c5]: imsModule is null, shutdown not required
+11-14 10:02:40.419   367  7090 W C2BqBuffer: last successful dequeue was 8959017 us ago, 803 consecutive failures
+11-14 10:02:40.961   367  7076 W C2BqBuffer: last successful dequeue was 213518 us ago, 20 consecutive failures
+11-14 10:02:41.153   367  7079 W C2BqBuffer: last successful dequeue was 169836 us ago, 15 consecutive failures
+11-14 10:02:41.795   367  7084 W C2BqBuffer: last successful dequeue was 18111957 us ago, 1542 consecutive failures
+11-14 10:02:42.417  6812  7116 W ZappDownloader: No successful module downloads for requested features [vision.ocr].
+11-14 10:02:42.420  6812  7116 W ChimeraConfigService: Retry attempt was throttled. [CONTEXT service_id=264 ]
+11-14 10:02:42.422  6812  7114 W Vision  : Request for optional module download of ocr failed. Request again.
+11-14 10:02:42.422  6812  7114 W Vision  : Would have logged:
+11-14 10:02:42.422  6812  7114 W Vision  : # dsae@37884fe7
+11-14 10:02:42.799  6756  7095 W PhenotypeConfigurationU: Update for unknown DeviceConfig package com.google.android.gms [CONTEXT service_id=204 ]
+11-14 10:02:42.799  6756  7095 W PhenotypeConfigurationU: bwix: No package exists for config package: com.google.android.gms
+11-14 10:02:42.799  6756  7095 W PhenotypeConfigurationU: 	at com.google.android.gms.platformconfigurator.PhenotypeConfigurationUpdateListener.b(:com.google.android.gms@231818047@23.18.18 (190800-535401451):6)
+11-14 10:02:42.799  6756  7095 W PhenotypeConfigurationU: 	at com.google.android.gms.platformconfigurator.PhenotypeConfigurationUpdateListener.a(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-14 10:02:42.799  6756  7095 W PhenotypeConfigurationU: 	at com.google.android.gms.platformconfigurator.PhenotypeConfigurationUpdateListener.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):21)
+11-14 10:02:42.799  6756  7095 W PhenotypeConfigurationU: 	at com.google.android.chimera.IntentOperation.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-14 10:02:42.799  6756  7095 W PhenotypeConfigurationU: 	at zhv.onHandleIntent(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-14 10:02:42.799  6756  7095 W PhenotypeConfigurationU: 	at hjm.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):3)
+11-14 10:02:42.799  6756  7095 W PhenotypeConfigurationU: 	at hjl.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):11)
+11-14 10:02:42.799  6756  7095 W PhenotypeConfigurationU: 	at dfhf.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-14 10:02:42.799  6756  7095 W PhenotypeConfigurationU: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-14 10:02:42.799  6756  7095 W PhenotypeConfigurationU: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-14 10:02:42.799  6756  7095 W PhenotypeConfigurationU: 	at java.lang.Thread.run(Thread.java:1012)
+11-14 10:02:45.431   367  7090 W C2BqBuffer: last successful dequeue was 13970697 us ago, 1251 consecutive failures
+11-14 10:02:45.971   367  7076 W C2BqBuffer: last successful dequeue was 128663 us ago, 11 consecutive failures
+11-14 10:02:46.157   367  7079 W C2BqBuffer: last successful dequeue was 98228 us ago, 8 consecutive failures
+11-14 10:02:46.799   367  7084 W C2BqBuffer: last successful dequeue was 23116563 us ago, 1995 consecutive failures
+11-14 10:02:47.186  6756  7118 W TapAndPay: NfcAdapter is null while obtaining CardEmulation instance. [CONTEXT service_id=79 ]
+11-14 10:02:47.186  6756  7118 W TapAndPay: java.lang.NullPointerException: NfcAdapter is null
+11-14 10:02:47.186  6756  7118 W TapAndPay: 	at android.nfc.cardemulation.CardEmulation.getInstance(CardEmulation.java:152)
+11-14 10:02:47.186  6756  7118 W TapAndPay: 	at cdoy.<init>(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+11-14 10:02:47.186  6756  7118 W TapAndPay: 	at com.google.android.gms.tapandpay.hce.task.TapAndPayAidRegistrationTaskOperation.a(:com.google.android.gms@231818047@23.18.18 (190800-535401451):5)
+11-14 10:02:47.186  6756  7118 W TapAndPay: 	at com.google.android.gms.tapandpay.gcmtask.TapAndPayGcmTaskChimeraService.a(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-14 10:02:47.186  6756  7118 W TapAndPay: 	at avzs.call(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-14 10:02:47.186  6756  7118 W TapAndPay: 	at java.util.concurrent.FutureTask.run(FutureTask.java:264)
+11-14 10:02:47.186  6756  7118 W TapAndPay: 	at aced.c(:com.google.android.gms@231818047@23.18.18 (190800-535401451):6)
+11-14 10:02:47.186  6756  7118 W TapAndPay: 	at aced.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):7)
+11-14 10:02:47.186  6756  7118 W TapAndPay: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-14 10:02:47.186  6756  7118 W TapAndPay: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-14 10:02:47.186  6756  7118 W TapAndPay: 	at acjn.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+11-14 10:02:47.186  6756  7118 W TapAndPay: 	at java.lang.Thread.run(Thread.java:1012)
+11-14 10:02:50.436   367  7090 W C2BqBuffer: last successful dequeue was 297341 us ago, 26 consecutive failures
+11-14 10:02:51.807   367  7084 W C2BqBuffer: last successful dequeue was 28124147 us ago, 2454 consecutive failures
+11-14 10:02:51.841  4596  7077 W MediaCodec: no metrics handle found
+11-14 10:02:52.041  4596  7073 W MediaCodec: no metrics handle found
+11-14 10:02:52.081  4596  7156 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:02:52.088  4596  7156 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:02:52.088  4596  7156 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:02:52.089  4596  7156 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:02:52.089  4596  7156 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:02:52.089  4596  7156 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:02:52.089  4596  7156 W Codec2Client: query -- param skipped: index = 2684356609.
+11-14 10:02:52.094   473  3173 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:02:52.542  4596  7159 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:02:52.594  4596  7159 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:02:52.594  4596  7159 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:02:52.595  4596  7159 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:02:52.595  4596  7159 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:02:52.595  4596  7159 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:02:52.595  4596  7159 W Codec2Client: query -- param skipped: index = 2684356609.
+11-14 10:02:52.603   473  3173 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:02:55.445   367  7090 W C2BqBuffer: last successful dequeue was 712367 us ago, 69 consecutive failures
+11-14 10:02:56.815   367  7084 W C2BqBuffer: last successful dequeue was 33132495 us ago, 2737 consecutive failures
+11-14 10:02:57.662   367  7160 W C2BqBuffer: last successful dequeue was 87297 us ago, 8 consecutive failures
+11-14 10:03:00.071   853   853 W PageIndicator: Total number of pages invalid: 0. Assuming 1 page.
+11-14 10:03:00.450   367  7090 W C2BqBuffer: last successful dequeue was 111983 us ago, 10 consecutive failures
+11-14 10:03:01.766  6812  6892 E constellation: [api_verify_phone_operation] Failed to generate Client Signature
+11-14 10:03:01.766  6812  6892 E constellation: acwp: Stored private key deleted
+11-14 10:03:01.766  6812  6892 E constellation: 	at acos.e(:com.google.android.gms@231818047@23.18.18 (190800-535401451):4)
+11-14 10:03:01.766  6812  6892 E constellation: 	at acos.d(:com.google.android.gms@231818047@23.18.18 (190800-535401451):1)
+11-14 10:03:01.766  6812  6892 E constellation: 	at acoa.c(:com.google.android.gms@231818047@23.18.18 (190800-535401451):22)
+11-14 10:03:01.766  6812  6892 E constellation: 	at acoa.f(:com.google.android.gms@231818047@23.18.18 (190800-535401451):12)
+11-14 10:03:01.766  6812  6892 E constellation: 	at avsy.eo(:com.google.android.gms@231818047@23.18.18 (190800-535401451):1)
+11-14 10:03:01.766  6812  6892 E constellation: 	at avtf.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):14)
+11-14 10:03:01.766  6812  6892 E constellation: 	at dfhf.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):2)
+11-14 10:03:01.766  6812  6892 E constellation: 	at aced.c(:com.google.android.gms@231818047@23.18.18 (190800-535401451):6)
+11-14 10:03:01.766  6812  6892 E constellation: 	at aced.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):7)
+11-14 10:03:01.766  6812  6892 E constellation: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-14 10:03:01.766  6812  6892 E constellation: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-14 10:03:01.766  6812  6892 E constellation: 	at acjn.run(:com.google.android.gms@231818047@23.18.18 (190800-535401451):0)
+11-14 10:03:01.766  6812  6892 E constellation: 	at java.lang.Thread.run(Thread.java:1012)
+11-14 10:03:01.775  2684  2850 W DialerVerifiedNumberProvider: com.android.dialer.businessvoice.verifiedcall.impl.constellation.VerifiedNumberProvider.lambda$getConstellationResponse$1:155 Failed to get constellation token.
+11-14 10:03:01.775  2684  2850 W DialerVerifiedNumberProvider: nkq: 5004:
+11-14 10:03:01.775  2684  2850 W DialerVerifiedNumberProvider: 	at nov.au(PG:1)
+11-14 10:03:01.775  2684  2850 W DialerVerifiedNumberProvider: 	at nnf.g(PG:2)
+11-14 10:03:01.775  2684  2850 W DialerVerifiedNumberProvider: 	at npo.a(Unknown Source:2)
+11-14 10:03:01.775  2684  2850 W DialerVerifiedNumberProvider: 	at npy.dm(PG:9)
+11-14 10:03:01.775  2684  2850 W DialerVerifiedNumberProvider: 	at ncz.onTransact(PG:4)
+11-14 10:03:01.775  2684  2850 W DialerVerifiedNumberProvider: 	at android.os.Binder.execTransactInternal(Binder.java:1344)
+11-14 10:03:01.775  2684  2850 W DialerVerifiedNumberProvider: 	at android.os.Binder.execTransact(Binder.java:1275)
+11-14 10:03:01.803  2684  2837 W DialerConstellationSyncWorker: com.android.dialer.businessvoice.control.worker.ConstellationSyncWorker.lambda$syncConstellation$2:110 Constellation api request failed, status code: 5004
+11-14 10:03:01.817   367  7084 W C2BqBuffer: last successful dequeue was 38133775 us ago, 3182 consecutive failures
+11-14 10:03:02.108   367  7157 W C2BqBuffer: last successful dequeue was 157939 us ago, 14 consecutive failures
+11-14 10:03:02.670   367  7160 W C2BqBuffer: last successful dequeue was 213921 us ago, 19 consecutive failures
+11-14 10:03:06.824   367  7084 W C2BqBuffer: last successful dequeue was 43141252 us ago, 3627 consecutive failures
+11-14 10:03:07.114   367  7157 W C2BqBuffer: last successful dequeue was 85154 us ago, 8 consecutive failures
+11-14 10:03:07.675   367  7160 W C2BqBuffer: last successful dequeue was 130988 us ago, 10 consecutive failures
+11-14 10:03:10.337  4596  7088 W MediaCodec: no metrics handle found
+11-14 10:03:11.825   367  7084 W C2BqBuffer: last successful dequeue was 48142541 us ago, 4063 consecutive failures
+11-14 10:03:12.176  4596  7166 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:03:12.188  4596  7166 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:03:12.189  4596  7166 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:03:12.194  4596  7166 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:03:12.194  4596  7166 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:03:12.194  4596  7166 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:03:12.195  4596  7166 W Codec2Client: query -- param skipped: index = 2684356609.
+11-14 10:03:12.433   473  3173 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:03:12.683   367  7160 W C2BqBuffer: last successful dequeue was 557738 us ago, 29 consecutive failures
+11-14 10:03:12.963  2684  7168 W Settings: Setting airplane_mode_on has moved from android.provider.Settings.System to android.provider.Settings.Global, returning read-only value.
+11-14 10:03:13.247  2684  7168 W Settings: Setting airplane_mode_on has moved from android.provider.Settings.System to android.provider.Settings.Global, returning read-only value.
+11-14 10:03:16.827   367  7084 W C2BqBuffer: last successful dequeue was 53144629 us ago, 4463 consecutive failures
+11-14 10:03:17.443   367  7167 W C2BqBuffer: last successful dequeue was 4030687 us ago, 372 consecutive failures
+11-14 10:03:17.691   367  7160 W C2BqBuffer: last successful dequeue was 421894 us ago, 41 consecutive failures
+11-14 10:03:19.924  4596  7082 W MediaCodec: no metrics handle found
+11-14 10:03:20.725  4596  7155 W MediaCodec: no metrics handle found
+11-14 10:03:20.821  4596  7171 W MediaCodec: no metrics handle found
+11-14 10:03:20.829  4596  7179 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:03:20.867  4596  7179 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:03:20.867  4596  7179 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:03:20.884  4596  7179 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:03:20.884  4596  7179 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:03:20.884  4596  7179 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:03:20.885  4596  7179 W Codec2Client: query -- param skipped: index = 2684356609.
+11-14 10:03:20.995  4596  7178 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:03:21.056  4596  7178 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:03:21.056  4596  7178 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:03:21.091  4596  7178 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:03:21.091  4596  7178 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:03:21.092  4596  7178 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:03:21.093  4596  7178 W Codec2Client: query -- param skipped: index = 2684356609.
+11-14 10:03:21.159   473  3173 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:03:21.161   473  3172 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:03:22.465   367  7167 W C2BqBuffer: last successful dequeue was 801587 us ago, 11 consecutive failures
+11-14 10:03:24.944  4596  7165 W MediaCodec: no metrics handle found
+11-14 10:03:33.187  4596  7176 W MediaCodec: no metrics handle found
+11-14 10:03:33.382  4596  7177 W MediaCodec: no metrics handle found
+11-14 10:03:33.465  4596  7190 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:03:33.491  4596  7190 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:03:33.492  4596  7190 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:03:33.506  4596  7193 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:03:33.510  4596  7193 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:03:33.510  4596  7193 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:03:33.513  4596  7193 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:03:33.513  4596  7193 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:03:33.513  4596  7193 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:03:33.514  4596  7193 W Codec2Client: query -- param skipped: index = 2684356609.
+11-14 10:03:33.529   473  3173 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:03:33.533  4596  7190 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:03:33.533  4596  7190 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:03:33.533  4596  7190 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:03:33.538  4596  7190 W Codec2Client: query -- param skipped: index = 2684356609.
+11-14 10:03:33.720   473  3173 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-14 10:03:45.376  4596  6521 E Surface : freeAllBuffers: 1 buffers were freed while being dequeued!
+11-14 10:03:45.379  4596  6521 W GraphicBufferSource: released unpopulated slots: [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63]
+11-14 10:03:45.380  4596  6521 E Surface : getSlotFromBufferLocked: unknown buffer: 0x0
+11-14 10:03:45.389  4596  6542 W MediaCodec: no metrics handle found
+11-14 10:03:45.394  4596  6529 W MediaCodec: no metrics handle found
+11-14 10:03:45.418  4596  7191 W MediaCodec: no metrics handle found
+11-14 10:03:45.436  4596  7189 W MediaCodec: no metrics handle found
+11-14 10:03:45.504  1656  6016 W MediaProvider: isAppCloneUserPair for user 0: false
+11-14 10:03:45.597   473  7205 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:03:45.610   473  7205 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-14 10:03:45.610   473  7205 W Codec2Client: query -- param skipped: index = 1107298332.
+11-14 10:03:45.610   473  7205 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-14 10:03:45.616   473  7205 W Codec2Client: query -- param skipped: index = 1342179345.
+11-14 10:03:45.616   473  7205 W Codec2Client: query -- param skipped: index = 2415921170.
+11-14 10:03:45.616   473  7205 W Codec2Client: query -- param skipped: index = 1610614798.
+11-14 10:03:45.619   473  7204 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
