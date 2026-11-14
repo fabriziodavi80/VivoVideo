@@ -138,7 +138,7 @@ object DesignRenderer {
                 is DPhoto -> {
                     val cell = t.cells.getOrNull(e.slot) ?: CollageCell(0f, 0f, 1f, 1f)
                     val pose = CollageAnim.pose(spec.motion, pi++, photos, cell, tUs, dur, spec.kenBurns, still)
-                    if (pose.alpha > 0.002f && pose.reveal > 0.002f) drawPhoto(c, d, e, r, s, spec, frames, tUs, pose, w, h, selected == e.slot, false)
+                    if (pose.alpha > 0.002f && pose.reveal > 0.002f) drawPhoto(c, d, e, r, s, spec, frames, tUs, pose, w, h, selected == e.slot, false, still)
                 }
                 is DPhotoWord -> pi = drawWord(c, d, e, r, s, spec, meta, frames, tUs, still, pi, photos, w, h, selected)
                 is DText -> {
@@ -218,7 +218,7 @@ object DesignRenderer {
         val lh = (fm.descent - fm.ascent) * 0.82f
         val out = Path()
         lines.forEachIndexed { i, l ->
-            val lp = Path(); p.getTextPath(l, -p.measureText(l) / 2, i * lh, lp); out.addPath(lp)
+            val lp = Path(); p.getTextPath(l, 0, l.length, -p.measureText(l) / 2, i * lh, lp); out.addPath(lp)
         }
         val b = RectF().also { out.computeBounds(it, true) }
         if (b.width() <= 0f || b.height() <= 0f) return out
@@ -296,7 +296,7 @@ object DesignRenderer {
 
     private fun drawPhoto(
         c: Canvas, d: Design, e: DPhoto, r: RectF, s: Float, spec: CollageSpec, frames: CollageRenderer.Frames, tUs: Long,
-        pose: it.fabriziodavi.vivovideo.model.CellPose, w: Int, h: Int, selected: Boolean, subjectOnly: Boolean,
+        pose: it.fabriziodavi.vivovideo.model.CellPose, w: Int, h: Int, selected: Boolean, subjectOnly: Boolean, still: Boolean = false,
     ) {
         c.save()
         c.translate(pose.dx * w, pose.dy * h)
@@ -712,7 +712,7 @@ object DesignRenderer {
         val cell = t.cells.getOrNull(slot) ?: return
         val pi = d.els.filterIsInstance<DPhoto>().indexOf(e)
         val pose = CollageAnim.pose(spec.motion, pi, d.els.count { it is DPhoto }, cell, tUs, spec.durationUs, spec.kenBurns, still)
-        drawPhoto(c, d, e, r, s, spec, frames, tUs, pose, w, h, false, true)
+        drawPhoto(c, d, e, r, s, spec, frames, tUs, pose, w, h, false, true, still)
     }
 
     // ---------------- Parola con le foto dentro ----------------
