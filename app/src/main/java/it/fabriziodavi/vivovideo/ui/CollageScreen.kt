@@ -51,6 +51,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
@@ -67,6 +68,7 @@ import androidx.compose.material3.TextButton
 import it.fabriziodavi.vivovideo.engine.CollageRenderer
 import it.fabriziodavi.vivovideo.engine.DesignFonts
 import it.fabriziodavi.vivovideo.media.PhotoPlace
+import it.fabriziodavi.vivovideo.model.DLayout
 import it.fabriziodavi.vivovideo.model.DOrient
 import it.fabriziodavi.vivovideo.model.DText
 import it.fabriziodavi.vivovideo.model.Design
@@ -111,6 +113,8 @@ fun CollageScreen(vm: EditorViewModel) {
     var tab by remember { mutableStateOf(CollageTab.MODELS) }
     var selected by remember { mutableIntStateOf(-1) }
     var playing by remember { mutableStateOf(false) }
+    var moving by remember { mutableStateOf(false) }
+    var moved by remember { mutableIntStateOf(-1) }
     val adder = rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(CollageSpec.MAX_ITEMS)) { uris -> vm.addCollageMedia(uris) }
     val replacer = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri -> if (uri != null && selected >= 0) vm.replaceCollageItem(selected, uri) }
     fun frames(): CollageRenderer.Frames = CollageRenderer.Frames { i, _ -> spec.items.getOrNull(i)?.let { thumbs[it.uri] } }
@@ -119,8 +123,10 @@ fun CollageScreen(vm: EditorViewModel) {
         Row(Modifier.fillMaxWidth().height(52.dp).padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             IconBtn(VVIcons.Back, "Indietro", enabled = busy == null) { vm.closeCollage() }
             Text("Collage", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
-            Text(if (playing) "Ferma" else "▶ Prova il movimento", style = MaterialTheme.typography.labelLarge, color = VV.Tally,
-                modifier = Modifier.clip(RoundedCornerShape(10.dp)).clickable(enabled = busy == null) { playing = !playing; selected = -1 }.padding(10.dp))
+            if (template.design != null) Text(if (moving) "✓ Fatto" else "✥ Sposta", style = MaterialTheme.typography.labelLarge, color = if (moving) VV.Tally else VV.Text,
+                modifier = Modifier.clip(RoundedCornerShape(10.dp)).clickable(enabled = busy == null) { moving = !moving; moved = -1; playing = false; selected = -1 }.padding(10.dp))
+            Text(if (playing) "Ferma" else "▶ Movimento", style = MaterialTheme.typography.labelLarge, color = VV.Tally,
+                modifier = Modifier.clip(RoundedCornerShape(10.dp)).clickable(enabled = busy == null) { playing = !playing; selected = -1; moving = false; moved = -1 }.padding(10.dp))
         }
 
         // Anteprima: grande quanto lo spazio lo permette, con il formato giusto.
@@ -134,7 +140,26 @@ fun CollageScreen(vm: EditorViewModel) {
                     }
                 },
                 onDrag = { dx, dy -> if (selected >= 0) vm.frameCollageCell(selected, dx, dy) },
+                moveMode = moving && template.design != null, moved = moved,
+                onMoveStart = { x, y -> template.design?.let { d -> val i = DLayout.elementAt(d, spec, 1f, 1f, x, y); if (i >= 0) moved = i } },
+                onMoveTap = { x, y -> template.design?.let { d -> moved = DLayout.elementAt(d, spec, 1f, 1f, x, y) } },
+                onMoveDrag = { dx, dy -> if (moved >= 0) vm.moveCollageElement(moved, dx, dy) },
             )
+        }
+        if (moving && !playing) {
+            Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)) {
+                if (moved < 0) Hint("Tocca una scritta, una foto o un adesivo, poi trascinalo col dito dove vuoi. Vale per l'immagine e la stampa.")
+                else {
+                    val m = spec.moves["e$moved"]
+                    LabeledSlider("Grandezza", null, (((m?.scale ?: 1f) * 100).toInt()), range = 30..250, format = { "$it%" }) { v ->
+                        vm.moveCollageElement(moved, scale = v / 100f)
+                    }
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        SecondaryButton("Rimetti a posto") { vm.resetCollageMoves(moved) }
+                        if (spec.moves.isNotEmpty()) SecondaryButton("Tutto com'era") { vm.resetCollageMoves(); moved = -1 }
+                    }
+                }
+            }
         }
         if (selected >= 0 && !playing) {
             Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)) {
@@ -319,6 +344,8 @@ private fun ColorDots(options: List<Long>, current: Long, onPick: (Long) -> Unit
 private fun CollagePreview(
     spec: CollageSpec, template: CollageTemplate, thumbs: Map<String, Bitmap>, face: android.graphics.Typeface?, selected: Int, playing: Boolean,
     frames: CollageRenderer.Frames, maskTick: Int, onTap: (Int) -> Unit, onDrag: (Float, Float) -> Unit,
+    moveMode: Boolean = false, moved: Int = -1, onMoveStart: (Float, Float) -> Unit = { _, _ -> }, onMoveTap: (Float, Float) -> Unit = { _, _ -> },
+    onMoveDrag: (Float, Float) -> Unit = { _, _ -> },
 ) {
     var box by remember { mutableStateOf(IntSize.Zero) }
     val ratio = spec.aspect.ratio
@@ -326,6 +353,10 @@ private fun CollagePreview(
     val curTemplate by rememberUpdatedState(template)
     val curOnTap by rememberUpdatedState(onTap)
     val curOnDrag by rememberUpdatedState(onDrag)
+    val curMove by rememberUpdatedState(moveMode)
+    val curOnMoveStart by rememberUpdatedState(onMoveStart)
+    val curOnMoveTap by rememberUpdatedState(onMoveTap)
+    val curOnMoveDrag by rememberUpdatedState(onMoveDrag)
     // Immagine ferma, rifatta a ogni modifica.
     val still by produceState<Bitmap?>(null, spec, template, thumbs, selected, box, maskTick) {
         if (box.width <= 0) return@produceState
@@ -369,14 +400,26 @@ private fun CollagePreview(
                 .pointerInput(Unit) {
                     detectTapGestures { o ->
                         val s = curSpec; val t = curTemplate
-                        curOnTap(CollageRenderer.cellAt(t, s, size.width, size.height, o.x, o.y))
+                        if (curMove) curOnMoveTap(o.x / size.width, o.y / size.height)
+                        else curOnTap(CollageRenderer.cellAt(t, s, size.width, size.height, o.x, o.y))
                     }
                 }
                 .pointerInput(Unit) {
-                    detectDragGestures { change, d ->
+                    detectDragGestures(onDragStart = { o -> if (curMove) curOnMoveStart(o.x / size.width, o.y / size.height) }) { change, d ->
                         change.consume()
+                        if (curMove) curOnMoveDrag(d.x / size.width, d.y / size.height)
                         // Trascinare a destra porta la foto a destra: l'inquadratura va a sinistra.
-                        curOnDrag(-d.x / size.width * 3f, -d.y / size.height * 3f)
+                        else curOnDrag(-d.x / size.width * 3f, -d.y / size.height * 3f)
+                    }
+                }
+                .drawWithContent {
+                    drawContent()
+                    val d = curTemplate.design
+                    if (curMove && d != null && moved in d.els.indices) {
+                        // Il riquadro dell'elemento che stai spostando.
+                        val r = DLayout.placed(d, moved, curSpec, size.width, size.height)
+                        drawRect(VV.Tally, topLeft = androidx.compose.ui.geometry.Offset(r[0], r[1]), size = androidx.compose.ui.geometry.Size(r[2], r[3]),
+                            style = androidx.compose.ui.graphics.drawscope.Stroke(width = 2.dp.toPx(), pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(12f, 8f))))
                     }
                 },
         ) {

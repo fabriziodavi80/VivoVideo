@@ -296,6 +296,36 @@ object DLayout {
     }
 
     /** Il riquadro in pixel: sinistra, alto, larghezza, altezza. */
+    /** Il riquadro dell'elemento [i] dopo gli spostamenti e gli ingrandimenti fatti a mano ([CollageSpec.moves]). */
+    fun placed(d: Design, i: Int, spec: CollageSpec?, w: Float, h: Float): FloatArray {
+        val r = rect(d, d.els[i].box, w, h)
+        val m = spec?.moves?.get("e$i") ?: return r
+        val cw = r[2] * m.scale; val ch = r[3] * m.scale
+        return floatArrayOf(r[0] + r[2] / 2 - cw / 2 + m.dx * w, r[1] + r[3] / 2 - ch / 2 + m.dy * h, cw, ch)
+    }
+
+    /** Si può spostare: tutto tranne i motivi di fondo e i rettangoli grandi come metà quadro (sfondi, sfumature). */
+    fun movable(d: Design, i: Int): Boolean {
+        val e = d.els[i]
+        if (e is DPattern) return false
+        if (e is DRect) { val r = rect(d, e.box, 1000f, 1000f * d.h / d.w); if (r[2] * r[3] > 0.5f * 1000f * 1000f * d.h / d.w) return false }
+        return true
+    }
+
+    /** L'elemento sotto il dito (il più in alto; a parità, il più piccolo), o -1. */
+    fun elementAt(d: Design, spec: CollageSpec?, w: Float, h: Float, x: Float, y: Float): Int {
+        var best = -1; var bestArea = Float.MAX_VALUE
+        for (i in d.els.indices.reversed()) {
+            if (!movable(d, i)) continue
+            val r = placed(d, i, spec, w, h)
+            if (x < r[0] || x > r[0] + r[2] || y < r[1] || y > r[1] + r[3]) continue
+            val area = r[2] * r[3]
+            // Le scritte e le decorazioni stanno sopra le foto: vince la prima trovata, se non è molto più grande.
+            if (best < 0 || area < bestArea * 0.5f) { best = i; bestArea = area }
+        }
+        return best
+    }
+
     fun rect(d: Design, b: DBox, w: Float, h: Float): FloatArray {
         val s = scale(d, w, h)
         val (x, ww) = axis(b.x, b.w, d.w, w, s, b.ax)

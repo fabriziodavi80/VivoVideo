@@ -179,6 +179,10 @@ data class CollageItem(
     val source: String = "",
 )
 
+/** Un elemento del modello spostato ([dx], [dy] in frazioni del quadro) e ingrandito ([scale], attorno al suo centro). */
+@Serializable
+data class ElMove(val dx: Float = 0f, val dy: Float = 0f, val scale: Float = 1f)
+
 /** Tutto quello che serve per rifare il collage (resta nella clip, per modificarlo dopo). */
 @Serializable
 data class CollageSpec(
@@ -196,6 +200,8 @@ data class CollageSpec(
     val accent: Long? = null,
     val accent2: Long? = null,
     val behind: Boolean = true,
+    /** Modelli grafici da stampare: scritte e foto spostate o ingrandite da te (chiave "e<numero dell'elemento>"). */
+    val moves: Map<String, ElMove> = emptyMap(),
 ) {
     companion object {
         val DURATIONS = listOf(3_000_000L, 4_000_000L, 6_000_000L, 8_000_000L)

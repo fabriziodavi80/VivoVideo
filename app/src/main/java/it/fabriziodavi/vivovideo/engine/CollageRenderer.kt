@@ -162,6 +162,15 @@ object CollageRenderer {
 
     /** La cella sotto il punto ([x],[y]) in pixel (collage fermo), o -1. Per scegliere una foto toccandola. */
     fun cellAt(t: CollageTemplate, spec: CollageSpec, w: Int, h: Int, x: Float, y: Float): Int {
+        val d = t.design
+        if (d != null && spec.moves.isNotEmpty()) {
+            // Foto spostate a mano: si guarda dove sono adesso.
+            for (i in d.els.indices.reversed()) {
+                val e = d.els[i] as? it.fabriziodavi.vivovideo.model.DPhoto ?: continue
+                val r = it.fabriziodavi.vivovideo.model.DLayout.placed(d, i, spec, w.toFloat(), h.toFloat())
+                if (x >= r[0] && x <= r[0] + r[2] && y >= r[1] && y <= r[1] + r[3]) return e.slot
+            }
+        }
         for (i in t.cells.indices.reversed()) {
             val r = cellRect(t, t.cells[i], spec.style.gap, w, h)
             if (r.contains(x, y)) return i

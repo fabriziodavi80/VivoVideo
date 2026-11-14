@@ -106,8 +106,8 @@ object DesignRenderer {
         else -> c.toInt()
     }
 
-    private fun rectOf(d: Design, e: DEl, w: Int, h: Int): RectF {
-        val r = DLayout.rect(d, e.box, w.toFloat(), h.toFloat())
+    private fun rectOf(d: Design, i: Int, spec: CollageSpec, w: Int, h: Int): RectF {
+        val r = DLayout.placed(d, i, spec, w.toFloat(), h.toFloat())
         return RectF(r[0], r[1], r[0] + r[2], r[1] + r[3])
     }
 
@@ -132,8 +132,11 @@ object DesignRenderer {
         val late = d.els.count { it !is DPhoto && it !is DPhotoWord && it !is DTorn && it !is DPattern }
         val torns = d.els.count { it is DTorn }
         var pi = 0; var li = 0; var ti = 0
-        for (e in d.els) {
-            val r = rectOf(d, e, w, h)
+        val s0 = s
+        for ((ei, e) in d.els.withIndex()) {
+            val r = rectOf(d, ei, spec, w, h)
+            // Un elemento ingrandito a mano: anche scritte, bordi e ombre crescono con lui.
+            val s = s0 * (spec.moves["e$ei"]?.scale ?: 1f)
             when (e) {
                 is DPhoto -> {
                     val cell = t.cells.getOrNull(e.slot) ?: CollageCell(0f, 0f, 1f, 1f)
@@ -708,7 +711,9 @@ object DesignRenderer {
     /** La persona della foto [slot] ridisegnata sopra (davanti al titolo). */
     private fun subject(c: Canvas, d: Design, slot: Int, s: Float, spec: CollageSpec, frames: CollageRenderer.Frames, tUs: Long, still: Boolean, w: Int, h: Int, t: CollageTemplate) {
         val e = d.els.firstOrNull { it is DPhoto && it.slot == slot } as? DPhoto ?: return
-        val r = rectOf(d, e, w, h)
+        val ei = d.els.indexOf(e)
+        val r = rectOf(d, ei, spec, w, h)
+        val s = s * (spec.moves["e$ei"]?.scale ?: 1f)
         val cell = t.cells.getOrNull(slot) ?: return
         val pi = d.els.filterIsInstance<DPhoto>().indexOf(e)
         val pose = CollageAnim.pose(spec.motion, pi, d.els.count { it is DPhoto }, cell, tUs, spec.durationUs, spec.kenBurns, still)

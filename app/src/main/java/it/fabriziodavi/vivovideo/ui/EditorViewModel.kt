@@ -144,6 +144,7 @@ import it.fabriziodavi.vivovideo.model.CollageAspect
 import it.fabriziodavi.vivovideo.model.CollageBg
 import it.fabriziodavi.vivovideo.model.CollageItem
 import it.fabriziodavi.vivovideo.model.CollagePlan
+import it.fabriziodavi.vivovideo.model.ElMove
 import it.fabriziodavi.vivovideo.model.withItemReplaced
 import it.fabriziodavi.vivovideo.model.CollageSpec
 import it.fabriziodavi.vivovideo.model.CollageTemplate
@@ -2077,10 +2078,21 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         updateCollage { s ->
             // Le scritte cambiate restano (se il nuovo modello ha le stesse), i colori ripartono da quelli del modello.
             s.copy(templateId = t.id, style = if (s.style.bg == CollageBg.BLUR && t.design == null) t.style.copy(bg = CollageBg.BLUR) else t.style,
-                motion = t.motion, accent = null, accent2 = null)
+                motion = t.motion, accent = null, accent2 = null, moves = emptyMap())
         }
         ensureCollageMasks()
     }
+
+    /** Sposta di [dx], [dy] (frazioni del quadro) e/o ingrandisce l'elemento [i] del modello grafico. */
+    fun moveCollageElement(i: Int, dx: Float = 0f, dy: Float = 0f, scale: Float? = null) = updateCollage { s ->
+        val k = "e$i"
+        val m = s.moves[k] ?: ElMove()
+        val n = m.copy(dx = (m.dx + dx).coerceIn(-0.9f, 0.9f), dy = (m.dy + dy).coerceIn(-0.9f, 0.9f), scale = (scale ?: m.scale).coerceIn(0.3f, 3f))
+        s.copy(moves = s.moves + (k to n))
+    }
+
+    /** Rimette al suo posto l'elemento [i], o tutti con -1. */
+    fun resetCollageMoves(i: Int = -1) = updateCollage { s -> s.copy(moves = if (i < 0) emptyMap() else s.moves - "e$i") }
 
     /** Cambia una scritta del modello grafico (vuota = torna quella del modello). */
     fun setCollageText(id: String, text: String) = updateCollage { s ->

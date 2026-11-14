@@ -126,4 +126,18 @@ class DesignTest {
         val d = Designs.all.first { it.id == "x-wow-letters" }
         assertTrue(d.words.single().oneLine)
     }
+
+    @Test fun movedElementsAreFoundWhereTheyAre() {
+        val d = Designs.all.first { it.id == "x-wow-cover" }
+        val title = d.els.indexOfFirst { it is DText && it.id == "mast" }
+        val spec0 = CollageSpec(d.id, CollageAspect.PAPER)
+        val r0 = DLayout.placed(d, title, spec0, 1f, 1f)
+        assertEquals(title, DLayout.elementAt(d, spec0, 1f, 1f, r0[0] + r0[2] / 2, r0[1] + r0[3] / 2))
+        val spec = spec0.copy(moves = mapOf("e$title" to ElMove(dy = 0.6f, scale = 0.5f)))
+        val r = DLayout.placed(d, title, spec, 1f, 1f)
+        assertEquals(r0[2] * 0.5f, r[2], 0.001f)
+        assertEquals(r0[1] + r0[3] / 2 + 0.6f, r[1] + r[3] / 2, 0.001f)
+        assertEquals(title, DLayout.elementAt(d, spec, 1f, 1f, r[0] + r[2] / 2, r[1] + r[3] / 2))
+        assertTrue(d.els.indices.none { DLayout.movable(d, it) && d.els[it] is DPattern })
+    }
 }
