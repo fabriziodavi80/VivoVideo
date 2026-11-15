@@ -451,7 +451,7 @@ object Designs {
             DText(bk(40, 30, 714, 100), "title", "Titolo", "Moodboard", DFont.SERIF_IT, 96f, ACC2),
             DText(bk(40, 112, 714, 26), "date", "Data", "{luogo|Parigi} · {Mese} {ANNO}", DFont.MONO_BOLD, 18f, ACC2, track = 0.25f, upper = true),
         )
-        val left = listOf(420f, 290f, 230f); val right = listOf(250f, 400f, 290f)
+        val left = listOf(400f, 280f, 230f); val right = listOf(240f, 390f, 280f)
         var y = 160f; var slot = 0
         left.forEach { h -> els += DPhoto(bk(40, y, 347, h), slot++, radius = 24f); y += h + 14 }
         y = 160f
@@ -615,7 +615,7 @@ object Designs {
     private fun polaInstax(): Design {
         val els = arrayListOf<DEl>(
             DPattern(b(0, 0, 794, 1123, F), DPatternKind.HOLO, 0, 0f),
-            DText(bk(0, 30, 794, 170, F), "title", "Titolo", "Best of {ANNO}", DFont.ARCHIVO, 110f, WHITE, DAlign.CENTER, gradient = CHROME, shine = true, glow = 0x99FFFFFFL, upper = true),
+            DText(bk(0, 30, 794, 170, F), "title", "Titolo", "Best of {ANNO}", DFont.ARCHIVO, 110f, ACC, DAlign.CENTER, shine = true, upper = true),
         )
         val caps = listOf("{luogo|qui}", "noi", "{Mese}", "wow", "ancora!", "{giorno_breve}")
         for (i in 0 until 6) {
@@ -626,8 +626,8 @@ object Designs {
         }
         els += DPath(bk(690, 190, 70, 70), SPARKLE, 100f, 100f, fill = WHITE)
         return Design("x-pola-instax", "Instax", DesignFamily.POLAROID, DOrient.PORTRAIT, 794f, 1123f, 0xFFEFEAF8L,
-            accents = listOf(0xFF1A1033L), els = els, motion = CollageMotion.CASCADE,
-            hint = "Sei instax mini con una parola scritta a mano sotto ciascuna, su fondo olografico, titolo cromato")
+            accents = listOf(0xFF1A1033L, 0xFF2340D9L, 0xFFFF2E93L), els = els, motion = CollageMotion.CASCADE,
+            hint = "Sei instax mini con una parola scritta a mano sotto ciascuna, su fondo olografico, titolo con il riflesso")
     }
 
     private fun polaBig(): Design {
