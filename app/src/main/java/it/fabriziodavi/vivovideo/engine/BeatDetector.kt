@@ -53,7 +53,7 @@ object BeatDetector {
         // Mediane: un colpo isolato non decide.
         val b = onBeats[onBeats.size / 2]
         val m = onMids[onMids.size / 2]
-        if (m <= b * 1.5f || m < 0.5f) return beats
+        if (m <= b * 1.3f || m < 0.5f) return beats
         val half = (period / 2).toLong()
         val shifted = mids.toMutableList()
         shifted += beats.last() + half

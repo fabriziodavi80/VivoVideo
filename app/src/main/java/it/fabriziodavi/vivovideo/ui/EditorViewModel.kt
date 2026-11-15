@@ -1134,6 +1134,12 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     fun clearBeats() = updateMusic { it.copy(beatsUs = emptyList(), bpm = 0f, markersUs = emptyList(), hiddenUs = emptyList(), beatShiftUs = 0) }
 
     /** Modifica dei battiti del brano selezionato senza ricaricare l'anteprima. */
+    /** Battiti automatici spostati di mezzo battito (battere ↔ levare); i tagli già fatti sui battiti si rifanno con «Allinea». */
+    fun flipBeatPhase() {
+        updateBeats { it.flipBeatPhase() }
+        message = "Battiti spostati di mezzo battito. Se avevi già tagliato a ritmo, tocca «Allinea i tagli al ritmo»; ritocca il pulsante per tornare indietro."
+    }
+
     fun updateBeats(change: (MusicTrack) -> MusicTrack) {
         val t = selectedMusic ?: return
         update(rebuild = false) { it.replaceMusic(change(t)) }

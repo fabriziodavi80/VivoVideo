@@ -1342,6 +1342,8 @@ private fun MusicPanel(vm: EditorViewModel, running: Boolean, tab: Int, onAdd: (
                     (t.beatShiftUs / 10_000).toInt(), enabled, range = -30..30,
                     format = { (if (it > 0) "+" else "") + "${it * 10} ms" },
                 ) { v -> vm.updateBeats { it.copy(beatShiftUs = v * 10_000L) } }
+                SecondaryButton("Battere ↔ levare (sposta di mezzo battito)", Modifier.fillMaxWidth(), onClick = { if (enabled) vm.flipBeatPhase() })
+                Hint("Se i tagli sono a tempo ma cadono fra un colpo e l'altro (sui piatti invece che sulla grancassa), tocca qui; ritocca per tornare indietro.")
             }
             if (t.hasBeats) {
                 PanelLabel("Tagli a ritmo")

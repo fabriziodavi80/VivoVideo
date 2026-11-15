@@ -3,6 +3,7 @@
 Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 
 ## Novità di questa versione
+- **Battere ↔ levare** (Audio → Ritmo): se i tagli sono a tempo ma cadono fra un colpo e l'altro, un tocco sposta tutti i battiti automatici di mezzo battito (ritocca per tornare); poi **Allinea i tagli al ritmo**. Anche il rilevamento automatico ora riconosce più spesso i brani con i piatti in levare forti.
 - **Collage grafici: sposta e ingrandisci tutto.** Premi **✥ Sposta** in alto, tocca una scritta, una foto o un adesivo e trascinalo dove vuoi; con **Grandezza** lo fai più grande o più piccolo. **Rimetti a posto** lo riporta com'era, **Tutto com'era** rimette tutto. Vale per l'immagine, la stampa e il video. **✓ Fatto** per tornare a toccare le foto (scambiarle, inquadrarle, cambiarle).
 - **Effetto wow, 7 modelli nuovi**: **Ritratto nella parola** (la foto dentro una parola gigante e la persona che esce dalle lettere), **Contorno davanti** (la scritta enorme dietro di te con il contorno davanti, si legge tutta), **Esce dal cerchio** (foto rotonda, la persona sporge, la scritta gira attorno come un timbro), **Foto a strisce** (la foto tagliata in strisce sfalsate che nel video arrivano dall'alto e dal basso), **Scia** (la persona con la scia colorata dietro, per sport e ballo), **Lettere e persona** (lettere-foto con te scontornato davanti), **Copertina 3D** (rivista con la persona che esce sopra la testata).
 - **Collage «Effetto wow»** (la prima famiglia): **Esce dalla foto** (la persona sporge dal bordo della foto e passa davanti alla scritta gigante, effetto 3D), **Doppia esposizione** (la tua sagoma riempita col paesaggio della seconda foto, come le locandine dei film), **Oro e brillantini** (brillantini che scintillano e scritte d'oro con il riflesso di luce che passa), **Olografico** (fondo iridescente che si muove, scritta cromata, tu scontornato come un adesivo lucido), **Polaroid 3D** (chi salta o pedala esce dalla polaroid). Anche la dedica di Strisce sul muro ora ha il riflesso d'oro.
@@ -210,7 +211,7 @@ Versione {VERSIONE}. Questa guida si aggiorna con ogni nuova versione dell'app.
 - Volume, dissolvenze in entrata/uscita (si sentono in anteprima e nel video esportato), **Parti dal punto del brano**, Dividi, Elimina.
 
 ## Taglio a ritmo (battiti)
-- **Audio → scheda Ritmo**: **Rileva i battiti automaticamente** (dai MIDI i battiti sono già esatti). I battiti cadono sul battere, dove suona la grancassa, anche quando i piatti in levare sono più forti.
+- **Audio → scheda Ritmo**: **Rileva i battiti automaticamente** (dai MIDI i battiti sono già esatti). I battiti cadono sul battere, dove suona la grancassa, anche quando i piatti in levare sono più forti. Se in un brano cadono ancora in levare, tocca **Battere ↔ levare (sposta di mezzo battito)** sotto «Sposta i battiti automatici», poi **Allinea i tagli al ritmo**.
 - **Tutti / Ogni 2 / Ogni 4** sceglie quanti battiti usare (Ogni 4 ≈ uno per battuta).
 - **Sposta i battiti automatici** corregge un anticipo/ritardo costante.
 - **Allinea i tagli al ritmo**, **Dividi i video sui battiti** sono nella scheda Ritmo. «Dividi» taglia su ogni battito di tutti i brani del progetto (analizza da sola quelli che non hanno ancora i battiti).

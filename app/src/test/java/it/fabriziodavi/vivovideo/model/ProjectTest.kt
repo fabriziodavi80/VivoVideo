@@ -213,4 +213,14 @@ class ProjectTest {
         assertEquals(500_000L, pcf.beforeUs)
         assertEquals(500_000L, pcf.afterUs)
     }
+
+    @Test fun flipBeatPhaseMovesHalfABeatAndBack() {
+        val beats = (0 until 10).map { 100_000L + it * 500_000L }
+        val m = MusicTrack(uri = "m", name = "M", sourceDurationUs = 30_000_000, beatsUs = beats, bpm = 120f, hiddenUs = listOf(600_000L))
+        val f = m.flipBeatPhase()
+        assertEquals((0 until 10).map { 350_000L + it * 500_000L }, f.beatsUs)
+        assertTrue(f.hiddenUs.isEmpty())
+        val back = f.flipBeatPhase()
+        assertEquals(beats, back.beatsUs.take(10))
+    }
 }

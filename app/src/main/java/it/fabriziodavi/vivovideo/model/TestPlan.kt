@@ -60,7 +60,7 @@ object TestPlan {
             "Musica → Voce → registra 10 s parlando, con un brano sotto e il ducking acceso.",
             "La voce è nitida e a volume costante (frasi forti e deboli simili, niente fruscio fra le parole); in anteprima (dopo un attimo) e nel video esportato la musica si abbassa quando parli, poi risale."),
         Item("aud_beats", "Audio", "Tagli a ritmo",
-            "Musica → Battiti → trova i battiti (rifallo sui brani già analizzati), poi Ascolta e tocca a tempo. Prova un brano pop o dance con piatti in levare.",
+            "Musica → Battiti → trova i battiti (rifallo sui brani già analizzati), poi Ascolta e tocca a tempo. Prova un brano pop o dance con piatti in levare. Se cadono in levare: Battere ↔ levare, poi Allinea i tagli al ritmo; ritocca per tornare.",
             "I tagli cadono sui colpi della musica, sul battere (la grancassa), non in levare; nella timeline il bordo di ogni clip sta sotto la sua tacca arancione del righello, anche dopo centinaia di clip e con lo zoom più lontano."),
         Item("aud_mixer", "Audio", "Mixer audio",
             "Progetto con video parlato, una voce fuori campo e un brano → Audio → Mixer audio. Fai partire l'ascolto: abbassa la musica di 6 dB, metti Voce nitida e compressore Medio sulla voce, prova M e S. Esporta.",

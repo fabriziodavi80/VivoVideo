@@ -783,6 +783,18 @@ data class MusicTrack(
         .filter { b -> hiddenUs.none { kotlin.math.abs(it - b) < 20_000 } }
         .map { it + beatShiftUs }
 
+    /**
+     * Battere ↔ levare: tutti i battiti automatici si spostano di mezzo battito (a metà fra uno e il successivo),
+     * per quando cadono a tempo ma sui piatti invece che sulla grancassa. Rifatto torna dov'era.
+     */
+    fun flipBeatPhase(): MusicTrack {
+        if (beatsUs.size < 2) return this
+        val mids = beatsUs.zipWithNext { a, b -> (a + b) / 2 }
+        val half = (beatsUs.last() - beatsUs[beatsUs.size - 2]) / 2
+        val head = (beatsUs.first() - (beatsUs[1] - beatsUs[0]) / 2).takeIf { it >= 0 }
+        return copy(beatsUs = listOfNotNull(head) + mids + (beatsUs.last() + half), hiddenUs = emptyList())
+    }
+
     private fun toTimeline(src: List<Long>, projectUs: Long): List<Long> {
         val play = playUs(projectUs)
         return src.map { startUs + it - offsetUs }.filter { it >= startUs && it < startUs + play }
