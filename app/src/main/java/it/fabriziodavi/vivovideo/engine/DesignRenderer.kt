@@ -383,7 +383,7 @@ object DesignRenderer {
             // Con «esce dalla cornice» la foto copre un riquadro più alto: la testa finisce sopra il bordo.
             val area = if (e.pop > 0f) RectF(bounds.left, bounds.top - bounds.height() * e.pop, bounds.right, bounds.bottom) else bounds
             val dst = cover(bmp.width.toFloat(), bmp.height.toFloat(), area, it.zoom.coerceAtLeast(1f) * pose.inner * (if (e.filter == DFilter.BLUR) 1.15f else 1f), it.panX, it.panY)
-            if (e.pop > 0f || e.front) { popSrc = src; popDst = dst }
+            if (e.pop > 0f || e.front) { popSrc = if (e.colorPop) bmp else src; popDst = dst }
             if (e.fill >= 0 && !subjectOnly) {
                 // Doppia esposizione: la persona in bianco e nero, la seconda foto "schiarita" sopra, tutto dentro la sagoma.
                 val mask = if (it.video) null else frames.mask(item) ?: SubjectMasks.get(it.uri)
@@ -402,13 +402,16 @@ object DesignRenderer {
                 val mask = if (it.video) null else frames.mask(item) ?: SubjectMasks.get(it.uri)
                 if (mask != null) {
                     val l = c.saveLayer(bounds, null)
-                    c.drawBitmap(src, null, dst, filterPaint(e.filter, d, spec))
+                    if (e.colorPop) c.drawBitmap(bmp, null, dst, Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG))
+                    else c.drawBitmap(src, null, dst, filterPaint(e.filter, d, spec))
                     c.drawBitmap(mask, null, dst, Paint(Paint.FILTER_BITMAP_FLAG).apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.DST_IN) })
                     c.restoreToCount(l)
                 }
             } else if (e.filter == DFilter.HALFTONE) {
                 halftone(c, src, dst, bounds, max(1.6f, 4.5f * s), tint(e.ink, d, spec), tint(e.paper, d, spec), e.multiply, e.shiftX * s, e.shiftY * s)
             } else c.drawBitmap(src, null, dst, filterPaint(e.filter, d, spec))
+            // Fondo abbassato (la persona, ridisegnata sopra, resta accesa: effetto riflettore).
+            if (e.dim > 0f && !subjectOnly) c.drawColor(Color.argb((e.dim * 255).toInt().coerceIn(0, 255), 0, 0, 0))
         }
         c.restore()
         // La persona scontornata sopra la cornice, fuori dal ritaglio: sembra uscire dalla foto.
@@ -418,7 +421,7 @@ object DesignRenderer {
             val mask = if (it.video) null else frames.mask(item) ?: SubjectMasks.get(it.uri)
             if (mask != null) {
                 val l = c.saveLayer(null, null)
-                c.drawBitmap(ps, null, pd, filterPaint(e.filter, d, spec))
+                c.drawBitmap(ps, null, pd, if (e.colorPop) Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG) else filterPaint(e.filter, d, spec))
                 c.drawBitmap(mask, null, pd, Paint(Paint.FILTER_BITMAP_FLAG).apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.DST_IN) })
                 c.restoreToCount(l)
             }

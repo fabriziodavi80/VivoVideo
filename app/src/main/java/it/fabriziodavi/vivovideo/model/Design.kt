@@ -95,6 +95,10 @@ data class DPhoto(
     val slices: Int = 0,
     /** Scia: copie colorate della persona scontornata dietro di lei, come in una foto in movimento. */
     val echo: Int = 0,
+    /** Con [pop]/[front]: la persona ridisegnata a colori veri, mentre il fondo resta col filtro (bianco e nero, duotono, sfocato). */
+    val colorPop: Boolean = false,
+    /** Fondo della foto scurito (0..1); con [front] la persona resta accesa, come sotto un riflettore. */
+    val dim: Float = 0f,
 ) : DEl
 
 /** Pezzo di carta strappata: bordo irregolare sui lati [edges] (1 sopra, 2 destra, 4 sotto, 8 sinistra) con la fibra bianca e la grana. */

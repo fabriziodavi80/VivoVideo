@@ -19,12 +19,13 @@ import it.fabriziodavi.vivovideo.model.DColor.WHITE
 object Designs {
     val all: List<Design> by lazy {
         listOf(wowPop(), wowWord(), wowOutline(), wowCircle(), wowSlices(), wowEcho(), wowLetters(), wowCover(), wowDouble(), wowGold(), wowHolo(), wowAction(),
-            wedding(), saveDate(), booth(), flash(), balloons(), disco(), vip(), laurea(), baby(), badge(), speaker(),
-            bib(), topo(), speed(), mud(), hud(), record(), sequence(), skipass(),
-            paperTrip(), paperNews(), paperLove(), paperRecipe(), paperStrips(), paperWall(), paperRansom(), paperSticker(), paperRiso(),
-            notes(), chrome(), leak(), blue(), pearls(), thenNow(), windows(), dump(),
-            cover(), reportage(), letters(), bentoTrip(), bentoRide(), year(), scrap(), stickers(), mood(), duotone(), pop(), glass(),
-            sport(), love(), ticket(), route(), street(), food())
+            evGold3d(), wedding(), saveDate(), booth(), flash(), balloons(), disco(), vip(), laurea(), baby(), badge(), speaker(),
+            actJump(), actColor(), bib(), topo(), speed(), mud(), hud(), record(), sequence(), skipass(),
+            paperPop(), paperStrips(), paperTrip(), paperNews(), paperLove(), paperRecipe(), paperWall(), paperRansom(), paperSticker(), paperRiso(),
+            trendColorPop(), trendHoloSlices(), notes(), chrome(), leak(), blue(), pearls(), thenNow(), windows(), dump(),
+            magPop(), magQuote(), cover(), reportage(), letters(), bento3d(), bentoTrip(), bentoRide(), year(), scrap3d(), scrap(), stickers(), mood(),
+            posterSpot(), posterDuo3d(), duotone(), pop(), glass(),
+            trip3d(), loveDouble(), sport(), love(), ticket(), route(), street(), food())
     }
 
     fun byId(id: String): Design? = all.firstOrNull { it.id == id }
@@ -200,6 +201,185 @@ object Designs {
             DText(bk(80, 830, 330, 120), "line2", "Titolo 2", "Il meglio\ndi {luogo|Roma}", DFont.SERIF_IT, 40f, WHITE, shadow = true),
             DText(bk(520, 920, 190, 110), "num", "Numero", "N°{mese_n}", DFont.ANTON, 80f, ACC, DAlign.CENTER, pill = WHITE, pad = 16f, rot = -6f),
             DText(bk(40, 1068, 714, 26), "small", "Piede", "{ANNO} · edizione speciale", DFont.MONO_BOLD, 18f, ACC2, DAlign.CENTER, track = 0.3f, upper = true),
+        ))
+
+    // ---- Stile wow nelle altre famiglie (15/11/2026): persona che esce, colore che spicca sul bianco e nero, riflettore, oro ----
+
+    private fun evGold3d() = Design("x-ev-gold3d", "Auguri 3D", DesignFamily.EVENTS, DOrient.PORTRAIT, 794f, 1123f, 0xFF0B0B0FL,
+        accents = listOf(0xFFE7C26BL, 0xFFE9E9F2L, 0xFFF2A7C8L), motion = CollageMotion.DROP,
+        hint = "Compleanni e anniversari: la persona esce dal cerchio d'oro, la scritta gira attorno, brillantini e anni d'oro che contano",
+        els = listOf(
+            DPattern(b(0, 0, 794, 1123, F), DPatternKind.GLITTER, ACC, 0f),
+            DText(bk(0, 30, 794, 200, F), "title", "Titolo", "Auguri!", DFont.SCRIPT, 190f, WHITE, DAlign.CENTER, gradient = GOLD, shine = true, shadow = true),
+            DText(bk(107, 250, 580, 580), "ring", "Scritta in cerchio", "Buon compleanno · {data}", DFont.MONO_BOLD, 26f, 0xFFD9A93BL, track = 0.25f, upper = true, arc = true),
+            DPhoto(bk(167, 310, 460, 460), 0, DShape.CIRCLE, border = 10f, borderColor = 0xFFD9A93BL, shadow = 40f, pop = 0.32f),
+            DText(bk(0, 830, 794, 200, F), "age", "Anni", "50", DFont.ANTON, 200f, WHITE, DAlign.CENTER, gradient = GOLD, shine = true, shadow = true, count = true),
+            DText(bk(40, 1030, 714, 70), "name", "Nome", "Marco", DFont.SERIF_IT, 60f, CREAM, DAlign.CENTER),
+        ))
+
+    private fun actJump() = Design("x-act-jump", "Salto 3D", DesignFamily.ACTION, DOrient.PORTRAIT, 794f, 1123f, ACC,
+        accents = listOf(0xFFC6FF3DL, 0xFFFF5B14L, 0xFF00E5FFL, 0xFFFFD60AL, WHITE), motion = CollageMotion.DROP,
+        hint = "Salti, drop, tuffi: chi salta esce dalla foto storta, la scritta vuota gigante e la misura che conta nel video",
+        els = listOf(
+            DPattern(b(0, 0, 794, 1123, F), DPatternKind.SPEED, BLACK, 0f),
+            DText(bk(0, 20, 794, 300, F), "title", "Titolo", "Big air", DFont.ANTON, 260f, BLACK, DAlign.CENTER, upper = true, stroke = 4f, skew = -0.12f, rot = -4f),
+            DPhoto(bk(97, 300, 600, 600), 0, rot = -6f, shadow = 34f, pop = 0.4f),
+            DText(bk(60, 920, 420, 170), "stat", "Misura", "12 m", DFont.ANTON, 170f, BLACK, skew = -0.1f, count = true),
+            DText(bk(470, 960, 280, 60), "tag", "Etichetta", "{luogo|Bike park}", DFont.MONO_BOLD, 24f, ACC, DAlign.RIGHT, pill = BLACK, pad = 18f, upper = true, rot = 3f),
+            DText(bk(470, 1040, 280, 30), "date", "Data", "{giorno_breve}", DFont.MONO_BOLD, 20f, BLACK, DAlign.RIGHT, track = 0.2f, upper = true),
+        ))
+
+    private fun actColor() = Design("x-act-color", "Colore in corsa", DesignFamily.ACTION, DOrient.PORTRAIT, 794f, 1123f, 0xFF111111L,
+        accents = listOf(0xFFC6FF3DL, 0xFFFF2E93L, 0xFF00E5FFL, 0xFFFF5B14L), motion = CollageMotion.ZOOM,
+        hint = "Il mondo in bianco e nero e tu a colori, davanti alla scritta al neon (che si legge comunque grazie al contorno)",
+        els = listOf(
+            DPhoto(bk(0, 0, 794, 1123, F), 0, filter = DFilter.BW, front = true, colorPop = true),
+            DRect(bk(0, 800, 794, 323, F), 0, grad = listOf(0f to 0x00000000L, 1f to 0xCC000000L)),
+            DText(bk(0, 120, 794, 380, F), "title", "Titolo", "Go!", DFont.ANTON, 380f, ACC, DAlign.CENTER, upper = true, behind = 0, glow = ACC),
+            DText(bk(0, 120, 794, 380, F), "title", "", "Go!", DFont.ANTON, 380f, ACC, DAlign.CENTER, upper = true, stroke = 3f),
+            DText(bk(40, 1000, 714, 40), "stats", "Dati", "{luogo|Gara} · {data}", DFont.MONO_BOLD, 26f, WHITE, DAlign.CENTER, track = 0.25f, upper = true),
+            DText(bk(40, 1050, 714, 50), "note", "Frase", "never stop", DFont.HAND, 46f, ACC, DAlign.CENTER, rot = -2f),
+        ))
+
+    private fun paperPop() = Design("x-paper-pop", "Strappo 3D", DesignFamily.PAPER, DOrient.PORTRAIT, 794f, 1123f, ACC,
+        accents = listOf(0xFFC9A77CL, 0xFF9FD8FFL, 0xFFFFB3C7L, 0xFFB9C9A5L), accents2 = listOf(0xFF1A1A1AL, WHITE, 0xFFE5432DL),
+        motion = CollageMotion.DROP,
+        hint = "La foto su un pezzo di carta strappata e la persona che ne esce, con il nastro adesivo e la scritta a mano",
+        els = listOf(
+            DPattern(b(0, 0, 794, 1123, F), DPatternKind.PAPER, 0, 0f),
+            DText(bk(40, 40, 714, 160), "title", "Titolo", "Che giornata!", DFont.HAND, 120f, ACC2, DAlign.CENTER, rot = -4f),
+            DTorn(bk(77, 260, 640, 730), CREAM, rot = -3f, seed = 5, shadow = 22f),
+            DPhoto(bk(122, 300, 550, 600), 0, rot = -3f, pop = 0.3f),
+            DRect(bk(90, 250, 150, 46), TAPE, rot = -30f),
+            DRect(bk(560, 940, 150, 46), TAPE, rot = -25f),
+            DText(bk(130, 920, 420, 50), "date", "Data", "{data} · {luogo|Lago di Garda}", DFont.MONO_BOLD, 20f, 0xFF3A3530L, rot = -3f, track = 0.15f, upper = true),
+            DPath(bk(660, 200, 80, 80), SPARKLE, 100f, 100f, fill = ACC2),
+        ))
+
+    private fun trendColorPop() = Design("x-trend-colorpop", "Colore pop", DesignFamily.TREND, DOrient.PORTRAIT, 794f, 1123f, 0xFF111111L,
+        accents = listOf(BUTTER, 0xFFFF6FB5L, WHITE, 0xFFC6FF3DL), motion = CollageMotion.ZOOM,
+        hint = "Tutto in bianco e nero tranne te, a colori: la scritta a mano, gli adesivi e la data come nei reel",
+        els = listOf(
+            DPhoto(bk(0, 0, 794, 1123, F), 0, filter = DFilter.BW, front = true, colorPop = true),
+            DText(bk(40, 60, 600, 160), "title", "Frase", "main\ncharacter", DFont.HAND, 90f, ACC, rot = -5f, line = 0.85f, shadow = true),
+            DPath(bk(640, 80, 90, 90), SPARKLE, 100f, 100f, fill = ACC),
+            DPath(bk(80, 900, 60, 60), SPARKLE, 100f, 100f, fill = WHITE),
+            DText(bk(40, 990, 360, 60), "tag", "Etichetta", "{luogo|Milano}", DFont.MONO_BOLD, 24f, BLACK, rot = -3f, pill = ACC, pad = 18f, upper = true, track = 0.1f),
+            DText(bk(430, 1000, 324, 50), "date", "Data", "{giorno_breve}", DFont.MONO_BOLD, 24f, WHITE, DAlign.RIGHT, rot = 3f, pill = 0x66000000L, pad = 16f, upper = true),
+        ))
+
+    private fun trendHoloSlices() = Design("x-trend-holo-slices", "Strisce Y2K", DesignFamily.TREND, DOrient.PORTRAIT, 794f, 1123f, 0xFFEFEAF8L,
+        accents = listOf(0xFF1A1033L, 0xFF2340D9L, 0xFFFF2E93L), motion = CollageMotion.ZOOM,
+        hint = "Fondo olografico, la foto a strisce sfalsate e la scritta cromata con il riflesso che passa",
+        els = listOf(
+            DPattern(b(0, 0, 794, 1123, F), DPatternKind.HOLO, 0, 0f),
+            DText(bk(0, 30, 794, 240, F), "title", "Titolo", "Vibes", DFont.ARCHIVO, 200f, WHITE, DAlign.CENTER, gradient = CHROME, shine = true, glow = 0x99FFFFFFL, upper = true, skew = -0.06f),
+            DPhoto(bk(70, 270, 654, 700), 0, slices = 6, shadow = 16f),
+            DText(bk(60, 1010, 320, 56), "tag", "Etichetta", "{luogo|Ibiza}", DFont.MONO_BOLD, 22f, WHITE, rot = -4f, pill = ACC, pad = 18f, upper = true, track = 0.1f),
+            DText(bk(414, 1020, 320, 56), "date", "Data", "{giorno_breve}", DFont.MONO_BOLD, 22f, BLACK, DAlign.RIGHT, rot = 4f, pill = WHITE, pad = 18f, upper = true),
+            DPath(bk(670, 250, 70, 70), SPARKLE, 100f, 100f, fill = WHITE),
+        ))
+
+    private fun posterSpot() = Design("x-poster-spot", "Riflettore", DesignFamily.POSTER, DOrient.PORTRAIT, 794f, 1123f, 0xFF0B0B0BL,
+        accents = listOf(WHITE, BUTTER, 0xFFFF3B30L, 0xFF7CC8FFL), motion = CollageMotion.ZOOM,
+        hint = "Locandina da film: il fondo sfocato e scuro, tu nitido sotto il riflettore davanti al titolo enorme, i titoli di testa in basso",
+        els = listOf(
+            DPhoto(bk(0, 0, 794, 1123, F), 0, filter = DFilter.BLUR, dim = 0.45f, front = true, colorPop = true),
+            DText(bk(0, 140, 794, 420, F), "title", "Titolo", "Legend", DFont.ANTON, 330f, ACC, DAlign.CENTER, upper = true, behind = 0),
+            DText(bk(0, 140, 794, 420, F), "title", "", "Legend", DFont.ANTON, 330f, ACC, DAlign.CENTER, upper = true, stroke = 2.5f),
+            DText(bk(40, 60, 714, 30), "kicker", "Sopra", "{luogo|Roma} presenta", DFont.MONO_BOLD, 20f, WHITE, DAlign.CENTER, track = 0.4f, upper = true),
+            DText(bk(60, 990, 674, 60), "credits", "Titoli di testa", "una produzione di famiglia · regia di chi ha il telefono · musiche dal vivo", DFont.MONO, 14f, 0xCCFFFFFFL, DAlign.CENTER, track = 0.15f, upper = true, wrap = true),
+            DText(bk(40, 1060, 714, 34), "date", "Data", "al cinema dal {data}", DFont.SERIF_IT, 28f, ACC, DAlign.CENTER),
+        ))
+
+    private fun posterDuo3d() = Design("x-poster-duo3d", "Duotono 3D", DesignFamily.POSTER, DOrient.PORTRAIT, 794f, 1123f, ACC2,
+        accents = listOf(0xFFFFB3C7L, 0xFFFFE14DL, 0xFF9FEFFFL, 0xFFC6FF3DL), accents2 = listOf(0xFF2340D9L, 0xFF111111L, 0xFFE5432DL, 0xFF5B2A86L),
+        motion = CollageMotion.ZOOM,
+        hint = "Poster in due colori con te a colori veri davanti al numero gigante dell'anno",
+        els = listOf(
+            DPhoto(bk(0, 0, 794, 1123, F), 0, filter = DFilter.DUOTONE, front = true, colorPop = true),
+            DText(bk(0, 60, 794, 640, F), "num", "Numero", "{AA|26}", DFont.ANTON, 640f, ACC, DAlign.CENTER, behind = 0),
+            DText(bk(40, 980, 714, 80), "title", "Titolo", "{luogo|Summer}", DFont.SERIF_IT, 76f, ACC, DAlign.CENTER),
+            DText(bk(40, 1062, 714, 26), "small", "Piccolo", "{foto} foto · {ANNO}", DFont.MONO_BOLD, 18f, ACC, DAlign.CENTER, track = 0.3f, upper = true),
+        ))
+
+    private fun magPop() = Design("x-mag-pop", "Copertina a colori", DesignFamily.MAGAZINE, DOrient.PORTRAIT, 794f, 1123f, 0xFF111111L,
+        accents = listOf(0xFFE10600L, BUTTER, WHITE, 0xFF2340D9L), motion = CollageMotion.ZOOM,
+        hint = "Copertina di moda: la foto in bianco e nero, tu a colori davanti alla testata, i titoli ai lati",
+        els = listOf(
+            DPhoto(bk(0, 0, 794, 1123, F), 0, filter = DFilter.BW, front = true, colorPop = true),
+            DText(bk(0, 20, 794, 250, F), "mast", "Testata", "Mood", DFont.SERIF, 260f, ACC, DAlign.CENTER, line = 0.9f, upper = true, behind = 0),
+            DText(bk(50, 560, 300, 160), "line1", "Titolo 1", "La stagione\ndi {luogo|Milano}", DFont.GROTESK, 40f, WHITE, line = 0.95f, shadow = true),
+            DText(bk(50, 760, 300, 120), "line2", "Titolo 2", "{foto} scatti\nda non perdere", DFont.SERIF_IT, 36f, WHITE, shadow = true),
+            DText(bk(540, 900, 200, 110), "num", "Numero", "N°{mese_n}", DFont.ANTON, 76f, BLACK, DAlign.CENTER, pill = ACC, pad = 16f, rot = -6f),
+            DText(bk(40, 1068, 714, 26), "small", "Piede", "{Mese} {ANNO} · edizione speciale", DFont.MONO_BOLD, 18f, WHITE, DAlign.CENTER, track = 0.3f, upper = true),
+        ))
+
+    private fun magQuote() = Design("x-mag-quote", "Intervista", DesignFamily.MAGAZINE, DOrient.PORTRAIT, 794f, 1123f, ACC,
+        accents = listOf(0xFFF2EDE4L, 0xFFFFE14DL, 0xFFFFB3C7L, 0xFF9FD8FFL), accents2 = listOf(0xFF111111L, 0xFFE5432DL, 0xFF2340D9L),
+        motion = CollageMotion.DROP,
+        hint = "Pagina d'intervista: virgolette giganti, la frase in corsivo grande e la persona scontornata che entra dal lato",
+        els = listOf(
+            DText(bk(30, 10, 400, 400), "", "", "“", DFont.SERIF, 520f, ACC2),
+            DText(bk(50, 260, 440, 420), "quote", "Frase", "La felicità è adesso, non domani.", DFont.SERIF_IT, 70f, ACC2, line = 1f, wrap = true),
+            DPhoto(bk(380, 330, 414, 793), 0, cutout = true, border = 0f, shadow = 26f),
+            DText(bk(50, 720, 330, 60), "name", "Nome", "Giulia, {AA} anni", DFont.MONO_BOLD, 22f, ACC, pill = ACC2, pad = 18f, upper = true, rot = -3f),
+            DText(bk(50, 1020, 400, 30), "small", "Piede", "intervista · {luogo|Torino} · {Mese} {ANNO}", DFont.MONO, 16f, ACC2, track = 0.2f, upper = true),
+            DRect(bk(50, 990, 120, 4), ACC2),
+        ))
+
+    private fun bento3d() = Design("x-bento-3d", "Bento 3D", DesignFamily.BENTO, DOrient.SQUARE, 756f, 756f, 0xFFEDEFF3L,
+        accents = listOf(0xFF2340D9L, 0xFFE5432DL, 0xFF111111L, 0xFF0F7B5FL), motion = CollageMotion.CASCADE,
+        hint = "Bento con la persona che esce dalla casella grande, un numero che conta, una seconda foto e un timbro che gira",
+        els = listOf(
+            DText(bk(28, 24, 420, 120), "title", "Titolo", "Weekend", DFont.GROTESK, 92f, 0xFF111111L),
+            DPhoto(bk(28, 170, 420, 560), 0, radius = 30f, shadow = 14f, pop = 0.22f),
+            DRect(bk(466, 24, 262, 240), ACC, radius = 30f),
+            DText(bk(486, 40, 222, 150), "count", "Numero", "{foto}", DFont.ANTON, 140f, WHITE, DAlign.CENTER, count = true),
+            DText(bk(486, 196, 222, 40), "countl", "Sotto il numero", "ricordi", DFont.MONO_BOLD, 22f, WHITE, DAlign.CENTER, track = 0.2f, upper = true),
+            DPhoto(bk(466, 282, 262, 210), 1, radius = 30f, shadow = 14f),
+            DRect(bk(466, 510, 262, 220), 0xFF111111L, radius = 30f),
+            DText(bk(497, 521, 200, 200), "ring", "Timbro", "{luogo|Sardegna} · {ANNO}", DFont.MONO_BOLD, 17f, WHITE, track = 0.15f, upper = true, arc = true),
+            DPath(bk(567, 591, 60, 60), SPARKLE, 100f, 100f, fill = ACC),
+        ))
+
+    private fun scrap3d() = Design("x-scrap-3d", "Ritaglio 3D", DesignFamily.SCRAP, DOrient.PORTRAIT, 794f, 1123f, ACC,
+        accents = listOf(0xFFFFB3C7L, 0xFFFFE14DL, 0xFF9FD8FFL, 0xFFC6F04AL), motion = CollageMotion.DROP,
+        hint = "Collage ritagliato: la persona scontornata come un grande adesivo con la scia, strisce di carta, polaroid ai lati e lettere ritagliate",
+        els = listOf(
+            DPattern(b(0, 0, 794, 1123, F), DPatternKind.PAPER, 0, 0f),
+            DTorn(bk(-20, 180, 834, 160, F), 0xFF111111L, rot = -4f, seed = 11, shadow = 10f),
+            DTorn(bk(-20, 760, 834, 140, F), WHITE, rot = 3f, seed = 13, shadow = 10f),
+            DRansom(bk(40, 40, 714, 130), "title", "Lettere ritagliate", "best day", seed = 9, rot = -3f),
+            DPhoto(bk(40, 380, 250, 300), 1, rot = -8f, border = 12f, bottomPad = 50f, shadow = 18f),
+            DPhoto(bk(520, 420, 240, 290), 2, rot = 7f, border = 12f, bottomPad = 50f, shadow = 18f),
+            DPhoto(bk(177, 230, 440, 720), 0, cutout = true, border = 16f, shadow = 26f, echo = 2),
+            DText(bk(40, 990, 714, 80), "note", "Frase", "{luogo|con gli amici} · {giorno_breve}", DFont.HAND, 56f, 0xFF111111L, DAlign.CENTER, rot = -2f),
+            DPath(bk(660, 180, 80, 80), SPARKLE, 100f, 100f, fill = 0xFF111111L),
+        ))
+
+    private fun trip3d() = Design("x-trip-3d", "Cartolina 3D", DesignFamily.THEMES, DOrient.PORTRAIT, 794f, 1123f, ACC,
+        accents = listOf(0xFF8FD3FFL, 0xFFF4C27AL, 0xFFE07A5FL, 0xFF9DD6B8L), motion = CollageMotion.DROP,
+        hint = "Viaggi: la cartolina con la persona che ne esce, il timbro postale che gira e i saluti scritti a mano",
+        els = listOf(
+            DRect(bk(57, 210, 680, 780), WHITE, rot = -3f, shadow = 30f),
+            DPhoto(bk(87, 240, 620, 580), 0, rot = -3f, pop = 0.3f),
+            DText(bk(97, 840, 600, 90), "title", "Saluti", "Saluti da {luogo|Positano}!", DFont.HAND, 70f, 0xFF1A1A1AL, DAlign.CENTER, rot = -3f),
+            DText(bk(110, 930, 560, 30), "date", "Data", "{data}", DFont.MONO_BOLD, 18f, 0xFF555555L, DAlign.CENTER, rot = -3f, track = 0.25f),
+            DText(bk(560, 60, 200, 200), "ring", "Timbro", "{luogo|Positano} · {ANNO}", DFont.MONO_BOLD, 17f, 0xFF1A1A1AL, track = 0.12f, upper = true, arc = true, rot = 12f),
+            DText(bk(600, 120, 120, 80), "", "", "{giorno_breve}", DFont.MONO_BOLD, 20f, 0xFF1A1A1AL, DAlign.CENTER, rot = 12f, upper = true),
+            DText(bk(40, 40, 480, 140), "kicker", "Sopra", "Wish you\nwere here", DFont.SERIF_IT, 64f, WHITE, line = 0.95f, shadow = true),
+        ))
+
+    private fun loveDouble() = Design("x-love-double", "Amore", DesignFamily.THEMES, DOrient.PORTRAIT, 794f, 1123f, ACC,
+        accents = listOf(0xFFF7E8E3L, 0xFFF3EEE6L, WHITE, 0xFF1A1414L), accents2 = listOf(0xFFB0303AL, 0xFF1A1A1AL, 0xFFD9A93BL),
+        motion = CollageMotion.ZOOM,
+        hint = "Doppia esposizione romantica: la vostra sagoma (prima foto) riempita col tramonto o il mare (seconda foto) e il corsivo d'oro",
+        els = listOf(
+            DPhoto(bk(97, 60, 600, 790), 0, fill = 1),
+            DText(bk(0, 820, 794, 190, F), "title", "Titolo", "Ti amo", DFont.SCRIPT, 170f, WHITE, DAlign.CENTER, gradient = GOLD, shine = true),
+            DText(bk(40, 1020, 714, 40), "names", "Nomi", "Anna & Luca", DFont.SERIF_IT, 40f, ACC2, DAlign.CENTER),
+            DText(bk(40, 1068, 714, 26), "date", "Data", "{data}", DFont.MONO, 18f, ACC2, DAlign.CENTER, track = 0.3f),
         ))
 
     // Eventi: colori pieni, foto grandi, scritte enormi e adesivi (niente avorio e rametti da partecipazione).
