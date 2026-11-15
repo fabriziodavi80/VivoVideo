@@ -377,7 +377,7 @@ object Designs {
         hint = "Doppia esposizione romantica: la vostra sagoma (prima foto) riempita col tramonto o il mare (seconda foto) e il corsivo d'oro",
         els = listOf(
             DPhoto(bk(97, 60, 600, 790), 0, fill = 1),
-            DText(bk(0, 820, 794, 190, F), "title", "Titolo", "Ti amo", DFont.SCRIPT, 170f, WHITE, DAlign.CENTER, gradient = GOLD, shine = true),
+            DText(bk(0, 820, 794, 190, F), "title", "Titolo", "Ti amo", DFont.SCRIPT, 170f, WHITE, DAlign.CENTER, gradient = listOf(0xFFE9C46AL, 0xFF9A6A12L, 0xFFD4A537L, 0xFF6E4A0AL, 0xFFC99A2EL), shine = true, shadow = true),
             DText(bk(40, 1020, 714, 40), "names", "Nomi", "Anna & Luca", DFont.SERIF_IT, 40f, ACC2, DAlign.CENTER),
             DText(bk(40, 1068, 714, 26), "date", "Data", "{data}", DFont.MONO, 18f, ACC2, DAlign.CENTER, track = 0.3f),
         ))
