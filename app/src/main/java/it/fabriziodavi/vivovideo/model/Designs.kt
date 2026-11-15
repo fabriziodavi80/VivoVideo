@@ -25,7 +25,9 @@ object Designs {
             trendColorPop(), trendHoloSlices(), notes(), chrome(), leak(), blue(), pearls(), thenNow(), windows(), dump(),
             magPop(), magQuote(), cover(), reportage(), letters(), bento3d(), bentoTrip(), bentoRide(), year(), scrap3d(), scrap(), stickers(), mood(),
             posterSpot(), posterDuo3d(), duotone(), pop(), glass(),
-            trip3d(), loveDouble(), sport(), love(), ticket(), route(), street(), food())
+            trip3d(), loveDouble(), sport(), love(), ticket(), route(), street(), food(),
+            grid9(), gridMasonry(), gridPop(), gridType(), shapeArch(), shapeHeart(), shapeBubbles(), shapeFlower(), shapeBlob(),
+            polaStack(), polaString(), polaInstax(), polaBig(), edMinimal(), edIndex(), edCover(), edSpread())
     }
 
     fun byId(id: String): Design? = all.firstOrNull { it.id == id }
@@ -380,6 +382,328 @@ object Designs {
             DText(bk(0, 820, 794, 190, F), "title", "Titolo", "Ti amo", DFont.SCRIPT, 170f, WHITE, DAlign.CENTER, gradient = listOf(0xFFE9C46AL, 0xFF9A6A12L, 0xFFD4A537L, 0xFF6E4A0AL, 0xFFC99A2EL), shine = true, shadow = true),
             DText(bk(40, 1020, 714, 40), "names", "Nomi", "Anna & Luca", DFont.SERIF_IT, 40f, ACC2, DAlign.CENTER),
             DText(bk(40, 1068, 714, 26), "date", "Data", "{data}", DFont.MONO, 18f, ACC2, DAlign.CENTER, track = 0.3f),
+        ))
+
+    // ---- Griglie, Forme, Polaroid, Editoriale rifatte nello stile nuovo (15/11/2026) ----
+
+    /** Contorno a cuore (0..1). */
+    private val HEART_PTS: List<Pt> by lazy {
+        val raw = (0 until 72).map { i ->
+            val t = i / 72.0 * 2 * Math.PI
+            val x = 16 * Math.pow(kotlin.math.sin(t), 3.0)
+            val y = 13 * kotlin.math.cos(t) - 5 * kotlin.math.cos(2 * t) - 2 * kotlin.math.cos(3 * t) - kotlin.math.cos(4 * t)
+            x to -y
+        }
+        norm(raw)
+    }
+
+    /** Fiore a [petals] petali tondi. */
+    private fun flowerPts(petals: Int): List<Pt> = norm((0 until 120).map { i ->
+        val t = i / 120.0 * 2 * Math.PI
+        val r = 0.78 + 0.22 * kotlin.math.abs(kotlin.math.cos(petals * t / 2))
+        r * kotlin.math.cos(t) to r * kotlin.math.sin(t)
+    })
+
+    /** Forma morbida irregolare. */
+    private fun blobPts(seed: Int): List<Pt> = norm((0 until 90).map { i ->
+        val t = i / 90.0 * 2 * Math.PI
+        val r = 1 + 0.09 * kotlin.math.sin(3 * t + seed) + 0.06 * kotlin.math.sin(5 * t + seed * 2.1) + 0.04 * kotlin.math.cos(2 * t + seed * 0.7)
+        r * kotlin.math.cos(t) to r * kotlin.math.sin(t)
+    })
+
+    private fun norm(raw: List<Pair<Double, Double>>): List<Pt> {
+        val x0 = raw.minOf { it.first }; val x1 = raw.maxOf { it.first }
+        val y0 = raw.minOf { it.second }; val y1 = raw.maxOf { it.second }
+        return raw.map { Pt(((it.first - x0) / (x1 - x0)).toFloat(), ((it.second - y0) / (y1 - y0)).toFloat()) }
+    }
+
+    /** Riquadro della scritta nel bordo bianco sotto una polaroid ruotata di [rot] (gira con lei). */
+    private fun capBox(x: Float, y: Float, w: Float, h: Float, border: Float, pad: Float, rot: Float): DBox {
+        val dy = h / 2 + border + pad / 2
+        val a = Math.toRadians(rot.toDouble())
+        val px = x + w / 2 - dy * kotlin.math.sin(a).toFloat(); val py = y + h / 2 + dy * kotlin.math.cos(a).toFloat()
+        return bk(px - w / 2, py - pad * 0.4f, w, pad * 0.8f)
+    }
+
+    // Griglie ----------------------------------------------------------------------------------------------------------
+    private fun grid9(): Design {
+        val els = arrayListOf<DEl>(
+            DText(bk(40, 40, 500, 90), "title", "Titolo", "Photo dump", DFont.GROTESK, 76f, ACC2),
+            DText(bk(454, 70, 300, 40), "date", "Data", "{Mese} {ANNO}", DFont.MONO_BOLD, 22f, ACC2, DAlign.RIGHT, track = 0.2f, upper = true),
+        )
+        var slot = 0
+        for (i in 0 until 9) {
+            val x = 40f + (i % 3) * 242f; val y = 160f + (i / 3) * 302f
+            if (i == 4) {
+                els += DRect(bk(x, y, 230, 290), ACC, radius = 22f)
+                els += DText(bk(x + 14, y + 40, 202, 140), "center", "Al centro", "{luogo|Estate}", DFont.SERIF_IT, 50f, WHITE, DAlign.CENTER, wrap = true)
+                els += DText(bk(x + 14, y + 200, 202, 60), "count", "Numero", "{foto} foto", DFont.MONO_BOLD, 22f, WHITE, DAlign.CENTER, track = 0.2f, upper = true)
+            } else els += DPhoto(bk(x, y, 230, 290), slot++, radius = 22f)
+        }
+        return Design("x-grid-9", "Mosaico con titolo", DesignFamily.GRID, DOrient.PORTRAIT, 794f, 1123f, 0xFFF4F1EAL,
+            accents = listOf(0xFFE5432DL, 0xFF2340D9L, 0xFF111111L, 0xFF0F7B5FL), accents2 = listOf(0xFF111111L, 0xFF2340D9L),
+            els = els, motion = CollageMotion.CASCADE,
+            hint = "Otto foto con gli angoli tondi e una casella di colore al centro con il luogo e quante foto")
+    }
+
+    private fun gridMasonry(): Design {
+        val els = arrayListOf<DEl>(
+            DText(bk(40, 30, 714, 100), "title", "Titolo", "Moodboard", DFont.SERIF_IT, 96f, ACC2),
+            DText(bk(40, 112, 714, 26), "date", "Data", "{luogo|Parigi} · {Mese} {ANNO}", DFont.MONO_BOLD, 18f, ACC2, track = 0.25f, upper = true),
+        )
+        val left = listOf(420f, 290f, 230f); val right = listOf(250f, 400f, 290f)
+        var y = 160f; var slot = 0
+        left.forEach { h -> els += DPhoto(bk(40, y, 347, h), slot++, radius = 24f); y += h + 14 }
+        y = 160f
+        right.forEach { h -> els += DPhoto(bk(407, y, 347, h), slot++, radius = 24f); y += h + 14 }
+        els += DText(bk(430, 380, 220, 56), "tag", "Etichetta", "mood", DFont.HAND, 44f, BLACK, DAlign.CENTER, rot = -6f, pill = BUTTER, pad = 18f)
+        els += DPath(bk(330, 560, 70, 70), SPARKLE, 100f, 100f, fill = ACC)
+        return Design("x-grid-masonry", "Bacheca", DesignFamily.GRID, DOrient.PORTRAIT, 794f, 1123f, 0xFFF7F4EFL,
+            accents = listOf(0xFFE5432DL, 0xFF2340D9L, BUTTER), accents2 = listOf(0xFF111111L, 0xFF5B2A86L),
+            els = els, motion = CollageMotion.CASCADE,
+            hint = "Bacheca alla Pinterest: due colonne di foto di altezze diverse, angoli tondi, un adesivo a mano")
+    }
+
+    private fun gridPop() = Design("x-grid-pop", "Griglia 3D", DesignFamily.GRID, DOrient.PORTRAIT, 794f, 1123f, ACC,
+        accents = listOf(0xFF111111L, 0xFF2340D9L, 0xFFE5432DL, 0xFFC6F04AL), accents2 = listOf(WHITE, BUTTER, 0xFF111111L),
+        motion = CollageMotion.CASCADE,
+        hint = "Quattro foto in griglia e la persona della prima che esce dalla sua casella e passa davanti al titolo",
+        els = listOf(
+            DText(bk(0, 30, 794, 240, F), "title", "Titolo", "Crew", DFont.ANTON, 250f, ACC2, DAlign.CENTER, upper = true),
+            DPhoto(bk(40, 300, 349, 360), 1, radius = 18f),
+            DPhoto(bk(405, 300, 349, 360), 2, radius = 18f),
+            DPhoto(bk(40, 676, 349, 360), 3, radius = 18f),
+            DPhoto(bk(405, 676, 349, 360), 0, radius = 18f, pop = 0.45f),
+            DText(bk(40, 1060, 714, 30), "date", "Data", "{luogo|Dolomiti} · {data}", DFont.MONO_BOLD, 20f, ACC2, DAlign.CENTER, track = 0.25f, upper = true),
+        ))
+
+    private fun gridType(): Design {
+        val words = listOf("We", "were", "here", "{AA|26}")
+        val els = arrayListOf<DEl>()
+        var slot = 0; var w = 0
+        for (i in 0 until 9) {
+            val x = 30f + (i % 3) * 250f; val y = 40f + (i / 3) * 350f
+            if (i % 2 == 0) els += DPhoto(bk(x, y, 234, 334), slot++)
+            else {
+                els += DRect(bk(x, y, 234, 334), if (w % 2 == 0) ACC else ACC2)
+                els += DText(bk(x + 10, y + 100, 214, 140), "w$w", "Parola ${w + 1}", words[w], DFont.ANTON, 110f, if (w % 2 == 0) ACC2 else ACC, DAlign.CENTER, upper = true)
+                w++
+            }
+        }
+        return Design("x-grid-type", "Griglia di parole", DesignFamily.GRID, DOrient.PORTRAIT, 794f, 1123f, WHITE,
+            accents = listOf(0xFFE5432DL, 0xFF2340D9L, 0xFFC6F04AL, BUTTER), accents2 = listOf(0xFF111111L, CREAM, 0xFF2340D9L),
+            els = els, motion = CollageMotion.CASCADE,
+            hint = "Scacchiera di foto e caselle di colore con una parola ciascuna (si leggono in fila: We were here 26), da cambiare in Scritte")
+    }
+
+    // Forme ------------------------------------------------------------------------------------------------------------
+    private fun shapeArch() = Design("x-shape-arch", "Archi 3D", DesignFamily.SHAPES, DOrient.PORTRAIT, 794f, 1123f, ACC,
+        accents = listOf(0xFFE07A5FL, 0xFFB9C9A5L, 0xFFF4C7C3L, 0xFF8FD3FFL), accents2 = listOf(CREAM, 0xFF1A1A1AL, 0xFF6B2E1EL),
+        motion = CollageMotion.DROP,
+        hint = "Un arco alto con la persona che ne esce, due tondi, un timbro che gira e forme morbide dietro",
+        els = listOf(
+            DRect(bk(60, 150, 420, 420), ACC2, poly = blobPts(2)),
+            DRect(bk(420, 640, 340, 340), ACC2, poly = blobPts(5)),
+            DPhoto(bk(207, 230, 380, 600), 0, DShape.ARCH, shadow = 24f, pop = 0.25f),
+            DPhoto(bk(60, 700, 220, 220), 1, DShape.CIRCLE, border = 8f, borderColor = CREAM, shadow = 16f),
+            DText(bk(520, 70, 240, 240), "ring", "Timbro", "{luogo|Marrakech} · {ANNO}", DFont.MONO_BOLD, 18f, ACC2, track = 0.15f, upper = true, arc = true),
+            DPhoto(bk(560, 110, 160, 160), 2, DShape.CIRCLE),
+            DText(bk(40, 960, 714, 120), "title", "Titolo", "Golden hour", DFont.SERIF_IT, 100f, ACC2, DAlign.CENTER),
+        ))
+
+    private fun shapeHeart() = Design("x-shape-heart", "Cuore", DesignFamily.SHAPES, DOrient.PORTRAIT, 794f, 1123f, ACC,
+        accents = listOf(0xFFE5243BL, 0xFFFF6FB5L, 0xFF111111L, 0xFFF7E8E3L), accents2 = listOf(WHITE, CREAM, 0xFFE5243BL),
+        motion = CollageMotion.ZOOM,
+        hint = "La foto a forma di cuore con il bordo, i brillantini e il corsivo con il riflesso; i nomi sotto",
+        els = listOf(
+            DPattern(b(0, 0, 794, 1123, F), DPatternKind.GLITTER, ACC2, 0f),
+            DText(bk(0, 40, 794, 200, F), "title", "Titolo", "Love you", DFont.SCRIPT, 170f, ACC2, DAlign.CENTER, shine = true, shadow = true),
+            DPhoto(bk(97, 260, 600, 560), 0, poly = HEART_PTS, border = 14f, borderColor = ACC2, shadow = 30f),
+            DText(bk(40, 880, 714, 90), "names", "Nomi", "Anna & Luca", DFont.SERIF_IT, 76f, ACC2, DAlign.CENTER),
+            DText(bk(40, 990, 714, 30), "date", "Data", "{data}", DFont.MONO_BOLD, 20f, ACC2, DAlign.CENTER, track = 0.3f),
+        ))
+
+    private fun shapeBubbles() = Design("x-shape-bubbles", "Bolle", DesignFamily.SHAPES, DOrient.PORTRAIT, 794f, 1123f, ACC,
+        accents = listOf(0xFFFFE14DL, 0xFFC6F04AL, 0xFFFF9EC7L, 0xFF9FD8FFL), accents2 = listOf(0xFF111111L, 0xFF2340D9L, 0xFFE5432DL),
+        motion = CollageMotion.CASCADE,
+        hint = "Foto in bolle di misure diverse con gli anelli che le seguono, titolo grosso e un adesivo",
+        els = listOf(
+            DText(bk(40, 30, 714, 140), "title", "Titolo", "Bubbly", DFont.GROTESK, 130f, ACC2),
+            DRect(bk(70, 190, 480, 480), ACC2, circle = true, stroke = 3f),
+            DPhoto(bk(90, 210, 440, 440), 0, DShape.CIRCLE),
+            DRect(bk(462, 502, 300, 300), ACC2, circle = true, stroke = 3f),
+            DPhoto(bk(482, 522, 260, 260), 1, DShape.CIRCLE),
+            DPhoto(bk(120, 720, 220, 220), 2, DShape.CIRCLE, border = 8f, borderColor = WHITE),
+            DPhoto(bk(580, 230, 150, 150), 3, DShape.CIRCLE, border = 6f, borderColor = WHITE),
+            DText(bk(380, 860, 360, 70), "tag", "Adesivo", "pop!", DFont.HAND, 60f, ACC, DAlign.CENTER, rot = -8f, pill = ACC2, pad = 22f),
+            DText(bk(40, 1050, 714, 30), "date", "Data", "{luogo|Rimini} · {data}", DFont.MONO_BOLD, 20f, ACC2, DAlign.CENTER, track = 0.25f, upper = true),
+        ))
+
+    private fun shapeFlower() = Design("x-shape-flower", "Fiore", DesignFamily.SHAPES, DOrient.PORTRAIT, 794f, 1123f, ACC,
+        accents = listOf(0xFFF6EEDFL, 0xFFFFE0EBL, 0xFFE3F1DCL, 0xFFFFF1B8L), accents2 = listOf(0xFFE5432DL, 0xFF2340D9L, 0xFF1E4D3AL),
+        motion = CollageMotion.DROP,
+        hint = "La foto a forma di fiore con la persona che sporge dai petali, un fiorellino piccolo e la scritta a mano",
+        els = listOf(
+            DRect(bk(102, 180, 590, 590), ACC2, poly = flowerPts(8)),
+            DPhoto(bk(132, 210, 530, 530), 0, poly = flowerPts(8), pop = 0.22f),
+            DPhoto(bk(540, 700, 200, 200), 1, poly = flowerPts(6), border = 8f, borderColor = WHITE, shadow = 14f, rot = 10f),
+            DText(bk(40, 40, 714, 120), "title", "Titolo", "in fiore", DFont.HAND, 110f, ACC2, rot = -4f),
+            DText(bk(40, 900, 500, 120), "line", "Frase", "{Mese} a {luogo|casa}", DFont.SERIF_IT, 60f, ACC2),
+            DPath(bk(60, 800, 70, 70), SPARKLE, 100f, 100f, fill = ACC2),
+        ))
+
+    private fun shapeBlob() = Design("x-shape-blob", "Forme morbide", DesignFamily.SHAPES, DOrient.PORTRAIT, 794f, 1123f, ACC,
+        accents = listOf(0xFFF2EDE4L, 0xFF111111L, 0xFFE3F1DCL, 0xFFFFE0EBL), accents2 = listOf(0xFFFF7A1AL, 0xFF2340D9L, 0xFFC6F04AL, 0xFFE5432DL),
+        motion = CollageMotion.CASCADE,
+        hint = "Tre foto in forme morbide che si sovrappongono, macchie di colore dietro e il titolo enorme",
+        els = listOf(
+            DRect(bk(380, 120, 400, 380), ACC2, poly = blobPts(7)),
+            DRect(bk(20, 620, 380, 360), ACC2, poly = blobPts(3)),
+            DPhoto(bk(60, 180, 440, 460), 0, poly = blobPts(1), shadow = 20f),
+            DPhoto(bk(420, 420, 330, 340), 1, poly = blobPts(4), shadow = 20f, border = 8f, borderColor = WHITE),
+            DPhoto(bk(180, 700, 300, 300), 2, poly = blobPts(9), shadow = 20f),
+            DText(bk(40, 40, 714, 130), "title", "Titolo", "Soft days", DFont.SERIF_IT, 110f, 0xFF111111L),
+            DText(bk(480, 1010, 274, 30), "date", "Data", "{data}", DFont.MONO_BOLD, 20f, 0xFF111111L, DAlign.RIGHT, track = 0.25f),
+        ))
+
+    // Polaroid ---------------------------------------------------------------------------------------------------------
+    private fun polaStack(): Design {
+        val x = 147f; val y = 260f; val w = 500f; val h = 540f; val rot = -4f
+        return Design("x-pola-stack", "Pila 3D", DesignFamily.POLAROID, DOrient.PORTRAIT, 794f, 1123f, ACC,
+            accents = listOf(0xFF6E8584L, 0xFF8A7F74L, 0xFF3A3F47L, 0xFFB7A694L), motion = CollageMotion.DROP,
+            hint = "Una pila di polaroid sul muro: quella davanti ha la persona che ne esce e la scritta a mano nel bordo",
+            els = listOf(
+                DPattern(b(0, 0, 794, 1123, F), DPatternKind.WALL, BLACK, 0f),
+                DPhoto(bk(120, 300, 480, 500), 2, rot = 9f, border = 20f, bottomPad = 110f, shadow = 20f),
+                DPhoto(bk(190, 280, 480, 500), 1, rot = -11f, border = 20f, bottomPad = 110f, shadow = 20f),
+                DPhoto(bk(x, y, w, h), 0, rot = rot, border = 22f, bottomPad = 130f, shadow = 30f, pop = 0.3f),
+                DText(capBox(x, y, w, h, 22f, 130f, rot), "cap", "Scritta sulla polaroid", "{luogo|noi} · {giorno_breve}", DFont.HAND, 56f, 0xFF1A1A1AL, DAlign.CENTER, rot = rot),
+                DRect(bk(330, 220, 140, 44), TAPE, rot = -8f),
+                DText(bk(40, 40, 714, 130), "title", "Titolo", "Memories", DFont.SCRIPT, 130f, WHITE, DAlign.CENTER, shadow = true),
+            ))
+    }
+
+    private fun polaString(): Design {
+        val els = arrayListOf<DEl>(
+            DPattern(b(0, 0, 794, 1123, F), DPatternKind.GLITTER, 0xFFFFD58AL, 0f),
+            DPath(bk(0, 150, 794, 80, F), "M0 10 C200 70 594 70 794 10", 794f, 80f, stroke = 0xFFEDE3D0L, width = 3f),
+            DPath(bk(0, 570, 794, 80, F), "M0 10 C200 70 594 70 794 10", 794f, 80f, stroke = 0xFFEDE3D0L, width = 3f),
+        )
+        val row1 = listOf(40f, 225f, 410f, 595f); val row2 = listOf(110f, 320f, 530f)
+        var slot = 0
+        row1.forEachIndexed { i, x ->
+            val sag = if (i == 0 || i == 3) 20f else 45f
+            val r = if (i % 2 == 0) -5f else 5f
+            els += DPhoto(bk(x + 12, 175 + sag, 140, 160), slot, rot = r, border = 10f, bottomPad = 40f, shadow = 14f)
+            els += DRect(bk(x + 72, 160 + sag, 18, 40), 0xFFC8A27AL, radius = 3f, rot = r)
+            slot++
+        }
+        row2.forEachIndexed { i, x ->
+            val sag = if (i == 1) 50f else 30f
+            val r = if (i % 2 == 0) 6f else -4f
+            els += DPhoto(bk(x + 12, 595 + sag, 150, 170), slot, rot = r, border = 10f, bottomPad = 40f, shadow = 14f)
+            els += DRect(bk(x + 77, 580 + sag, 18, 40), 0xFFC8A27AL, radius = 3f, rot = r)
+            slot++
+        }
+        els += DText(bk(0, 940, 794, 160, F), "title", "Titolo", "Ricordi", DFont.SCRIPT, 150f, WHITE, DAlign.CENTER, gradient = GOLD, shine = true, shadow = true)
+        els += DText(bk(40, 1080, 714, 26), "date", "Data", "{luogo|a casa} · {ANNO}", DFont.MONO_BOLD, 18f, 0xFFEDE3D0L, DAlign.CENTER, track = 0.3f, upper = true)
+        return Design("x-pola-string", "Polaroid appese", DesignFamily.POLAROID, DOrient.PORTRAIT, 794f, 1123f, ACC,
+            accents = listOf(0xFF1B1B22L, 0xFF22303AL, 0xFF3A2430L), els = els, motion = CollageMotion.DROP,
+            hint = "Sette polaroid appese ai fili con le mollette, le lucine che brillano e «Ricordi» d'oro")
+    }
+
+    private fun polaInstax(): Design {
+        val els = arrayListOf<DEl>(
+            DPattern(b(0, 0, 794, 1123, F), DPatternKind.HOLO, 0, 0f),
+            DText(bk(0, 30, 794, 170, F), "title", "Titolo", "Best of {ANNO}", DFont.ARCHIVO, 110f, WHITE, DAlign.CENTER, gradient = CHROME, shine = true, glow = 0x99FFFFFFL, upper = true),
+        )
+        val caps = listOf("{luogo|qui}", "noi", "{Mese}", "wow", "ancora!", "{giorno_breve}")
+        for (i in 0 until 6) {
+            val x = 50f + (i % 3) * 240f; val y = 230f + (i / 3) * 420f
+            val r = listOf(-4f, 3f, -2f, 5f, -5f, 2f)[i]
+            els += DPhoto(bk(x, y, 210, 270), i, rot = r, border = 12f, bottomPad = 70f, shadow = 16f)
+            els += DText(capBox(x, y, 210f, 270f, 12f, 70f, r), "c$i", "Scritta ${i + 1}", caps[i], DFont.HAND, 40f, 0xFF1A1A1AL, DAlign.CENTER, rot = r)
+        }
+        els += DPath(bk(690, 190, 70, 70), SPARKLE, 100f, 100f, fill = WHITE)
+        return Design("x-pola-instax", "Instax", DesignFamily.POLAROID, DOrient.PORTRAIT, 794f, 1123f, 0xFFEFEAF8L,
+            accents = listOf(0xFF1A1033L), els = els, motion = CollageMotion.CASCADE,
+            hint = "Sei instax mini con una parola scritta a mano sotto ciascuna, su fondo olografico, titolo cromato")
+    }
+
+    private fun polaBig(): Design {
+        val x = 107f; val y = 170f; val w = 580f; val h = 640f; val rot = -2f
+        return Design("x-pola-big", "Polaroid gigante", DesignFamily.POLAROID, DOrient.PORTRAIT, 794f, 1123f, ACC,
+            accents = listOf(0xFFFF7A1AL, 0xFF2340D9L, 0xFFC6F04AL, 0xFFFF6FB5L, 0xFF111111L), motion = CollageMotion.DROP,
+            hint = "Una polaroid enorme con la scritta a pennarello nel bordo e due piccole che spuntano dietro",
+            els = listOf(
+                DPhoto(bk(470, 110, 240, 260), 1, rot = 14f, border = 12f, bottomPad = 60f, shadow = 16f),
+                DPhoto(bk(60, 700, 240, 260), 2, rot = -12f, border = 12f, bottomPad = 60f, shadow = 16f),
+                DPhoto(bk(x, y, w, h), 0, rot = rot, border = 28f, bottomPad = 170f, shadow = 40f),
+                DText(capBox(x, y, w, h, 28f, 170f, rot), "cap", "Scritta sulla polaroid", "estate {AA}!", DFont.HAND, 100f, 0xFF1A1A1AL, DAlign.CENTER, rot = rot),
+                DRect(bk(320, 140, 160, 50), TAPE, rot = 4f),
+            ))
+    }
+
+    // Editoriale -------------------------------------------------------------------------------------------------------
+    private fun edMinimal() = Design("x-ed-minimal", "Minimal", DesignFamily.EDITORIAL, DOrient.PORTRAIT, 794f, 1123f, 0xFFF4F1EAL,
+        accents = listOf(0xFF1A1A1AL, 0xFFB0303AL, 0xFF2340D9L), motion = CollageMotion.ZOOM,
+        hint = "Pagina da rivista d'arte: tanto bianco, una foto, il titolo in corsivo enorme che la invade, numeri di pagina e una colonnina di testo",
+        els = listOf(
+            DText(bk(40, 40, 200, 30), "num", "Numero", "N°{mese_n}", DFont.MONO_BOLD, 18f, ACC, track = 0.2f),
+            DText(bk(454, 40, 300, 30), "date", "Data", "{Mese} {ANNO}", DFont.MONO_BOLD, 18f, ACC, DAlign.RIGHT, track = 0.2f, upper = true),
+            DRect(bk(40, 80, 714, 2), ACC),
+            DPhoto(bk(220, 150, 494, 640), 0, filter = DFilter.NONE),
+            DText(bk(30, 650, 740, 230), "title", "Titolo", "Lisbona", DFont.SERIF_IT, 210f, ACC),
+            DPhoto(bk(40, 900, 200, 160), 1),
+            DText(bk(270, 900, 230, 160), "text", "Testo", "Una settimana tra salite, tram gialli e tramonti sul fiume. Le foto sono di chi c'era.", DFont.SERIF, 20f, ACC, wrap = true, line = 1.25f),
+            DText(bk(530, 900, 224, 160), "text2", "Testo 2", "{foto} fotografie\n{luogo|Lisbona}\n{data}", DFont.MONO, 15f, ACC, DAlign.RIGHT, line = 1.6f, upper = true),
+            DRect(bk(40, 1080, 714, 1), ACC),
+        ))
+
+    private fun edIndex(): Design {
+        val els = arrayListOf<DEl>(
+            DText(bk(40, 30, 500, 110), "title", "Titolo", "Index", DFont.SERIF_IT, 110f, ACC2),
+            DText(bk(454, 80, 300, 30), "date", "Data", "{luogo|Tokyo} · {ANNO}", DFont.MONO_BOLD, 18f, ACC2, DAlign.RIGHT, track = 0.2f, upper = true),
+        )
+        val caps = listOf("Il primo giorno", "Le strade", "L'ultima sera")
+        for (i in 0 until 3) {
+            val y = 170f + i * 310f
+            els += DRect(bk(40, y - 12, 714, 2), ACC2)
+            els += DText(bk(40, y, 230, 150), "", "", "0${i + 1}", DFont.ANTON, 150f, ACC)
+            els += DText(bk(40, y + 170, 250, 80), "c$i", "Didascalia ${i + 1}", caps[i], DFont.SERIF_IT, 34f, ACC2, wrap = true)
+            els += DPhoto(bk(300, y, 454, 280), i)
+        }
+        return Design("x-ed-index", "Indice", DesignFamily.EDITORIAL, DOrient.PORTRAIT, 794f, 1123f, 0xFFF4F1EAL,
+            accents = listOf(0xFFE5432DL, 0xFF2340D9L, 0xFF111111L), accents2 = listOf(0xFF111111L, 0xFF2340D9L),
+            els = els, motion = CollageMotion.CASCADE,
+            hint = "Stile svizzero: tre foto in fila con i numeri grandi 01 02 03, righe sottili e una didascalia per ciascuna")
+    }
+
+    private fun edCover() = Design("x-ed-cover", "Copertina minimal", DesignFamily.EDITORIAL, DOrient.PORTRAIT, 794f, 1123f, 0xFFF4F1EAL,
+        accents = listOf(0xFF1A1A1AL, 0xFFB0303AL, 0xFF2340D9L), motion = CollageMotion.ZOOM,
+        hint = "Copertina elegante: testata spaziata con la persona davanti, i dettagli negli angoli e un titolo in corsivo",
+        els = listOf(
+            DPhoto(bk(40, 150, 714, 780), 0),
+            DText(bk(0, 70, 794, 200, F), "mast", "Testata", "Estate", DFont.SERIF, 170f, ACC, DAlign.CENTER, track = 0.12f, upper = true, behind = 0),
+            DText(bk(40, 30, 300, 26), "vol", "Volume", "Vol. {AA}", DFont.MONO_BOLD, 16f, ACC, track = 0.2f, upper = true),
+            DText(bk(454, 30, 300, 26), "num", "Numero", "N°{mese_n}", DFont.MONO_BOLD, 16f, ACC, DAlign.RIGHT, track = 0.2f),
+            DText(bk(40, 950, 714, 80), "title", "Titolo", "Le giornate più lunghe", DFont.SERIF_IT, 58f, ACC, DAlign.CENTER),
+            DText(bk(40, 1040, 300, 26), "place", "Luogo", "{luogo|Sicilia}", DFont.MONO_BOLD, 16f, ACC, track = 0.2f, upper = true),
+            DText(bk(454, 1040, 300, 26), "count", "Foto", "{foto} fotografie", DFont.MONO_BOLD, 16f, ACC, DAlign.RIGHT, track = 0.2f, upper = true),
+        ))
+
+    private fun edSpread() = Design("x-ed-spread", "Doppia pagina", DesignFamily.EDITORIAL, DOrient.LANDSCAPE, 1123f, 794f, 0xFFF4F1EAL,
+        accents = listOf(0xFF1A1A1AL, 0xFFB0303AL, 0xFF2340D9L), motion = CollageMotion.ZOOM,
+        hint = "Due pagine di rivista affiancate: a sinistra titolo, testo con il capolettera e una foto piccola, a destra la foto a tutta pagina",
+        els = listOf(
+            DPhoto(bk(561, 0, 562, 794), 0),
+            DRect(bk(560, 0, 2, 794), 0x33000000L),
+            DText(bk(40, 40, 480, 30), "kicker", "Rubrica", "Viaggi · {Mese} {ANNO}", DFont.MONO_BOLD, 16f, ACC, track = 0.25f, upper = true),
+            DText(bk(40, 90, 480, 220), "title", "Titolo", "Il mare d'inverno", DFont.SERIF_IT, 92f, ACC, line = 0.95f, wrap = true),
+            DText(bk(40, 330, 70, 90), "", "", "S", DFont.SERIF, 100f, ACC),
+            DText(bk(110, 340, 410, 200), "text", "Testo", "iamo partiti presto, con il thermos e la voglia di vedere il mare senza nessuno. {luogo|Camogli} ci ha accolti col sole basso e le barche ferme.", DFont.SERIF, 21f, ACC, wrap = true, line = 1.35f),
+            DPhoto(bk(40, 560, 300, 200), 1),
+            DText(bk(360, 700, 160, 60), "cap", "Didascalia", "{data}", DFont.MONO, 14f, ACC, track = 0.15f),
         ))
 
     // Eventi: colori pieni, foto grandi, scritte enormi e adesivi (niente avorio e rametti da partecipazione).

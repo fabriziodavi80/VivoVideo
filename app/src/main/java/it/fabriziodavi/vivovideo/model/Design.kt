@@ -239,6 +239,10 @@ enum class DesignFamily(val label: String, val hint: String) {
     SCRAP("Ritagliato", "Carta strappata, nastro adesivo, scritte a mano e adesivi"),
     POSTER("Poster", "Colore pieno, duotono, bianco e nero con un tocco di colore, vetro"),
     THEMES("Temi", "Sport, matrimonio, viaggi, città di notte, cucina"),
+    GRID("Griglie", "Griglie moderne: mosaico con il titolo al centro, bacheca, persona che esce dalla casella, parole fra le foto"),
+    SHAPES("Forme", "Archi, cuore, bolle, fiore e forme morbide, con la persona che sporge e i colori pieni"),
+    POLAROID("Polaroid", "Pila di polaroid col muro, polaroid appese con le lucine, instax olografiche, polaroid gigante"),
+    EDITORIAL("Editoriale", "Riviste d'arte: tanto bianco, corsivi enormi, indice 01 02 03, copertina minimal, doppia pagina"),
 }
 
 data class Design(
