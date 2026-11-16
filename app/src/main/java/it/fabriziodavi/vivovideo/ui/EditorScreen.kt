@@ -1511,6 +1511,14 @@ private fun FramePanel(vm: EditorViewModel, running: Boolean) {
         SecondaryButton("Reimposta", onClick = { if (enabled) { vm.setFrame(Transform()); vm.project?.let { p -> vm.updateSelected { it.withMode(p.presetModeFor(it)) } } } })
     }
     SecondaryButton("Applica a tutte le clip", selected = vm.project?.frameOnAll(clip) == true, onClick = { if (enabled) vm.applyFrameToAll() })
+    PanelLabel("Zoom sul volto")
+    val zoomed = f.scale > 1.001f
+    if (!zoomed) SecondaryButton("Stringi sul volto", Modifier.fillMaxWidth(), onClick = { if (enabled) vm.faceZoom() })
+    else Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        SecondaryButton("Allunga lo zoom alla clip dopo", onClick = { if (enabled) vm.extendZoomToNext() })
+        SecondaryButton("Togli lo zoom", onClick = { if (enabled) vm.setFrame(Transform()) })
+    }
+    Hint("Lo zoom dura quanto la clip. Per allungarlo tocca «Allunga lo zoom alla clip dopo» (ogni tocco un pezzo in più); per farlo iniziare o finire in un punto preciso, metti l'indicatore lì, Dividi e stringi o togli lo zoom sul pezzo giusto.")
     TutorialZoom(vm, enabled)
     PanelLabel("Segui il soggetto")
     if (clip.reframe == null) {

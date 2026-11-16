@@ -2960,6 +2960,45 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
     /** Inquadratura fissa della clip selezionata. */
     fun setFrame(f: Transform) = updateSelected { it.copy(frame = f) }
 
+    /** Zoom sul volto a mano: la clip selezionata si stringe di [zoom] centrata sul volto (come nei jump cut). */
+    fun faceZoom(zoom: Float = JumpCuts.ZOOM) {
+        val c = selectedClip ?: return
+        if (busy != null) return
+        val ctx = getApplication<Application>()
+        viewModelScope.launch {
+            val path = if (c.isPhoto) null else {
+                busy = "Cerco il volto…"
+                val scan = runCatching { SmartAnalyzer.scan(ctx, c.uri, false, c.sourceDurationUs) }
+                    .onFailure { if (it is kotlinx.coroutines.CancellationException) { busy = null; throw it } }.getOrNull()
+                busy = null
+                if (scan != null && scan.hasFaces) Moments.subjectPath(scan) else null
+            }
+            val now = project ?: return@launch
+            val cur = now.clips.firstOrNull { it.id == c.id } ?: return@launch
+            val f = JumpCuts.punchFrame(cur.copy(frame = Transform()), zoom, path?.at((cur.trimStartUs + cur.trimEndUs) / 2), outAspect(now))
+            update { p -> p.copy(clips = p.clips.map { if (it.id == c.id) it.copy(frame = f) else it }) }
+            message = if (path == null && !c.isPhoto) "Nessun volto trovato: zoom al centro. Per allungarlo: «Allunga lo zoom alla clip dopo»."
+            else "Zoom sul volto. Per allungarlo: «Allunga lo zoom alla clip dopo»; per farlo finire in un punto preciso: Dividi lì e togli lo zoom dal pezzo dopo."
+        }
+    }
+
+    /**
+     * Allunga lo zoom: la clip dopo prende la stessa inquadratura della selezionata e diventa lei la selezionata,
+     * così ogni tocco lo allunga di un pezzo.
+     */
+    fun extendZoomToNext() {
+        val p = project ?: return
+        val i = p.clips.indexOfFirst { it.id == selectedClipId }
+        if (i < 0) return
+        val next = p.clips.getOrNull(i + 1)
+        if (next == null) { message = "È l'ultima clip: lo zoom arriva già alla fine."; return }
+        val frame = p.clips[i].frame
+        update { q -> q.copy(clips = q.clips.map { if (it.id == next.id) it.copy(frame = frame) else it }) }
+        selectedClipId = next.id
+        val end = (project ?: p).let { q -> q.clipStartsUs()[i + 1] + q.clips[i + 1].outputUs }
+        message = "Zoom allungato fino a ${formatSeconds(end)}. Tocca ancora per allungarlo di un altro pezzo."
+    }
+
     /** Copia inquadratura e Adatta/Riempi della clip selezionata su tutte le clip. */
     fun applyFrameToAll() {
         val c = selectedClip ?: return
