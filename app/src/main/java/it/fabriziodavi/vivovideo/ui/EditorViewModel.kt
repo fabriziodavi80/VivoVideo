@@ -2982,6 +2982,26 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    /** Lo zoom (l'inquadratura) della clip selezionata continua fin dove sta l'indicatore, senza limiti. */
+    fun extendZoomToPlayhead() {
+        val p = project ?: return
+        val id = selectedClipId ?: return
+        val r = p.extendFrameTo(id, playheadUs)
+        if (r == null) { message = "Porta l'indicatore più avanti, dove vuoi che lo zoom finisca, poi tocca di nuovo."; return }
+        update { r }
+        message = "Zoom allungato fino a ${formatSeconds(playheadUs)}. Annulla per tornare indietro."
+    }
+
+    /** Bianco e nero (o di nuovo colore) dall'indicatore fino alla fine, con il passaggio sfumato se [fade]. */
+    fun bwFromPlayhead(on: Boolean, fade: Boolean) {
+        val p = project ?: return
+        if (p.clips.isEmpty()) return
+        val r = p.bwFrom(playheadUs, on, if (fade) 600_000L else 0L)
+        update { r }
+        message = (if (on) "Bianco e nero da ${formatSeconds(playheadUs)} fino alla fine." else "Di nuovo a colori da ${formatSeconds(playheadUs)}.") +
+            " Sposta l'indicatore e tocca «" + (if (on) "Colore da qui" else "Bianco e nero da qui") + "» per cambiare ancora."
+    }
+
     /**
      * Allunga lo zoom: la clip dopo prende la stessa inquadratura della selezionata e diventa lei la selezionata,
      * così ogni tocco lo allunga di un pezzo.

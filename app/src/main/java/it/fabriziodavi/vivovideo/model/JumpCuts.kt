@@ -34,6 +34,9 @@ object JumpCuts {
 
     /** Frasi lunghe: senza pause l'inquadratura cambia comunque, al più tardi dopo tanto (e mai pezzi più corti di MIN). */
     const val MAX_HOLD_US = 4_500_000L
+
+    /** «Senza limite»: l'inquadratura cambia solo ai tagli. */
+    const val NO_HOLD_LIMIT = Long.MAX_VALUE / 4
     const val MIN_HOLD_US = 1_500_000L
 
     /**

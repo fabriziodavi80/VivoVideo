@@ -1514,11 +1514,14 @@ private fun FramePanel(vm: EditorViewModel, running: Boolean) {
     PanelLabel("Zoom sul volto")
     val zoomed = f.scale > 1.001f
     if (!zoomed) SecondaryButton("Stringi sul volto", Modifier.fillMaxWidth(), onClick = { if (enabled) vm.faceZoom() })
-    else Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        SecondaryButton("Allunga lo zoom alla clip dopo", onClick = { if (enabled) vm.extendZoomToNext() })
-        SecondaryButton("Togli lo zoom", onClick = { if (enabled) vm.setFrame(Transform()) })
+    else {
+        SecondaryButton("Allunga lo zoom fino all'indicatore", Modifier.fillMaxWidth(), onClick = { if (enabled) vm.extendZoomToPlayhead() })
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            SecondaryButton("Alla clip dopo", onClick = { if (enabled) vm.extendZoomToNext() })
+            SecondaryButton("Togli lo zoom", onClick = { if (enabled) vm.setFrame(Transform()) })
+        }
     }
-    Hint("Lo zoom dura quanto la clip. Per allungarlo tocca «Allunga lo zoom alla clip dopo» (ogni tocco un pezzo in più); per farlo iniziare o finire in un punto preciso, metti l'indicatore lì, Dividi e stringi o togli lo zoom sul pezzo giusto.")
+    Hint("Per allungare lo zoom quanto vuoi: porta l'indicatore dove deve finire e tocca «Allunga lo zoom fino all'indicatore». Per farlo iniziare in un punto preciso: indicatore lì, Dividi e Stringi sul volto sul pezzo dopo.")
     TutorialZoom(vm, enabled)
     PanelLabel("Segui il soggetto")
     if (clip.reframe == null) {
@@ -2040,6 +2043,14 @@ private fun FxTab(vm: EditorViewModel, clip: it.fabriziodavi.vivovideo.model.Cli
     if (clip.fx.any { it.type.onBeats } && p.beatTimes().isEmpty()) {
         Hint("\"Pulsa a ritmo\", \"Lampi a ritmo\" e \"Colpo a ritmo\" usano i battiti della musica: aggiungi un brano e rileva i battiti dal pannello Musica.")
     }
+    PanelLabel("Bianco e nero da un punto")
+    var bwFade by remember { mutableStateOf(true) }
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        SecondaryButton("Bianco e nero da qui", onClick = { if (enabled) vm.bwFromPlayhead(true, bwFade) })
+        SecondaryButton("Colore da qui", onClick = { if (enabled) vm.bwFromPlayhead(false, bwFade) })
+    }
+    ToggleRow("Passaggio sfumato (0,6 s)", bwFade, enabled) { bwFade = it }
+    Hint("Porta l'indicatore dove vuoi il cambio: da lì fino alla fine il video va in bianco e nero (o torna a colori). Puoi farlo quante volte vuoi, come nei video di YouTube.")
     if (clip.fx.isNotEmpty()) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             SecondaryButton("Applica a tutte le clip", selected = p.fxOnAll(clip), onClick = { if (enabled) vm.applyFxToAll() })

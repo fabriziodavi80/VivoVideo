@@ -454,7 +454,13 @@ enum class FxType(val label: String, val category: FxCategory, val toggle: Boole
 enum class FadeColor(val label: String) { BLACK("Nero"), WHITE("Bianco") }
 
 @Serializable
-data class ClipFx(val type: FxType, val amount: Float = type.defaultAmount)
+data class ClipFx(
+    val type: FxType,
+    val amount: Float = type.defaultAmount,
+    /** L'effetto entra piano nei primi [rampInUs] della clip ed esce negli ultimi [rampOutUs] (es. il passaggio al bianco e nero). */
+    val rampInUs: Long = 0,
+    val rampOutUs: Long = 0,
+)
 
 /** Movimenti pronti per foto (e video), come gli stili di diapositiva di ProShow. */
 enum class MotionStyle(val label: String) {
@@ -1225,6 +1231,39 @@ data class Project(
 
     /** Il video si apre dal nero/bianco e si chiude (prima clip con entrata, ultima con uscita). */
     fun videoEndsFaded(): Boolean = clips.isNotEmpty() && clips.first().fadeInUs > 0 && clips.last().fadeOutUs > 0
+
+    /**
+     * Bianco e nero ([on]) o di nuovo a colori dal punto [timeUs] fino alla fine del video: la clip lì si divide e il
+     * passaggio è sfumato in [fadeUs] (0 = netto). Il resto degli effetti non si tocca.
+     */
+    fun bwFrom(timeUs: Long, on: Boolean, fadeUs: Long = 0): Project {
+        val p = splitAt(timeUs) ?: this
+        val starts = p.clipStartsUs()
+        val first = starts.indexOfFirst { it >= timeUs - 50_000 }
+        if (first < 0) return this
+        fun hasBw(c: Clip) = c.fx.any { it.type == FxType.BW }
+        val prevBw = p.clips.getOrNull(first - 1)?.let { hasBw(it) } == true
+        return p.copy(clips = p.clips.mapIndexed { i, c ->
+            when {
+                i < first - 1 -> c
+                // La clip prima del punto: se era in bianco e nero e si torna a colori, il colore rientra piano alla sua fine.
+                i == first - 1 -> if (!hasBw(c)) c else c.copy(fx = c.fx.map { if (it.type == FxType.BW) it.copy(rampOutUs = if (on) 0 else fadeUs) else it })
+                on -> c.copy(fx = c.fx.filterNot { it.type == FxType.BW } + ClipFx(FxType.BW, 1f, rampInUs = if (i == first && !prevBw) fadeUs else 0))
+                else -> c.copy(fx = c.fx.filterNot { it.type == FxType.BW })
+            }
+        })
+    }
+
+    /** L'inquadratura della clip [clipId] continua sulle clip dopo fino a [toUs] (lì la clip si divide). */
+    fun extendFrameTo(clipId: String, toUs: Long): Project? {
+        val i0 = clips.indexOfFirst { it.id == clipId }
+        if (i0 < 0) return null
+        if (toUs <= clipStartsUs()[i0] + clips[i0].outputUs + 50_000) return null
+        val p = splitAt(toUs) ?: this
+        val frame = clips[i0].frame
+        val ps = p.clipStartsUs()
+        return p.copy(clips = p.clips.mapIndexed { i, c -> if (i > i0 && ps[i] < toUs - 50_000) c.copy(frame = frame) else c })
+    }
 
     fun splitAt(timeUs: Long, minPieceUs: Long = 100_000): Project? {
         val (index, offsetOut) = locate(timeUs) ?: return null

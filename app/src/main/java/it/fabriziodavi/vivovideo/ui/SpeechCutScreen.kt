@@ -91,9 +91,9 @@ fun SpeechCutScreen(vm: EditorViewModel) {
                 }
                 if (style == JumpStyle.SOCIAL) ToggleRow("Whoosh sui lampi", whoosh, busy == null) { whoosh = it }
                 PanelLabel("Cambia inquadratura al massimo ogni")
-                LabeledSlider("Durata massima", null, (maxHold / 500_000L).toInt(), busy == null, range = 2..40,
-                    format = { String.format(java.util.Locale.ITALIAN, "%.1f s", it / 2f) }) { maxHold = it * 500_000L }
-                Hint("Quanto può durare al massimo un'inquadratura (normale o stretta sul volto) quando parli senza pause, da 1 a 20 s (mezzo secondo alla volta): 2 s ritmo da reel, 12 s quasi ferma. A ogni taglio cambia comunque, quindi un pezzo può essere più corto.")
+                LabeledSlider("Durata massima", null, if (maxHold >= JumpCuts.NO_HOLD_LIMIT) 41 else (maxHold / 500_000L).toInt(), busy == null, range = 2..41,
+                    format = { if (it >= 41) "senza limite" else String.format(java.util.Locale.ITALIAN, "%.1f s", it / 2f) }) { maxHold = if (it >= 41) JumpCuts.NO_HOLD_LIMIT else it * 500_000L }
+                Hint("Quanto può durare al massimo un'inquadratura (normale o stretta sul volto) quando parli senza pause, da 1 a 20 s (mezzo secondo alla volta), oppure tutto a destra «senza limite»: cambia solo ai tagli. A ogni taglio cambia comunque, quindi un pezzo può essere più corto.")
             } else {
                 Hint("L'app ascolta l'audio delle clip e toglie i silenzi lunghi, lasciando un attimo di respiro fra le frasi. Le foto, le clip mute, la musica e le voci fuori campo non si toccano. Prima vedi quanto si toglie, poi decidi.")
             }

@@ -223,4 +223,28 @@ class ProjectTest {
         val back = f.flipBeatPhase()
         assertEquals(beats, back.beatsUs.take(10))
     }
+
+    @Test fun blackAndWhiteFromAPointAndBack() {
+        val p = Project(name = "bw", clips = listOf(clip(10.0), clip(10.0)))
+        // Bianco e nero da 4 s: la prima clip si divide, dal pezzo dopo fino alla fine tutto in bianco e nero.
+        val bw = p.bwFrom(4_000_000, on = true, fadeUs = 600_000)
+        assertEquals(3, bw.clips.size)
+        assertTrue(bw.clips[0].fx.none { it.type == FxType.BW })
+        assertEquals(600_000L, bw.clips[1].fx.single { it.type == FxType.BW }.rampInUs)
+        assertEquals(0L, bw.clips[2].fx.single { it.type == FxType.BW }.rampInUs)
+        // Di nuovo a colori da 15 s: la terza si divide, il pezzo prima esce piano dal bianco e nero.
+        val back = bw.bwFrom(15_000_000, on = false, fadeUs = 600_000)
+        assertEquals(4, back.clips.size)
+        assertEquals(600_000L, back.clips[2].fx.single { it.type == FxType.BW }.rampOutUs)
+        assertTrue(back.clips[3].fx.none { it.type == FxType.BW })
+    }
+
+    @Test fun zoomExtendsToThePlayhead() {
+        val zoomed = clip(3.0).copy(frame = Transform(scale = 1.14f))
+        val p = Project(name = "z", clips = listOf(zoomed, clip(3.0), clip(3.0)))
+        val r = p.extendFrameTo(zoomed.id, 7_500_000)!!
+        assertEquals(4, r.clips.size)
+        assertEquals(listOf(1.14f, 1.14f, 1.14f, 1f), r.clips.map { it.frame.scale })
+        assertEquals(null, p.extendFrameTo(zoomed.id, 2_000_000))
+    }
 }

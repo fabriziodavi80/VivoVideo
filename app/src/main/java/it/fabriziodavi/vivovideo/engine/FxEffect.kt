@@ -32,6 +32,18 @@ class FxEffect(
 
     internal fun amount(t: FxType): Float = fx.firstOrNull { it.type == t }?.amount ?: 0f
 
+    private val ramps = fx.filter { it.rampInUs > 0 || it.rampOutUs > 0 }.associate { it.type to (it.rampInUs to it.rampOutUs) }
+
+    /** Quanto è acceso l'effetto [t] a quest'istante: entra e esce piano se la clip ha una rampa (bianco e nero da un punto). */
+    internal fun rampAt(t: FxType, timeUs: Long): Float {
+        val r = ramps[t] ?: return 1f
+        val local = localTimeUs(timeUs, clipStartUs)
+        var f = 1f
+        if (r.first > 0) f = minOf(f, (local.toFloat() / r.first).coerceIn(0f, 1f))
+        if (r.second > 0 && clipOutputUs > 0) f = minOf(f, ((clipOutputUs - local).toFloat() / r.second).coerceIn(0f, 1f))
+        return f
+    }
+
     /** Tempo dall'ultimo battito, in secondi (o un valore grande se non c'è). */
     private fun sinceBeat(timeUs: Long): Float {
         if (beatsUs.isEmpty()) return 99f
@@ -105,7 +117,7 @@ private class FxProgram(private val effect: FxEffect, useHdr: Boolean) : BaseGlS
                     FxType.STROBE -> effect.strobeAt(presentationTimeUs)
                     FxType.HIT -> effect.hitAt(presentationTimeUs)
                     else -> 1f
-                }
+                } * effect.rampAt(type, presentationTimeUs)
                 program.setFloatsUniform(name, floatArrayOf(a))
             }
             program.setFloatsUniform("uFade", floatArrayOf(effect.fadeAt(presentationTimeUs)))
