@@ -71,6 +71,9 @@ object TestPlan {
         Item("aud_jump", "Audio", "Jump cut pronti",
             "Un video parlato di 1–2 minuti girato col telefono fermo → Audio → Clip → Jump cut: prova Pulito, poi Dinamico e Social (pause 0,4 s) → Analizza → leggi il riepilogo → Fai i jump cut → guarda l'anteprima ed esporta.",
             "A ogni taglio l'inquadratura passa da normale a stretta sul volto (mai bordi neri); Dinamico stringe di più sulle frasi forti; Social ha qualche lampo con whoosh e i sottotitoli parola per parola; nel video esportato la voce non fa clic sui tagli; un solo Annulla torna com'era."),
+        Item("aud_jump_hold", "Audio", "Jump cut: durata dello zoom sul volto",
+            "Stesso video parlato, meglio con un tratto lungo senza pause → Jump cut → Cambia inquadratura al massimo ogni 2 s → Fai i jump cut e guarda; Annulla, poi rifai con 8 s.",
+            "Con 2 s l'inquadratura (normale e stretta sul volto) cambia spesso anche quando parli di fila; con 8 s resta ferma più a lungo; a ogni taglio cambia comunque."),
         // Testo
         Item("txt_styles", "Testo", "Stili e animazioni WOW",
             "Testo → aggiungi → Stili pronti, prova Glitch, Onda, Oro, Cascata.",

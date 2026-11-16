@@ -54,12 +54,13 @@ fun SpeechCutScreen(vm: EditorViewModel) {
     var fillers by remember { mutableStateOf(false) }
     var style by remember { mutableStateOf(JumpStyle.CLEAN) }
     var whoosh by remember { mutableStateOf(true) }
+    var maxHold by remember { mutableStateOf(JumpCuts.MAX_HOLD_US) }
     // Con Social servono le parole (sottotitoli): il riconoscimento vocale si usa anche senza togliere gli ehm.
     val forSubtitles = jump && style == JumpStyle.SOCIAL
     val transcribe = fillers || forSubtitles
     val plan = vm.speechPlan
     val total = vm.project?.durationUs ?: 0L
-    val summary = remember(plan, style, whoosh, vm.speechWords) { if (jump && plan != null) vm.jumpPreview(style, whoosh) else null }
+    val summary = remember(plan, style, whoosh, maxHold, vm.speechWords) { if (jump && plan != null) vm.jumpPreview(style, whoosh, maxHold) else null }
 
     Column(Modifier.fillMaxSize().background(VV.Canvas).safeDrawingPadding()) {
         Row(Modifier.fillMaxWidth().height(52.dp).padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -89,6 +90,9 @@ fun SpeechCutScreen(vm: EditorViewModel) {
                     }
                 }
                 if (style == JumpStyle.SOCIAL) ToggleRow("Whoosh sui lampi", whoosh, busy == null) { whoosh = it }
+                PanelLabel("Cambia inquadratura al massimo ogni")
+                PillRow(JumpCuts.HOLD_CHOICES, maxHold, { String.format(java.util.Locale.ITALIAN, if (it % 1_000_000L == 0L) "%.0f s" else "%.1f s", it / 1e6) }, busy == null) { maxHold = it }
+                Hint("Quanto può durare al massimo un'inquadratura (normale o stretta sul volto) quando parli senza pause: 2 s ritmo da reel, 12 s quasi ferma. A ogni taglio cambia comunque, quindi un pezzo può essere più corto.")
             } else {
                 Hint("L'app ascolta l'audio delle clip e toglie i silenzi lunghi, lasciando un attimo di respiro fra le frasi. Le foto, le clip mute, la musica e le voci fuori campo non si toccano. Prima vedi quanto si toglie, poi decidi.")
             }
@@ -172,7 +176,7 @@ fun SpeechCutScreen(vm: EditorViewModel) {
                 LinearProgressIndicator(Modifier.fillMaxWidth().height(4.dp).clip(RoundedCornerShape(2.dp)), color = VV.Tally, trackColor = VV.Raised2)
                 SecondaryButton("Annulla", Modifier.fillMaxWidth(), onClick = { vm.cancelSubtitles() })
             } else if (plan != null && !plan.isEmpty) {
-                if (jump) PrimaryButton("Fai i jump cut", Modifier.fillMaxWidth()) { vm.applyJumpCuts(style, whoosh) }
+                if (jump) PrimaryButton("Fai i jump cut", Modifier.fillMaxWidth()) { vm.applyJumpCuts(style, whoosh, maxHold) }
                 else PrimaryButton("Taglia ${sec(plan.totalUs)}", Modifier.fillMaxWidth()) { vm.applySpeechCuts() }
                 SecondaryButton("Rifai l'analisi", Modifier.fillMaxWidth(), onClick = { vm.analyzeSpeech(model, lang, minPause, fillers, forSubtitles) })
             } else {

@@ -41,9 +41,10 @@ object JumpCuts {
      * più lungo fra due parole se ci sono le parole ([words]), altrimenti nel momento più basso della voce ([pcm]),
      * altrimenti a metà. Si divide finché ogni pezzo dura al massimo [MAX_HOLD_US].
      */
-    internal fun holdSplits(a: Long, b: Long, words: List<SpokenWord>, pcm: FloatArray?): List<Long> {
-        if (b - a <= MAX_HOLD_US) return emptyList()
-        val lo = a + MIN_HOLD_US; val hi = b - MIN_HOLD_US
+    internal fun holdSplits(a: Long, b: Long, words: List<SpokenWord>, pcm: FloatArray?, maxHoldUs: Long = MAX_HOLD_US): List<Long> {
+        if (b - a <= maxHoldUs) return emptyList()
+        val minHold = minHold(maxHoldUs)
+        val lo = a + minHold; val hi = b - minHold
         if (hi <= lo) return emptyList()
         val w = words.filter { it.endUs > a && it.startUs < b }.sortedBy { it.startUs }
         var best: Long? = null
@@ -80,8 +81,14 @@ object JumpCuts {
             }
         }
         val at = best ?: ((a + b) / 2)
-        return holdSplits(a, at, words, pcm) + at + holdSplits(at, b, words, pcm)
+        return holdSplits(a, at, words, pcm, maxHoldUs) + at + holdSplits(at, b, words, pcm, maxHoldUs)
     }
+
+    /** Durate a scelta per «Cambia inquadratura al massimo ogni»: 2 s ritmo da reel, 12 s quasi ferma. */
+    val HOLD_CHOICES = listOf(2_000_000L, 3_000_000L, 4_500_000L, 6_000_000L, 8_000_000L, 12_000_000L)
+
+    /** Pezzo più corto che si crea dividendo una frase lunga: un terzo del massimo, mai più di [MIN_HOLD_US]. */
+    fun minHold(maxHoldUs: Long): Long = minOf(MIN_HOLD_US, maxHoldUs / 3)
 
     /** Il whoosh: durata del suono e istante del suo culmine (dall'inizio del suono). */
     const val WHOOSH_US = 500_000L
@@ -150,7 +157,7 @@ object JumpCuts {
      * in ogni ripresa il primo pezzo è normale, poi stretto, normale… Con [style] Dinamico i pezzi detti più forte
      * (dall'audio [pcm]) diventano punch-in. Le foto e le clip mute restano come sono.
      */
-    fun pieces(p: Project, spans: List<Span>, style: JumpStyle, pcm: FloatArray?, words: List<SpokenWord> = emptyList()): List<Piece> {
+    fun pieces(p: Project, spans: List<Span>, style: JumpStyle, pcm: FloatArray?, words: List<SpokenWord> = emptyList(), maxHoldUs: Long = MAX_HOLD_US): List<Piece> {
         val cuts = SpeechCuts.merge(spans)
         val starts = p.clipStartsUs()
         data class Raw(val uri: String, val a: Long, val b: Long, val srcA: Long, val srcB: Long, val shot: Int, val index: Int, val audible: Boolean, val reframe: Boolean)
@@ -173,7 +180,7 @@ object JumpCuts {
                 val audible = !c.muted && c.volume > 0f
                 parts.forEachIndexed { k, (x, y) ->
                     // Frasi lunghe senza pause: altri cambi d'inquadratura dentro il pezzo (solo dove si parla).
-                    val bounds = listOf(x) + (if (audible) holdSplits(x, y, words, pcm) else emptyList()) + y
+                    val bounds = listOf(x) + (if (audible) holdSplits(x, y, words, pcm, maxHoldUs) else emptyList()) + y
                     for (q in 0 until bounds.size - 1) {
                         val x1 = bounds[q]; val y1 = bounds[q + 1]
                         // Un pezzo continua il precedente se fra loro non c'era un taglio (bordo di clip nella stessa ripresa).
@@ -250,10 +257,11 @@ object JumpCuts {
         words: List<SpokenWord> = emptyList(),
         whoosh: Boolean = true,
         outAspect: Float = 9f / 16f,
+        maxHoldUs: Long = MAX_HOLD_US,
         subject: (uri: String, srcUs: Long) -> Pair<Float, Float>? = { _, _ -> null },
     ): Outcome {
         val cuts = SpeechCuts.merge(spans)
-        val list = pieces(p, cuts, style, pcm, words)
+        val list = pieces(p, cuts, style, pcm, words, maxHoldUs)
         // Sottotitoli prima del taglio: poi seguono il parlato tagliato da soli (come testi della timeline).
         val subs = if (style == JumpStyle.SOCIAL) Subtitles.build(subtitleWords(words, cuts), SubStyle.SOCIAL, SubPosition.BOTTOM, p.durationUs) else emptyList()
         val withSubs = if (subs.isNotEmpty()) p.copy(texts = p.texts.filterNot { it.subtitle } + subs) else p

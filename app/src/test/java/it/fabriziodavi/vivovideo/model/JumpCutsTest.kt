@@ -205,4 +205,14 @@ class JumpCutsTest {
         assertEquals(1, splits.size)
         assertEquals(4_000_000.0, splits[0].toDouble(), 40_000.0)
     }
+
+    @Test fun maxHoldChoosesHowLongEachFramingLasts() {
+        // 20 s di parlato senza pause: con 2 s l'inquadratura cambia spesso, con 12 s quasi mai.
+        val short = JumpCuts.holdSplits(0, 20_000_000, emptyList(), null, maxHoldUs = 2_000_000)
+        val long = JumpCuts.holdSplits(0, 20_000_000, emptyList(), null, maxHoldUs = 12_000_000)
+        val bounds = listOf(0L) + short + 20_000_000L
+        assertTrue("pezzi ${bounds.zipWithNext { a, b -> b - a }}", bounds.zipWithNext { a, b -> b - a }.all { it <= 2_000_000 && it >= JumpCuts.minHold(2_000_000) })
+        assertTrue(short.size >= 9)
+        assertEquals(1, long.size)
+    }
 }

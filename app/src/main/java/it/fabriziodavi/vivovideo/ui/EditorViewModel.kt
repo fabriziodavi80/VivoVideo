@@ -2706,12 +2706,12 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
         ?.let { (w, h) -> w.toFloat() / h.coerceAtLeast(1) } ?: (9f / 16f)
 
     /** Riepilogo dei jump cut prima di confermare (veloce: i volti contano solo per centrare l'inquadratura). */
-    fun jumpPreview(style: JumpStyle, whoosh: Boolean): JumpCuts.Summary? {
+    fun jumpPreview(style: JumpStyle, whoosh: Boolean, maxHoldUs: Long = JumpCuts.MAX_HOLD_US): JumpCuts.Summary? {
         val p = project ?: return null
         val plan = speechPlan ?: return null
         if (plan.isEmpty) return null
         return runCatching {
-            JumpCuts.apply(p, plan.spans, style, speechPcm, speechWords, whoosh, outAspect(p)).summary
+            JumpCuts.apply(p, plan.spans, style, speechPcm, speechWords, whoosh, outAspect(p), maxHoldUs).summary
         }.getOrNull()
     }
 
@@ -2719,7 +2719,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
      * Jump cut: toglie pause ed ehm trovati e a ogni taglio cambia l'inquadratura (centrata sul volto, che si cerca
      * con la stessa analisi di "Momento migliore"); con Social anche lampi, whoosh e sottotitoli. Un solo Annulla.
      */
-    fun applyJumpCuts(style: JumpStyle, whoosh: Boolean) {
+    fun applyJumpCuts(style: JumpStyle, whoosh: Boolean, maxHoldUs: Long = JumpCuts.MAX_HOLD_US) {
         val plan = speechPlan ?: return
         val p0 = project ?: return
         if (plan.isEmpty || busy != null) return
@@ -2740,7 +2740,7 @@ class EditorViewModel(app: Application) : AndroidViewModel(app) {
                 busy = "Preparo i jump cut…"
                 val now = project ?: return@launch
                 val outcome = withContext(Dispatchers.Default) {
-                    JumpCuts.apply(now, plan.spans, style, pcm, words, whoosh, outAspect(now)) { uri, srcUs ->
+                    JumpCuts.apply(now, plan.spans, style, pcm, words, whoosh, outAspect(now), maxHoldUs) { uri, srcUs ->
                         paths[uri]?.at(srcUs)
                     }
                 }
