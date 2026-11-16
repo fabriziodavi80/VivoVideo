@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.model.HesitationsTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-11-16T18:35:02.830Z" hostname="ip-10-0-139-166" time="0.877">
+  <properties/>
+  <testcase name="realWordsAreNotCut" classname="it.fabriziodavi.vivovideo.model.HesitationsTest" time="0.464"/>
+  <testcase name="ehmRightAfterAWordIsFoundButADrawnWordIsNot" classname="it.fabriziodavi.vivovideo.model.HesitationsTest" time="0.1"/>
+  <testcase name="realRecordingOfTheCollaudo" classname="it.fabriziodavi.vivovideo.model.HesitationsTest" time="0.017"/>
+  <testcase name="worksOnAMuffledPhoneRecordingWithHum" classname="it.fabriziodavi.vivovideo.model.HesitationsTest" time="0.066"/>
+  <testcase name="ehmGluedToAWordTakesOnlyTheHeldSound" classname="it.fabriziodavi.vivovideo.model.HesitationsTest" time="0.033"/>
+  <testcase name="whisperTimesAreCorrectedFromTheSound" classname="it.fabriziodavi.vivovideo.model.HesitationsTest" time="0.035"/>
+  <testcase name="hesitationSoundsAreFound" classname="it.fabriziodavi.vivovideo.model.HesitationsTest" time="0.121"/>
+  <testcase name="planListsFillersToReviewAndToggle" classname="it.fabriziodavi.vivovideo.model.HesitationsTest" time="0.041"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

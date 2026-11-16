@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.model.SpeechCutsTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-16T18:35:03.924Z" hostname="ip-10-0-139-166" time="0.02">
+  <properties/>
+  <testcase name="findsLongPausesAndKeepsBreath" classname="it.fabriziodavi.vivovideo.model.SpeechCutsTest" time="0.012"/>
+  <testcase name="recognisesFillersButNotTheWordE" classname="it.fabriziodavi.vivovideo.model.SpeechCutsTest" time="0.0"/>
+  <testcase name="planOnlyTouchesVideosWithSound" classname="it.fabriziodavi.vivovideo.model.SpeechCutsTest" time="0.007"/>
+  <testcase name="cutsTheTimelineAndShiftsTextsAndMusic" classname="it.fabriziodavi.vivovideo.model.SpeechCutsTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.model.InterviewTest" tests="15" skipped="0" failures="0" errors="0" timestamp="2026-11-16T18:35:03.710Z" hostname="ip-10-0-139-166" time="0.053">
+  <properties/>
+  <testcase name="questionWrittenDifferentlyInTheTwoVideosStaysWhole" classname="it.fabriziodavi.vivovideo.model.InterviewTest" time="0.006"/>
+  <testcase name="halvesFitTheirSide" classname="it.fabriziodavi.vivovideo.model.InterviewTest" time="0.0"/>
+  <testcase name="answersAreFoundInBothVideos" classname="it.fabriziodavi.vivovideo.model.InterviewTest" time="0.001"/>
+  <testcase name="realTestVideosOfNovember11" classname="it.fabriziodavi.vivovideo.model.InterviewTest" time="0.001"/>
+  <testcase name="answersEndingWithTheSameWordDoNotStartTheNextQuestion" classname="it.fabriziodavi.vivovideo.model.InterviewTest" time="0.001"/>
+  <testcase name="withoutPunctuationAtAllThePausesSplitTheTurns" classname="it.fabriziodavi.vivovideo.model.InterviewTest" time="0.0"/>
+  <testcase name="theThreeQuestionsOfTheTestStayWholeWithoutPunctuation" classname="it.fabriziodavi.vivovideo.model.InterviewTest" time="0.001"/>
+  <testcase name="realTestVideosWithGapsBetweenWords" classname="it.fabriziodavi.vivovideo.model.InterviewTest" time="0.001"/>
+  <testcase name="cutsGoInTheRealPauseOfTheAudio" classname="it.fabriziodavi.vivovideo.model.InterviewTest" time="0.028"/>
+  <testcase name="questionsWithoutQuestionMarkAreFoundBecauseBothHeardThem" classname="it.fabriziodavi.vivovideo.model.InterviewTest" time="0.0"/>
+  <testcase name="splitShowsBothOneVoiceAtATime" classname="it.fabriziodavi.vivovideo.model.InterviewTest" time="0.005"/>
+  <testcase name="questionsAreTheSentencesWithAQuestionMark" classname="it.fabriziodavi.vivovideo.model.InterviewTest" time="0.001"/>
+  <testcase name="typedQuestionsWinAndMissingOnesAreNull" classname="it.fabriziodavi.vivovideo.model.InterviewTest" time="0.001"/>
+  <testcase name="alternateIsCardThenAThenB" classname="it.fabriziodavi.vivovideo.model.InterviewTest" time="0.001"/>
+  <testcase name="aSingleVideoStillFindsQuestionWords" classname="it.fabriziodavi.vivovideo.model.InterviewTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

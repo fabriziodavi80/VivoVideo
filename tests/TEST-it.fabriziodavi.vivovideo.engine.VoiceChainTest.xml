@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.engine.VoiceChainTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-16T18:35:01.858Z" hostname="ip-10-0-139-166" time="0.203">
+  <properties/>
+  <testcase name="rumbleIsRemovedAndVoiceKept" classname="it.fabriziodavi.vivovideo.engine.VoiceChainTest" time="0.047"/>
+  <testcase name="loudAndQuietPhrasesBecomeEvenAndNoiseDrops" classname="it.fabriziodavi.vivovideo.engine.VoiceChainTest" time="0.149"/>
+  <testcase name="limiterKeepsPeaksUnderTheCeiling" classname="it.fabriziodavi.vivovideo.engine.VoiceChainTest" time="0.007"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

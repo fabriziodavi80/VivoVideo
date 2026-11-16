@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.engine.CollageRenderTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-16T18:34:46.160Z" hostname="ip-10-0-139-166" time="2.535">
+  <properties/>
+  <testcase name="photosGoInTheirCellsWithTheGapBetween" classname="it.fabriziodavi.vivovideo.engine.CollageRenderTest" time="2.411"/>
+  <testcase name="shapesAndPolaroidsAreDrawn" classname="it.fabriziodavi.vivovideo.engine.CollageRenderTest" time="0.053"/>
+  <testcase name="captionAndGrainChangeThePicture" classname="it.fabriziodavi.vivovideo.engine.CollageRenderTest" time="0.028"/>
+  <testcase name="motionStartsEmptyAndEndsLikeTheImage" classname="it.fabriziodavi.vivovideo.engine.CollageRenderTest" time="0.031"/>
+  <testcase name="tappingFindsTheCell" classname="it.fabriziodavi.vivovideo.engine.CollageRenderTest" time="0.012"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

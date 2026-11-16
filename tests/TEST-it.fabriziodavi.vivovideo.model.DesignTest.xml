@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.model.DesignTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-11-16T18:35:02.799Z" hostname="ip-10-0-139-166" time="0.011">
+  <properties/>
+  <testcase name="textsComeFromThePhotos" classname="it.fabriziodavi.vivovideo.model.DesignTest" time="0.001"/>
+  <testcase name="colorsHaveNames" classname="it.fabriziodavi.vivovideo.model.DesignTest" time="0.001"/>
+  <testcase name="anchorsFollowTheSheet" classname="it.fabriziodavi.vivovideo.model.DesignTest" time="0.0"/>
+  <testcase name="numbersCountUp" classname="it.fabriziodavi.vivovideo.model.DesignTest" time="0.001"/>
+  <testcase name="printSizes" classname="it.fabriziodavi.vivovideo.model.DesignTest" time="0.002"/>
+  <testcase name="oneLineWordNeverBreaks" classname="it.fabriziodavi.vivovideo.model.DesignTest" time="0.0"/>
+  <testcase name="movedElementsAreFoundWhereTheyAre" classname="it.fabriziodavi.vivovideo.model.DesignTest" time="0.0"/>
+  <testcase name="everyDesignIsComplete" classname="it.fabriziodavi.vivovideo.model.DesignTest" time="0.006"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

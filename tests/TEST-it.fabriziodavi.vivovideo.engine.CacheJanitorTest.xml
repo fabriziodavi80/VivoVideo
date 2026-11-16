@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.engine.CacheJanitorTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-16T18:34:45.977Z" hostname="ip-10-0-139-166" time="0.126">
+  <properties/>
+  <testcase name="unusedProxiesStayUnderBudgetOldestFirst" classname="it.fabriziodavi.vivovideo.engine.CacheJanitorTest" time="0.029"/>
+  <testcase name="cancelledSoundtrackLeavesNoFiles" classname="it.fabriziodavi.vivovideo.engine.CacheJanitorTest" time="0.054"/>
+  <testcase name="proxiesOfProjectsAreNeverDeleted" classname="it.fabriziodavi.vivovideo.engine.CacheJanitorTest" time="0.016"/>
+  <testcase name="runKeepsProjectProxiesAndRemovesLeftovers" classname="it.fabriziodavi.vivovideo.engine.CacheJanitorTest" time="0.015"/>
+  <testcase name="oldTempFilesGoFreshOnesStay" classname="it.fabriziodavi.vivovideo.engine.CacheJanitorTest" time="0.011"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

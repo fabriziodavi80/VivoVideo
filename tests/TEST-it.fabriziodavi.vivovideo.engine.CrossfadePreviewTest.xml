@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="it.fabriziodavi.vivovideo.engine.CrossfadePreviewTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-11-16T18:34:48.696Z" hostname="ip-10-0-139-166" time="0.048">
+  <properties/>
+  <testcase name="jobsCutHalvesAroundTheCut" classname="it.fabriziodavi.vivovideo.engine.CrossfadePreviewTest" time="0.048"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
