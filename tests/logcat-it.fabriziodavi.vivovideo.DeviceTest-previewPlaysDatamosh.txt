@@ -1,0 +1,66 @@
+11-16 19:15:36.439  4587 12941 W Codec2Client: query -- param skipped: index = 1107298332.
+11-16 19:15:36.439  4587 12941 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-16 19:15:36.441  4587 12941 W Codec2Client: query -- param skipped: index = 1342179345.
+11-16 19:15:36.441  4587 12941 W Codec2Client: query -- param skipped: index = 2415921170.
+11-16 19:15:36.441  4587 12941 W Codec2Client: query -- param skipped: index = 1610614798.
+11-16 19:15:36.458  4587 12945 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+11-16 19:15:36.458  4587 12945 E EGL_emulation: tid 12945: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+11-16 19:15:36.464  4587 12947 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-16 19:15:36.468  4587 12947 W Codec2Client: query -- param skipped: index = 1107298332.
+11-16 19:15:36.468  4587 12947 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-16 19:15:36.470  4587 12947 W Codec2Client: query -- param skipped: index = 1342179345.
+11-16 19:15:36.470  4587 12947 W Codec2Client: query -- param skipped: index = 2415921170.
+11-16 19:15:36.470  4587 12947 W Codec2Client: query -- param skipped: index = 1610614798.
+11-16 19:15:36.471  4587 12947 W Codec2Client: query -- param skipped: index = 2684356609.
+11-16 19:15:36.474   468   508 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-16 19:15:36.487  4587 12939 W SpeakerLayoutUtil: Built-in speaker's getSpeakerLayoutChannelMask not usable, defaulting to stereo.
+11-16 19:15:36.490   396   411 W AudioFlinger: createTrack_l(): mismatch between requested flags (00000008) and output flags (00000002)
+11-16 19:15:36.500  4587 12939 W SpeakerLayoutUtil: Built-in speaker's getSpeakerLayoutChannelMask not usable, defaulting to stereo.
+11-16 19:15:36.631  4587 12954 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+11-16 19:15:36.631  4587 12954 E EGL_emulation: tid 12954: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+11-16 19:15:36.679  4587 12956 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-16 19:15:36.685  4587 12956 W Codec2Client: query -- param skipped: index = 1107298332.
+11-16 19:15:36.685  4587 12956 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-16 19:15:36.689  4587 12956 W Codec2Client: query -- param skipped: index = 1342179345.
+11-16 19:15:36.689  4587 12956 W Codec2Client: query -- param skipped: index = 2415921170.
+11-16 19:15:36.689  4587 12956 W Codec2Client: query -- param skipped: index = 1610614798.
+11-16 19:15:36.690  4587 12956 W Codec2Client: query -- param skipped: index = 2684356609.
+11-16 19:15:36.694   468   508 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-16 19:15:40.918  4587 12939 W SpeakerLayoutUtil: Built-in speaker's getSpeakerLayoutChannelMask not usable, defaulting to stereo.
+11-16 19:15:41.733   351 12957 W C2BqBuffer: last successful dequeue was 3873711 us ago, 372 consecutive failures
+11-16 19:15:43.133  4587 12941 W Codec2Client: query -- param skipped: index = 1342179345.
+11-16 19:15:43.133  4587 12941 W Codec2Client: query -- param skipped: index = 2415921170.
+11-16 19:15:43.133  4587 12941 W Codec2Client: query -- param skipped: index = 1610614798.
+11-16 19:15:43.848  4587 12946 W Codec2Client: query -- param skipped: index = 1342179345.
+11-16 19:15:43.848  4587 12946 W Codec2Client: query -- param skipped: index = 2415921170.
+11-16 19:15:43.848  4587 12946 W Codec2Client: query -- param skipped: index = 1610614798.
+11-16 19:15:43.854  4587 12960 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+11-16 19:15:43.854  4587 12960 E EGL_emulation: tid 12960: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+11-16 19:15:43.866  4587 12946 W MediaCodec: no metrics handle found
+11-16 19:15:43.929   351 11634 W C2BqBuffer: get generationNumber failed 19701014987231
+11-16 19:15:46.736   351 12957 W C2BqBuffer: last successful dequeue was 8877507 us ago, 856 consecutive failures
+11-16 19:15:48.943  4587 12941 W Codec2Client: query -- param skipped: index = 1342179345.
+11-16 19:15:48.943  4587 12941 W Codec2Client: query -- param skipped: index = 2415921170.
+11-16 19:15:48.943  4587 12941 W Codec2Client: query -- param skipped: index = 1610614798.
+11-16 19:15:48.947  4587 12955 W Codec2Client: query -- param skipped: index = 1342179345.
+11-16 19:15:48.948  4587 12955 W Codec2Client: query -- param skipped: index = 2415921170.
+11-16 19:15:48.948  4587 12955 W Codec2Client: query -- param skipped: index = 1610614798.
+11-16 19:15:48.974  4587  4649 W Codec2-OutputBufferQueue: receiving stale buffer: generation 4697694 , diff 1 : slot 0
+11-16 19:15:48.978  4587 12955 W MessageQueue: Handler (android.media.MediaCodec$EventHandler) {c843782} sending message to a Handler on a dead thread
+11-16 19:15:48.978  4587 12955 W MessageQueue: java.lang.IllegalStateException: Handler (android.media.MediaCodec$EventHandler) {c843782} sending message to a Handler on a dead thread
+11-16 19:15:48.978  4587 12955 W MessageQueue: 	at android.os.MessageQueue.enqueueMessage(MessageQueue.java:560)
+11-16 19:15:48.978  4587 12955 W MessageQueue: 	at android.os.Handler.enqueueMessage(Handler.java:786)
+11-16 19:15:48.978  4587 12955 W MessageQueue: 	at android.os.Handler.sendMessageAtTime(Handler.java:735)
+11-16 19:15:48.978  4587 12955 W MessageQueue: 	at android.os.Handler.sendMessageDelayed(Handler.java:705)
+11-16 19:15:48.978  4587 12955 W MessageQueue: 	at android.os.Handler.sendMessage(Handler.java:643)
+11-16 19:15:48.978  4587 12955 W MessageQueue: 	at android.media.MediaCodec.postEventFromNative(MediaCodec.java:5222)
+11-16 19:15:48.979  4587 12955 W MessageQueue: Handler (android.media.MediaCodec$EventHandler) {c843782} sending message to a Handler on a dead thread
+11-16 19:15:48.979  4587 12955 W MessageQueue: java.lang.IllegalStateException: Handler (android.media.MediaCodec$EventHandler) {c843782} sending message to a Handler on a dead thread
+11-16 19:15:48.979  4587 12955 W MessageQueue: 	at android.os.MessageQueue.enqueueMessage(MessageQueue.java:560)
+11-16 19:15:48.979  4587 12955 W MessageQueue: 	at android.os.Handler.enqueueMessage(Handler.java:786)
+11-16 19:15:48.979  4587 12955 W MessageQueue: 	at android.os.Handler.sendMessageAtTime(Handler.java:735)
+11-16 19:15:48.979  4587 12955 W MessageQueue: 	at android.os.Handler.sendMessageDelayed(Handler.java:705)
+11-16 19:15:48.979  4587 12955 W MessageQueue: 	at android.os.Handler.sendMessage(Handler.java:643)
+11-16 19:15:48.979  4587 12955 W MessageQueue: 	at android.media.MediaCodec.postEventFromNative(MediaCodec.java:5222)
+11-16 19:15:49.112  4587 12955 W MediaCodec: no metrics handle found
+11-16 19:15:49.114  4587 12941 W MediaCodec: no metrics handle found

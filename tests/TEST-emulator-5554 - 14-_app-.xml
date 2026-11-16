@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="it.fabriziodavi.vivovideo.DeviceTest" tests="49" failures="3" errors="0" skipped="0" time="4031.77" timestamp="2026-11-16T19:46:20" hostname="localhost">
+  <properties>
+    <property name="device" value="emulator-5554 - 14" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="backupWithMediaAndRelink" classname="it.fabriziodavi.vivovideo.DeviceTest" time="21.59" />
+  <testcase name="maskPassAmongOtherTransitionsInExport" classname="it.fabriziodavi.vivovideo.DeviceTest" time="128.624" />
+  <testcase name="bisectEachEffectGroupSingle" classname="it.fabriziodavi.vivovideo.DeviceTest" time="105.626" />
+  <testcase name="exportTextBehindPerson" classname="it.fabriziodavi.vivovideo.DeviceTest" time="21.661" />
+  <testcase name="exportTelemetry" classname="it.fabriziodavi.vivovideo.DeviceTest" time="19.54" />
+  <testcase name="exportAutoVideoEnergico" classname="it.fabriziodavi.vivovideo.DeviceTest" time="164.726" />
+  <testcase name="freezeFrameFromEditor" classname="it.fabriziodavi.vivovideo.DeviceTest" time="12.393" />
+  <testcase name="bisectFadesOnly" classname="it.fabriziodavi.vivovideo.DeviceTest" time="17.083" />
+  <testcase name="exportSimple" classname="it.fabriziodavi.vivovideo.DeviceTest" time="7.156" />
+  <testcase name="exportCreditsRoll" classname="it.fabriziodavi.vivovideo.DeviceTest" time="18.925" />
+  <testcase name="personMasksAndExport" classname="it.fabriziodavi.vivovideo.DeviceTest" time="45.93" />
+  <testcase name="transitionsAreSmoothInExport" classname="it.fabriziodavi.vivovideo.DeviceTest" time="30.508" />
+  <testcase name="crossfadeSegmentRendersAndPlays" classname="it.fabriziodavi.vivovideo.DeviceTest" time="42.887" />
+  <testcase name="exportAutoVideoCinema" classname="it.fabriziodavi.vivovideo.DeviceTest" time="74.3" />
+  <testcase name="graphicCollagePrintAndVideo" classname="it.fabriziodavi.vivovideo.DeviceTest" time="6.565" />
+  <testcase name="exportKineticTexts" classname="it.fabriziodavi.vivovideo.DeviceTest" time="8.958" />
+  <testcase name="exportNewestTransitions" classname="it.fabriziodavi.vivovideo.DeviceTest" time="107.387" />
+  <testcase name="previewPlaysPremium" classname="it.fabriziodavi.vivovideo.DeviceTest" time="15.884" />
+  <testcase name="exportEveryFeature" classname="it.fabriziodavi.vivovideo.DeviceTest" time="209.384" />
+  <testcase name="exportWithHdrOption" classname="it.fabriziodavi.vivovideo.DeviceTest" time="7.378" />
+  <testcase name="shadersCompileForHdr" classname="it.fabriziodavi.vivovideo.DeviceTest" time="0.23" />
+  <testcase name="exportWithoutCompositor" classname="it.fabriziodavi.vivovideo.DeviceTest" time="422.527" />
+  <testcase name="proxyCopyIsMadeAndUsed" classname="it.fabriziodavi.vivovideo.DeviceTest" time="9.799" />
+  <testcase name="softwareDecoderExports" classname="it.fabriziodavi.vivovideo.DeviceTest" time="0.051" />
+  <testcase name="onlineLibraryOpenverse" classname="it.fabriziodavi.vivovideo.DeviceTest" time="5.219" />
+  <testcase name="voiceOverLevelAndPreviewDucking" classname="it.fabriziodavi.vivovideo.DeviceTest" time="5.89" />
+  <testcase name="bisectFullWithoutNewEffectsSingle" classname="it.fabriziodavi.vivovideo.DeviceTest" time="59.83" />
+  <testcase name="bestMomentFindsTheSharpPart" classname="it.fabriziodavi.vivovideo.DeviceTest" time="5.179" />
+  <testcase name="previewPlaysTelemetry" classname="it.fabriziodavi.vivovideo.DeviceTest" time="10.105" />
+  <testcase name="exportSocialEffects" classname="it.fabriziodavi.vivovideo.DeviceTest" time="112.402" />
+  <testcase name="exportTrendKit" classname="it.fabriziodavi.vivovideo.DeviceTest" time="94.017" />
+  <testcase name="exportTextBehindShowThrough" classname="it.fabriziodavi.vivovideo.DeviceTest" time="22.252" />
+  <testcase name="timelapseWithTrails" classname="it.fabriziodavi.vivovideo.DeviceTest" time="13.981" />
+  <testcase name="exportDuckingAndLoudness" classname="it.fabriziodavi.vivovideo.DeviceTest" time="5.012" />
+  <testcase name="overlaidVideoStretchRendersAndPlays" classname="it.fabriziodavi.vivovideo.DeviceTest" time="12.595" />
+  <testcase name="precisePersonCutoutOrFallback" classname="it.fabriziodavi.vivovideo.DeviceTest" time="189.583" />
+  <testcase name="exportDatamosh" classname="it.fabriziodavi.vivovideo.DeviceTest" time="28.14" />
+  <testcase name="maskPassInExport" classname="it.fabriziodavi.vivovideo.DeviceTest" time="33.625" />
+  <testcase name="exportFollowsTheMixer" classname="it.fabriziodavi.vivovideo.DeviceTest" time="12.926" />
+  <testcase name="redactAnalyzesAndExports" classname="it.fabriziodavi.vivovideo.DeviceTest" time="66.604" />
+  <testcase name="whisperTranscribes" classname="it.fabriziodavi.vivovideo.DeviceTest" time="11.519" />
+  <testcase name="previewPlaysDatamosh" classname="it.fabriziodavi.vivovideo.DeviceTest" time="12.717" />
+  <testcase name="exportVideoLayer" classname="it.fabriziodavi.vivovideo.DeviceTest" time="392.992" />
+  <testcase name="collageVideoAndImage" classname="it.fabriziodavi.vivovideo.DeviceTest" time="13.559" />
+  <testcase name="reverseClip" classname="it.fabriziodavi.vivovideo.DeviceTest" time="21.021" />
+  <testcase name="exportWowTransitionsAndTexts" classname="it.fabriziodavi.vivovideo.DeviceTest" time="1157.096">
+    <failure>java.lang.AssertionError: esportazione fallita: Errore 3003 (ERROR_CODE_DECODING_FORMAT_UNSUPPORTED)
+Causa: IllegalArgumentException:
+
+Tentativi:
+• qualità piena, 10 Mbps: ERROR_CODE_MUXING_TIMEOUT
+• qualità piena: ERROR_CODE_MUXING_TIMEOUT
+• massima velocità, 10 Mbps: ERROR_CODE_DECODING_FORMAT_UNSUPPORTED
+at org.junit.Assert.fail(Assert.java:89)
+at it.fabriziodavi.vivovideo.DeviceTest.exportAndCheckUri(DeviceTest.kt:568)
+at it.fabriziodavi.vivovideo.DeviceTest.exportAndCheck(DeviceTest.kt:547)
+at it.fabriziodavi.vivovideo.DeviceTest.exportAndCheck$default(DeviceTest.kt:547)
+at it.fabriziodavi.vivovideo.DeviceTest.exportWowTransitionsAndTexts(DeviceTest.kt:530)
+</failure>
+  </testcase>
+  <testcase name="previewPlaysWow" classname="it.fabriziodavi.vivovideo.DeviceTest" time="35.297">
+    <failure>java.lang.AssertionError: anteprima senza immagini: 9 fotogrammi (posizioni: 0 517 1054 1471 2037 2658 3013 3296 3577 3881 4133 4396 4668 4917 5245 5420)
+at org.junit.Assert.fail(Assert.java:89)
+at org.junit.Assert.assertTrue(Assert.java:42)
+at it.fabriziodavi.vivovideo.DeviceTest.playFor(DeviceTest.kt:799)
+at it.fabriziodavi.vivovideo.DeviceTest.playFor$default(DeviceTest.kt:730)
+at it.fabriziodavi.vivovideo.DeviceTest.previewPlaysWow(DeviceTest.kt:534)
+</failure>
+  </testcase>
+  <testcase name="previewPlaysPastTheEndOfAShortSong" classname="it.fabriziodavi.vivovideo.DeviceTest" time="18.32" />
+  <testcase name="bisectEffectsOnly" classname="it.fabriziodavi.vivovideo.DeviceTest" time="180.689">
+    <failure></failure>
+  </testcase>
+  <system-err>Test run failed to complete. Expected 54 tests, received 48. onError: commandError=false message=INSTRUMENTATION_ABORTED: System has crashed.
+</system-err>
+</testsuite>

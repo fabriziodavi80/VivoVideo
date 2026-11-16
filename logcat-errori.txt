@@ -1,0 +1,800 @@
+11-16 18:38:52.855 I/TestRunner( 4587): run started: 54 tests
+11-16 18:39:08.335 I/TestRunner( 4587): started: backupWithMediaAndRelink(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:39:29.979 I/TestRunner( 4587): finished: backupWithMediaAndRelink(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:39:29.981 I/TestRunner( 4587): started: maskPassAmongOtherTransitionsInExport(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:41:38.637 I/TestRunner( 4587): finished: maskPassAmongOtherTransitionsInExport(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:41:38.640 I/TestRunner( 4587): started: bisectEachEffectGroupSingle(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:43:24.261 I/TestRunner( 4587): finished: bisectEachEffectGroupSingle(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:43:24.262 I/TestRunner( 4587): started: exportTextBehindPerson(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:43:45.934 I/TestRunner( 4587): finished: exportTextBehindPerson(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:43:45.935 I/TestRunner( 4587): started: exportTelemetry(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:44:05.478 I/TestRunner( 4587): finished: exportTelemetry(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:44:05.480 I/TestRunner( 4587): started: exportAutoVideoEnergico(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:44:05.497 I/AutoScene( 4587): Energico:   a.mp4 2000-3000 ms di 6000, esce 1000 ms, NORMAL, passaggio WHIP 250 ms, fx [GRAIN]
+11-16 18:44:05.497 I/AutoScene( 4587): Energico:   foto.jpg 0-1000 ms di 60000, esce 1000 ms, NORMAL, passaggio CAMSHAKE 250 ms, fx [GRAIN, BWBEAT]
+11-16 18:44:05.497 I/AutoScene( 4587): Energico:   b.mp4 2000-3000 ms di 6000, esce 1000 ms, NORMAL, passaggio WHIP 250 ms, fx [GRAIN]
+11-16 18:44:05.497 I/AutoScene( 4587): Energico:   foto.jpg 0-1000 ms di 60000, esce 1000 ms, NORMAL, passaggio - 0 ms, fx [GRAIN]
+11-16 18:44:05.497 I/AutoScene( 4587): Energico:   c.mp4 2000-3000 ms di 6000, esce 1000 ms, NORMAL, passaggio WHIP 250 ms, fx [GRAIN, CHROMA]
+11-16 18:44:05.497 I/AutoScene( 4587): Energico:   a.mp4 2000-3000 ms di 6000, esce 1000 ms, NORMAL, passaggio - 0 ms, fx [GRAIN]
+11-16 18:44:05.497 I/AutoScene( 4587): Energico:   foto.jpg 0-1000 ms di 60000, esce 1000 ms, NORMAL, passaggio CAMSHAKE 250 ms, fx [GRAIN]
+11-16 18:44:05.497 I/AutoScene( 4587): Energico:   b.mp4 2000-3000 ms di 6000, esce 1000 ms, NORMAL, passaggio - 0 ms, fx [GRAIN, BWBEAT]
+11-16 18:44:05.497 I/AutoScene( 4587): Energico:   foto.jpg 0-1000 ms di 60000, esce 1000 ms, NORMAL, passaggio CAMSHAKE 250 ms, fx [GRAIN]
+11-16 18:44:05.497 I/AutoScene( 4587): Energico:   c.mp4 2000-3000 ms di 6000, esce 1000 ms, NORMAL, passaggio - 0 ms, fx [GRAIN]
+11-16 18:44:05.497 I/AutoScene( 4587): Energico:   a.mp4 2000-3000 ms di 6000, esce 1000 ms, NORMAL, passaggio SWIPE 450 ms, fx [GRAIN, CHROMA]
+11-16 18:44:05.497 I/AutoScene( 4587): Energico:   foto.jpg 0-1000 ms di 60000, esce 1000 ms, NORMAL, passaggio - 0 ms, fx [GRAIN]
+11-16 18:44:41.533 D/DefaultCodec( 4587):   android.media.MediaCodec$CodecException: 
+11-16 18:46:50.188 I/TestRunner( 4587): finished: exportAutoVideoEnergico(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:46:50.190 I/TestRunner( 4587): started: freezeFrameFromEditor(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:47:02.572 I/TestRunner( 4587): finished: freezeFrameFromEditor(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:47:02.573 I/TestRunner( 4587): started: bisectFadesOnly(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:47:19.663 I/TestRunner( 4587): finished: bisectFadesOnly(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:47:19.664 I/TestRunner( 4587): started: exportSimple(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:47:26.830 I/TestRunner( 4587): finished: exportSimple(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:47:26.831 I/TestRunner( 4587): started: exportCreditsRoll(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:47:45.759 I/TestRunner( 4587): finished: exportCreditsRoll(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:47:45.760 I/TestRunner( 4587): started: personMasksAndExport(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:48:31.679 I/TestRunner( 4587): finished: personMasksAndExport(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:48:31.680 I/TestRunner( 4587): started: transitionsAreSmoothInExport(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:49:02.176 I/TestRunner( 4587): finished: transitionsAreSmoothInExport(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:49:02.178 I/TestRunner( 4587): started: crossfadeSegmentRendersAndPlays(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:49:45.078 I/TestRunner( 4587): finished: crossfadeSegmentRendersAndPlays(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:49:45.079 I/TestRunner( 4587): started: exportAutoVideoCinema(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:49:45.084 I/AutoScene( 4587): Cinema:   a.mp4 1400-3900 ms di 6000, esce 2500 ms, NORMAL, passaggio CROSSFADE 1000 ms, fx [CINEMATIC, FILM35]
+11-16 18:49:45.084 I/AutoScene( 4587): Cinema:   foto.jpg 0-2500 ms di 60000, esce 2500 ms, NORMAL, passaggio CROSSFADE 1000 ms, fx [CINEMATIC, FILM35, HALATION]
+11-16 18:49:45.084 I/AutoScene( 4587): Cinema:   b.mp4 1400-3900 ms di 6000, esce 2500 ms, NORMAL, passaggio BLUR 1000 ms, fx [CINEMATIC, FILM35]
+11-16 18:49:45.084 I/AutoScene( 4587): Cinema:   foto.jpg 0-2500 ms di 60000, esce 2500 ms, NORMAL, passaggio CROSSFADE 1000 ms, fx [CINEMATIC, FILM35]
+11-16 18:49:45.084 I/AutoScene( 4587): Cinema:   c.mp4 1400-3400 ms di 6000, esce 2000 ms, NORMAL, passaggio - 0 ms, fx [CINEMATIC, FILM35, LETTERBOX]
+11-16 18:50:59.374 I/TestRunner( 4587): finished: exportAutoVideoCinema(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:50:59.375 I/TestRunner( 4587): started: graphicCollagePrintAndVideo(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:51:05.928 I/TestRunner( 4587): finished: graphicCollagePrintAndVideo(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:51:05.930 I/TestRunner( 4587): started: exportKineticTexts(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:51:14.906 I/TestRunner( 4587): finished: exportKineticTexts(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:51:14.907 I/TestRunner( 4587): started: exportNewestTransitions(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:52:05.979 E/ExoPlayerAssetLoader( 4587): Releasing the player timed out.
+11-16 18:52:05.979 E/ExoPlayerAssetLoader( 4587):   androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-16 18:52:05.979 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1161)
+11-16 18:52:05.979 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-16 18:52:05.979 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet$ListenerHolder.invoke(ListenerSet.java:466)
+11-16 18:52:05.979 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet.lambda$queueEvent$0(ListenerSet.java:334)
+11-16 18:52:05.979 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+11-16 18:52:05.979 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet.flushEvents(ListenerSet.java:358)
+11-16 18:52:05.979 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet.sendEvent(ListenerSet.java:386)
+11-16 18:52:05.979 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1157)
+11-16 18:52:05.979 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.transformer.ExoPlayerAssetLoader.release(ExoPlayerAssetLoader.java:352)
+11-16 18:52:05.979 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.transformer.SequenceAssetLoader$SampleConsumerWrapper.lambda$switchAssetLoader$0$androidx-media3-transformer-SequenceAssetLoader$SampleConsumerWrapper(SequenceAssetLoader.java:678)
+11-16 18:52:05.979 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.transformer.SequenceAssetLoader$SampleConsumerWrapper$$ExternalSyntheticLambda0.run(D8$$SyntheticClass:0)
+11-16 18:52:05.979 E/ExoPlayerAssetLoader( 4587):       at android.os.Handler.handleCallback(Handler.java:958)
+11-16 18:52:05.979 E/ExoPlayerAssetLoader( 4587):       at android.os.Handler.dispatchMessage(Handler.java:99)
+11-16 18:52:05.979 E/ExoPlayerAssetLoader( 4587):       at android.os.Looper.loopOnce(Looper.java:205)
+11-16 18:52:05.979 E/ExoPlayerAssetLoader( 4587):       at android.os.Looper.loop(Looper.java:294)
+11-16 18:52:05.979 E/ExoPlayerAssetLoader( 4587):       at android.os.HandlerThread.run(HandlerThread.java:67)
+11-16 18:52:05.979 E/ExoPlayerAssetLoader( 4587):   Caused by: androidx.media3.exoplayer.ExoTimeoutException: Player release timed out.
+11-16 18:52:05.979 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+11-16 18:52:05.979 E/ExoPlayerAssetLoader( 4587):       ... 15 more
+11-16 18:53:02.270 I/TestRunner( 4587): finished: exportNewestTransitions(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:53:02.271 I/TestRunner( 4587): started: previewPlaysPremium(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:53:17.639 E/CompositionPlayer-0( 4587): playerFailed [eventTime=15.34, mediaPos=4.50, window=0, period=1, errorCode=ERROR_CODE_TIMEOUT
+11-16 18:53:17.639 E/CompositionPlayer-0( 4587):   androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-16 18:53:17.639 E/CompositionPlayer-0( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1161)
+11-16 18:53:17.639 E/CompositionPlayer-0( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-16 18:53:17.639 E/CompositionPlayer-0( 4587):       at androidx.media3.common.util.ListenerSet$ListenerHolder.invoke(ListenerSet.java:466)
+11-16 18:53:17.639 E/CompositionPlayer-0( 4587):       at androidx.media3.common.util.ListenerSet.lambda$queueEvent$0(ListenerSet.java:334)
+11-16 18:53:17.639 E/CompositionPlayer-0( 4587):       at androidx.media3.common.util.ListenerSet$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+11-16 18:53:17.639 E/CompositionPlayer-0( 4587):       at androidx.media3.common.util.ListenerSet.flushEvents(ListenerSet.java:358)
+11-16 18:53:17.639 E/CompositionPlayer-0( 4587):       at androidx.media3.common.util.ListenerSet.sendEvent(ListenerSet.java:386)
+11-16 18:53:17.639 E/CompositionPlayer-0( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1157)
+11-16 18:53:17.639 E/CompositionPlayer-0( 4587):       at androidx.media3.transformer.CompositionPlayer$SequencePlayerHolder.release(CompositionPlayer.java:2400)
+11-16 18:53:17.639 E/CompositionPlayer-0( 4587):       at androidx.media3.transformer.CompositionPlayer$SequencePlayerHolder.access$2300(CompositionPlayer.java:2352)
+11-16 18:53:17.639 E/CompositionPlayer-0( 4587):       at androidx.media3.transformer.CompositionPlayer.handleRelease(CompositionPlayer.java:1091)
+11-16 18:53:17.639 E/CompositionPlayer-0( 4587):       at androidx.media3.common.SimpleBasePlayer.release(SimpleBasePlayer.java:2656)
+11-16 18:53:17.639 E/CompositionPlayer-0( 4587):       at it.fabriziodavi.vivovideo.DeviceTest.playFor$lambda$5(DeviceTest.kt:791)
+11-16 18:53:17.639 E/CompositionPlayer-0( 4587):       at it.fabriziodavi.vivovideo.DeviceTest.$r8$lambda$JG3Pa8ySzUtBzE_ZlBfqfHf_daA(Unknown Source:0)
+11-16 18:53:17.639 E/CompositionPlayer-0( 4587):       at it.fabriziodavi.vivovideo.DeviceTest$$ExternalSyntheticLambda21.run(D8$$SyntheticClass:0)
+11-16 18:53:17.639 E/CompositionPlayer-0( 4587):       at android.os.Handler.handleCallback(Handler.java:958)
+11-16 18:53:17.639 E/CompositionPlayer-0( 4587):       at android.os.Handler.dispatchMessage(Handler.java:99)
+11-16 18:53:17.639 E/CompositionPlayer-0( 4587):       at android.os.Looper.loopOnce(Looper.java:205)
+11-16 18:53:17.639 E/CompositionPlayer-0( 4587):       at android.os.Looper.loop(Looper.java:294)
+11-16 18:53:17.639 E/CompositionPlayer-0( 4587):       at android.app.ActivityThread.main(ActivityThread.java:8177)
+11-16 18:53:17.639 E/CompositionPlayer-0( 4587):       at java.lang.reflect.Method.invoke(Native Method)
+11-16 18:53:17.639 E/CompositionPlayer-0( 4587):       at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:552)
+11-16 18:53:17.639 E/CompositionPlayer-0( 4587):       at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:971)
+11-16 18:53:17.639 E/CompositionPlayer-0( 4587):   Caused by: androidx.media3.exoplayer.ExoTimeoutException: Player release timed out.
+11-16 18:53:17.639 E/CompositionPlayer-0( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+11-16 18:53:17.639 E/CompositionPlayer-0( 4587):       ... 22 more
+11-16 18:53:17.639 E/CompositionPlayer-0( 4587): ]
+11-16 18:53:17.647 E/CompositionPlayer( 4587): playerFailed [eventTime=15.36, mediaPos=4.50, window=0, errorCode=ERROR_CODE_TIMEOUT
+11-16 18:53:17.647 E/CompositionPlayer( 4587):   androidx.media3.common.PlaybackException: error from player 0
+11-16 18:53:17.647 E/CompositionPlayer( 4587):       at androidx.media3.transformer.CompositionPlayer.maybeUpdatePlaybackError(CompositionPlayer.java:2040)
+11-16 18:53:17.647 E/CompositionPlayer( 4587):       at androidx.media3.transformer.CompositionPlayer.access$3300(CompositionPlayer.java:165)
+11-16 18:53:17.647 E/CompositionPlayer( 4587):       at androidx.media3.transformer.CompositionPlayer$PlayerListener.onPlayerError(CompositionPlayer.java:2319)
+11-16 18:53:17.647 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+11-16 18:53:17.647 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-16 18:53:17.647 E/CompositionPlayer( 4587):       at androidx.media3.common.util.ListenerSet$ListenerHolder.invoke(ListenerSet.java:466)
+11-16 18:53:17.647 E/CompositionPlayer( 4587):       at androidx.media3.common.util.ListenerSet.lambda$queueEvent$0(ListenerSet.java:334)
+11-16 18:53:17.647 E/CompositionPlayer( 4587):       at androidx.media3.common.util.ListenerSet$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+11-16 18:53:17.647 E/CompositionPlayer( 4587):       at androidx.media3.common.util.ListenerSet.flushEvents(ListenerSet.java:358)
+11-16 18:53:17.647 E/CompositionPlayer( 4587):       at androidx.media3.common.util.ListenerSet.sendEvent(ListenerSet.java:386)
+11-16 18:53:17.647 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1157)
+11-16 18:53:17.647 E/CompositionPlayer( 4587):       at androidx.media3.transformer.CompositionPlayer$SequencePlayerHolder.release(CompositionPlayer.java:2400)
+11-16 18:53:17.647 E/CompositionPlayer( 4587):       at androidx.media3.transformer.CompositionPlayer$SequencePlayerHolder.access$2300(CompositionPlayer.java:2352)
+11-16 18:53:17.647 E/CompositionPlayer( 4587):       at androidx.media3.transformer.CompositionPlayer.handleRelease(CompositionPlayer.java:1091)
+11-16 18:53:17.647 E/CompositionPlayer( 4587):       at androidx.media3.common.SimpleBasePlayer.release(SimpleBasePlayer.java:2656)
+11-16 18:53:17.647 E/CompositionPlayer( 4587):       at it.fabriziodavi.vivovideo.DeviceTest.playFor$lambda$5(DeviceTest.kt:791)
+11-16 18:53:17.647 E/CompositionPlayer( 4587):       at it.fabriziodavi.vivovideo.DeviceTest.$r8$lambda$JG3Pa8ySzUtBzE_ZlBfqfHf_daA(Unknown Source:0)
+11-16 18:53:17.647 E/CompositionPlayer( 4587):       at it.fabriziodavi.vivovideo.DeviceTest$$ExternalSyntheticLambda21.run(D8$$SyntheticClass:0)
+11-16 18:53:17.647 E/CompositionPlayer( 4587):       at android.os.Handler.handleCallback(Handler.java:958)
+11-16 18:53:17.647 E/CompositionPlayer( 4587):       at android.os.Handler.dispatchMessage(Handler.java:99)
+11-16 18:53:17.647 E/CompositionPlayer( 4587):       at android.os.Looper.loopOnce(Looper.java:205)
+11-16 18:53:17.647 E/CompositionPlayer( 4587):       at android.os.Looper.loop(Looper.java:294)
+11-16 18:53:17.647 E/CompositionPlayer( 4587):       at android.app.ActivityThread.main(ActivityThread.java:8177)
+11-16 18:53:17.647 E/CompositionPlayer( 4587):       at java.lang.reflect.Method.invoke(Native Method)
+11-16 18:53:17.647 E/CompositionPlayer( 4587):       at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:552)
+11-16 18:53:17.647 E/CompositionPlayer( 4587):       at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:971)
+11-16 18:53:17.647 E/CompositionPlayer( 4587):   Caused by: androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-16 18:53:17.647 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1161)
+11-16 18:53:17.647 E/CompositionPlayer( 4587):       ... 22 more
+11-16 18:53:17.647 E/CompositionPlayer( 4587):   Caused by: androidx.media3.exoplayer.ExoTimeoutException: Player release timed out.
+11-16 18:53:17.647 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+11-16 18:53:17.647 E/CompositionPlayer( 4587):       ... 22 more
+11-16 18:53:17.647 E/CompositionPlayer( 4587): ]
+11-16 18:53:18.165 E/CompositionPlayer( 4587): playerFailed [eventTime=15.88, mediaPos=0.00, window=0, errorCode=ERROR_CODE_TIMEOUT
+11-16 18:53:18.165 E/CompositionPlayer( 4587):   androidx.media3.common.PlaybackException: InternalPlayer release timeout
+11-16 18:53:18.165 E/CompositionPlayer( 4587):       at androidx.media3.transformer.CompositionPlayer.handleRelease(CompositionPlayer.java:1125)
+11-16 18:53:18.165 E/CompositionPlayer( 4587):       at androidx.media3.common.SimpleBasePlayer.release(SimpleBasePlayer.java:2656)
+11-16 18:53:18.165 E/CompositionPlayer( 4587):       at it.fabriziodavi.vivovideo.DeviceTest.playFor$lambda$5(DeviceTest.kt:791)
+11-16 18:53:18.165 E/CompositionPlayer( 4587):       at it.fabriziodavi.vivovideo.DeviceTest.$r8$lambda$JG3Pa8ySzUtBzE_ZlBfqfHf_daA(Unknown Source:0)
+11-16 18:53:18.165 E/CompositionPlayer( 4587):       at it.fabriziodavi.vivovideo.DeviceTest$$ExternalSyntheticLambda21.run(D8$$SyntheticClass:0)
+11-16 18:53:18.165 E/CompositionPlayer( 4587):       at android.os.Handler.handleCallback(Handler.java:958)
+11-16 18:53:18.165 E/CompositionPlayer( 4587):       at android.os.Handler.dispatchMessage(Handler.java:99)
+11-16 18:53:18.165 E/CompositionPlayer( 4587):       at android.os.Looper.loopOnce(Looper.java:205)
+11-16 18:53:18.165 E/CompositionPlayer( 4587):       at android.os.Looper.loop(Looper.java:294)
+11-16 18:53:18.165 E/CompositionPlayer( 4587):       at android.app.ActivityThread.main(ActivityThread.java:8177)
+11-16 18:53:18.165 E/CompositionPlayer( 4587):       at java.lang.reflect.Method.invoke(Native Method)
+11-16 18:53:18.165 E/CompositionPlayer( 4587):       at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:552)
+11-16 18:53:18.165 E/CompositionPlayer( 4587):       at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:971)
+11-16 18:53:18.165 E/CompositionPlayer( 4587): ]
+11-16 18:53:18.167 I/TestRunner( 4587): finished: previewPlaysPremium(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:53:18.168 I/TestRunner( 4587): started: exportEveryFeature(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:54:41.436 E/MediaCodec( 4587): Released by resource manager
+11-16 18:56:47.554 I/TestRunner( 4587): finished: exportEveryFeature(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:56:47.555 I/TestRunner( 4587): started: exportWithHdrOption(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:56:54.927 I/TestRunner( 4587): finished: exportWithHdrOption(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:56:54.928 I/TestRunner( 4587): started: shadersCompileForHdr(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:56:55.158 I/TestRunner( 4587): finished: shadersCompileForHdr(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:56:55.160 I/TestRunner( 4587): started: exportWithoutCompositor(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 18:58:34.940 E/MediaCodec( 4587): Codec reported err 0xe/14 (Unknown error -14), actionCode 0, while in state 6/STARTED
+11-16 18:58:34.947 E/MediaCodec( 4587): Invalid to call at Released state; only valid in executing state
+11-16 18:58:34.953 W/TransformerInternal( 4587):   androidx.media3.transformer.ExportException: Codec exception: CodecInfo{type=VideoDecoder, configurationFormat={exo-pixel-width-height-ratio-float=1.0, sar-width=1, allow-frame-drop=0, mime=video/avc, bitrate=196685, color-standard=1, color-transfer=3, sar-height=1, is-autoselect=0, is-default=0, color-range=2, frame-rate=30.0, max-input-size=13361, rotation-degrees=0, height=360, track-id=2, is-forced-subtitle=0, level=4096, profile=1, codecs-string=avc1.42C029, csd-1=java.nio.HeapByteBuffer[pos=0 lim=10 cap=10], encoder-delay=0, width=640, encoder-padding=0, csd-0=java.nio.HeapByteBuffer[pos=0 lim=22 cap=22]}, name=c2.goldfish.h264.decoder}
+11-16 18:58:34.953 W/TransformerInternal( 4587):       at androidx.media3.transformer.DefaultCodec.createExportException(DefaultCodec.java:487)
+11-16 18:58:34.953 W/TransformerInternal( 4587):       at androidx.media3.transformer.DefaultCodec.createExportException(DefaultCodec.java:465)
+11-16 18:58:35.006 E/ExoPlayerImplInternal( 4587): Playback error
+11-16 18:58:35.006 E/ExoPlayerImplInternal( 4587):   androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-16 18:58:35.006 E/ExoPlayerImplInternal( 4587):       at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:1005)
+11-16 18:58:35.006 E/ExoPlayerImplInternal( 4587):       at android.os.Handler.dispatchMessage(Handler.java:102)
+11-16 18:58:35.006 E/ExoPlayerImplInternal( 4587):       at android.os.Looper.loopOnce(Looper.java:205)
+11-16 18:58:35.006 E/ExoPlayerImplInternal( 4587):       at android.os.Looper.loop(Looper.java:294)
+11-16 18:58:35.006 E/ExoPlayerImplInternal( 4587):       at android.os.HandlerThread.run(HandlerThread.java:67)
+11-16 18:58:35.006 E/ExoPlayerImplInternal( 4587):   Caused by: java.lang.IllegalStateException
+11-16 18:58:35.006 E/ExoPlayerImplInternal( 4587):       at com.google.common.base.Preconditions.checkState(Preconditions.java:497)
+11-16 18:58:35.006 E/ExoPlayerImplInternal( 4587):       at androidx.media3.transformer.AudioGraphInput.getInputBuffer(AudioGraphInput.java:238)
+11-16 18:58:35.006 E/ExoPlayerImplInternal( 4587):       at androidx.media3.transformer.SequenceAssetLoader$SampleConsumerWrapper.getInputBuffer(SequenceAssetLoader.java:531)
+11-16 18:58:35.006 E/ExoPlayerImplInternal( 4587):       at androidx.media3.transformer.ExoAssetLoaderBaseRenderer.feedConsumerFromInput(ExoAssetLoaderBaseRenderer.java:329)
+11-16 18:58:35.006 E/ExoPlayerImplInternal( 4587):       at androidx.media3.transformer.ExoAssetLoaderBaseRenderer.render(ExoAssetLoaderBaseRenderer.java:116)
+11-16 18:58:35.006 E/ExoPlayerImplInternal( 4587):       at androidx.media3.exoplayer.RendererHolder.render(RendererHolder.java:425)
+11-16 18:58:35.006 E/ExoPlayerImplInternal( 4587):       at androidx.media3.exoplayer.ExoPlayerImplInternal.doSomeWork(ExoPlayerImplInternal.java:1484)
+11-16 18:58:35.006 E/ExoPlayerImplInternal( 4587):       at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:765)
+11-16 18:58:35.006 E/ExoPlayerImplInternal( 4587):       ... 4 more
+11-16 19:00:47.939 E/ExoPlayerImplInternal( 4587): Playback error
+11-16 19:00:47.939 E/ExoPlayerImplInternal( 4587):   androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-16 19:00:47.939 E/ExoPlayerImplInternal( 4587):       at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:1005)
+11-16 19:00:47.939 E/ExoPlayerImplInternal( 4587):       at android.os.Handler.dispatchMessage(Handler.java:102)
+11-16 19:00:47.939 E/ExoPlayerImplInternal( 4587):       at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:00:47.939 E/ExoPlayerImplInternal( 4587):       at android.os.Looper.loop(Looper.java:294)
+11-16 19:00:47.939 E/ExoPlayerImplInternal( 4587):       at android.os.HandlerThread.run(HandlerThread.java:67)
+11-16 19:00:47.939 E/ExoPlayerImplInternal( 4587):   Caused by: java.lang.IllegalStateException
+11-16 19:00:47.939 E/ExoPlayerImplInternal( 4587):       at com.google.common.base.Preconditions.checkState(Preconditions.java:497)
+11-16 19:00:47.939 E/ExoPlayerImplInternal( 4587):       at androidx.media3.transformer.AudioGraphInput.getInputBuffer(AudioGraphInput.java:238)
+11-16 19:00:47.939 E/ExoPlayerImplInternal( 4587):       at androidx.media3.transformer.SequenceAssetLoader$SampleConsumerWrapper.getInputBuffer(SequenceAssetLoader.java:531)
+11-16 19:00:47.939 E/ExoPlayerImplInternal( 4587):       at androidx.media3.transformer.ExoAssetLoaderBaseRenderer.feedConsumerFromInput(ExoAssetLoaderBaseRenderer.java:329)
+11-16 19:00:47.939 E/ExoPlayerImplInternal( 4587):       at androidx.media3.transformer.ExoAssetLoaderBaseRenderer.render(ExoAssetLoaderBaseRenderer.java:116)
+11-16 19:00:47.939 E/ExoPlayerImplInternal( 4587):       at androidx.media3.exoplayer.RendererHolder.render(RendererHolder.java:425)
+11-16 19:00:47.939 E/ExoPlayerImplInternal( 4587):       at androidx.media3.exoplayer.ExoPlayerImplInternal.doSomeWork(ExoPlayerImplInternal.java:1484)
+11-16 19:00:47.939 E/ExoPlayerImplInternal( 4587):       at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:765)
+11-16 19:00:47.939 E/ExoPlayerImplInternal( 4587):       ... 4 more
+11-16 19:00:48.170 E/MediaCodec( 4587): Codec reported err 0xe/14 (Unknown error -14), actionCode 0, while in state 6/STARTED
+11-16 19:03:57.677 I/TestRunner( 4587): finished: exportWithoutCompositor(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:03:57.678 I/TestRunner( 4587): started: proxyCopyIsMadeAndUsed(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:04:07.473 I/TestRunner( 4587): finished: proxyCopyIsMadeAndUsed(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:04:07.476 I/TestRunner( 4587): started: softwareDecoderExports(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:04:07.525 I/TestRunner( 4587): finished: softwareDecoderExports(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:04:07.526 I/TestRunner( 4587): started: onlineLibraryOpenverse(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:04:12.728 I/TestRunner( 4587): finished: onlineLibraryOpenverse(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:04:12.730 I/TestRunner( 4587): started: voiceOverLevelAndPreviewDucking(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:04:18.636 I/TestRunner( 4587): finished: voiceOverLevelAndPreviewDucking(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:04:18.639 I/TestRunner( 4587): started: bisectFullWithoutNewEffectsSingle(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:05:18.460 I/TestRunner( 4587): finished: bisectFullWithoutNewEffectsSingle(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:05:18.461 I/TestRunner( 4587): started: bestMomentFindsTheSharpPart(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:05:23.635 I/TestRunner( 4587): finished: bestMomentFindsTheSharpPart(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:05:23.636 I/TestRunner( 4587): started: previewPlaysTelemetry(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:05:33.744 I/TestRunner( 4587): finished: previewPlaysTelemetry(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:05:33.747 I/TestRunner( 4587): started: exportSocialEffects(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:07:26.143 I/TestRunner( 4587): finished: exportSocialEffects(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:07:26.144 I/TestRunner( 4587): started: exportTrendKit(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:09:00.167 I/TestRunner( 4587): finished: exportTrendKit(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:09:00.168 I/TestRunner( 4587): started: exportTextBehindShowThrough(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:09:22.405 I/TestRunner( 4587): finished: exportTextBehindShowThrough(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:09:22.406 I/TestRunner( 4587): started: timelapseWithTrails(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:09:36.401 I/TestRunner( 4587): finished: timelapseWithTrails(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:09:36.403 I/TestRunner( 4587): started: exportDuckingAndLoudness(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:09:41.396 I/TestRunner( 4587): finished: exportDuckingAndLoudness(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:09:41.398 I/TestRunner( 4587): started: overlaidVideoStretchRendersAndPlays(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:09:53.990 I/TestRunner( 4587): finished: overlaidVideoStretchRendersAndPlays(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:09:53.991 I/TestRunner( 4587): started: precisePersonCutoutOrFallback(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:13:03.580 I/TestRunner( 4587): finished: precisePersonCutoutOrFallback(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:13:03.581 I/TestRunner( 4587): started: exportDatamosh(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:13:31.710 I/TestRunner( 4587): finished: exportDatamosh(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:13:31.712 I/TestRunner( 4587): started: maskPassInExport(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:14:05.348 I/TestRunner( 4587): finished: maskPassInExport(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:14:05.349 I/TestRunner( 4587): started: exportFollowsTheMixer(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:14:18.266 I/TestRunner( 4587): finished: exportFollowsTheMixer(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:14:18.268 I/TestRunner( 4587): started: redactAnalyzesAndExports(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:15:24.878 I/TestRunner( 4587): finished: redactAnalyzesAndExports(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:15:24.879 I/TestRunner( 4587): started: whisperTranscribes(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:15:36.399 I/TestRunner( 4587): finished: whisperTranscribes(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:15:36.400 I/TestRunner( 4587): started: previewPlaysDatamosh(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:15:49.125 I/TestRunner( 4587): finished: previewPlaysDatamosh(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:15:49.126 I/TestRunner( 4587): started: exportVideoLayer(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:17:34.776 E/ExoPlayerImplInternal( 4587): Playback error
+11-16 19:17:34.776 E/ExoPlayerImplInternal( 4587):   androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-16 19:17:34.776 E/ExoPlayerImplInternal( 4587):       at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:1005)
+11-16 19:17:34.776 E/ExoPlayerImplInternal( 4587):       at android.os.Handler.dispatchMessage(Handler.java:102)
+11-16 19:17:34.776 E/ExoPlayerImplInternal( 4587):       at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:17:34.776 E/ExoPlayerImplInternal( 4587):       at android.os.Looper.loop(Looper.java:294)
+11-16 19:17:34.776 E/ExoPlayerImplInternal( 4587):       at android.os.HandlerThread.run(HandlerThread.java:67)
+11-16 19:17:34.776 E/ExoPlayerImplInternal( 4587):   Caused by: java.lang.IllegalStateException
+11-16 19:17:34.776 E/ExoPlayerImplInternal( 4587):       at com.google.common.base.Preconditions.checkState(Preconditions.java:497)
+11-16 19:17:34.776 E/ExoPlayerImplInternal( 4587):       at androidx.media3.transformer.AudioGraphInput.getInputBuffer(AudioGraphInput.java:238)
+11-16 19:17:34.776 E/ExoPlayerImplInternal( 4587):       at androidx.media3.transformer.SequenceAssetLoader$SampleConsumerWrapper.getInputBuffer(SequenceAssetLoader.java:531)
+11-16 19:17:34.776 E/ExoPlayerImplInternal( 4587):       at androidx.media3.transformer.ExoAssetLoaderBaseRenderer.feedConsumerFromInput(ExoAssetLoaderBaseRenderer.java:329)
+11-16 19:17:34.776 E/ExoPlayerImplInternal( 4587):       at androidx.media3.transformer.ExoAssetLoaderBaseRenderer.render(ExoAssetLoaderBaseRenderer.java:116)
+11-16 19:17:34.776 E/ExoPlayerImplInternal( 4587):       at androidx.media3.exoplayer.RendererHolder.render(RendererHolder.java:425)
+11-16 19:17:34.776 E/ExoPlayerImplInternal( 4587):       at androidx.media3.exoplayer.ExoPlayerImplInternal.doSomeWork(ExoPlayerImplInternal.java:1484)
+11-16 19:17:34.776 E/ExoPlayerImplInternal( 4587):       at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:765)
+11-16 19:17:34.776 E/ExoPlayerImplInternal( 4587):       ... 4 more
+11-16 19:17:36.273 E/ExoPlayerAssetLoader( 4587): Releasing the player timed out.
+11-16 19:17:36.273 E/ExoPlayerAssetLoader( 4587):   androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-16 19:17:36.273 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1161)
+11-16 19:17:36.273 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-16 19:17:36.273 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet$ListenerHolder.invoke(ListenerSet.java:466)
+11-16 19:17:36.273 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet.lambda$queueEvent$0(ListenerSet.java:334)
+11-16 19:17:36.273 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+11-16 19:17:36.273 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet.flushEvents(ListenerSet.java:358)
+11-16 19:17:36.273 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet.sendEvent(ListenerSet.java:386)
+11-16 19:17:36.273 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1157)
+11-16 19:17:36.273 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.transformer.ExoPlayerAssetLoader.release(ExoPlayerAssetLoader.java:352)
+11-16 19:17:36.273 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.transformer.SequenceAssetLoader.release(SequenceAssetLoader.java:208)
+11-16 19:17:36.273 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.transformer.TransformerInternal.endInternal(TransformerInternal.java:473)
+11-16 19:17:36.273 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.transformer.TransformerInternal.handleMessage(TransformerInternal.java:391)
+11-16 19:17:36.273 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.transformer.TransformerInternal.$r8$lambda$bzZKK-tnQO9QOb4NEtMsm46hw_4(Unknown Source:0)
+11-16 19:17:36.273 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.transformer.TransformerInternal$$ExternalSyntheticLambda0.handleMessage(D8$$SyntheticClass:0)
+11-16 19:17:36.273 E/ExoPlayerAssetLoader( 4587):       at android.os.Handler.dispatchMessage(Handler.java:102)
+11-16 19:17:36.273 E/ExoPlayerAssetLoader( 4587):       at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:17:36.273 E/ExoPlayerAssetLoader( 4587):       at android.os.Looper.loop(Looper.java:294)
+11-16 19:17:36.273 E/ExoPlayerAssetLoader( 4587):       at android.os.HandlerThread.run(HandlerThread.java:67)
+11-16 19:17:36.273 E/ExoPlayerAssetLoader( 4587):   Caused by: androidx.media3.exoplayer.ExoTimeoutException: Player release timed out.
+11-16 19:17:36.273 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+11-16 19:17:36.273 E/ExoPlayerAssetLoader( 4587):       ... 17 more
+11-16 19:17:36.775 E/ExoPlayerAssetLoader( 4587): Releasing the player timed out.
+11-16 19:17:36.775 E/ExoPlayerAssetLoader( 4587):   androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-16 19:17:36.775 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1161)
+11-16 19:17:36.775 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-16 19:17:36.775 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet$ListenerHolder.invoke(ListenerSet.java:466)
+11-16 19:17:36.775 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet.lambda$queueEvent$0(ListenerSet.java:334)
+11-16 19:17:36.775 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+11-16 19:17:36.775 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet.flushEvents(ListenerSet.java:358)
+11-16 19:17:36.775 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet.sendEvent(ListenerSet.java:386)
+11-16 19:17:36.775 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1157)
+11-16 19:17:36.775 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.transformer.ExoPlayerAssetLoader.release(ExoPlayerAssetLoader.java:352)
+11-16 19:17:36.775 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.transformer.SequenceAssetLoader.release(SequenceAssetLoader.java:208)
+11-16 19:17:36.775 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.transformer.TransformerInternal.endInternal(TransformerInternal.java:473)
+11-16 19:17:36.775 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.transformer.TransformerInternal.handleMessage(TransformerInternal.java:391)
+11-16 19:17:36.775 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.transformer.TransformerInternal.$r8$lambda$bzZKK-tnQO9QOb4NEtMsm46hw_4(Unknown Source:0)
+11-16 19:17:36.775 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.transformer.TransformerInternal$$ExternalSyntheticLambda0.handleMessage(D8$$SyntheticClass:0)
+11-16 19:17:36.775 E/ExoPlayerAssetLoader( 4587):       at android.os.Handler.dispatchMessage(Handler.java:102)
+11-16 19:17:36.775 E/ExoPlayerAssetLoader( 4587):       at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:17:36.775 E/ExoPlayerAssetLoader( 4587):       at android.os.Looper.loop(Looper.java:294)
+11-16 19:17:36.775 E/ExoPlayerAssetLoader( 4587):       at android.os.HandlerThread.run(HandlerThread.java:67)
+11-16 19:17:36.775 E/ExoPlayerAssetLoader( 4587):   Caused by: androidx.media3.exoplayer.ExoTimeoutException: Player release timed out.
+11-16 19:17:36.775 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+11-16 19:17:36.775 E/ExoPlayerAssetLoader( 4587):       ... 17 more
+11-16 19:17:45.389 E/MediaCodec( 4587): queueCSDInputBuffer failed w/ error -2147483648
+11-16 19:17:45.393 D/DefaultCodec( 4587):   android.media.MediaCodec$CodecException: 
+11-16 19:17:45.405 E/ExoPlayerImplInternal( 4587): Playback error
+11-16 19:17:45.405 E/ExoPlayerImplInternal( 4587):   androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-16 19:17:45.405 E/ExoPlayerImplInternal( 4587):       at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:1005)
+11-16 19:17:45.405 E/ExoPlayerImplInternal( 4587):       at android.os.Handler.dispatchMessage(Handler.java:102)
+11-16 19:17:45.405 E/ExoPlayerImplInternal( 4587):       at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:17:45.405 E/ExoPlayerImplInternal( 4587):       at android.os.Looper.loop(Looper.java:294)
+11-16 19:17:45.405 E/ExoPlayerImplInternal( 4587):       at android.os.HandlerThread.run(HandlerThread.java:67)
+11-16 19:17:45.405 E/ExoPlayerImplInternal( 4587):   Caused by: java.lang.IllegalStateException
+11-16 19:17:45.405 E/ExoPlayerImplInternal( 4587):       at com.google.common.base.Preconditions.checkState(Preconditions.java:497)
+11-16 19:17:45.405 E/ExoPlayerImplInternal( 4587):       at androidx.media3.transformer.AudioGraphInput.getInputBuffer(AudioGraphInput.java:238)
+11-16 19:17:45.405 E/ExoPlayerImplInternal( 4587):       at androidx.media3.transformer.SequenceAssetLoader$SampleConsumerWrapper.getInputBuffer(SequenceAssetLoader.java:531)
+11-16 19:17:45.405 E/ExoPlayerImplInternal( 4587):       at androidx.media3.transformer.ExoAssetLoaderBaseRenderer.feedConsumerFromInput(ExoAssetLoaderBaseRenderer.java:329)
+11-16 19:17:45.405 E/ExoPlayerImplInternal( 4587):       at androidx.media3.transformer.ExoAssetLoaderBaseRenderer.render(ExoAssetLoaderBaseRenderer.java:116)
+11-16 19:17:45.405 E/ExoPlayerImplInternal( 4587):       at androidx.media3.exoplayer.RendererHolder.render(RendererHolder.java:425)
+11-16 19:17:45.405 E/ExoPlayerImplInternal( 4587):       at androidx.media3.exoplayer.ExoPlayerImplInternal.doSomeWork(ExoPlayerImplInternal.java:1484)
+11-16 19:17:45.405 E/ExoPlayerImplInternal( 4587):       at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:765)
+11-16 19:17:45.405 E/ExoPlayerImplInternal( 4587):       ... 4 more
+11-16 19:17:45.583 E/MediaCodec( 4587): Codec reported err 0xe/14 (Unknown error -14), actionCode 0, while in state 6/STARTED
+11-16 19:17:45.584 E/MediaCodec( 4587): Codec reported err 0xe/14 (Unknown error -14), actionCode 0, while in state 6/STARTED
+11-16 19:17:45.585 E/MediaCodec( 4587): Codec reported err 0xe/14 (Unknown error -14), actionCode 0, while in state 6/STARTED
+11-16 19:17:45.585 E/MediaCodec( 4587): Codec reported err 0xe/14 (Unknown error -14), actionCode 0, while in state 6/STARTED
+11-16 19:17:45.587 E/MediaCodec( 4587): Invalid to call at Released state; only valid in executing state
+11-16 19:17:45.589 E/MediaCodec( 4587): Invalid to call at Released state; only valid in executing state
+11-16 19:17:45.589 E/MediaCodec( 4587): Invalid to call at Released state; only valid in executing state
+11-16 19:17:45.590 W/TransformerInternal( 4587):   androidx.media3.transformer.ExportException: Codec exception: CodecInfo{type=VideoDecoder, configurationFormat={exo-pixel-width-height-ratio-float=1.0, sar-width=1, allow-frame-drop=0, mime=video/avc, bitrate=189605, color-standard=1, color-transfer=3, sar-height=1, is-autoselect=0, is-default=0, color-range=2, frame-rate=30.0, max-input-size=13015, rotation-degrees=0, height=360, track-id=2, is-forced-subtitle=0, level=4096, profile=1, codecs-string=avc1.42C029, csd-1=java.nio.HeapByteBuffer[pos=0 lim=10 cap=10], encoder-delay=0, width=640, encoder-padding=0, csd-0=java.nio.HeapByteBuffer[pos=0 lim=22 cap=22]}, name=c2.goldfish.h264.decoder}
+11-16 19:17:45.590 W/TransformerInternal( 4587):       at androidx.media3.transformer.DefaultCodec.createExportException(DefaultCodec.java:487)
+11-16 19:17:45.590 W/TransformerInternal( 4587):       at androidx.media3.transformer.DefaultCodec.createExportException(DefaultCodec.java:465)
+11-16 19:17:45.592 E/MediaCodec( 4587): Invalid to call at Released state; only valid in executing state
+11-16 19:17:45.600 W/TransformerInternal( 4587):   androidx.media3.transformer.ExportException: Codec exception: CodecInfo{type=VideoDecoder, configurationFormat={exo-pixel-width-height-ratio-float=1.0, sar-width=1, allow-frame-drop=0, mime=video/avc, bitrate=208928, color-standard=1, color-transfer=3, sar-height=1, is-autoselect=0, is-default=0, color-range=2, frame-rate=30.0, max-input-size=13810, rotation-degrees=0, height=360, track-id=2, is-forced-subtitle=0, level=4096, profile=1, codecs-string=avc1.42C029, csd-1=java.nio.HeapByteBuffer[pos=0 lim=10 cap=10], encoder-delay=0, width=640, encoder-padding=0, csd-0=java.nio.HeapByteBuffer[pos=0 lim=22 cap=22]}, name=c2.goldfish.h264.decoder}
+11-16 19:17:45.600 W/TransformerInternal( 4587):       at androidx.media3.transformer.DefaultCodec.createExportException(DefaultCodec.java:487)
+11-16 19:17:45.600 W/TransformerInternal( 4587):       at androidx.media3.transformer.DefaultCodec.createExportException(DefaultCodec.java:465)
+11-16 19:17:45.601 W/TransformerInternal( 4587):   androidx.media3.transformer.ExportException: Codec exception: CodecInfo{type=VideoDecoder, configurationFormat={exo-pixel-width-height-ratio-float=1.0, sar-width=1, allow-frame-drop=0, mime=video/avc, bitrate=208928, color-standard=1, color-transfer=3, sar-height=1, is-autoselect=0, is-default=0, color-range=2, frame-rate=30.0, max-input-size=13810, rotation-degrees=0, height=360, track-id=2, is-forced-subtitle=0, level=4096, profile=1, codecs-string=avc1.42C029, csd-1=java.nio.HeapByteBuffer[pos=0 lim=10 cap=10], encoder-delay=0, width=640, encoder-padding=0, csd-0=java.nio.HeapByteBuffer[pos=0 lim=22 cap=22]}, name=c2.goldfish.h264.decoder}
+11-16 19:17:45.601 W/TransformerInternal( 4587):       at androidx.media3.transformer.DefaultCodec.createExportException(DefaultCodec.java:487)
+11-16 19:17:45.601 W/TransformerInternal( 4587):       at androidx.media3.transformer.DefaultCodec.createExportException(DefaultCodec.java:465)
+11-16 19:17:45.602 W/TransformerInternal( 4587):   androidx.media3.transformer.ExportException: Codec exception: CodecInfo{type=VideoDecoder, configurationFormat={exo-pixel-width-height-ratio-float=1.0, sar-width=1, allow-frame-drop=0, mime=video/avc, bitrate=196685, color-standard=1, color-transfer=3, sar-height=1, is-autoselect=0, is-default=0, color-range=2, frame-rate=30.0, max-input-size=13361, rotation-degrees=0, height=360, track-id=2, is-forced-subtitle=0, level=4096, profile=1, codecs-string=avc1.42C029, csd-1=java.nio.HeapByteBuffer[pos=0 lim=10 cap=10], encoder-delay=0, width=640, encoder-padding=0, csd-0=java.nio.HeapByteBuffer[pos=0 lim=22 cap=22]}, name=c2.goldfish.h264.decoder}
+11-16 19:17:45.602 W/TransformerInternal( 4587):       at androidx.media3.transformer.DefaultCodec.createExportException(DefaultCodec.java:487)
+11-16 19:17:45.602 W/TransformerInternal( 4587):       at androidx.media3.transformer.DefaultCodec.createExportException(DefaultCodec.java:465)
+11-16 19:22:22.093 I/TestRunner( 4587): finished: exportVideoLayer(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:22:22.094 I/TestRunner( 4587): started: collageVideoAndImage(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:22:35.653 I/TestRunner( 4587): finished: collageVideoAndImage(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:22:35.654 I/TestRunner( 4587): started: reverseClip(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:22:40.571 E/MediaCodec( 4587): Released by resource manager
+11-16 19:22:56.687 I/TestRunner( 4587): finished: reverseClip(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:22:56.688 I/TestRunner( 4587): started: exportWowTransitionsAndTexts(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:27:39.514 W/TransformerInternal( 4587):   androidx.media3.transformer.ExportException: Video frame processing error
+11-16 19:27:39.514 W/TransformerInternal( 4587):   Caused by: androidx.media3.common.VideoFrameProcessingException: Release timed out. OpenGL resources may not be cleaned up properly. @UNSET
+11-16 19:27:39.532 E/ExoPlayerImplInternal( 4587): Playback error
+11-16 19:27:39.532 E/ExoPlayerImplInternal( 4587):   androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-16 19:27:39.532 E/ExoPlayerImplInternal( 4587):       at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:1005)
+11-16 19:27:39.532 E/ExoPlayerImplInternal( 4587):       at android.os.Handler.dispatchMessage(Handler.java:102)
+11-16 19:27:39.532 E/ExoPlayerImplInternal( 4587):       at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:27:39.532 E/ExoPlayerImplInternal( 4587):       at android.os.Looper.loop(Looper.java:294)
+11-16 19:27:39.532 E/ExoPlayerImplInternal( 4587):       at android.os.HandlerThread.run(HandlerThread.java:67)
+11-16 19:27:39.532 E/ExoPlayerImplInternal( 4587):   Caused by: java.lang.IllegalStateException
+11-16 19:27:39.532 E/ExoPlayerImplInternal( 4587):       at com.google.common.base.Preconditions.checkState(Preconditions.java:497)
+11-16 19:27:39.532 E/ExoPlayerImplInternal( 4587):       at androidx.media3.transformer.AudioGraphInput.getInputBuffer(AudioGraphInput.java:238)
+11-16 19:27:39.532 E/ExoPlayerImplInternal( 4587):       at androidx.media3.transformer.SequenceAssetLoader$SampleConsumerWrapper.getInputBuffer(SequenceAssetLoader.java:531)
+11-16 19:27:39.532 E/ExoPlayerImplInternal( 4587):       at androidx.media3.transformer.ExoAssetLoaderBaseRenderer.feedConsumerFromInput(ExoAssetLoaderBaseRenderer.java:329)
+11-16 19:27:39.532 E/ExoPlayerImplInternal( 4587):       at androidx.media3.transformer.ExoAssetLoaderBaseRenderer.render(ExoAssetLoaderBaseRenderer.java:116)
+11-16 19:27:39.532 E/ExoPlayerImplInternal( 4587):       at androidx.media3.exoplayer.RendererHolder.render(RendererHolder.java:425)
+11-16 19:27:39.532 E/ExoPlayerImplInternal( 4587):       at androidx.media3.exoplayer.ExoPlayerImplInternal.doSomeWork(ExoPlayerImplInternal.java:1484)
+11-16 19:27:39.532 E/ExoPlayerImplInternal( 4587):       at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:765)
+11-16 19:27:39.532 E/ExoPlayerImplInternal( 4587):       ... 4 more
+11-16 19:35:49.286 E/ExoPlayerImplInternal( 4587): Playback error
+11-16 19:35:49.286 E/ExoPlayerImplInternal( 4587):   androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-16 19:35:49.286 E/ExoPlayerImplInternal( 4587):       at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:1005)
+11-16 19:35:49.286 E/ExoPlayerImplInternal( 4587):       at android.os.Handler.dispatchMessage(Handler.java:102)
+11-16 19:35:49.286 E/ExoPlayerImplInternal( 4587):       at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:35:49.286 E/ExoPlayerImplInternal( 4587):       at android.os.Looper.loop(Looper.java:294)
+11-16 19:35:49.286 E/ExoPlayerImplInternal( 4587):       at android.os.HandlerThread.run(HandlerThread.java:67)
+11-16 19:35:49.286 E/ExoPlayerImplInternal( 4587):   Caused by: java.lang.IllegalStateException
+11-16 19:35:49.286 E/ExoPlayerImplInternal( 4587):       at com.google.common.base.Preconditions.checkState(Preconditions.java:497)
+11-16 19:35:49.286 E/ExoPlayerImplInternal( 4587):       at androidx.media3.transformer.AudioGraphInput.getInputBuffer(AudioGraphInput.java:238)
+11-16 19:35:49.286 E/ExoPlayerImplInternal( 4587):       at androidx.media3.transformer.SequenceAssetLoader$SampleConsumerWrapper.getInputBuffer(SequenceAssetLoader.java:531)
+11-16 19:35:49.286 E/ExoPlayerImplInternal( 4587):       at androidx.media3.transformer.ExoAssetLoaderBaseRenderer.feedConsumerFromInput(ExoAssetLoaderBaseRenderer.java:329)
+11-16 19:35:49.286 E/ExoPlayerImplInternal( 4587):       at androidx.media3.transformer.ExoAssetLoaderBaseRenderer.render(ExoAssetLoaderBaseRenderer.java:116)
+11-16 19:35:49.286 E/ExoPlayerImplInternal( 4587):       at androidx.media3.exoplayer.RendererHolder.render(RendererHolder.java:425)
+11-16 19:35:49.286 E/ExoPlayerImplInternal( 4587):       at androidx.media3.exoplayer.ExoPlayerImplInternal.doSomeWork(ExoPlayerImplInternal.java:1484)
+11-16 19:35:49.286 E/ExoPlayerImplInternal( 4587):       at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:765)
+11-16 19:35:49.286 E/ExoPlayerImplInternal( 4587):       ... 4 more
+11-16 19:39:11.561 E/ExoPlayerAssetLoader( 4587): Releasing the player timed out.
+11-16 19:39:11.561 E/ExoPlayerAssetLoader( 4587):   androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-16 19:39:11.561 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1161)
+11-16 19:39:11.561 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-16 19:39:11.561 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet$ListenerHolder.invoke(ListenerSet.java:466)
+11-16 19:39:11.561 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet.lambda$queueEvent$0(ListenerSet.java:334)
+11-16 19:39:11.561 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+11-16 19:39:11.561 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet.flushEvents(ListenerSet.java:358)
+11-16 19:39:11.561 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet.sendEvent(ListenerSet.java:386)
+11-16 19:39:11.561 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1157)
+11-16 19:39:11.561 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.transformer.ExoPlayerAssetLoader.release(ExoPlayerAssetLoader.java:352)
+11-16 19:39:11.561 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.transformer.SequenceAssetLoader$SampleConsumerWrapper.lambda$switchAssetLoader$0$androidx-media3-transformer-SequenceAssetLoader$SampleConsumerWrapper(SequenceAssetLoader.java:678)
+11-16 19:39:11.561 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.transformer.SequenceAssetLoader$SampleConsumerWrapper$$ExternalSyntheticLambda0.run(D8$$SyntheticClass:0)
+11-16 19:39:11.561 E/ExoPlayerAssetLoader( 4587):       at android.os.Handler.handleCallback(Handler.java:958)
+11-16 19:39:11.561 E/ExoPlayerAssetLoader( 4587):       at android.os.Handler.dispatchMessage(Handler.java:99)
+11-16 19:39:11.561 E/ExoPlayerAssetLoader( 4587):       at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:39:11.561 E/ExoPlayerAssetLoader( 4587):       at android.os.Looper.loop(Looper.java:294)
+11-16 19:39:11.561 E/ExoPlayerAssetLoader( 4587):       at android.os.HandlerThread.run(HandlerThread.java:67)
+11-16 19:39:11.561 E/ExoPlayerAssetLoader( 4587):   Caused by: androidx.media3.exoplayer.ExoTimeoutException: Player release timed out.
+11-16 19:39:11.561 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+11-16 19:39:11.561 E/ExoPlayerAssetLoader( 4587):       ... 15 more
+11-16 19:41:37.708 E/MediaCodec( 4587): Codec reported err 0xe/14 (Unknown error -14), actionCode 0, while in state 6/STARTED
+11-16 19:41:37.723 E/MediaCodec( 4587): Invalid to call at Released state; only valid in executing state
+11-16 19:41:37.729 W/TransformerInternal( 4587):   androidx.media3.transformer.ExportException: Codec exception: CodecInfo{type=VideoDecoder, configurationFormat={exo-pixel-width-height-ratio-float=1.0, sar-width=1, allow-frame-drop=0, mime=video/avc, bitrate=189605, color-standard=1, color-transfer=3, sar-height=1, is-autoselect=0, is-default=0, color-range=2, frame-rate=30.0, max-input-size=13015, rotation-degrees=0, height=360, track-id=2, is-forced-subtitle=0, level=4096, profile=1, codecs-string=avc1.42C029, csd-1=java.nio.HeapByteBuffer[pos=0 lim=10 cap=10], encoder-delay=0, width=640, encoder-padding=0, csd-0=java.nio.HeapByteBuffer[pos=0 lim=22 cap=22]}, name=c2.goldfish.h264.decoder}
+11-16 19:41:37.729 W/TransformerInternal( 4587):       at androidx.media3.transformer.DefaultCodec.createExportException(DefaultCodec.java:487)
+11-16 19:41:37.729 W/TransformerInternal( 4587):       at androidx.media3.transformer.DefaultCodec.createExportException(DefaultCodec.java:465)
+11-16 19:41:37.737 E/ExoPlayerImplInternal( 4587): Playback error
+11-16 19:41:37.737 E/ExoPlayerImplInternal( 4587):   androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-16 19:41:37.737 E/ExoPlayerImplInternal( 4587):       at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:1005)
+11-16 19:41:37.737 E/ExoPlayerImplInternal( 4587):       at android.os.Handler.dispatchMessage(Handler.java:102)
+11-16 19:41:37.737 E/ExoPlayerImplInternal( 4587):       at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:41:37.737 E/ExoPlayerImplInternal( 4587):       at android.os.Looper.loop(Looper.java:294)
+11-16 19:41:37.737 E/ExoPlayerImplInternal( 4587):       at android.os.HandlerThread.run(HandlerThread.java:67)
+11-16 19:41:37.737 E/ExoPlayerImplInternal( 4587):   Caused by: java.lang.IllegalStateException
+11-16 19:41:37.737 E/ExoPlayerImplInternal( 4587):       at com.google.common.base.Preconditions.checkState(Preconditions.java:497)
+11-16 19:41:37.737 E/ExoPlayerImplInternal( 4587):       at androidx.media3.transformer.AudioGraphInput.getInputBuffer(AudioGraphInput.java:238)
+11-16 19:41:37.737 E/ExoPlayerImplInternal( 4587):       at androidx.media3.transformer.SequenceAssetLoader$SampleConsumerWrapper.getInputBuffer(SequenceAssetLoader.java:531)
+11-16 19:41:37.737 E/ExoPlayerImplInternal( 4587):       at androidx.media3.transformer.ExoAssetLoaderBaseRenderer.feedConsumerFromInput(ExoAssetLoaderBaseRenderer.java:329)
+11-16 19:41:37.737 E/ExoPlayerImplInternal( 4587):       at androidx.media3.transformer.ExoAssetLoaderBaseRenderer.render(ExoAssetLoaderBaseRenderer.java:116)
+11-16 19:41:37.737 E/ExoPlayerImplInternal( 4587):       at androidx.media3.exoplayer.RendererHolder.render(RendererHolder.java:425)
+11-16 19:41:37.737 E/ExoPlayerImplInternal( 4587):       at androidx.media3.exoplayer.ExoPlayerImplInternal.doSomeWork(ExoPlayerImplInternal.java:1484)
+11-16 19:41:37.737 E/ExoPlayerImplInternal( 4587):       at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:765)
+11-16 19:41:37.737 E/ExoPlayerImplInternal( 4587):       ... 4 more
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587): Releasing the player timed out.
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):   androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1161)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet$ListenerHolder.invoke(ListenerSet.java:466)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet.lambda$queueEvent$0(ListenerSet.java:334)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet.flushEvents(ListenerSet.java:358)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet.sendEvent(ListenerSet.java:386)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1157)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.transformer.ExoPlayerAssetLoader.release(ExoPlayerAssetLoader.java:352)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.transformer.SequenceAssetLoader$SampleConsumerWrapper.lambda$switchAssetLoader$0$androidx-media3-transformer-SequenceAssetLoader$SampleConsumerWrapper(SequenceAssetLoader.java:678)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.transformer.SequenceAssetLoader$SampleConsumerWrapper$$ExternalSyntheticLambda0.run(D8$$SyntheticClass:0)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at android.os.Handler.handleCallback(Handler.java:958)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at android.os.Handler.dispatchMessage(Handler.java:99)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at android.os.Looper.loop(Looper.java:294)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at android.os.HandlerThread.run(HandlerThread.java:67)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):   Caused by: androidx.media3.exoplayer.ExoTimeoutException: Player release timed out.
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       ... 15 more
+11-16 19:42:11.543 E/MediaCodec( 4587): nativeWindowConnect returned an error: Invalid argument (-22)
+11-16 19:42:11.543 E/MediaCodec( 4587): configure failed with err 0xffffffea, resetting...
+11-16 19:42:13.699 E/TestRunner( 4587): failed: exportWowTransitionsAndTexts(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:42:13.703 E/TestRunner( 4587): ----- begin exception -----
+11-16 19:42:13.703 E/TestRunner( 4587): java.lang.AssertionError: esportazione fallita: Errore 3003 (ERROR_CODE_DECODING_FORMAT_UNSUPPORTED)
+11-16 19:42:13.703 E/TestRunner( 4587): Causa: IllegalArgumentException: 
+11-16 19:42:13.703 E/TestRunner( 4587): 
+11-16 19:42:13.703 E/TestRunner( 4587): Tentativi:
+11-16 19:42:13.703 E/TestRunner( 4587): • qualità piena, 10 Mbps: ERROR_CODE_MUXING_TIMEOUT
+11-16 19:42:13.703 E/TestRunner( 4587): • qualità piena: ERROR_CODE_MUXING_TIMEOUT
+11-16 19:42:13.703 E/TestRunner( 4587): • massima velocità, 10 Mbps: ERROR_CODE_DECODING_FORMAT_UNSUPPORTED
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.Assert.fail(Assert.java:89)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at it.fabriziodavi.vivovideo.DeviceTest.exportAndCheckUri(DeviceTest.kt:568)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at it.fabriziodavi.vivovideo.DeviceTest.exportAndCheck(DeviceTest.kt:547)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at it.fabriziodavi.vivovideo.DeviceTest.exportAndCheck$default(DeviceTest.kt:547)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at it.fabriziodavi.vivovideo.DeviceTest.exportWowTransitionsAndTexts(DeviceTest.kt:530)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at java.lang.reflect.Method.invoke(Native Method)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at it.fabriziodavi.vivovideo.DeviceTest$retry$1$1.evaluate(DeviceTest.kt:158)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.BlockJUnit4ClassRunner$1.evaluate(BlockJUnit4ClassRunner.java:100)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:366)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:103)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:63)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at androidx.test.ext.junit.runners.AndroidJUnit4.run(AndroidJUnit4.java:162)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.Suite.runChild(Suite.java:128)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.Suite.runChild(Suite.java:27)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at androidx.test.internal.runner.TestExecutor.execute(TestExecutor.java:68)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at androidx.test.internal.runner.TestExecutor.execute(TestExecutor.java:59)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at androidx.test.runner.AndroidJUnitRunner.onStart(AndroidJUnitRunner.java:463)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at android.app.Instrumentation$InstrumentationThread.run(Instrumentation.java:2402)
+11-16 19:42:13.705 E/TestRunner( 4587): ----- end exception -----
+11-16 19:42:13.710 I/TestRunner( 4587): finished: exportWowTransitionsAndTexts(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:42:13.725 I/TestRunner( 4587): started: previewPlaysWow(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:42:29.269 E/CompositionPlayer-0( 4587): playerFailed [eventTime=15.50, mediaPos=5.41, window=0, period=1, errorCode=ERROR_CODE_TIMEOUT
+11-16 19:42:29.269 E/CompositionPlayer-0( 4587):   androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-16 19:42:29.269 E/CompositionPlayer-0( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1161)
+11-16 19:42:29.269 E/CompositionPlayer-0( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-16 19:42:29.269 E/CompositionPlayer-0( 4587):       at androidx.media3.common.util.ListenerSet$ListenerHolder.invoke(ListenerSet.java:466)
+11-16 19:42:29.269 E/CompositionPlayer-0( 4587):       at androidx.media3.common.util.ListenerSet.lambda$queueEvent$0(ListenerSet.java:334)
+11-16 19:42:29.269 E/CompositionPlayer-0( 4587):       at androidx.media3.common.util.ListenerSet$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+11-16 19:42:29.269 E/CompositionPlayer-0( 4587):       at androidx.media3.common.util.ListenerSet.flushEvents(ListenerSet.java:358)
+11-16 19:42:29.269 E/CompositionPlayer-0( 4587):       at androidx.media3.common.util.ListenerSet.sendEvent(ListenerSet.java:386)
+11-16 19:42:29.269 E/CompositionPlayer-0( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1157)
+11-16 19:42:29.269 E/CompositionPlayer-0( 4587):       at androidx.media3.transformer.CompositionPlayer$SequencePlayerHolder.release(CompositionPlayer.java:2400)
+11-16 19:42:29.269 E/CompositionPlayer-0( 4587):       at androidx.media3.transformer.CompositionPlayer$SequencePlayerHolder.access$2300(CompositionPlayer.java:2352)
+11-16 19:42:29.269 E/CompositionPlayer-0( 4587):       at androidx.media3.transformer.CompositionPlayer.handleRelease(CompositionPlayer.java:1091)
+11-16 19:42:29.269 E/CompositionPlayer-0( 4587):       at androidx.media3.common.SimpleBasePlayer.release(SimpleBasePlayer.java:2656)
+11-16 19:42:29.269 E/CompositionPlayer-0( 4587):       at it.fabriziodavi.vivovideo.DeviceTest.playFor$lambda$5(DeviceTest.kt:791)
+11-16 19:42:29.269 E/CompositionPlayer-0( 4587):       at it.fabriziodavi.vivovideo.DeviceTest.$r8$lambda$JG3Pa8ySzUtBzE_ZlBfqfHf_daA(Unknown Source:0)
+11-16 19:42:29.269 E/CompositionPlayer-0( 4587):       at it.fabriziodavi.vivovideo.DeviceTest$$ExternalSyntheticLambda21.run(D8$$SyntheticClass:0)
+11-16 19:42:29.269 E/CompositionPlayer-0( 4587):       at android.os.Handler.handleCallback(Handler.java:958)
+11-16 19:42:29.269 E/CompositionPlayer-0( 4587):       at android.os.Handler.dispatchMessage(Handler.java:99)
+11-16 19:42:29.269 E/CompositionPlayer-0( 4587):       at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:42:29.269 E/CompositionPlayer-0( 4587):       at android.os.Looper.loop(Looper.java:294)
+11-16 19:42:29.269 E/CompositionPlayer-0( 4587):       at android.app.ActivityThread.main(ActivityThread.java:8177)
+11-16 19:42:29.269 E/CompositionPlayer-0( 4587):       at java.lang.reflect.Method.invoke(Native Method)
+11-16 19:42:29.269 E/CompositionPlayer-0( 4587):       at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:552)
+11-16 19:42:29.269 E/CompositionPlayer-0( 4587):       at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:971)
+11-16 19:42:29.269 E/CompositionPlayer-0( 4587):   Caused by: androidx.media3.exoplayer.ExoTimeoutException: Player release timed out.
+11-16 19:42:29.269 E/CompositionPlayer-0( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+11-16 19:42:29.269 E/CompositionPlayer-0( 4587):       ... 22 more
+11-16 19:42:29.269 E/CompositionPlayer-0( 4587): ]
+11-16 19:42:29.272 E/CompositionPlayer( 4587): playerFailed [eventTime=15.51, mediaPos=5.41, window=0, errorCode=ERROR_CODE_TIMEOUT
+11-16 19:42:29.272 E/CompositionPlayer( 4587):   androidx.media3.common.PlaybackException: error from player 0
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       at androidx.media3.transformer.CompositionPlayer.maybeUpdatePlaybackError(CompositionPlayer.java:2040)
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       at androidx.media3.transformer.CompositionPlayer.access$3300(CompositionPlayer.java:165)
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       at androidx.media3.transformer.CompositionPlayer$PlayerListener.onPlayerError(CompositionPlayer.java:2319)
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       at androidx.media3.common.util.ListenerSet$ListenerHolder.invoke(ListenerSet.java:466)
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       at androidx.media3.common.util.ListenerSet.lambda$queueEvent$0(ListenerSet.java:334)
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       at androidx.media3.common.util.ListenerSet$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       at androidx.media3.common.util.ListenerSet.flushEvents(ListenerSet.java:358)
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       at androidx.media3.common.util.ListenerSet.sendEvent(ListenerSet.java:386)
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1157)
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       at androidx.media3.transformer.CompositionPlayer$SequencePlayerHolder.release(CompositionPlayer.java:2400)
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       at androidx.media3.transformer.CompositionPlayer$SequencePlayerHolder.access$2300(CompositionPlayer.java:2352)
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       at androidx.media3.transformer.CompositionPlayer.handleRelease(CompositionPlayer.java:1091)
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       at androidx.media3.common.SimpleBasePlayer.release(SimpleBasePlayer.java:2656)
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       at it.fabriziodavi.vivovideo.DeviceTest.playFor$lambda$5(DeviceTest.kt:791)
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       at it.fabriziodavi.vivovideo.DeviceTest.$r8$lambda$JG3Pa8ySzUtBzE_ZlBfqfHf_daA(Unknown Source:0)
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       at it.fabriziodavi.vivovideo.DeviceTest$$ExternalSyntheticLambda21.run(D8$$SyntheticClass:0)
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       at android.os.Handler.handleCallback(Handler.java:958)
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       at android.os.Handler.dispatchMessage(Handler.java:99)
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       at android.os.Looper.loop(Looper.java:294)
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       at android.app.ActivityThread.main(ActivityThread.java:8177)
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       at java.lang.reflect.Method.invoke(Native Method)
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:552)
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:971)
+11-16 19:42:29.272 E/CompositionPlayer( 4587):   Caused by: androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1161)
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       ... 22 more
+11-16 19:42:29.272 E/CompositionPlayer( 4587):   Caused by: androidx.media3.exoplayer.ExoTimeoutException: Player release timed out.
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       ... 22 more
+11-16 19:42:29.272 E/CompositionPlayer( 4587): ]
+11-16 19:42:29.777 E/CompositionPlayer( 4587): playerFailed [eventTime=16.02, mediaPos=0.00, window=0, errorCode=ERROR_CODE_TIMEOUT
+11-16 19:42:29.777 E/CompositionPlayer( 4587):   androidx.media3.common.PlaybackException: InternalPlayer release timeout
+11-16 19:42:29.777 E/CompositionPlayer( 4587):       at androidx.media3.transformer.CompositionPlayer.handleRelease(CompositionPlayer.java:1125)
+11-16 19:42:29.777 E/CompositionPlayer( 4587):       at androidx.media3.common.SimpleBasePlayer.release(SimpleBasePlayer.java:2656)
+11-16 19:42:29.777 E/CompositionPlayer( 4587):       at it.fabriziodavi.vivovideo.DeviceTest.playFor$lambda$5(DeviceTest.kt:791)
+11-16 19:42:29.777 E/CompositionPlayer( 4587):       at it.fabriziodavi.vivovideo.DeviceTest.$r8$lambda$JG3Pa8ySzUtBzE_ZlBfqfHf_daA(Unknown Source:0)
+11-16 19:42:29.777 E/CompositionPlayer( 4587):       at it.fabriziodavi.vivovideo.DeviceTest$$ExternalSyntheticLambda21.run(D8$$SyntheticClass:0)
+11-16 19:42:29.777 E/CompositionPlayer( 4587):       at android.os.Handler.handleCallback(Handler.java:958)
+11-16 19:42:29.777 E/CompositionPlayer( 4587):       at android.os.Handler.dispatchMessage(Handler.java:99)
+11-16 19:42:29.777 E/CompositionPlayer( 4587):       at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:42:29.777 E/CompositionPlayer( 4587):       at android.os.Looper.loop(Looper.java:294)
+11-16 19:42:29.777 E/CompositionPlayer( 4587):       at android.app.ActivityThread.main(ActivityThread.java:8177)
+11-16 19:42:29.777 E/CompositionPlayer( 4587):       at java.lang.reflect.Method.invoke(Native Method)
+11-16 19:42:29.777 E/CompositionPlayer( 4587):       at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:552)
+11-16 19:42:29.777 E/CompositionPlayer( 4587):       at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:971)
+11-16 19:42:29.777 E/CompositionPlayer( 4587): ]
+11-16 19:42:48.520 E/CompositionPlayer-0( 4587): playerFailed [eventTime=18.73, mediaPos=5.72, window=0, period=1, errorCode=ERROR_CODE_TIMEOUT
+11-16 19:42:48.520 E/CompositionPlayer-0( 4587):   androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-16 19:42:48.520 E/CompositionPlayer-0( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1161)
+11-16 19:42:48.520 E/CompositionPlayer-0( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-16 19:42:48.520 E/CompositionPlayer-0( 4587):       at androidx.media3.common.util.ListenerSet$ListenerHolder.invoke(ListenerSet.java:466)
+11-16 19:42:48.520 E/CompositionPlayer-0( 4587):       at androidx.media3.common.util.ListenerSet.lambda$queueEvent$0(ListenerSet.java:334)
+11-16 19:42:48.520 E/CompositionPlayer-0( 4587):       at androidx.media3.common.util.ListenerSet$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+11-16 19:42:48.520 E/CompositionPlayer-0( 4587):       at androidx.media3.common.util.ListenerSet.flushEvents(ListenerSet.java:358)
+11-16 19:42:48.520 E/CompositionPlayer-0( 4587):       at androidx.media3.common.util.ListenerSet.sendEvent(ListenerSet.java:386)
+11-16 19:42:48.520 E/CompositionPlayer-0( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1157)
+11-16 19:42:48.520 E/CompositionPlayer-0( 4587):       at androidx.media3.transformer.CompositionPlayer$SequencePlayerHolder.release(CompositionPlayer.java:2400)
+11-16 19:42:48.520 E/CompositionPlayer-0( 4587):       at androidx.media3.transformer.CompositionPlayer$SequencePlayerHolder.access$2300(CompositionPlayer.java:2352)
+11-16 19:42:48.520 E/CompositionPlayer-0( 4587):       at androidx.media3.transformer.CompositionPlayer.handleRelease(CompositionPlayer.java:1091)
+11-16 19:42:48.520 E/CompositionPlayer-0( 4587):       at androidx.media3.common.SimpleBasePlayer.release(SimpleBasePlayer.java:2656)
+11-16 19:42:48.520 E/CompositionPlayer-0( 4587):       at it.fabriziodavi.vivovideo.DeviceTest.playFor$lambda$5(DeviceTest.kt:791)
+11-16 19:42:48.520 E/CompositionPlayer-0( 4587):       at it.fabriziodavi.vivovideo.DeviceTest.$r8$lambda$JG3Pa8ySzUtBzE_ZlBfqfHf_daA(Unknown Source:0)
+11-16 19:42:48.520 E/CompositionPlayer-0( 4587):       at it.fabriziodavi.vivovideo.DeviceTest$$ExternalSyntheticLambda21.run(D8$$SyntheticClass:0)
+11-16 19:42:48.520 E/CompositionPlayer-0( 4587):       at android.os.Handler.handleCallback(Handler.java:958)
+11-16 19:42:48.520 E/CompositionPlayer-0( 4587):       at android.os.Handler.dispatchMessage(Handler.java:99)
+11-16 19:42:48.520 E/CompositionPlayer-0( 4587):       at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:42:48.520 E/CompositionPlayer-0( 4587):       at android.os.Looper.loop(Looper.java:294)
+11-16 19:42:48.520 E/CompositionPlayer-0( 4587):       at android.app.ActivityThread.main(ActivityThread.java:8177)
+11-16 19:42:48.520 E/CompositionPlayer-0( 4587):       at java.lang.reflect.Method.invoke(Native Method)
+11-16 19:42:48.520 E/CompositionPlayer-0( 4587):       at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:552)
+11-16 19:42:48.520 E/CompositionPlayer-0( 4587):       at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:971)
+11-16 19:42:48.520 E/CompositionPlayer-0( 4587):   Caused by: androidx.media3.exoplayer.ExoTimeoutException: Player release timed out.
+11-16 19:42:48.520 E/CompositionPlayer-0( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+11-16 19:42:48.520 E/CompositionPlayer-0( 4587):       ... 22 more
+11-16 19:42:48.520 E/CompositionPlayer-0( 4587): ]
+11-16 19:42:48.523 E/CompositionPlayer( 4587): playerFailed [eventTime=18.74, mediaPos=5.72, window=0, errorCode=ERROR_CODE_TIMEOUT
+11-16 19:42:48.523 E/CompositionPlayer( 4587):   androidx.media3.common.PlaybackException: error from player 0
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       at androidx.media3.transformer.CompositionPlayer.maybeUpdatePlaybackError(CompositionPlayer.java:2040)
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       at androidx.media3.transformer.CompositionPlayer.access$3300(CompositionPlayer.java:165)
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       at androidx.media3.transformer.CompositionPlayer$PlayerListener.onPlayerError(CompositionPlayer.java:2319)
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       at androidx.media3.common.util.ListenerSet$ListenerHolder.invoke(ListenerSet.java:466)
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       at androidx.media3.common.util.ListenerSet.lambda$queueEvent$0(ListenerSet.java:334)
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       at androidx.media3.common.util.ListenerSet$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       at androidx.media3.common.util.ListenerSet.flushEvents(ListenerSet.java:358)
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       at androidx.media3.common.util.ListenerSet.sendEvent(ListenerSet.java:386)
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1157)
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       at androidx.media3.transformer.CompositionPlayer$SequencePlayerHolder.release(CompositionPlayer.java:2400)
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       at androidx.media3.transformer.CompositionPlayer$SequencePlayerHolder.access$2300(CompositionPlayer.java:2352)
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       at androidx.media3.transformer.CompositionPlayer.handleRelease(CompositionPlayer.java:1091)
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       at androidx.media3.common.SimpleBasePlayer.release(SimpleBasePlayer.java:2656)
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       at it.fabriziodavi.vivovideo.DeviceTest.playFor$lambda$5(DeviceTest.kt:791)
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       at it.fabriziodavi.vivovideo.DeviceTest.$r8$lambda$JG3Pa8ySzUtBzE_ZlBfqfHf_daA(Unknown Source:0)
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       at it.fabriziodavi.vivovideo.DeviceTest$$ExternalSyntheticLambda21.run(D8$$SyntheticClass:0)
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       at android.os.Handler.handleCallback(Handler.java:958)
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       at android.os.Handler.dispatchMessage(Handler.java:99)
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       at android.os.Looper.loop(Looper.java:294)
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       at android.app.ActivityThread.main(ActivityThread.java:8177)
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       at java.lang.reflect.Method.invoke(Native Method)
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:552)
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:971)
+11-16 19:42:48.523 E/CompositionPlayer( 4587):   Caused by: androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1161)
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       ... 22 more
+11-16 19:42:48.523 E/CompositionPlayer( 4587):   Caused by: androidx.media3.exoplayer.ExoTimeoutException: Player release timed out.
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       ... 22 more
+11-16 19:42:48.523 E/CompositionPlayer( 4587): ]
+11-16 19:42:49.028 E/CompositionPlayer( 4587): playerFailed [eventTime=19.24, mediaPos=0.00, window=0, errorCode=ERROR_CODE_TIMEOUT
+11-16 19:42:49.028 E/CompositionPlayer( 4587):   androidx.media3.common.PlaybackException: InternalPlayer release timeout
+11-16 19:42:49.028 E/CompositionPlayer( 4587):       at androidx.media3.transformer.CompositionPlayer.handleRelease(CompositionPlayer.java:1125)
+11-16 19:42:49.028 E/CompositionPlayer( 4587):       at androidx.media3.common.SimpleBasePlayer.release(SimpleBasePlayer.java:2656)
+11-16 19:42:49.028 E/CompositionPlayer( 4587):       at it.fabriziodavi.vivovideo.DeviceTest.playFor$lambda$5(DeviceTest.kt:791)
+11-16 19:42:49.028 E/CompositionPlayer( 4587):       at it.fabriziodavi.vivovideo.DeviceTest.$r8$lambda$JG3Pa8ySzUtBzE_ZlBfqfHf_daA(Unknown Source:0)
+11-16 19:42:49.028 E/CompositionPlayer( 4587):       at it.fabriziodavi.vivovideo.DeviceTest$$ExternalSyntheticLambda21.run(D8$$SyntheticClass:0)
+11-16 19:42:49.028 E/CompositionPlayer( 4587):       at android.os.Handler.handleCallback(Handler.java:958)
+11-16 19:42:49.028 E/CompositionPlayer( 4587):       at android.os.Handler.dispatchMessage(Handler.java:99)
+11-16 19:42:49.028 E/CompositionPlayer( 4587):       at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:42:49.028 E/CompositionPlayer( 4587):       at android.os.Looper.loop(Looper.java:294)
+11-16 19:42:49.028 E/CompositionPlayer( 4587):       at android.app.ActivityThread.main(ActivityThread.java:8177)
+11-16 19:42:49.028 E/CompositionPlayer( 4587):       at java.lang.reflect.Method.invoke(Native Method)
+11-16 19:42:49.028 E/CompositionPlayer( 4587):       at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:552)
+11-16 19:42:49.028 E/CompositionPlayer( 4587):       at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:971)
+11-16 19:42:49.028 E/CompositionPlayer( 4587): ]
+11-16 19:42:49.029 E/TestRunner( 4587): failed: previewPlaysWow(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:42:49.031 E/TestRunner( 4587): ----- begin exception -----
+11-16 19:42:49.031 E/TestRunner( 4587): java.lang.AssertionError: anteprima senza immagini: 9 fotogrammi (posizioni: 0 517 1054 1471 2037 2658 3013 3296 3577 3881 4133 4396 4668 4917 5245 5420)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.Assert.fail(Assert.java:89)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.Assert.assertTrue(Assert.java:42)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at it.fabriziodavi.vivovideo.DeviceTest.playFor(DeviceTest.kt:799)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at it.fabriziodavi.vivovideo.DeviceTest.playFor$default(DeviceTest.kt:730)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at it.fabriziodavi.vivovideo.DeviceTest.previewPlaysWow(DeviceTest.kt:534)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at java.lang.reflect.Method.invoke(Native Method)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at it.fabriziodavi.vivovideo.DeviceTest$retry$1$1.evaluate(DeviceTest.kt:158)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.BlockJUnit4ClassRunner$1.evaluate(BlockJUnit4ClassRunner.java:100)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:366)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:103)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:63)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at androidx.test.ext.junit.runners.AndroidJUnit4.run(AndroidJUnit4.java:162)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.Suite.runChild(Suite.java:128)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.Suite.runChild(Suite.java:27)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at androidx.test.internal.runner.TestExecutor.execute(TestExecutor.java:68)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at androidx.test.internal.runner.TestExecutor.execute(TestExecutor.java:59)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at androidx.test.runner.AndroidJUnitRunner.onStart(AndroidJUnitRunner.java:463)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at android.app.Instrumentation$InstrumentationThread.run(Instrumentation.java:2402)
+11-16 19:42:49.031 E/TestRunner( 4587): ----- end exception -----
+11-16 19:42:49.033 I/TestRunner( 4587): finished: previewPlaysWow(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:42:49.036 I/TestRunner( 4587): started: previewPlaysPastTheEndOfAShortSong(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:43:06.331 E/CompositionPlayer-0( 4587): playerFailed [eventTime=17.27, mediaPos=5.72, window=0, period=0, errorCode=ERROR_CODE_TIMEOUT
+11-16 19:43:06.331 E/CompositionPlayer-0( 4587):   androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-16 19:43:06.331 E/CompositionPlayer-0( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1161)
+11-16 19:43:06.331 E/CompositionPlayer-0( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-16 19:43:06.331 E/CompositionPlayer-0( 4587):       at androidx.media3.common.util.ListenerSet$ListenerHolder.invoke(ListenerSet.java:466)
+11-16 19:43:06.331 E/CompositionPlayer-0( 4587):       at androidx.media3.common.util.ListenerSet.lambda$queueEvent$0(ListenerSet.java:334)
+11-16 19:43:06.331 E/CompositionPlayer-0( 4587):       at androidx.media3.common.util.ListenerSet$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+11-16 19:43:06.331 E/CompositionPlayer-0( 4587):       at androidx.media3.common.util.ListenerSet.flushEvents(ListenerSet.java:358)
+11-16 19:43:06.331 E/CompositionPlayer-0( 4587):       at androidx.media3.common.util.ListenerSet.sendEvent(ListenerSet.java:386)
+11-16 19:43:06.331 E/CompositionPlayer-0( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1157)
+11-16 19:43:06.331 E/CompositionPlayer-0( 4587):       at androidx.media3.transformer.CompositionPlayer$SequencePlayerHolder.release(CompositionPlayer.java:2400)
+11-16 19:43:06.331 E/CompositionPlayer-0( 4587):       at androidx.media3.transformer.CompositionPlayer$SequencePlayerHolder.access$2300(CompositionPlayer.java:2352)
+11-16 19:43:06.331 E/CompositionPlayer-0( 4587):       at androidx.media3.transformer.CompositionPlayer.handleRelease(CompositionPlayer.java:1091)
+11-16 19:43:06.331 E/CompositionPlayer-0( 4587):       at androidx.media3.common.SimpleBasePlayer.release(SimpleBasePlayer.java:2656)
+11-16 19:43:06.331 E/CompositionPlayer-0( 4587):       at it.fabriziodavi.vivovideo.DeviceTest.playFor$lambda$5(DeviceTest.kt:791)
+11-16 19:43:06.331 E/CompositionPlayer-0( 4587):       at it.fabriziodavi.vivovideo.DeviceTest.$r8$lambda$JG3Pa8ySzUtBzE_ZlBfqfHf_daA(Unknown Source:0)
+11-16 19:43:06.331 E/CompositionPlayer-0( 4587):       at it.fabriziodavi.vivovideo.DeviceTest$$ExternalSyntheticLambda21.run(D8$$SyntheticClass:0)
+11-16 19:43:06.331 E/CompositionPlayer-0( 4587):       at android.os.Handler.handleCallback(Handler.java:958)
+11-16 19:43:06.331 E/CompositionPlayer-0( 4587):       at android.os.Handler.dispatchMessage(Handler.java:99)
+11-16 19:43:06.331 E/CompositionPlayer-0( 4587):       at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:43:06.331 E/CompositionPlayer-0( 4587):       at android.os.Looper.loop(Looper.java:294)
+11-16 19:43:06.331 E/CompositionPlayer-0( 4587):       at android.app.ActivityThread.main(ActivityThread.java:8177)
+11-16 19:43:06.331 E/CompositionPlayer-0( 4587):       at java.lang.reflect.Method.invoke(Native Method)
+11-16 19:43:06.331 E/CompositionPlayer-0( 4587):       at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:552)
+11-16 19:43:06.331 E/CompositionPlayer-0( 4587):       at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:971)
+11-16 19:43:06.331 E/CompositionPlayer-0( 4587):   Caused by: androidx.media3.exoplayer.ExoTimeoutException: Player release timed out.
+11-16 19:43:06.331 E/CompositionPlayer-0( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+11-16 19:43:06.331 E/CompositionPlayer-0( 4587):       ... 22 more
+11-16 19:43:06.331 E/CompositionPlayer-0( 4587): ]
+11-16 19:43:06.337 E/CompositionPlayer( 4587): playerFailed [eventTime=17.28, mediaPos=5.72, window=0, errorCode=ERROR_CODE_TIMEOUT
+11-16 19:43:06.337 E/CompositionPlayer( 4587):   androidx.media3.common.PlaybackException: error from player 0
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       at androidx.media3.transformer.CompositionPlayer.maybeUpdatePlaybackError(CompositionPlayer.java:2040)
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       at androidx.media3.transformer.CompositionPlayer.access$3300(CompositionPlayer.java:165)
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       at androidx.media3.transformer.CompositionPlayer$PlayerListener.onPlayerError(CompositionPlayer.java:2319)
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       at androidx.media3.common.util.ListenerSet$ListenerHolder.invoke(ListenerSet.java:466)
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       at androidx.media3.common.util.ListenerSet.lambda$queueEvent$0(ListenerSet.java:334)
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       at androidx.media3.common.util.ListenerSet$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       at androidx.media3.common.util.ListenerSet.flushEvents(ListenerSet.java:358)
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       at androidx.media3.common.util.ListenerSet.sendEvent(ListenerSet.java:386)
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1157)
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       at androidx.media3.transformer.CompositionPlayer$SequencePlayerHolder.release(CompositionPlayer.java:2400)
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       at androidx.media3.transformer.CompositionPlayer$SequencePlayerHolder.access$2300(CompositionPlayer.java:2352)
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       at androidx.media3.transformer.CompositionPlayer.handleRelease(CompositionPlayer.java:1091)
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       at androidx.media3.common.SimpleBasePlayer.release(SimpleBasePlayer.java:2656)
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       at it.fabriziodavi.vivovideo.DeviceTest.playFor$lambda$5(DeviceTest.kt:791)
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       at it.fabriziodavi.vivovideo.DeviceTest.$r8$lambda$JG3Pa8ySzUtBzE_ZlBfqfHf_daA(Unknown Source:0)
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       at it.fabriziodavi.vivovideo.DeviceTest$$ExternalSyntheticLambda21.run(D8$$SyntheticClass:0)
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       at android.os.Handler.handleCallback(Handler.java:958)
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       at android.os.Handler.dispatchMessage(Handler.java:99)
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       at android.os.Looper.loop(Looper.java:294)
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       at android.app.ActivityThread.main(ActivityThread.java:8177)
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       at java.lang.reflect.Method.invoke(Native Method)
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:552)
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:971)
+11-16 19:43:06.337 E/CompositionPlayer( 4587):   Caused by: androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1161)
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       ... 22 more
+11-16 19:43:06.337 E/CompositionPlayer( 4587):   Caused by: androidx.media3.exoplayer.ExoTimeoutException: Player release timed out.
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       ... 22 more
+11-16 19:43:06.337 E/CompositionPlayer( 4587): ]
+11-16 19:43:06.848 E/CompositionPlayer-1( 4587): playerFailed [eventTime=17.78, mediaPos=5.71, window=0, period=1, errorCode=ERROR_CODE_TIMEOUT
+11-16 19:43:06.848 E/CompositionPlayer-1( 4587):   androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-16 19:43:06.848 E/CompositionPlayer-1( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1161)
+11-16 19:43:06.848 E/CompositionPlayer-1( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-16 19:43:06.848 E/CompositionPlayer-1( 4587):       at androidx.media3.common.util.ListenerSet$ListenerHolder.invoke(ListenerSet.java:466)
+11-16 19:43:06.848 E/CompositionPlayer-1( 4587):       at androidx.media3.common.util.ListenerSet.lambda$queueEvent$0(ListenerSet.java:334)
+11-16 19:43:06.848 E/CompositionPlayer-1( 4587):       at androidx.media3.common.util.ListenerSet$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+11-16 19:43:06.848 E/CompositionPlayer-1( 4587):       at androidx.media3.common.util.ListenerSet.flushEvents(ListenerSet.java:358)
+11-16 19:43:06.848 E/CompositionPlayer-1( 4587):       at androidx.media3.common.util.ListenerSet.sendEvent(ListenerSet.java:386)
+11-16 19:43:06.848 E/CompositionPlayer-1( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1157)
+11-16 19:43:06.848 E/CompositionPlayer-1( 4587):       at androidx.media3.transformer.CompositionPlayer$SequencePlayerHolder.release(CompositionPlayer.java:2400)
+11-16 19:43:06.848 E/CompositionPlayer-1( 4587):       at androidx.media3.transformer.CompositionPlayer$SequencePlayerHolder.access$2300(CompositionPlayer.java:2352)
+11-16 19:43:06.848 E/CompositionPlayer-1( 4587):       at androidx.media3.transformer.CompositionPlayer.handleRelease(CompositionPlayer.java:1091)
+11-16 19:43:06.848 E/CompositionPlayer-1( 4587):       at androidx.media3.common.SimpleBasePlayer.release(SimpleBasePlayer.java:2656)
+11-16 19:43:06.848 E/CompositionPlayer-1( 4587):       at it.fabriziodavi.vivovideo.DeviceTest.playFor$lambda$5(DeviceTest.kt:791)
+11-16 19:43:06.848 E/CompositionPlayer-1( 4587):       at it.fabriziodavi.vivovideo.DeviceTest.$r8$lambda$JG3Pa8ySzUtBzE_ZlBfqfHf_daA(Unknown Source:0)
+11-16 19:43:06.848 E/CompositionPlayer-1( 4587):       at it.fabriziodavi.vivovideo.DeviceTest$$ExternalSyntheticLambda21.run(D8$$SyntheticClass:0)
+11-16 19:43:06.848 E/CompositionPlayer-1( 4587):       at android.os.Handler.handleCallback(Handler.java:958)
+11-16 19:43:06.848 E/CompositionPlayer-1( 4587):       at android.os.Handler.dispatchMessage(Handler.java:99)
+11-16 19:43:06.848 E/CompositionPlayer-1( 4587):       at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:43:06.848 E/CompositionPlayer-1( 4587):       at android.os.Looper.loop(Looper.java:294)

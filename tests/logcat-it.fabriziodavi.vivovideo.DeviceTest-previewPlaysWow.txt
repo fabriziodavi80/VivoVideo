@@ -1,0 +1,300 @@
+11-16 19:42:33.104  4587 17600 W MessageQueue: 	at android.os.MessageQueue.enqueueMessage(MessageQueue.java:560)
+11-16 19:42:33.104  4587 17600 W MessageQueue: 	at android.os.Handler.enqueueMessage(Handler.java:786)
+11-16 19:42:33.104  4587 17600 W MessageQueue: 	at android.os.Handler.sendMessageAtTime(Handler.java:735)
+11-16 19:42:33.104  4587 17600 W MessageQueue: 	at android.os.Handler.sendMessageDelayed(Handler.java:705)
+11-16 19:42:33.104  4587 17600 W MessageQueue: 	at android.os.Handler.sendMessage(Handler.java:643)
+11-16 19:42:33.104  4587 17600 W MessageQueue: 	at android.media.MediaCodec.postEventFromNative(MediaCodec.java:5222)
+11-16 19:42:33.106  4587 17600 W MessageQueue: Handler (android.media.MediaCodec$EventHandler) {37bd242} sending message to a Handler on a dead thread
+11-16 19:42:33.106  4587 17600 W MessageQueue: java.lang.IllegalStateException: Handler (android.media.MediaCodec$EventHandler) {37bd242} sending message to a Handler on a dead thread
+11-16 19:42:33.106  4587 17600 W MessageQueue: 	at android.os.MessageQueue.enqueueMessage(MessageQueue.java:560)
+11-16 19:42:33.106  4587 17600 W MessageQueue: 	at android.os.Handler.enqueueMessage(Handler.java:786)
+11-16 19:42:33.106  4587 17600 W MessageQueue: 	at android.os.Handler.sendMessageAtTime(Handler.java:735)
+11-16 19:42:33.106  4587 17600 W MessageQueue: 	at android.os.Handler.sendMessageDelayed(Handler.java:705)
+11-16 19:42:33.106  4587 17600 W MessageQueue: 	at android.os.Handler.sendMessage(Handler.java:643)
+11-16 19:42:33.106  4587 17600 W MessageQueue: 	at android.media.MediaCodec.postEventFromNative(MediaCodec.java:5222)
+11-16 19:42:33.106  4587 17600 W MessageQueue: Handler (android.media.MediaCodec$EventHandler) {37bd242} sending message to a Handler on a dead thread
+11-16 19:42:33.106  4587 17600 W MessageQueue: java.lang.IllegalStateException: Handler (android.media.MediaCodec$EventHandler) {37bd242} sending message to a Handler on a dead thread
+11-16 19:42:33.106  4587 17600 W MessageQueue: 	at android.os.MessageQueue.enqueueMessage(MessageQueue.java:560)
+11-16 19:42:33.106  4587 17600 W MessageQueue: 	at android.os.Handler.enqueueMessage(Handler.java:786)
+11-16 19:42:33.106  4587 17600 W MessageQueue: 	at android.os.Handler.sendMessageAtTime(Handler.java:735)
+11-16 19:42:33.106  4587 17600 W MessageQueue: 	at android.os.Handler.sendMessageDelayed(Handler.java:705)
+11-16 19:42:33.106  4587 17600 W MessageQueue: 	at android.os.Handler.sendMessage(Handler.java:643)
+11-16 19:42:33.106  4587 17600 W MessageQueue: 	at android.media.MediaCodec.postEventFromNative(MediaCodec.java:5222)
+11-16 19:42:33.107  4587 17600 W MessageQueue: Handler (android.media.MediaCodec$EventHandler) {37bd242} sending message to a Handler on a dead thread
+11-16 19:42:33.107  4587 17600 W MessageQueue: java.lang.IllegalStateException: Handler (android.media.MediaCodec$EventHandler) {37bd242} sending message to a Handler on a dead thread
+11-16 19:42:33.107  4587 17600 W MessageQueue: 	at android.os.MessageQueue.enqueueMessage(MessageQueue.java:560)
+11-16 19:42:33.107  4587 17600 W MessageQueue: 	at android.os.Handler.enqueueMessage(Handler.java:786)
+11-16 19:42:33.107  4587 17600 W MessageQueue: 	at android.os.Handler.sendMessageAtTime(Handler.java:735)
+11-16 19:42:33.107  4587 17600 W MessageQueue: 	at android.os.Handler.sendMessageDelayed(Handler.java:705)
+11-16 19:42:33.107  4587 17600 W MessageQueue: 	at android.os.Handler.sendMessage(Handler.java:643)
+11-16 19:42:33.107  4587 17600 W MessageQueue: 	at android.media.MediaCodec.postEventFromNative(MediaCodec.java:5222)
+11-16 19:42:33.125  4587 17583 W MessageQueue: Handler (android.os.Handler) {6d040af} sending message to a Handler on a dead thread
+11-16 19:42:33.125  4587 17583 W MessageQueue: java.lang.IllegalStateException: Handler (android.os.Handler) {6d040af} sending message to a Handler on a dead thread
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at android.os.MessageQueue.enqueueMessage(MessageQueue.java:560)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at android.os.Handler.enqueueMessage(Handler.java:786)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at android.os.Handler.sendMessageAtTime(Handler.java:735)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at android.os.Handler.sendMessageDelayed(Handler.java:705)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at android.os.Handler.sendMessage(Handler.java:643)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at android.os.Message.sendToTarget(Message.java:468)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at androidx.media3.exoplayer.source.ConcatenatingMediaSource2.scheduleTimelineUpdate(ConcatenatingMediaSource2.java:381)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at androidx.media3.exoplayer.source.ConcatenatingMediaSource2.onChildSourceInfoRefreshed(ConcatenatingMediaSource2.java:328)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at androidx.media3.exoplayer.source.ConcatenatingMediaSource2.onChildSourceInfoRefreshed(ConcatenatingMediaSource2.java:58)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at androidx.media3.exoplayer.source.CompositeMediaSource.lambda$prepareChildSource$0$androidx-media3-exoplayer-source-CompositeMediaSource(CompositeMediaSource.java:119)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at androidx.media3.exoplayer.source.CompositeMediaSource$$ExternalSyntheticLambda0.onSourceInfoRefreshed(D8$$SyntheticClass:0)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at androidx.media3.exoplayer.source.BaseMediaSource.refreshSourceInfo(BaseMediaSource.java:96)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at androidx.media3.exoplayer.source.MaskingMediaSource.onChildSourceInfoRefreshed(MaskingMediaSource.java:204)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at androidx.media3.exoplayer.source.WrappingMediaSource.onChildSourceInfoRefreshed(WrappingMediaSource.java:155)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at androidx.media3.exoplayer.source.WrappingMediaSource.onChildSourceInfoRefreshed(WrappingMediaSource.java:50)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at androidx.media3.exoplayer.source.CompositeMediaSource.lambda$prepareChildSource$0$androidx-media3-exoplayer-source-CompositeMediaSource(CompositeMediaSource.java:119)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at androidx.media3.exoplayer.source.CompositeMediaSource$$ExternalSyntheticLambda0.onSourceInfoRefreshed(D8$$SyntheticClass:0)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at androidx.media3.exoplayer.source.BaseMediaSource.refreshSourceInfo(BaseMediaSource.java:96)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at androidx.media3.exoplayer.source.MergingMediaSource.onChildSourceInfoRefreshed(MergingMediaSource.java:314)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at androidx.media3.exoplayer.source.MergingMediaSource.onChildSourceInfoRefreshed(MergingMediaSource.java:55)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at androidx.media3.exoplayer.source.CompositeMediaSource.lambda$prepareChildSource$0$androidx-media3-exoplayer-source-CompositeMediaSource(CompositeMediaSource.java:119)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at androidx.media3.exoplayer.source.CompositeMediaSource$$ExternalSyntheticLambda0.onSourceInfoRefreshed(D8$$SyntheticClass:0)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at androidx.media3.exoplayer.source.BaseMediaSource.refreshSourceInfo(BaseMediaSource.java:96)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at androidx.media3.exoplayer.source.ClippingMediaSource.refreshClippedTimeline(ClippingMediaSource.java:493)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at androidx.media3.exoplayer.source.ClippingMediaSource.releasePeriod(ClippingMediaSource.java:430)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at androidx.media3.exoplayer.source.MergingMediaSource.releasePeriod(MergingMediaSource.java:274)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at androidx.media3.exoplayer.source.MaskingMediaPeriod.releasePeriod(MaskingMediaPeriod.java:146)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at androidx.media3.exoplayer.source.MaskingMediaSource.releasePeriod(MaskingMediaSource.java:128)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at androidx.media3.exoplayer.source.ConcatenatingMediaSource2.releasePeriod(ConcatenatingMediaSource2.java:308)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at androidx.media3.exoplayer.source.WrappingMediaSource.releasePeriod(WrappingMediaSource.java:149)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at androidx.media3.exoplayer.source.MaskingMediaPeriod.releasePeriod(MaskingMediaPeriod.java:146)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at androidx.media3.exoplayer.source.MaskingMediaSource.releasePeriod(MaskingMediaSource.java:128)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at androidx.media3.exoplayer.MediaSourceList.releasePeriod(MediaSourceList.java:354)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at androidx.media3.exoplayer.MediaPeriodHolder.releaseMediaPeriod(MediaPeriodHolder.java:482)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at androidx.media3.exoplayer.MediaPeriodHolder.release(MediaPeriodHolder.java:364)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at androidx.media3.exoplayer.MediaPeriodQueue.clear(MediaPeriodQueue.java:622)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at androidx.media3.exoplayer.ExoPlayerImplInternal.resetInternal(ExoPlayerImplInternal.java:2124)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at androidx.media3.exoplayer.ExoPlayerImplInternal.releaseInternal(ExoPlayerImplInternal.java:2055)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:880)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at android.os.Handler.dispatchMessage(Handler.java:102)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at android.os.Looper.loop(Looper.java:294)
+11-16 19:42:33.125  4587 17583 W MessageQueue: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+11-16 19:42:33.157  4587 17632 W MessageQueue: Handler (android.os.Handler) {6a38cb} sending message to a Handler on a dead thread
+11-16 19:42:33.157  4587 17632 W MessageQueue: java.lang.IllegalStateException: Handler (android.os.Handler) {6a38cb} sending message to a Handler on a dead thread
+11-16 19:42:33.157  4587 17632 W MessageQueue: 	at android.os.MessageQueue.enqueueMessage(MessageQueue.java:560)
+11-16 19:42:33.157  4587 17632 W MessageQueue: 	at android.os.Handler.enqueueMessage(Handler.java:786)
+11-16 19:42:33.157  4587 17632 W MessageQueue: 	at android.os.Handler.sendMessageAtTime(Handler.java:735)
+11-16 19:42:33.157  4587 17632 W MessageQueue: 	at android.os.Handler.sendMessageDelayed(Handler.java:705)
+11-16 19:42:33.157  4587 17632 W MessageQueue: 	at android.os.Handler.post(Handler.java:435)
+11-16 19:42:33.157  4587 17632 W MessageQueue: 	at androidx.media3.exoplayer.audio.AudioTrackAudioOutput.lambda$releaseAudioTrackAsync$1(AudioTrackAudioOutput.java:501)
+11-16 19:42:33.157  4587 17632 W MessageQueue: 	at androidx.media3.exoplayer.audio.AudioTrackAudioOutput$$ExternalSyntheticLambda3.run(D8$$SyntheticClass:0)
+11-16 19:42:33.157  4587 17632 W MessageQueue: 	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:487)
+11-16 19:42:33.157  4587 17632 W MessageQueue: 	at java.util.concurrent.FutureTask.run(FutureTask.java:264)
+11-16 19:42:33.157  4587 17632 W MessageQueue: 	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:307)
+11-16 19:42:33.157  4587 17632 W MessageQueue: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+11-16 19:42:33.157  4587 17632 W MessageQueue: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+11-16 19:42:33.157  4587 17632 W MessageQueue: 	at java.lang.Thread.run(Thread.java:1012)
+11-16 19:42:33.171  4587 17617 W MediaCodec: no metrics handle found
+11-16 19:42:33.174  4587 17589 E BufferQueueProducer: [ImageReader-640x360f1m4-4587-7](id:11eb0000029c,api:1,p:4587,c:4587) cancelBuffer: BufferQueue has been abandoned
+11-16 19:42:33.176  4587 17628 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+11-16 19:42:33.176  4587 17628 E EGL_emulation: tid 17628: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+11-16 19:42:33.182  4587 17583 W MessageQueue: Handler (android.view.Choreographer$FrameHandler) {79e3754} sending message to a Handler on a dead thread
+11-16 19:42:33.182  4587 17583 W MessageQueue: java.lang.IllegalStateException: Handler (android.view.Choreographer$FrameHandler) {79e3754} sending message to a Handler on a dead thread
+11-16 19:42:33.182  4587 17583 W MessageQueue: 	at android.os.MessageQueue.enqueueMessage(MessageQueue.java:560)
+11-16 19:42:33.182  4587 17583 W MessageQueue: 	at android.os.Handler.enqueueMessage(Handler.java:786)
+11-16 19:42:33.182  4587 17583 W MessageQueue: 	at android.os.Handler.sendMessageAtTime(Handler.java:735)
+11-16 19:42:33.182  4587 17583 W MessageQueue: 	at android.view.Choreographer$FrameDisplayEventReceiver.onVsync(Choreographer.java:1313)
+11-16 19:42:33.182  4587 17583 W MessageQueue: 	at android.view.DisplayEventReceiver.dispatchVsync(DisplayEventReceiver.java:332)
+11-16 19:42:33.182  4587 17583 W MessageQueue: 	at android.os.MessageQueue.nativePollOnce(Native Method)
+11-16 19:42:33.182  4587 17583 W MessageQueue: 	at android.os.MessageQueue.next(MessageQueue.java:335)
+11-16 19:42:33.182  4587 17583 W MessageQueue: 	at android.os.Looper.loopOnce(Looper.java:162)
+11-16 19:42:33.182  4587 17583 W MessageQueue: 	at android.os.Looper.loop(Looper.java:294)
+11-16 19:42:33.182  4587 17583 W MessageQueue: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+11-16 19:42:33.190  4587 17600 W MediaCodec: no metrics handle found
+11-16 19:42:33.197  4587 17622 W MediaCodec: no metrics handle found
+11-16 19:42:33.198   468  3242 W ServiceManagerCppClient: Permission failure: android.permission.MEDIA_RESOURCE_OVERRIDE_PID from uid=10192 pid=4587
+11-16 19:42:33.198   468  3242 W ResourceManagerService: removeResource called with untrusted pid -1, using calling pid 4587
+11-16 19:42:33.204  4587 17634 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-16 19:42:33.207  4587 17634 W Codec2Client: query -- param skipped: index = 1107298332.
+11-16 19:42:33.207  4587 17634 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-16 19:42:33.208  4587 17634 W Codec2Client: query -- param skipped: index = 1342179345.
+11-16 19:42:33.208  4587 17634 W Codec2Client: query -- param skipped: index = 2415921170.
+11-16 19:42:33.208  4587 17634 W Codec2Client: query -- param skipped: index = 1610614798.
+11-16 19:42:33.209  4587 17634 W Codec2Client: query -- param skipped: index = 2684356609.
+11-16 19:42:33.291   468  3242 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-16 19:42:33.777  4587 17640 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+11-16 19:42:33.780  4587 17640 E EGL_emulation: tid 17640: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+11-16 19:42:33.804  4587 17642 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-16 19:42:33.823  4587 17642 W Codec2Client: query -- param skipped: index = 1107298332.
+11-16 19:42:33.823  4587 17642 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-16 19:42:33.832  4587 17642 W Codec2Client: query -- param skipped: index = 1342179345.
+11-16 19:42:33.832  4587 17642 W Codec2Client: query -- param skipped: index = 2415921170.
+11-16 19:42:33.832  4587 17642 W Codec2Client: query -- param skipped: index = 1610614798.
+11-16 19:42:33.832  4587 17642 W Codec2Client: query -- param skipped: index = 2684356609.
+11-16 19:42:33.900   468  3242 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-16 19:42:33.952  4587 17622 W SpeakerLayoutUtil: Built-in speaker's getSpeakerLayoutChannelMask not usable, defaulting to stereo.
+11-16 19:42:33.988  4587 17622 W SpeakerLayoutUtil: Built-in speaker's getSpeakerLayoutChannelMask not usable, defaulting to stereo.
+11-16 19:42:33.998   396   413 W AudioFlinger: createTrack_l(): mismatch between requested flags (00000008) and output flags (00000002)
+11-16 19:42:38.071   351 17614 W C2BqBuffer: last successful dequeue was 2170283 us ago, 213 consecutive failures
+11-16 19:42:38.305   351 17635 W C2BqBuffer: last successful dequeue was 2992960 us ago, 268 consecutive failures
+11-16 19:42:38.910   351 17643 W C2BqBuffer: last successful dequeue was 3325874 us ago, 320 consecutive failures
+11-16 19:42:39.812  4587 17622 W SpeakerLayoutUtil: Built-in speaker's getSpeakerLayoutChannelMask not usable, defaulting to stereo.
+11-16 19:42:40.816  4587 17624 W Codec2Client: query -- param skipped: index = 1342179345.
+11-16 19:42:40.816  4587 17624 W Codec2Client: query -- param skipped: index = 2415921170.
+11-16 19:42:40.816  4587 17624 W Codec2Client: query -- param skipped: index = 1610614798.
+11-16 19:42:41.286  4587 17633 W Codec2Client: query -- param skipped: index = 1342179345.
+11-16 19:42:41.287  4587 17633 W Codec2Client: query -- param skipped: index = 2415921170.
+11-16 19:42:41.287  4587 17633 W Codec2Client: query -- param skipped: index = 1610614798.
+11-16 19:42:41.500  4587 17612 W MediaCodec: no metrics handle found
+11-16 19:42:41.540  4587 17652 E EGL_emulation: eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+11-16 19:42:41.541  4587 17652 E EGL_emulation: tid 17652: eglQueryContext(2146): error 0x3004 (EGL_BAD_ATTRIBUTE)
+11-16 19:42:41.563   351   382 W C2BqBuffer: get generationNumber failed 19701014987429
+11-16 19:42:41.636  4587 17622 W MediaCodec: no metrics handle found
+11-16 19:42:41.702  4587 17658 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-16 19:42:41.780  4587 17658 W Codec2Client: query -- param skipped: index = 1107298332.
+11-16 19:42:41.780  4587 17658 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-16 19:42:41.788  4587 17658 W Codec2Client: query -- param skipped: index = 1342179345.
+11-16 19:42:41.788  4587 17658 W Codec2Client: query -- param skipped: index = 2415921170.
+11-16 19:42:41.789  4587 17658 W Codec2Client: query -- param skipped: index = 1610614798.
+11-16 19:42:41.789  4587 17658 W Codec2Client: query -- param skipped: index = 2684356609.
+11-16 19:42:41.795   468  3242 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-16 19:42:41.979  4587 17663 W ColorUtils: expected specified color aspects (2:0:0:0)
+11-16 19:42:41.997  4587 17663 W Codec2Client: query -- param skipped: index = 1107298332.
+11-16 19:42:41.997  4587 17663 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-16 19:42:41.999  4587 17663 W Codec2Client: query -- param skipped: index = 1342179345.
+11-16 19:42:41.999  4587 17663 W Codec2Client: query -- param skipped: index = 2415921170.
+11-16 19:42:41.999  4587 17663 W Codec2Client: query -- param skipped: index = 1610614798.
+11-16 19:42:42.000  4587 17663 W Codec2Client: query -- param skipped: index = 2684356609.
+11-16 19:42:42.019   468  3242 W ResourceManagerService: Ignoring request to add new resource entry with value <= 0
+11-16 19:42:46.145  4587  4649 E Codec2-types: Failed to receive buffer from bufferpool -- resultStatus = 4.
+11-16 19:42:46.145  4587  4649 E Codec2-types: Invalid WorkBundle::baseBlocks[1].
+11-16 19:42:46.149   351 17643 W C2BqBuffer: last successful dequeue was 10564579 us ago, 601 consecutive failures
+11-16 19:42:46.766   475 17306 W BufferPoolAccessor2.0: buffer status message processing failure - message : 4 connection : 2041904320692
+11-16 19:42:48.020  4587 17624 W Codec2Client: query -- param skipped: index = 1342179345.
+11-16 19:42:48.020  4587 17624 W Codec2Client: query -- param skipped: index = 2415921170.
+11-16 19:42:48.020  4587 17624 W Codec2Client: query -- param skipped: index = 1610614798.
+11-16 19:42:48.022  4587 17657 W Codec2Client: query -- param skipped: index = 1342179345.
+11-16 19:42:48.022  4587 17657 W Codec2Client: query -- param skipped: index = 2415921170.
+11-16 19:42:48.022  4587 17657 W Codec2Client: query -- param skipped: index = 1610614798.
+11-16 19:42:48.026  4587 17641 W Codec2Client: query -- param skipped: index = 1342179345.
+11-16 19:42:48.026  4587 17641 W Codec2Client: query -- param skipped: index = 2415921170.
+11-16 19:42:48.026  4587 17641 W Codec2Client: query -- param skipped: index = 1610614798.
+11-16 19:42:48.045  4587  4649 W Codec2-OutputBufferQueue: receiving stale buffer: generation 4698009 , diff 3 : slot 0
+11-16 19:42:48.520  4587  4587 E CompositionPlayer-0: playerFailed [eventTime=18.73, mediaPos=5.72, window=0, period=1, errorCode=ERROR_CODE_TIMEOUT
+11-16 19:42:48.520  4587  4587 E CompositionPlayer-0:   androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-16 19:42:48.520  4587  4587 E CompositionPlayer-0:       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1161)
+11-16 19:42:48.520  4587  4587 E CompositionPlayer-0:       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-16 19:42:48.520  4587  4587 E CompositionPlayer-0:       at androidx.media3.common.util.ListenerSet$ListenerHolder.invoke(ListenerSet.java:466)
+11-16 19:42:48.520  4587  4587 E CompositionPlayer-0:       at androidx.media3.common.util.ListenerSet.lambda$queueEvent$0(ListenerSet.java:334)
+11-16 19:42:48.520  4587  4587 E CompositionPlayer-0:       at androidx.media3.common.util.ListenerSet$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+11-16 19:42:48.520  4587  4587 E CompositionPlayer-0:       at androidx.media3.common.util.ListenerSet.flushEvents(ListenerSet.java:358)
+11-16 19:42:48.520  4587  4587 E CompositionPlayer-0:       at androidx.media3.common.util.ListenerSet.sendEvent(ListenerSet.java:386)
+11-16 19:42:48.520  4587  4587 E CompositionPlayer-0:       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1157)
+11-16 19:42:48.520  4587  4587 E CompositionPlayer-0:       at androidx.media3.transformer.CompositionPlayer$SequencePlayerHolder.release(CompositionPlayer.java:2400)
+11-16 19:42:48.520  4587  4587 E CompositionPlayer-0:       at androidx.media3.transformer.CompositionPlayer$SequencePlayerHolder.access$2300(CompositionPlayer.java:2352)
+11-16 19:42:48.520  4587  4587 E CompositionPlayer-0:       at androidx.media3.transformer.CompositionPlayer.handleRelease(CompositionPlayer.java:1091)
+11-16 19:42:48.520  4587  4587 E CompositionPlayer-0:       at androidx.media3.common.SimpleBasePlayer.release(SimpleBasePlayer.java:2656)
+11-16 19:42:48.520  4587  4587 E CompositionPlayer-0:       at it.fabriziodavi.vivovideo.DeviceTest.playFor$lambda$5(DeviceTest.kt:791)
+11-16 19:42:48.520  4587  4587 E CompositionPlayer-0:       at it.fabriziodavi.vivovideo.DeviceTest.$r8$lambda$JG3Pa8ySzUtBzE_ZlBfqfHf_daA(Unknown Source:0)
+11-16 19:42:48.520  4587  4587 E CompositionPlayer-0:       at it.fabriziodavi.vivovideo.DeviceTest$$ExternalSyntheticLambda21.run(D8$$SyntheticClass:0)
+11-16 19:42:48.520  4587  4587 E CompositionPlayer-0:       at android.os.Handler.handleCallback(Handler.java:958)
+11-16 19:42:48.520  4587  4587 E CompositionPlayer-0:       at android.os.Handler.dispatchMessage(Handler.java:99)
+11-16 19:42:48.520  4587  4587 E CompositionPlayer-0:       at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:42:48.520  4587  4587 E CompositionPlayer-0:       at android.os.Looper.loop(Looper.java:294)
+11-16 19:42:48.520  4587  4587 E CompositionPlayer-0:       at android.app.ActivityThread.main(ActivityThread.java:8177)
+11-16 19:42:48.520  4587  4587 E CompositionPlayer-0:       at java.lang.reflect.Method.invoke(Native Method)
+11-16 19:42:48.520  4587  4587 E CompositionPlayer-0:       at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:552)
+11-16 19:42:48.520  4587  4587 E CompositionPlayer-0:       at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:971)
+11-16 19:42:48.520  4587  4587 E CompositionPlayer-0:   Caused by: androidx.media3.exoplayer.ExoTimeoutException: Player release timed out.
+11-16 19:42:48.520  4587  4587 E CompositionPlayer-0:       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+11-16 19:42:48.520  4587  4587 E CompositionPlayer-0:       ... 22 more
+11-16 19:42:48.520  4587  4587 E CompositionPlayer-0: ]
+11-16 19:42:48.523  4587  4587 E CompositionPlayer: playerFailed [eventTime=18.74, mediaPos=5.72, window=0, errorCode=ERROR_CODE_TIMEOUT
+11-16 19:42:48.523  4587  4587 E CompositionPlayer:   androidx.media3.common.PlaybackException: error from player 0
+11-16 19:42:48.523  4587  4587 E CompositionPlayer:       at androidx.media3.transformer.CompositionPlayer.maybeUpdatePlaybackError(CompositionPlayer.java:2040)
+11-16 19:42:48.523  4587  4587 E CompositionPlayer:       at androidx.media3.transformer.CompositionPlayer.access$3300(CompositionPlayer.java:165)
+11-16 19:42:48.523  4587  4587 E CompositionPlayer:       at androidx.media3.transformer.CompositionPlayer$PlayerListener.onPlayerError(CompositionPlayer.java:2319)
+11-16 19:42:48.523  4587  4587 E CompositionPlayer:       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+11-16 19:42:48.523  4587  4587 E CompositionPlayer:       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-16 19:42:48.523  4587  4587 E CompositionPlayer:       at androidx.media3.common.util.ListenerSet$ListenerHolder.invoke(ListenerSet.java:466)
+11-16 19:42:48.523  4587  4587 E CompositionPlayer:       at androidx.media3.common.util.ListenerSet.lambda$queueEvent$0(ListenerSet.java:334)
+11-16 19:42:48.523  4587  4587 E CompositionPlayer:       at androidx.media3.common.util.ListenerSet$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+11-16 19:42:48.523  4587  4587 E CompositionPlayer:       at androidx.media3.common.util.ListenerSet.flushEvents(ListenerSet.java:358)
+11-16 19:42:48.523  4587  4587 E CompositionPlayer:       at androidx.media3.common.util.ListenerSet.sendEvent(ListenerSet.java:386)
+11-16 19:42:48.523  4587  4587 E CompositionPlayer:       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1157)
+11-16 19:42:48.523  4587  4587 E CompositionPlayer:       at androidx.media3.transformer.CompositionPlayer$SequencePlayerHolder.release(CompositionPlayer.java:2400)
+11-16 19:42:48.523  4587  4587 E CompositionPlayer:       at androidx.media3.transformer.CompositionPlayer$SequencePlayerHolder.access$2300(CompositionPlayer.java:2352)
+11-16 19:42:48.523  4587  4587 E CompositionPlayer:       at androidx.media3.transformer.CompositionPlayer.handleRelease(CompositionPlayer.java:1091)
+11-16 19:42:48.523  4587  4587 E CompositionPlayer:       at androidx.media3.common.SimpleBasePlayer.release(SimpleBasePlayer.java:2656)
+11-16 19:42:48.523  4587  4587 E CompositionPlayer:       at it.fabriziodavi.vivovideo.DeviceTest.playFor$lambda$5(DeviceTest.kt:791)
+11-16 19:42:48.523  4587  4587 E CompositionPlayer:       at it.fabriziodavi.vivovideo.DeviceTest.$r8$lambda$JG3Pa8ySzUtBzE_ZlBfqfHf_daA(Unknown Source:0)
+11-16 19:42:48.523  4587  4587 E CompositionPlayer:       at it.fabriziodavi.vivovideo.DeviceTest$$ExternalSyntheticLambda21.run(D8$$SyntheticClass:0)
+11-16 19:42:48.523  4587  4587 E CompositionPlayer:       at android.os.Handler.handleCallback(Handler.java:958)
+11-16 19:42:48.523  4587  4587 E CompositionPlayer:       at android.os.Handler.dispatchMessage(Handler.java:99)
+11-16 19:42:48.523  4587  4587 E CompositionPlayer:       at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:42:48.523  4587  4587 E CompositionPlayer:       at android.os.Looper.loop(Looper.java:294)
+11-16 19:42:48.523  4587  4587 E CompositionPlayer:       at android.app.ActivityThread.main(ActivityThread.java:8177)
+11-16 19:42:48.523  4587  4587 E CompositionPlayer:       at java.lang.reflect.Method.invoke(Native Method)
+11-16 19:42:48.523  4587  4587 E CompositionPlayer:       at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:552)
+11-16 19:42:48.523  4587  4587 E CompositionPlayer:       at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:971)
+11-16 19:42:48.523  4587  4587 E CompositionPlayer:   Caused by: androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-16 19:42:48.523  4587  4587 E CompositionPlayer:       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1161)
+11-16 19:42:48.523  4587  4587 E CompositionPlayer:       ... 22 more
+11-16 19:42:48.523  4587  4587 E CompositionPlayer:   Caused by: androidx.media3.exoplayer.ExoTimeoutException: Player release timed out.
+11-16 19:42:48.523  4587  4587 E CompositionPlayer:       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+11-16 19:42:48.523  4587  4587 E CompositionPlayer:       ... 22 more
+11-16 19:42:48.523  4587  4587 E CompositionPlayer: ]
+11-16 19:42:49.028  4587  4587 E CompositionPlayer: playerFailed [eventTime=19.24, mediaPos=0.00, window=0, errorCode=ERROR_CODE_TIMEOUT
+11-16 19:42:49.028  4587  4587 E CompositionPlayer:   androidx.media3.common.PlaybackException: InternalPlayer release timeout
+11-16 19:42:49.028  4587  4587 E CompositionPlayer:       at androidx.media3.transformer.CompositionPlayer.handleRelease(CompositionPlayer.java:1125)
+11-16 19:42:49.028  4587  4587 E CompositionPlayer:       at androidx.media3.common.SimpleBasePlayer.release(SimpleBasePlayer.java:2656)
+11-16 19:42:49.028  4587  4587 E CompositionPlayer:       at it.fabriziodavi.vivovideo.DeviceTest.playFor$lambda$5(DeviceTest.kt:791)
+11-16 19:42:49.028  4587  4587 E CompositionPlayer:       at it.fabriziodavi.vivovideo.DeviceTest.$r8$lambda$JG3Pa8ySzUtBzE_ZlBfqfHf_daA(Unknown Source:0)
+11-16 19:42:49.028  4587  4587 E CompositionPlayer:       at it.fabriziodavi.vivovideo.DeviceTest$$ExternalSyntheticLambda21.run(D8$$SyntheticClass:0)
+11-16 19:42:49.028  4587  4587 E CompositionPlayer:       at android.os.Handler.handleCallback(Handler.java:958)
+11-16 19:42:49.028  4587  4587 E CompositionPlayer:       at android.os.Handler.dispatchMessage(Handler.java:99)
+11-16 19:42:49.028  4587  4587 E CompositionPlayer:       at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:42:49.028  4587  4587 E CompositionPlayer:       at android.os.Looper.loop(Looper.java:294)
+11-16 19:42:49.028  4587  4587 E CompositionPlayer:       at android.app.ActivityThread.main(ActivityThread.java:8177)
+11-16 19:42:49.028  4587  4587 E CompositionPlayer:       at java.lang.reflect.Method.invoke(Native Method)
+11-16 19:42:49.028  4587  4587 E CompositionPlayer:       at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:552)
+11-16 19:42:49.028  4587  4587 E CompositionPlayer:       at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:971)
+11-16 19:42:49.028  4587  4587 E CompositionPlayer: ]
+11-16 19:42:49.029  4587  4615 E TestRunner: failed: previewPlaysWow(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:42:49.031  4587  4615 E TestRunner: ----- begin exception -----
+11-16 19:42:49.031  4587  4615 E TestRunner: java.lang.AssertionError: anteprima senza immagini: 9 fotogrammi (posizioni: 0 517 1054 1471 2037 2658 3013 3296 3577 3881 4133 4396 4668 4917 5245 5420)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at org.junit.Assert.fail(Assert.java:89)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at org.junit.Assert.assertTrue(Assert.java:42)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at it.fabriziodavi.vivovideo.DeviceTest.playFor(DeviceTest.kt:799)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at it.fabriziodavi.vivovideo.DeviceTest.playFor$default(DeviceTest.kt:730)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at it.fabriziodavi.vivovideo.DeviceTest.previewPlaysWow(DeviceTest.kt:534)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at java.lang.reflect.Method.invoke(Native Method)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at it.fabriziodavi.vivovideo.DeviceTest$retry$1$1.evaluate(DeviceTest.kt:158)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at org.junit.runners.BlockJUnit4ClassRunner$1.evaluate(BlockJUnit4ClassRunner.java:100)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:366)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:103)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:63)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at androidx.test.ext.junit.runners.AndroidJUnit4.run(AndroidJUnit4.java:162)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at org.junit.runners.Suite.runChild(Suite.java:128)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at org.junit.runners.Suite.runChild(Suite.java:27)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at androidx.test.internal.runner.TestExecutor.execute(TestExecutor.java:68)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at androidx.test.internal.runner.TestExecutor.execute(TestExecutor.java:59)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at androidx.test.runner.AndroidJUnitRunner.onStart(AndroidJUnitRunner.java:463)
+11-16 19:42:49.031  4587  4615 E TestRunner: 	at android.app.Instrumentation$InstrumentationThread.run(Instrumentation.java:2402)
+11-16 19:42:49.031  4587  4615 E TestRunner: ----- end exception -----

@@ -1,0 +1,400 @@
+11-16 19:41:37.862 I/ExoPlayerImpl( 4587): Init 42d28f4 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:41:37.871 I/ExoPlayerImpl( 4587): Init a6cf81d [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:41:39.312 I/ExoPlayerImpl( 4587): Release db5f7f7 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:41:39.318 I/ExoPlayerImpl( 4587): Init 45ea122 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:42:00.489 I/ExoPlayerImpl( 4587): Release 45ea122 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:42:00.717 I/ExoPlayerImpl( 4587): Init 90149b8 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:42:09.104 I/ExoPlayerImpl( 4587): Release 42d28f4 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587): Releasing the player timed out.
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):   androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1161)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet$ListenerHolder.invoke(ListenerSet.java:466)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet.lambda$queueEvent$0(ListenerSet.java:334)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet.flushEvents(ListenerSet.java:358)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet.sendEvent(ListenerSet.java:386)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1157)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.transformer.ExoPlayerAssetLoader.release(ExoPlayerAssetLoader.java:352)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.transformer.SequenceAssetLoader$SampleConsumerWrapper.lambda$switchAssetLoader$0$androidx-media3-transformer-SequenceAssetLoader$SampleConsumerWrapper(SequenceAssetLoader.java:678)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.transformer.SequenceAssetLoader$SampleConsumerWrapper$$ExternalSyntheticLambda0.run(D8$$SyntheticClass:0)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at android.os.Handler.handleCallback(Handler.java:958)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at android.os.Handler.dispatchMessage(Handler.java:99)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at android.os.Looper.loop(Looper.java:294)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at android.os.HandlerThread.run(HandlerThread.java:67)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):   Caused by: androidx.media3.exoplayer.ExoTimeoutException: Player release timed out.
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+11-16 19:42:09.623 E/ExoPlayerAssetLoader( 4587):       ... 15 more
+11-16 19:42:09.632 I/ExoPlayerImpl( 4587): Init 1c16f83 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:42:11.647 D/DefaultCodec( 4587):       at androidx.media3.exoplayer.ExoPlayerImplInternal.doSomeWork(ExoPlayerImplInternal.java:1484)
+11-16 19:42:11.647 D/DefaultCodec( 4587):       at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:765)
+11-16 19:42:11.673 I/TransformerInternal( 4587): Release 734cac7 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:42:12.339 W/odavi.vivovideo( 4587): Long monitor contention with owner ExoPlayer:Loader:ProgressiveMediaPeriod (17573) at boolean android.os.MessageQueue.enqueueMessage(android.os.Message, long)(MessageQueue.java:600) waiters=0 in android.os.Message android.os.MessageQueue.next() for 400ms
+11-16 19:42:13.689 I/ExoPlayerImpl( 4587): Release 1c16f83 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:42:13.690 I/ExoPlayerImpl( 4587): Release a6cf81d [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:42:13.699 E/TestRunner( 4587): failed: exportWowTransitionsAndTexts(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:42:13.703 E/TestRunner( 4587): ----- begin exception -----
+11-16 19:42:13.703 E/TestRunner( 4587): java.lang.AssertionError: esportazione fallita: Errore 3003 (ERROR_CODE_DECODING_FORMAT_UNSUPPORTED)
+11-16 19:42:13.703 E/TestRunner( 4587): Causa: IllegalArgumentException: 
+11-16 19:42:13.703 E/TestRunner( 4587): 
+11-16 19:42:13.703 E/TestRunner( 4587): Tentativi:
+11-16 19:42:13.703 E/TestRunner( 4587): • qualità piena, 10 Mbps: ERROR_CODE_MUXING_TIMEOUT
+11-16 19:42:13.703 E/TestRunner( 4587): • qualità piena: ERROR_CODE_MUXING_TIMEOUT
+11-16 19:42:13.703 E/TestRunner( 4587): • massima velocità, 10 Mbps: ERROR_CODE_DECODING_FORMAT_UNSUPPORTED
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.Assert.fail(Assert.java:89)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at it.fabriziodavi.vivovideo.DeviceTest.exportAndCheckUri(DeviceTest.kt:568)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at it.fabriziodavi.vivovideo.DeviceTest.exportAndCheck(DeviceTest.kt:547)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at it.fabriziodavi.vivovideo.DeviceTest.exportAndCheck$default(DeviceTest.kt:547)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at it.fabriziodavi.vivovideo.DeviceTest.exportWowTransitionsAndTexts(DeviceTest.kt:530)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at java.lang.reflect.Method.invoke(Native Method)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at it.fabriziodavi.vivovideo.DeviceTest$retry$1$1.evaluate(DeviceTest.kt:158)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.BlockJUnit4ClassRunner$1.evaluate(BlockJUnit4ClassRunner.java:100)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:366)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:103)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:63)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at androidx.test.ext.junit.runners.AndroidJUnit4.run(AndroidJUnit4.java:162)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.Suite.runChild(Suite.java:128)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.Suite.runChild(Suite.java:27)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at androidx.test.internal.runner.TestExecutor.execute(TestExecutor.java:68)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at androidx.test.internal.runner.TestExecutor.execute(TestExecutor.java:59)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at androidx.test.runner.AndroidJUnitRunner.onStart(AndroidJUnitRunner.java:463)
+11-16 19:42:13.703 E/TestRunner( 4587): 	at android.app.Instrumentation$InstrumentationThread.run(Instrumentation.java:2402)
+11-16 19:42:13.705 E/TestRunner( 4587): ----- end exception -----
+11-16 19:42:13.710 I/TestRunner( 4587): finished: exportWowTransitionsAndTexts(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:42:13.725 I/TestRunner( 4587): started: previewPlaysWow(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:42:13.766 I/ExoPlayerImpl( 4587): Init ac1782e [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:42:20.995 I/ExoPlayerImpl( 4587): Release 90149b8 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:42:21.115 I/ExoPlayerImpl( 4587): Init 1367f27 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:42:28.766 I/ExoPlayerImpl( 4587): Release ac1782e [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:42:29.269 E/CompositionPlayer-0( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1161)
+11-16 19:42:29.269 E/CompositionPlayer-0( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-16 19:42:29.269 E/CompositionPlayer-0( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1157)
+11-16 19:42:29.269 E/CompositionPlayer-0( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1157)
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1161)
+11-16 19:42:29.272 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+11-16 19:42:29.779 W/VivoVideoTest( 4587): previewPlaysWow: primo tentativo fallito, riprovo: anteprima senza immagini: 11 fotogrammi (posizioni: 0 497 1036 1532 1703 1838 2300 2765 3111 3364 3628 3921 4182 4453 4714 5151)
+11-16 19:42:29.789 I/ExoPlayerImpl( 4587): Init 840746 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:42:33.125 W/MessageQueue( 4587): 	at androidx.media3.exoplayer.ExoPlayerImplInternal.resetInternal(ExoPlayerImplInternal.java:2124)
+11-16 19:42:33.125 W/MessageQueue( 4587): 	at androidx.media3.exoplayer.ExoPlayerImplInternal.releaseInternal(ExoPlayerImplInternal.java:2055)
+11-16 19:42:33.125 W/MessageQueue( 4587): 	at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:880)
+11-16 19:42:41.311 I/ExoPlayerImpl( 4587): Release 1367f27 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:42:41.356 I/ExoPlayerImpl( 4587): Init d78aab0 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:42:48.018 I/ExoPlayerImpl( 4587): Release 840746 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:42:48.520 E/CompositionPlayer-0( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1161)
+11-16 19:42:48.520 E/CompositionPlayer-0( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-16 19:42:48.520 E/CompositionPlayer-0( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1157)
+11-16 19:42:48.520 E/CompositionPlayer-0( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1157)
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1161)
+11-16 19:42:48.523 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+11-16 19:42:49.029 E/TestRunner( 4587): failed: previewPlaysWow(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:42:49.031 E/TestRunner( 4587): ----- begin exception -----
+11-16 19:42:49.031 E/TestRunner( 4587): java.lang.AssertionError: anteprima senza immagini: 9 fotogrammi (posizioni: 0 517 1054 1471 2037 2658 3013 3296 3577 3881 4133 4396 4668 4917 5245 5420)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.Assert.fail(Assert.java:89)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.Assert.assertTrue(Assert.java:42)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at it.fabriziodavi.vivovideo.DeviceTest.playFor(DeviceTest.kt:799)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at it.fabriziodavi.vivovideo.DeviceTest.playFor$default(DeviceTest.kt:730)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at it.fabriziodavi.vivovideo.DeviceTest.previewPlaysWow(DeviceTest.kt:534)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at java.lang.reflect.Method.invoke(Native Method)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at it.fabriziodavi.vivovideo.DeviceTest$retry$1$1.evaluate(DeviceTest.kt:158)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.BlockJUnit4ClassRunner$1.evaluate(BlockJUnit4ClassRunner.java:100)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:366)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:103)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:63)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at androidx.test.ext.junit.runners.AndroidJUnit4.run(AndroidJUnit4.java:162)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.Suite.runChild(Suite.java:128)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.Suite.runChild(Suite.java:27)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at androidx.test.internal.runner.TestExecutor.execute(TestExecutor.java:68)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at androidx.test.internal.runner.TestExecutor.execute(TestExecutor.java:59)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at androidx.test.runner.AndroidJUnitRunner.onStart(AndroidJUnitRunner.java:463)
+11-16 19:42:49.031 E/TestRunner( 4587): 	at android.app.Instrumentation$InstrumentationThread.run(Instrumentation.java:2402)
+11-16 19:42:49.031 E/TestRunner( 4587): ----- end exception -----
+11-16 19:42:49.033 I/TestRunner( 4587): finished: previewPlaysWow(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:42:49.036 I/TestRunner( 4587): started: previewPlaysPastTheEndOfAShortSong(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:42:49.057 I/ExoPlayerImpl( 4587): Init 3ef5e3c [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:42:49.062 I/ExoPlayerImpl( 4587): Init 9b1d51a [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:42:54.821 W/MessageQueue( 4587): 	at androidx.media3.exoplayer.ExoPlayerImplInternal$1.onWakeup(ExoPlayerImplInternal.java:3730)
+11-16 19:42:54.872 W/MessageQueue( 4587): 	at androidx.media3.exoplayer.ExoPlayerImpl$VirtualDeviceIdChangeListener$$ExternalSyntheticLambda1.execute(D8$$SyntheticClass:0)
+11-16 19:42:55.118 W/MessageQueue( 4587): 	at androidx.media3.exoplayer.ExoPlayerImplInternal.resetInternal(ExoPlayerImplInternal.java:2124)
+11-16 19:42:55.118 W/MessageQueue( 4587): 	at androidx.media3.exoplayer.ExoPlayerImplInternal.releaseInternal(ExoPlayerImplInternal.java:2055)
+11-16 19:42:55.118 W/MessageQueue( 4587): 	at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:880)
+11-16 19:43:01.860 I/ExoPlayerImpl( 4587): Release d78aab0 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:43:01.954 I/ExoPlayerImpl( 4587): Init cdc02d5 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:43:05.829 I/ExoPlayerImpl( 4587): Release 3ef5e3c [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:43:06.331 E/CompositionPlayer-0( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1161)
+11-16 19:43:06.331 E/CompositionPlayer-0( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-16 19:43:06.331 E/CompositionPlayer-0( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1157)
+11-16 19:43:06.331 E/CompositionPlayer-0( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1157)
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1161)
+11-16 19:43:06.337 E/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+11-16 19:43:06.342 I/ExoPlayerImpl( 4587): Release 9b1d51a [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:43:06.848 E/CompositionPlayer-1( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1161)
+11-16 19:43:06.848 E/CompositionPlayer-1( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-16 19:43:06.848 E/CompositionPlayer-1( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1157)
+11-16 19:43:06.848 E/CompositionPlayer-1( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+11-16 19:43:06.850 W/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1161)
+11-16 19:43:06.850 W/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-16 19:43:06.850 W/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1157)
+11-16 19:43:06.850 W/CompositionPlayer( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+11-16 19:43:07.355 I/TestRunner( 4587): finished: previewPlaysPastTheEndOfAShortSong(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:43:07.358 I/TestRunner( 4587): started: bisectEffectsOnly(it.fabriziodavi.vivovideo.DeviceTest)
+11-16 19:43:10.293 W/MessageQueue( 4587): 	at androidx.media3.exoplayer.ExoPlayerImpl$VirtualDeviceIdChangeListener$$ExternalSyntheticLambda1.execute(D8$$SyntheticClass:0)
+11-16 19:43:11.212 I/TransformerInternal( 4587): Init fa03669 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:43:11.220 I/ExoPlayerImpl( 4587): Init 60158ee [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:43:11.248 I/ExoPlayerImpl( 4587): Init dbf918f [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:43:15.183 W/MessageQueue( 4587): 	at androidx.media3.exoplayer.ExoPlayerImplInternal.resetInternal(ExoPlayerImplInternal.java:2124)
+11-16 19:43:15.183 W/MessageQueue( 4587): 	at androidx.media3.exoplayer.ExoPlayerImplInternal.releaseInternal(ExoPlayerImplInternal.java:2055)
+11-16 19:43:15.183 W/MessageQueue( 4587): 	at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:880)
+11-16 19:43:15.191 W/MessageQueue( 4587): 	at androidx.media3.exoplayer.ExoPlayerImplInternal.scheduleNextWork(ExoPlayerImplInternal.java:1642)
+11-16 19:43:15.191 W/MessageQueue( 4587): 	at androidx.media3.exoplayer.ExoPlayerImplInternal.doSomeWork(ExoPlayerImplInternal.java:1596)
+11-16 19:43:15.191 W/MessageQueue( 4587): 	at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:765)
+11-16 19:43:15.193 W/MessageQueue( 4587): 	at androidx.media3.exoplayer.ExoPlayerImplInternal.resetInternal(ExoPlayerImplInternal.java:2124)
+11-16 19:43:15.193 W/MessageQueue( 4587): 	at androidx.media3.exoplayer.ExoPlayerImplInternal.stopInternal(ExoPlayerImplInternal.java:2042)
+11-16 19:43:15.193 W/MessageQueue( 4587): 	at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:802)
+11-16 19:43:15.207 W/odavi.vivovideo( 4587): Long monitor contention with owner ExoPlayer:Playback (17734) at androidx.media3.transformer.SampleConsumer androidx.media3.transformer.TransformerInternal$SequenceAssetLoaderListener.onOutputFormat(androidx.media3.common.Format)(TransformerInternal.java:709) waiters=0 in androidx.media3.transformer.SampleConsumer androidx.media3.transformer.TransformerInternal$SequenceAssetLoaderListener.onOutputFormat(androidx.media3.common.Format) for 3.876s
+11-16 19:43:22.963 I/ExoPlayerImpl( 4587): Release 60158ee [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:43:22.988 I/ExoPlayerImpl( 4587): Init c2d60d3 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:43:24.361 I/ExoPlayerImpl( 4587): Release cdc02d5 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:43:24.424 I/ExoPlayerImpl( 4587): Init 28d316c [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:43:32.412 I/ExoPlayerImpl( 4587): Release c2d60d3 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:43:32.913 E/ExoPlayerAssetLoader( 4587): Releasing the player timed out.
+11-16 19:43:32.913 E/ExoPlayerAssetLoader( 4587):   androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-16 19:43:32.913 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1161)
+11-16 19:43:32.913 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-16 19:43:32.913 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet$ListenerHolder.invoke(ListenerSet.java:466)
+11-16 19:43:32.913 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet.lambda$queueEvent$0(ListenerSet.java:334)
+11-16 19:43:32.913 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+11-16 19:43:32.913 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet.flushEvents(ListenerSet.java:358)
+11-16 19:43:32.913 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.common.util.ListenerSet.sendEvent(ListenerSet.java:386)
+11-16 19:43:32.913 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1157)
+11-16 19:43:32.913 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.transformer.ExoPlayerAssetLoader.release(ExoPlayerAssetLoader.java:352)
+11-16 19:43:32.913 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.transformer.SequenceAssetLoader$SampleConsumerWrapper.lambda$switchAssetLoader$0$androidx-media3-transformer-SequenceAssetLoader$SampleConsumerWrapper(SequenceAssetLoader.java:678)
+11-16 19:43:32.913 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.transformer.SequenceAssetLoader$SampleConsumerWrapper$$ExternalSyntheticLambda0.run(D8$$SyntheticClass:0)
+11-16 19:43:32.913 E/ExoPlayerAssetLoader( 4587):       at android.os.Handler.handleCallback(Handler.java:958)
+11-16 19:43:32.913 E/ExoPlayerAssetLoader( 4587):       at android.os.Handler.dispatchMessage(Handler.java:99)
+11-16 19:43:32.913 E/ExoPlayerAssetLoader( 4587):       at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:43:32.913 E/ExoPlayerAssetLoader( 4587):       at android.os.Looper.loop(Looper.java:294)
+11-16 19:43:32.913 E/ExoPlayerAssetLoader( 4587):       at android.os.HandlerThread.run(HandlerThread.java:67)
+11-16 19:43:32.913 E/ExoPlayerAssetLoader( 4587):   Caused by: androidx.media3.exoplayer.ExoTimeoutException: Player release timed out.
+11-16 19:43:32.913 E/ExoPlayerAssetLoader( 4587):       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$9(ExoPlayerImpl.java:1160)
+11-16 19:43:32.913 E/ExoPlayerAssetLoader( 4587):       ... 15 more
+11-16 19:43:32.916 I/ExoPlayerImpl( 4587): Init 4943434 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:43:33.220 D/DefaultCodec( 4587):       at androidx.media3.exoplayer.ExoPlayerImplInternal.doSomeWork(ExoPlayerImplInternal.java:1484)
+11-16 19:43:33.220 D/DefaultCodec( 4587):       at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:765)
+11-16 19:43:33.221 I/TransformerInternal( 4587): Release fa03669 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:43:38.223 W/TransformerInternal( 4587): Export error after export ended
+11-16 19:43:38.223 W/TransformerInternal( 4587):   androidx.media3.transformer.ExportException: Video frame processing error
+11-16 19:43:38.223 W/TransformerInternal( 4587):       at androidx.media3.transformer.VideoSampleExporter$VideoGraphWrapper.onError(VideoSampleExporter.java:333)
+11-16 19:43:38.223 W/TransformerInternal( 4587):       at androidx.media3.effect.SingleInputVideoGraph$1.lambda$onError$3$androidx-media3-effect-SingleInputVideoGraph$1(SingleInputVideoGraph.java:181)
+11-16 19:43:38.223 W/TransformerInternal( 4587):       at androidx.media3.effect.SingleInputVideoGraph$1$$ExternalSyntheticLambda3.run(D8$$SyntheticClass:0)
+11-16 19:43:38.223 W/TransformerInternal( 4587):       at com.google.common.util.concurrent.DirectExecutor.execute(DirectExecutor.java:31)
+11-16 19:43:38.223 W/TransformerInternal( 4587):       at androidx.media3.effect.SingleInputVideoGraph$1.onError(SingleInputVideoGraph.java:181)
+11-16 19:43:38.223 W/TransformerInternal( 4587):       at androidx.media3.effect.DefaultVideoFrameProcessor$Factory$$ExternalSyntheticLambda0.onError(D8$$SyntheticClass:0)
+11-16 19:43:38.223 W/TransformerInternal( 4587):       at androidx.media3.effect.VideoFrameProcessingTaskExecutor.release(VideoFrameProcessingTaskExecutor.java:240)
+11-16 19:43:38.223 W/TransformerInternal( 4587):       at androidx.media3.effect.DefaultVideoFrameProcessor.release(DefaultVideoFrameProcessor.java:880)
+11-16 19:43:38.223 W/TransformerInternal( 4587):       at androidx.media3.effect.SingleInputVideoGraph.release(SingleInputVideoGraph.java:309)
+11-16 19:43:38.223 W/TransformerInternal( 4587):       at androidx.media3.transformer.VideoSampleExporter$VideoGraphWrapper.release(VideoSampleExporter.java:296)
+11-16 19:43:38.223 W/TransformerInternal( 4587):       at androidx.media3.transformer.VideoSampleExporter.release(VideoSampleExporter.java:172)
+11-16 19:43:38.223 W/TransformerInternal( 4587):       at androidx.media3.transformer.TransformerInternal.endInternal(TransformerInternal.java:461)
+11-16 19:43:38.223 W/TransformerInternal( 4587):       at androidx.media3.transformer.TransformerInternal.handleMessage(TransformerInternal.java:391)
+11-16 19:43:38.223 W/TransformerInternal( 4587):       at androidx.media3.transformer.TransformerInternal.$r8$lambda$bzZKK-tnQO9QOb4NEtMsm46hw_4(Unknown Source:0)
+11-16 19:43:38.223 W/TransformerInternal( 4587):       at androidx.media3.transformer.TransformerInternal$$ExternalSyntheticLambda0.handleMessage(D8$$SyntheticClass:0)
+11-16 19:43:38.223 W/TransformerInternal( 4587):       at android.os.Handler.dispatchMessage(Handler.java:102)
+11-16 19:43:38.223 W/TransformerInternal( 4587):       at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:43:38.223 W/TransformerInternal( 4587):       at android.os.Looper.loop(Looper.java:294)
+11-16 19:43:38.223 W/TransformerInternal( 4587):       at android.os.HandlerThread.run(HandlerThread.java:67)
+11-16 19:43:38.223 W/TransformerInternal( 4587):   Caused by: androidx.media3.common.VideoFrameProcessingException: Release timed out. OpenGL resources may not be cleaned up properly. @UNSET
+11-16 19:43:38.223 W/TransformerInternal( 4587):       ... 13 more
+11-16 19:43:38.227 E/ExoPlayerImplInternal( 4587): Playback error
+11-16 19:43:38.227 E/ExoPlayerImplInternal( 4587):   androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-16 19:43:38.227 E/ExoPlayerImplInternal( 4587):       at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:1005)
+11-16 19:43:38.227 E/ExoPlayerImplInternal( 4587):       at android.os.Handler.dispatchMessage(Handler.java:102)
+11-16 19:43:38.227 E/ExoPlayerImplInternal( 4587):       at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:43:38.227 E/ExoPlayerImplInternal( 4587):       at android.os.Looper.loop(Looper.java:294)
+11-16 19:43:38.227 E/ExoPlayerImplInternal( 4587):       at android.os.HandlerThread.run(HandlerThread.java:67)
+11-16 19:43:38.227 E/ExoPlayerImplInternal( 4587):   Caused by: java.lang.IllegalStateException
+11-16 19:43:38.227 E/ExoPlayerImplInternal( 4587):       at com.google.common.base.Preconditions.checkState(Preconditions.java:497)
+11-16 19:43:38.227 E/ExoPlayerImplInternal( 4587):       at androidx.media3.transformer.AudioGraphInput.getInputBuffer(AudioGraphInput.java:238)
+11-16 19:43:38.227 E/ExoPlayerImplInternal( 4587):       at androidx.media3.transformer.SequenceAssetLoader$SampleConsumerWrapper.getInputBuffer(SequenceAssetLoader.java:531)
+11-16 19:43:38.227 E/ExoPlayerImplInternal( 4587):       at androidx.media3.transformer.ExoAssetLoaderBaseRenderer.feedConsumerFromInput(ExoAssetLoaderBaseRenderer.java:329)
+11-16 19:43:38.227 E/ExoPlayerImplInternal( 4587):       at androidx.media3.transformer.ExoAssetLoaderBaseRenderer.render(ExoAssetLoaderBaseRenderer.java:116)
+11-16 19:43:38.227 E/ExoPlayerImplInternal( 4587):       at androidx.media3.exoplayer.RendererHolder.render(RendererHolder.java:425)
+11-16 19:43:38.227 E/ExoPlayerImplInternal( 4587):       at androidx.media3.exoplayer.ExoPlayerImplInternal.doSomeWork(ExoPlayerImplInternal.java:1484)
+11-16 19:43:38.227 E/ExoPlayerImplInternal( 4587):       at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:765)
+11-16 19:43:38.227 E/ExoPlayerImplInternal( 4587):       ... 4 more
+11-16 19:43:38.230 I/ExoPlayerImpl( 4587): Release 4943434 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:43:38.231 I/ExoPlayerImpl( 4587): Release dbf918f [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:43:38.239 I/TransformerInternal( 4587): Init c3b2aef [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:43:38.248 I/ExoPlayerImpl( 4587): Init 2049fc [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:43:38.264 I/ExoPlayerImpl( 4587): Init 9327885 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:43:41.824 W/odavi.vivovideo( 4587): Long monitor contention with owner ExoPlayer:Playback (17785) at androidx.media3.transformer.SampleConsumer androidx.media3.transformer.TransformerInternal$SequenceAssetLoaderListener.onOutputFormat(androidx.media3.common.Format)(TransformerInternal.java:709) waiters=0 in androidx.media3.transformer.SampleConsumer androidx.media3.transformer.TransformerInternal$SequenceAssetLoaderListener.onOutputFormat(androidx.media3.common.Format) for 3.495s
+11-16 19:43:50.265 I/ExoPlayerImpl( 4587): Release 28d316c [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:43:50.292 I/ExoPlayerImpl( 4587): Init 789e2ec [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:43:51.551 I/ExoPlayerImpl( 4587): Release 2049fc [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:43:51.732 I/ExoPlayerImpl( 4587): Init 61bd108 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:44:08.207 I/ExoPlayerImpl( 4587): Release 61bd108 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:44:08.214 I/ExoPlayerImpl( 4587): Init e1e1449 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:44:08.477 I/ExoPlayerImpl( 4587): Release 789e2ec [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:44:08.552 I/ExoPlayerImpl( 4587): Init 917a1b9 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:44:31.759 I/ExoPlayerImpl( 4587): Release e1e1449 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:44:31.887 I/ExoPlayerImpl( 4587): Init 35af79d [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:44:33.921 I/ExoPlayerImpl( 4587): Release 917a1b9 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:44:34.156 I/ExoPlayerImpl( 4587): Init 3a5b209 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:44:57.721 I/ExoPlayerImpl( 4587): Release 35af79d [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:44:57.804 I/ExoPlayerImpl( 4587): Init 4d554b1 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:45:05.298 I/ExoPlayerImpl( 4587): Release 3a5b209 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:45:05.344 I/ExoPlayerImpl( 4587): Init 77bdfa3 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:45:19.645 I/ExoPlayerImpl( 4587): Release 4d554b1 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:45:19.656 I/ExoPlayerImpl( 4587): Init ae0ecfc [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:45:28.547 I/ExoPlayerImpl( 4587): Release 77bdfa3 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:45:28.752 I/ExoPlayerImpl( 4587): Init 12468d7 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:45:44.701 I/ExoPlayerImpl( 4587): Release ae0ecfc [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:45:44.900 I/ExoPlayerImpl( 4587): Init dcd5f60 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:45:55.218 I/ExoPlayerImpl( 4587): Release 12468d7 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:45:55.242 I/ExoPlayerImpl( 4587): Init dfcf89a [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:45:56.066 I/TransformerInternal( 4587): Release 35a75c0 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:45:56.422 D/DefaultCodec( 4587):       at androidx.media3.exoplayer.ExoPlayerImplInternal.doSomeWork(ExoPlayerImplInternal.java:1484)
+11-16 19:45:56.422 D/DefaultCodec( 4587):       at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:765)
+11-16 19:45:56.423 W/TransformerInternal( 4587): Export error after export ended
+11-16 19:45:56.423 W/TransformerInternal( 4587):   androidx.media3.transformer.ExportException: Codec exception: CodecInfo{type=VideoDecoder, configurationFormat={exo-pixel-width-height-ratio-float=1.0, sar-width=1, allow-frame-drop=0, mime=video/avc, bitrate=196685, color-standard=1, color-transfer=3, sar-height=1, is-autoselect=0, is-default=0, color-range=2, frame-rate=30.0, max-input-size=13361, rotation-degrees=0, height=360, track-id=2, is-forced-subtitle=0, level=4096, profile=1, codecs-string=avc1.42C029, csd-1=java.nio.HeapByteBuffer[pos=0 lim=10 cap=10], encoder-delay=0, width=640, encoder-padding=0, csd-0=java.nio.HeapByteBuffer[pos=0 lim=22 cap=22]}, name=c2.goldfish.h264.decoder}
+11-16 19:45:56.423 W/TransformerInternal( 4587):       at androidx.media3.transformer.DefaultCodec.createExportException(DefaultCodec.java:487)
+11-16 19:45:56.423 W/TransformerInternal( 4587):       at androidx.media3.transformer.DefaultCodec.createExportException(DefaultCodec.java:465)
+11-16 19:45:56.423 W/TransformerInternal( 4587):       at androidx.media3.transformer.DefaultCodec.maybeDequeueInputBuffer(DefaultCodec.java:197)
+11-16 19:45:56.423 W/TransformerInternal( 4587):       at androidx.media3.transformer.ExoAssetLoaderBaseRenderer.feedDecoderFromInput(ExoAssetLoaderBaseRenderer.java:305)
+11-16 19:45:56.423 W/TransformerInternal( 4587):       at androidx.media3.transformer.ExoAssetLoaderBaseRenderer.render(ExoAssetLoaderBaseRenderer.java:112)
+11-16 19:45:56.423 W/TransformerInternal( 4587):       at androidx.media3.exoplayer.RendererHolder.render(RendererHolder.java:425)
+11-16 19:45:56.423 W/TransformerInternal( 4587):       at androidx.media3.exoplayer.ExoPlayerImplInternal.doSomeWork(ExoPlayerImplInternal.java:1484)
+11-16 19:45:56.423 W/TransformerInternal( 4587):       at androidx.media3.exoplayer.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:765)
+11-16 19:45:56.423 W/TransformerInternal( 4587):       at android.os.Handler.dispatchMessage(Handler.java:102)
+11-16 19:45:56.423 W/TransformerInternal( 4587):       at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:45:56.423 W/TransformerInternal( 4587):       at android.os.Looper.loop(Looper.java:294)
+11-16 19:45:56.423 W/TransformerInternal( 4587):       at android.os.HandlerThread.run(HandlerThread.java:67)
+11-16 19:45:56.423 W/TransformerInternal( 4587):   Caused by: java.lang.IllegalStateException: Invalid to call at Released state; only valid in executing state
+11-16 19:45:56.423 W/TransformerInternal( 4587):   
+11-16 19:45:56.423 W/TransformerInternal( 4587):       at android.media.MediaCodec.native_dequeueInputBuffer(Native Method)
+11-16 19:45:56.423 W/TransformerInternal( 4587):       at android.media.MediaCodec.dequeueInputBuffer(MediaCodec.java:3139)
+11-16 19:45:56.423 W/TransformerInternal( 4587):       at androidx.media3.transformer.DefaultCodec.maybeDequeueInputBuffer(DefaultCodec.java:194)
+11-16 19:45:56.423 W/TransformerInternal( 4587):       ... 9 more
+11-16 19:45:56.536 I/ExoPlayerImpl( 4587): Release dfcf89a [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:45:56.539 I/ExoPlayerImpl( 4587): Release 24be23e [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:45:56.621 I/TransformerInternal( 4587): Init df08aa2 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:45:56.644 I/ExoPlayerImpl( 4587): Init 4f49333 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:45:56.703 I/ExoPlayerImpl( 4587): Init d6e66f0 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:45:57.021 W/odavi.vivovideo( 4587): Long monitor contention with owner ExoPlayer:Playback (17886) at androidx.media3.transformer.SampleConsumer androidx.media3.transformer.TransformerInternal$SequenceAssetLoaderListener.onOutputFormat(androidx.media3.common.Format)(TransformerInternal.java:709) waiters=0 in androidx.media3.transformer.SampleConsumer androidx.media3.transformer.TransformerInternal$SequenceAssetLoaderListener.onOutputFormat(androidx.media3.common.Format) for 270ms
+11-16 19:45:58.751 I/ExoPlayerImpl( 4587): Release dcd5f60 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-16 19:45:59.014 I/ExoPlayerImpl( 4587): Init 18b0d32 [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-16 19:46:06.169 E/AndroidRuntime(  517): *** FATAL EXCEPTION IN SYSTEM PROCESS: batterystats-handler
+11-16 19:46:06.169 E/AndroidRuntime(  517): java.lang.RuntimeException: failed to set system property (check logcat for reason)
+11-16 19:46:06.169 E/AndroidRuntime(  517): 	at android.os.SystemProperties.native_set(Native Method)
+11-16 19:46:06.169 E/AndroidRuntime(  517): 	at android.os.SystemProperties.set(SystemProperties.java:235)
+11-16 19:46:06.169 E/AndroidRuntime(  517): 	at com.android.internal.os.BatteryStatsHistory$TraceDelegate.traceCounter(BatteryStatsHistory.java:249)
+11-16 19:46:06.169 E/AndroidRuntime(  517): 	at com.android.internal.os.BatteryStatsHistory.recordTraceCounters(BatteryStatsHistory.java:1288)
+11-16 19:46:06.169 E/AndroidRuntime(  517): 	at com.android.internal.os.BatteryStatsHistory.writeHistoryItem(BatteryStatsHistory.java:1330)
+11-16 19:46:06.169 E/AndroidRuntime(  517): 	at com.android.internal.os.BatteryStatsHistory.writeHistoryItem(BatteryStatsHistory.java:1322)
+11-16 19:46:06.169 E/AndroidRuntime(  517): 	at com.android.internal.os.BatteryStatsHistory.recordState2StartEvent(BatteryStatsHistory.java:1132)
+11-16 19:46:06.169 E/AndroidRuntime(  517): 	at com.android.server.power.stats.BatteryStatsImpl.noteVideoOnLocked(BatteryStatsImpl.java:6253)
+11-16 19:46:06.169 E/AndroidRuntime(  517): 	at com.android.server.am.BatteryStatsService.lambda$noteStartVideo$54(BatteryStatsService.java:1701)
+11-16 19:46:06.169 E/AndroidRuntime(  517): 	at com.android.server.am.BatteryStatsService.$r8$lambda$JgQ8ngEgEF7wI4XZBQeQyDNRwmg(BatteryStatsService.java:0)
+11-16 19:46:06.169 E/AndroidRuntime(  517): 	at com.android.server.am.BatteryStatsService$$ExternalSyntheticLambda72.run(R8$$SyntheticClass:0)
+11-16 19:46:06.169 E/AndroidRuntime(  517): 	at android.os.Handler.handleCallback(Handler.java:958)
+11-16 19:46:06.169 E/AndroidRuntime(  517): 	at android.os.Handler.dispatchMessage(Handler.java:99)
+11-16 19:46:06.169 E/AndroidRuntime(  517): 	at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:46:06.169 E/AndroidRuntime(  517): 	at android.os.Looper.loop(Looper.java:294)
+11-16 19:46:06.169 E/AndroidRuntime(  517): 	at android.os.HandlerThread.run(HandlerThread.java:67)
+11-16 19:46:07.172 D/AndroidRuntime( 4568): Shutting down VM
+11-16 19:46:08.134 D/AndroidRuntime( 1043): Shutting down VM
+11-16 19:46:08.134 E/AndroidRuntime( 1043): FATAL EXCEPTION: main
+11-16 19:46:08.134 E/AndroidRuntime( 1043): Process: com.android.phone, PID: 1043
+11-16 19:46:08.134 E/AndroidRuntime( 1043): DeadSystemException: The system died; earlier logs will point to the root cause
+11-16 19:46:08.165 D/AndroidRuntime( 1622): Shutting down VM
+11-16 19:46:08.165 E/AndroidRuntime( 1622): FATAL EXCEPTION: main
+11-16 19:46:08.165 E/AndroidRuntime( 1622): Process: com.google.android.googlequicksearchbox:interactor, PID: 1622
+11-16 19:46:08.165 E/AndroidRuntime( 1622): DeadSystemException: The system died; earlier logs will point to the root cause
+11-16 19:46:08.175 I/trace_manager( 1622): 002860	Application creation > Application.onCreate > Startup Listeners > ExoPlayerConfigStartupListener > 0 ms
+11-16 19:46:08.282 E/AndroidRuntime( 1622): FATAL EXCEPTION: GoogleApiHandler
+11-16 19:46:08.282 E/AndroidRuntime( 1622): Process: com.google.android.googlequicksearchbox:interactor, PID: 1622
+11-16 19:46:08.282 E/AndroidRuntime( 1622): DeadSystemException: The system died; earlier logs will point to the root cause
+11-16 19:46:09.597 D/AndroidRuntime(17961): >>>>>> START com.android.internal.os.ZygoteInit uid 0 <<<<<<
+11-16 19:46:09.601 I/AndroidRuntime(17961): Using default boot image
+11-16 19:46:09.611 I/AndroidRuntime(17961): Leaving lock profiling enabled
+11-16 19:46:16.379 I/AndroidRuntime(18268): VM exiting with result code 0, cleanup skipped.
+11-16 19:46:18.506 D/AndroidRuntime(18225): Shutting down VM
+11-16 19:46:18.506 E/AndroidRuntime(18225): FATAL EXCEPTION: main
+11-16 19:46:18.506 E/AndroidRuntime(18225): Process: com.android.systemui, PID: 18225
+11-16 19:46:18.506 E/AndroidRuntime(18225): java.lang.IllegalArgumentException: subscriptionId 1 is not in the list of valid subscriptions
+11-16 19:46:18.506 E/AndroidRuntime(18225): 	at com.android.systemui.statusbar.pipeline.mobile.data.repository.prod.MobileConnectionsRepositoryImpl.getRepoForSubId(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:7)
+11-16 19:46:18.506 E/AndroidRuntime(18225): 	at com.android.systemui.statusbar.pipeline.mobile.data.repository.MobileRepositorySwitcher.getRepoForSubId(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:24)
+11-16 19:46:18.506 E/AndroidRuntime(18225): 	at com.android.systemui.statusbar.pipeline.mobile.ui.viewmodel.MobileIconsViewModel.commonViewModelForSub(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:51)
+11-16 19:46:18.506 E/AndroidRuntime(18225): 	at com.android.systemui.statusbar.pipeline.mobile.ui.viewmodel.MobileIconsViewModel.viewModelForSub(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:1)
+11-16 19:46:18.506 E/AndroidRuntime(18225): 	at com.android.systemui.statusbar.phone.StatusBarIconController$IconManager.addHolder(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:91)
+11-16 19:46:18.506 E/AndroidRuntime(18225): 	at com.android.systemui.statusbar.phone.StatusBarIconController$DarkIconManager.onIconAdded(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:1)
+11-16 19:46:18.506 E/AndroidRuntime(18225): 	at com.android.systemui.statusbar.phone.StatusBarIconControllerImpl.addIconGroup(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:91)
+11-16 19:46:18.506 E/AndroidRuntime(18225): 	at com.android.systemui.statusbar.phone.fragment.CollapsedStatusBarFragment.onViewCreated(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:315)
+11-16 19:46:18.506 E/AndroidRuntime(18225): 	at android.app.FragmentManagerImpl.moveToState(FragmentManager.java:1313)
+11-16 19:46:18.506 E/AndroidRuntime(18225): 	at android.app.FragmentManagerImpl.addAddedFragments(FragmentManager.java:2431)
+11-16 19:46:18.506 E/AndroidRuntime(18225): 	at android.app.FragmentManagerImpl.executeOpsTogether(FragmentManager.java:2210)
+11-16 19:46:18.506 E/AndroidRuntime(18225): 	at android.app.FragmentManagerImpl.removeRedundantOperationsAndExecute(FragmentManager.java:2166)
+11-16 19:46:18.506 E/AndroidRuntime(18225): 	at android.app.FragmentManagerImpl.execPendingActions(FragmentManager.java:2067)
+11-16 19:46:18.506 E/AndroidRuntime(18225): 	at android.app.FragmentManagerImpl$1.run(FragmentManager.java:742)
+11-16 19:46:18.506 E/AndroidRuntime(18225): 	at android.os.Handler.handleCallback(Handler.java:958)
+11-16 19:46:18.506 E/AndroidRuntime(18225): 	at android.os.Handler.dispatchMessage(Handler.java:99)
+11-16 19:46:18.506 E/AndroidRuntime(18225): 	at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:46:18.506 E/AndroidRuntime(18225): 	at android.os.Looper.loop(Looper.java:294)
+11-16 19:46:18.506 E/AndroidRuntime(18225): 	at android.app.ActivityThread.main(ActivityThread.java:8177)
+11-16 19:46:18.506 E/AndroidRuntime(18225): 	at java.lang.reflect.Method.invoke(Native Method)
+11-16 19:46:18.506 E/AndroidRuntime(18225): 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:552)
+11-16 19:46:18.506 E/AndroidRuntime(18225): 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:971)
+11-16 19:46:26.311 I/ExoPlayerImpl(19338): Init 71e7642 [AndroidXMedia3/1.0.0-alpha03] [emu64xa, sdk_gphone64_x86_64, Google, 34]

@@ -1,0 +1,300 @@
+11-16 19:46:17.912 18358 18358 E a2dp_vendor_ldac: packages/modules/Bluetooth/system/stack/a2dp/a2dp_vendor_ldac.cc:1422 init: init: cannot load the decoder
+11-16 19:46:17.919 18358 18358 E a2dp_vendor_ldac: packages/modules/Bluetooth/system/stack/a2dp/a2dp_vendor_ldac.cc:1422 init: init: cannot load the decoder
+11-16 19:46:17.926 18358 18358 E a2dp_vendor_ldac: packages/modules/Bluetooth/system/stack/a2dp/a2dp_vendor_ldac.cc:1422 init: init: cannot load the decoder
+11-16 19:46:17.931 18358 18358 E a2dp_vendor_ldac: packages/modules/Bluetooth/system/stack/a2dp/a2dp_vendor_ldac.cc:1422 init: init: cannot load the decoder
+11-16 19:46:17.936 18358 18358 E a2dp_vendor_ldac: packages/modules/Bluetooth/system/stack/a2dp/a2dp_vendor_ldac.cc:1422 init: init: cannot load the decoder
+11-16 19:46:17.939 18358 18358 E a2dp_vendor_ldac: packages/modules/Bluetooth/system/stack/a2dp/a2dp_vendor_ldac.cc:1422 init: init: cannot load the decoder
+11-16 19:46:17.963 18358 18358 E AvrcpTargetService: Please use AVRCP version 1.6 to enable cover art
+11-16 19:46:17.977 18225 18579 W Codec2Client: query -- param skipped: index = 1107298332.
+11-16 19:46:17.977 18225 18579 W Codec2Client: query -- param skipped: index = 1342179345.
+11-16 19:46:17.977 18225 18579 W Codec2Client: query -- param skipped: index = 2415921170.
+11-16 19:46:17.995 18588 18588 W oadcastreceiver: Unexpected CPU variant for x86: x86_64.
+11-16 19:46:17.995 18588 18588 W oadcastreceiver: Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, tremont, kabylake, default
+11-16 19:46:17.996 18588 18588 E oadcastreceiver: Not starting debugger since process cannot load the jdwp agent.
+11-16 19:46:18.017 18358 18358 W HeadsetClientService: getHeadsetClientService(): service is null
+11-16 19:46:18.056 18358 18358 W bt_btif : packages/modules/Bluetooth/system/btif/src/bluetooth.cc:824 pbap_pse_dynamic_version_upgrade_is_enabled: PBAP PSE dynamic version upgrade is not enabled
+11-16 19:46:18.056 18358 18358 W LeAudioService: getLeAudioService(): service is NULL
+11-16 19:46:18.074 18588 18622 E CellBroadcastConfigService: fails to setCellBroadcastRanges
+11-16 19:46:18.080 18358 18533 W MediaControlGattService: Feature MEDIA_STATE(BIT 17) support: true
+11-16 19:46:18.081 18358 18533 W MediaControlGattService: Feature PLAYER_NAME(BIT 1) support: true
+11-16 19:46:18.081 18358 18533 W MediaControlGattService: Feature PLAYER_NAME_NOTIFY support: true
+11-16 19:46:18.082 18358 18533 W MediaControlGattService: Feature PLAYER_ICON_URL(BIT 3) support: false
+11-16 19:46:18.082 18358 18533 W MediaControlGattService: Feature PLAYER_ICON_OBJ_ID(BIT 2) support: false
+11-16 19:46:18.082 18358 18533 W MediaControlGattService: Feature CURRENT_TRACK_SEGMENT_OBJ_ID(BIT 10) support: false
+11-16 19:46:18.083 18358 18533 W MediaControlGattService: Feature CURRENT_TRACK_OBJ_ID(BIT 11) support: false
+11-16 19:46:18.083 18358 18533 W MediaControlGattService: Feature NEXT_TRACK_OBJ_ID(BIT 12) support: false
+11-16 19:46:18.084 18358 18533 W MediaControlGattService: Feature CURRENT_GROUP_OBJ_ID(BIT 13) support: false
+11-16 19:46:18.084 18358 18533 W MediaControlGattService: Feature PARENT_GROUP_OBJ_ID(BIT 14) support: false
+11-16 19:46:18.084 18358 18533 W MediaControlGattService: Feature SEARCH_RESULT_OBJ_ID(BIT 20) support: false
+11-16 19:46:18.084 18358 18533 W MediaControlGattService: Feature TRACK_TITLE(BIT 5) support: true
+11-16 19:46:18.084 18358 18533 W MediaControlGattService: Feature TRACK_TITLE_NOTIFY support: true
+11-16 19:46:18.085 18358 18533 W MediaControlGattService: Feature TRACK_DURATION(BIT 6) support: true
+11-16 19:46:18.085 18358 18533 W MediaControlGattService: Feature TRACK_DURATION_NOTIFY support: true
+11-16 19:46:18.086 18358 18533 W MediaControlGattService: Feature TRACK_POSITION(BIT 7) support: true
+11-16 19:46:18.086 18358 18533 W MediaControlGattService: Feature TRACK_POSITION_NOTIFY support: true
+11-16 19:46:18.086 18358 18533 W MediaControlGattService: Feature MEDIA_STATE(BIT 17) support: true
+11-16 19:46:18.086 18358 18533 W MediaControlGattService: Feature MEDIA_STATE(BIT 17) support: true
+11-16 19:46:18.088 18358 18533 W MediaControlGattService: Feature PLAYBACK_SPEED(BIT 8) support: true
+11-16 19:46:18.088 18358 18533 W MediaControlGattService: Feature PLAYBACK_SPEED(BIT 8) support: true
+11-16 19:46:18.088 18358 18533 W MediaControlGattService: Feature PLAYBACK_SPEED_NOTIFY support: true
+11-16 19:46:18.088 18358 18533 W MediaControlGattService: Feature SEEKING_SPEED(BIT 9) support: true
+11-16 19:46:18.088 18358 18533 W MediaControlGattService: Feature SEEKING_SPEED(BIT 9) support: true
+11-16 19:46:18.088 18358 18533 W MediaControlGattService: Feature SEEKING_SPEED_NOTIFY support: true
+11-16 19:46:18.088 18358 18533 W MediaControlGattService: Feature PLAYING_ORDER_SUPPORTED(BIT 16) support: true
+11-16 19:46:18.088 18358 18533 W MediaControlGattService: Feature PLAYING_ORDER(BIT 15) support: true
+11-16 19:46:18.088 18358 18533 W MediaControlGattService: Feature PLAYING_ORDER_NOTIFY support: true
+11-16 19:46:18.089 18358 18533 W MediaControlGattService: Feature MEDIA_CONTROL_POINT_OPCODES_SUPPORTED(BIT 19) support: true
+11-16 19:46:18.089 18358 18533 W MediaControlGattService: Feature MEDIA_CONTROL_POINT_OPCODES_SUPPORTED_NOTIFY support: true
+11-16 19:46:18.089 18358 18533 W MediaControlGattService: Feature MEDIA_STATE(BIT 17) support: true
+11-16 19:46:18.090 18358 18533 W MediaControlGattService: Feature PLAYER_ICON_URL(BIT 3) support: false
+11-16 19:46:18.090 18358 18533 W MediaControlGattService: Feature PLAYER_ICON_OBJ_ID(BIT 2) support: false
+11-16 19:46:18.090 18358 18533 W MediaControlGattService: Feature PLAYER_NAME(BIT 1) support: true
+11-16 19:46:18.090 18358 18533 W MediaControlGattService: Feature PLAYING_ORDER_SUPPORTED(BIT 16) support: true
+11-16 19:46:18.096 18358 18358 W HeadsetClientService: getHeadsetClientService(): service is null
+11-16 19:46:18.097 18358 18358 W MapClientService: getMapClientService(): service is null
+11-16 19:46:18.098 18358 18358 W PbapClientService: getPbapClientService(): service is null
+11-16 19:46:18.098 18358 18358 W HapClientService: getHapClientService(): service is NULL
+11-16 19:46:18.098 18358 18358 W SapService: getSapService(): service is null
+11-16 19:46:18.098 18358 18358 W VolumeControlService: getVolumeControlService(): service is NULL
+11-16 19:46:18.098 18358 18358 W CsipSetCoordinatorService: getCsipSetCoordinatorService(): service is NULL
+11-16 19:46:18.098 18358 18358 W LeAudioService: getLeAudioService(): service is NULL
+11-16 19:46:18.098 18358 18358 W BassClientService: getBassClientService(): service is NULL
+11-16 19:46:18.098 18358 18358 W BatteryService: getBatteryService(): service is NULL
+11-16 19:46:18.104 18024 18118 W BluetoothManagerService: Cannot bind profile: 22, not in supported profiles list
+11-16 19:46:18.105 18024 18118 W BluetoothManagerService: Cannot bind profile: 22, not in supported profiles list
+11-16 19:46:18.105 18024 18118 W BluetoothManagerService: Cannot bind profile: 22, not in supported profiles list
+11-16 19:46:18.105 18024 18118 W BluetoothManagerService: Cannot bind profile: 22, not in supported profiles list
+11-16 19:46:18.115 18225 18614 W Codec2Client: query -- param skipped: index = 1107298332.
+11-16 19:46:18.116 18225 18614 W Codec2Client: query -- param skipped: index = 1342179345.
+11-16 19:46:18.116 18225 18614 W Codec2Client: query -- param skipped: index = 2415921170.
+11-16 19:46:18.136 18225 18225 W ConstraintSet: Unknown attribute 0x39   0
+11-16 19:46:18.146 18225 18225 W ConstraintSet: Unknown attribute 0x39   0
+11-16 19:46:18.146 18225 18225 W ConstraintSet: Unknown attribute 0x39   0
+11-16 19:46:18.147 18225 18225 W ConstraintSet: Unknown attribute 0x39   0
+11-16 19:46:18.157 18358 18358 W MediaSessionCompat: Couldn't find a unique registered media button receiver in the given context.
+11-16 19:46:18.161 18225 18639 W Codec2Client: query -- param skipped: index = 1107298332.
+11-16 19:46:18.166 18358 18358 E BluetoothPhonePolicy: autoConnect: most recently active a2dp device is null
+11-16 19:46:18.176 18225 18639 W Codec2Client: query -- param skipped: index = 1342179345.
+11-16 19:46:18.176 18225 18639 W Codec2Client: query -- param skipped: index = 2415921170.
+11-16 19:46:18.198 18358 18485 E bt_btif : packages/modules/Bluetooth/system/main/bte_logmsg.cc:105 LogMsg: toggleProfile: Unknown service 255 being enabled
+11-16 19:46:18.217 18358 18358 W MediaSessionCompat: Couldn't find a unique registered media button receiver in the given context.
+11-16 19:46:18.219 18401 18401 E MmTelFeatureConn [0]: ImsRegistrationCallbackAdapter: ImsRegistration is null
+11-16 19:46:18.226 18401 18550 W m.android.phone: Long monitor contention with owner main (18401) at com.android.internal.telephony.CommandsInterface[] com.android.internal.telephony.PhoneFactory.getCommandsInterfaces()(PhoneFactory.java:469) waiters=0 in com.android.internal.telephony.Phone[] com.android.internal.telephony.PhoneFactory.getPhones() for 547ms
+11-16 19:46:18.269 18024 18150 W BestClock: java.time.DateTimeException: Missing network time fix
+11-16 19:46:18.270 18024 18150 W BestClock: java.time.DateTimeException: Missing network time fix
+11-16 19:46:18.277   474   474 W libgoldfish-rild: Multi-element reporting criteria are not supported with HIDL HAL
+11-16 19:46:18.279   474   474 W libgoldfish-rild: Multi-element reporting criteria are not supported with HIDL HAL
+11-16 19:46:18.370 18331 18373 E SystemServiceRegistry: No service published for: ethernet
+11-16 19:46:18.370 18331 18373 E SystemServiceRegistry: android.os.ServiceManager$ServiceNotFoundException: No service published for: ethernet
+11-16 19:46:18.370 18331 18373 E SystemServiceRegistry: 	at android.os.ServiceManager.getServiceOrThrow(ServiceManager.java:166)
+11-16 19:46:18.370 18331 18373 E SystemServiceRegistry: 	at android.app.SystemServiceRegistry$139.createService(SystemServiceRegistry.java:1872)
+11-16 19:46:18.370 18331 18373 E SystemServiceRegistry: 	at android.app.SystemServiceRegistry$CachedServiceFetcher.getService(SystemServiceRegistry.java:1971)
+11-16 19:46:18.370 18331 18373 E SystemServiceRegistry: 	at android.app.SystemServiceRegistry.getSystemService(SystemServiceRegistry.java:1645)
+11-16 19:46:18.370 18331 18373 E SystemServiceRegistry: 	at android.app.ContextImpl.getSystemService(ContextImpl.java:2212)
+11-16 19:46:18.370 18331 18373 E SystemServiceRegistry: 	at android.content.ContextWrapper.getSystemService(ContextWrapper.java:934)
+11-16 19:46:18.370 18331 18373 E SystemServiceRegistry: 	at com.android.networkstack.tethering.Tethering.isEthernetSupported(Tethering.java:1582)
+11-16 19:46:18.370 18331 18373 E SystemServiceRegistry: 	at com.android.networkstack.tethering.Tethering.makeSupportedDownstreams(Tethering.java:2550)
+11-16 19:46:18.370 18331 18373 E SystemServiceRegistry: 	at com.android.networkstack.tethering.Tethering.updateSupportedDownstreams(Tethering.java:2524)
+11-16 19:46:18.370 18331 18373 E SystemServiceRegistry: 	at com.android.networkstack.tethering.Tethering.updateConfiguration(Tethering.java:546)
+11-16 19:46:18.370 18331 18373 E SystemServiceRegistry: 	at com.android.networkstack.tethering.Tethering.-$$Nest$mupdateConfiguration(Tethering.java:0)
+11-16 19:46:18.370 18331 18373 E SystemServiceRegistry: 	at com.android.networkstack.tethering.Tethering$StateReceiver.onReceive(Tethering.java:1184)
+11-16 19:46:18.370 18331 18373 E SystemServiceRegistry: 	at android.app.LoadedApk$ReceiverDispatcher$Args.lambda$getRunnable$0(LoadedApk.java:1802)
+11-16 19:46:18.370 18331 18373 E SystemServiceRegistry: 	at android.app.LoadedApk$ReceiverDispatcher$Args.$r8$lambda$gDuJqgxY6Zb-ifyeubKeivTLAwk(Unknown Source:0)
+11-16 19:46:18.370 18331 18373 E SystemServiceRegistry: 	at android.app.LoadedApk$ReceiverDispatcher$Args$$ExternalSyntheticLambda0.run(Unknown Source:2)
+11-16 19:46:18.370 18331 18373 E SystemServiceRegistry: 	at android.os.Handler.handleCallback(Handler.java:958)
+11-16 19:46:18.370 18331 18373 E SystemServiceRegistry: 	at android.os.Handler.dispatchMessage(Handler.java:99)
+11-16 19:46:18.370 18331 18373 E SystemServiceRegistry: 	at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:46:18.370 18331 18373 E SystemServiceRegistry: 	at android.os.Looper.loop(Looper.java:294)
+11-16 19:46:18.370 18331 18373 E SystemServiceRegistry: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+11-16 19:46:18.395   474   474 E RIL     : Error 0 opening logical channel: 0
+11-16 19:46:18.404 18225 18225 W DLObserver: wirelessCharger is not present
+11-16 19:46:18.423 18225 18225 W AlarmManager: Unrecognized alarm listener com.google.android.systemui.smartspace.KeyguardZenAlarmViewController$showNextAlarm$1@806ac5a
+11-16 19:46:18.446 18024 18039 W InputManager-JNI: Input channel object '[Gesture Monitor] swipe-up (client)' was disposed without first being removed with the input manager!
+11-16 19:46:18.454 18225 18225 E BatteryInfoBroadcast: failed to register observver for remaining time
+11-16 19:46:18.454 18225 18225 E BatteryInfoBroadcast: java.lang.SecurityException: Failed to find provider com.google.android.apps.turbo.estimated_time_remaining for user 0; expected to find a valid ContentProvider for this authority
+11-16 19:46:18.454 18225 18225 E BatteryInfoBroadcast: 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3057)
+11-16 19:46:18.454 18225 18225 E BatteryInfoBroadcast: 	at android.os.Parcel.createException(Parcel.java:3041)
+11-16 19:46:18.454 18225 18225 E BatteryInfoBroadcast: 	at android.os.Parcel.readException(Parcel.java:3024)
+11-16 19:46:18.454 18225 18225 E BatteryInfoBroadcast: 	at android.os.Parcel.readException(Parcel.java:2966)
+11-16 19:46:18.454 18225 18225 E BatteryInfoBroadcast: 	at android.content.IContentService$Stub$Proxy.registerContentObserver(IContentService.java:1032)
+11-16 19:46:18.454 18225 18225 E BatteryInfoBroadcast: 	at android.content.ContentResolver.registerContentObserver(ContentResolver.java:2728)
+11-16 19:46:18.454 18225 18225 E BatteryInfoBroadcast: 	at com.google.android.systemui.power.BatteryInfoBroadcast.<init>(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:124)
+11-16 19:46:18.454 18225 18225 E BatteryInfoBroadcast: 	at com.google.android.systemui.power.PowerNotificationWarningsGoogleImpl$$ExternalSyntheticLambda0.run(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:15)
+11-16 19:46:18.454 18225 18225 E BatteryInfoBroadcast: 	at android.os.Handler.handleCallback(Handler.java:958)
+11-16 19:46:18.454 18225 18225 E BatteryInfoBroadcast: 	at android.os.Handler.dispatchMessage(Handler.java:99)
+11-16 19:46:18.454 18225 18225 E BatteryInfoBroadcast: 	at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:46:18.454 18225 18225 E BatteryInfoBroadcast: 	at android.os.Looper.loop(Looper.java:294)
+11-16 19:46:18.454 18225 18225 E BatteryInfoBroadcast: 	at android.app.ActivityThread.main(ActivityThread.java:8177)
+11-16 19:46:18.454 18225 18225 E BatteryInfoBroadcast: 	at java.lang.reflect.Method.invoke(Native Method)
+11-16 19:46:18.454 18225 18225 E BatteryInfoBroadcast: 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:552)
+11-16 19:46:18.454 18225 18225 E BatteryInfoBroadcast: 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:971)
+11-16 19:46:18.454 18225 18225 E BatteryInfoBroadcast: Caused by: android.os.RemoteException: Remote stack trace:
+11-16 19:46:18.454 18225 18225 E BatteryInfoBroadcast: 	at com.android.server.content.ContentService.registerContentObserver(ContentService.java:379)
+11-16 19:46:18.454 18225 18225 E BatteryInfoBroadcast: 	at android.content.IContentService$Stub.onTransact(IContentService.java:486)
+11-16 19:46:18.454 18225 18225 E BatteryInfoBroadcast: 	at android.os.Binder.execTransactInternal(Binder.java:1344)
+11-16 19:46:18.454 18225 18225 E BatteryInfoBroadcast: 	at android.os.Binder.execTransact(Binder.java:1275)
+11-16 19:46:18.454 18225 18225 E BatteryInfoBroadcast:
+11-16 19:46:18.465 18024 18150 W BestClock: java.time.DateTimeException: Missing network time fix
+11-16 19:46:18.466 18024 18150 W BestClock: java.time.DateTimeException: Missing network time fix
+11-16 19:46:18.467 18024 18150 W BestClock: java.time.DateTimeException: Missing network time fix
+11-16 19:46:18.468 18024 18150 W BestClock: java.time.DateTimeException: Missing network time fix
+11-16 19:46:18.468 18225 18225 E StatusBarSignalPolicy: Unexpected subscription 1
+11-16 19:46:18.492 18401 18401 W nsconfig: com.android.phone: New config does not match the previously set config.
+11-16 19:46:18.506 18225 18225 E AndroidRuntime: FATAL EXCEPTION: main
+11-16 19:46:18.506 18225 18225 E AndroidRuntime: Process: com.android.systemui, PID: 18225
+11-16 19:46:18.506 18225 18225 E AndroidRuntime: java.lang.IllegalArgumentException: subscriptionId 1 is not in the list of valid subscriptions
+11-16 19:46:18.506 18225 18225 E AndroidRuntime: 	at com.android.systemui.statusbar.pipeline.mobile.data.repository.prod.MobileConnectionsRepositoryImpl.getRepoForSubId(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:7)
+11-16 19:46:18.506 18225 18225 E AndroidRuntime: 	at com.android.systemui.statusbar.pipeline.mobile.data.repository.MobileRepositorySwitcher.getRepoForSubId(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:24)
+11-16 19:46:18.506 18225 18225 E AndroidRuntime: 	at com.android.systemui.statusbar.pipeline.mobile.ui.viewmodel.MobileIconsViewModel.commonViewModelForSub(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:51)
+11-16 19:46:18.506 18225 18225 E AndroidRuntime: 	at com.android.systemui.statusbar.pipeline.mobile.ui.viewmodel.MobileIconsViewModel.viewModelForSub(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:1)
+11-16 19:46:18.506 18225 18225 E AndroidRuntime: 	at com.android.systemui.statusbar.phone.StatusBarIconController$IconManager.addHolder(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:91)
+11-16 19:46:18.506 18225 18225 E AndroidRuntime: 	at com.android.systemui.statusbar.phone.StatusBarIconController$DarkIconManager.onIconAdded(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:1)
+11-16 19:46:18.506 18225 18225 E AndroidRuntime: 	at com.android.systemui.statusbar.phone.StatusBarIconControllerImpl.addIconGroup(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:91)
+11-16 19:46:18.506 18225 18225 E AndroidRuntime: 	at com.android.systemui.statusbar.phone.fragment.CollapsedStatusBarFragment.onViewCreated(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:315)
+11-16 19:46:18.506 18225 18225 E AndroidRuntime: 	at android.app.FragmentManagerImpl.moveToState(FragmentManager.java:1313)
+11-16 19:46:18.506 18225 18225 E AndroidRuntime: 	at android.app.FragmentManagerImpl.addAddedFragments(FragmentManager.java:2431)
+11-16 19:46:18.506 18225 18225 E AndroidRuntime: 	at android.app.FragmentManagerImpl.executeOpsTogether(FragmentManager.java:2210)
+11-16 19:46:18.506 18225 18225 E AndroidRuntime: 	at android.app.FragmentManagerImpl.removeRedundantOperationsAndExecute(FragmentManager.java:2166)
+11-16 19:46:18.506 18225 18225 E AndroidRuntime: 	at android.app.FragmentManagerImpl.execPendingActions(FragmentManager.java:2067)
+11-16 19:46:18.506 18225 18225 E AndroidRuntime: 	at android.app.FragmentManagerImpl$1.run(FragmentManager.java:742)
+11-16 19:46:18.506 18225 18225 E AndroidRuntime: 	at android.os.Handler.handleCallback(Handler.java:958)
+11-16 19:46:18.506 18225 18225 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:99)
+11-16 19:46:18.506 18225 18225 E AndroidRuntime: 	at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:46:18.506 18225 18225 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:294)
+11-16 19:46:18.506 18225 18225 E AndroidRuntime: 	at android.app.ActivityThread.main(ActivityThread.java:8177)
+11-16 19:46:18.506 18225 18225 E AndroidRuntime: 	at java.lang.reflect.Method.invoke(Native Method)
+11-16 19:46:18.506 18225 18225 E AndroidRuntime: 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:552)
+11-16 19:46:18.506 18225 18225 E AndroidRuntime: 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:971)
+11-16 19:46:18.521 18692 18692 W ssioncontroller: Unexpected CPU variant for x86: x86_64.
+11-16 19:46:18.521 18692 18692 W ssioncontroller: Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, tremont, kabylake, default
+11-16 19:46:18.522 18692 18692 E ssioncontroller: Not starting debugger since process cannot load the jdwp agent.
+11-16 19:46:18.533 18024 18250 W InputManager-JNI: Input channel object 'a36909b ShellDropTarget (client)' was disposed without first being removed with the input manager!
+11-16 19:46:18.538 18024 18710 W AudioService.RecordingActivityMonitor: client died
+11-16 19:46:18.541 18024 18250 W InputManager-JNI: Input channel object '597e110 NotificationShade (client)' was disposed without first being removed with the input manager!
+11-16 19:46:18.541 18024 18250 W InputManager-JNI: Input channel object '537b7c5 StatusBar (client)' was disposed without first being removed with the input manager!
+11-16 19:46:18.542 18024 18443 W AS.AudioService: Current remote volume controller died, unregistering
+11-16 19:46:18.542 18024 18443 W VolumeController: Error calling dismiss
+11-16 19:46:18.542 18024 18443 W VolumeController: android.os.DeadObjectException
+11-16 19:46:18.542 18024 18443 W VolumeController: 	at android.os.BinderProxy.transactNative(Native Method)
+11-16 19:46:18.542 18024 18443 W VolumeController: 	at android.os.BinderProxy.transact(BinderProxy.java:584)
+11-16 19:46:18.542 18024 18443 W VolumeController: 	at android.media.IVolumeController$Stub$Proxy.dismiss(IVolumeController.java:279)
+11-16 19:46:18.542 18024 18443 W VolumeController: 	at com.android.server.audio.AudioService$VolumeController.postDismiss(AudioService.java:11396)
+11-16 19:46:18.542 18024 18443 W VolumeController: 	at com.android.server.audio.AudioService.setVolumeController(AudioService.java:11183)
+11-16 19:46:18.542 18024 18443 W VolumeController: 	at com.android.server.audio.AudioService$6.binderDied(AudioService.java:11192)
+11-16 19:46:18.542 18024 18443 W VolumeController: 	at android.os.IBinder$DeathRecipient.binderDied(IBinder.java:319)
+11-16 19:46:18.542 18024 18443 W VolumeController: 	at android.os.BinderProxy.sendDeathNotice(BinderProxy.java:704)
+11-16 19:46:18.543 18024 18713 W BinderNative: Uncaught exception from death notification
+11-16 19:46:18.543 18024 18713 W BinderNative: java.lang.NullPointerException: Attempt to invoke virtual method 'int java.lang.Integer.intValue()' on a null object reference
+11-16 19:46:18.543 18024 18713 W BinderNative: 	at com.android.server.input.BatteryController.handleListeningProcessDied(BatteryController.java:346)
+11-16 19:46:18.543 18024 18713 W BinderNative: 	at com.android.server.input.BatteryController.-$$Nest$mhandleListeningProcessDied(BatteryController.java:0)
+11-16 19:46:18.543 18024 18713 W BinderNative: 	at com.android.server.input.BatteryController$ListenerRecord.lambda$new$0(BatteryController.java:513)
+11-16 19:46:18.543 18024 18713 W BinderNative: 	at com.android.server.input.BatteryController$ListenerRecord.$r8$lambda$lsl1-ITSzgxW57M3wkMV_WbzFUk(BatteryController.java:0)
+11-16 19:46:18.543 18024 18713 W BinderNative: 	at com.android.server.input.BatteryController$ListenerRecord$$ExternalSyntheticLambda0.binderDied(R8$$SyntheticClass:0)
+11-16 19:46:18.543 18024 18713 W BinderNative: 	at android.os.IBinder$DeathRecipient.binderDied(IBinder.java:319)
+11-16 19:46:18.543 18024 18713 W BinderNative: 	at android.os.BinderProxy.sendDeathNotice(BinderProxy.java:704)
+11-16 19:46:18.556 18024 18711 W InputManager-JNI: Input channel object '20890de ScreenDecorOverlayBottom (client)' was disposed without first being removed with the input manager!
+11-16 19:46:18.557   474   474 W libgoldfish-rild: Multi-element reporting criteria are not supported with HIDL HAL
+11-16 19:46:18.562 18024 18708 W InputManager-JNI: Input channel object '44cf20b com.android.systemui.wallpapers.ImageWallpaper (client)' was disposed without first being removed with the input manager!
+11-16 19:46:18.563 18024 18712 W InputManager-JNI: Input channel object 'c2038ad ScreenDecorOverlay (client)' was disposed without first being removed with the input manager!
+11-16 19:46:18.567 18024 18708 W InputManager-JNI: Input channel object '[Gesture Monitor] swipe-up (client)' was disposed without first being removed with the input manager!
+11-16 19:46:18.568 18024 18713 W InputManager-JNI: Input channel object '8adf533 Wired Charging Animation (client)' was disposed without first being removed with the input manager!
+11-16 19:46:18.590   399   399 E BpTransactionCompletedListener: Failed to transact (-32)
+11-16 19:46:18.592 18331 18373 E SystemServiceRegistry: No service published for: ethernet
+11-16 19:46:18.592 18331 18373 E SystemServiceRegistry: android.os.ServiceManager$ServiceNotFoundException: No service published for: ethernet
+11-16 19:46:18.592 18331 18373 E SystemServiceRegistry: 	at android.os.ServiceManager.getServiceOrThrow(ServiceManager.java:166)
+11-16 19:46:18.592 18331 18373 E SystemServiceRegistry: 	at android.app.SystemServiceRegistry$139.createService(SystemServiceRegistry.java:1872)
+11-16 19:46:18.592 18331 18373 E SystemServiceRegistry: 	at android.app.SystemServiceRegistry$CachedServiceFetcher.getService(SystemServiceRegistry.java:1971)
+11-16 19:46:18.592 18331 18373 E SystemServiceRegistry: 	at android.app.SystemServiceRegistry.getSystemService(SystemServiceRegistry.java:1645)
+11-16 19:46:18.592 18331 18373 E SystemServiceRegistry: 	at android.app.ContextImpl.getSystemService(ContextImpl.java:2212)
+11-16 19:46:18.592 18331 18373 E SystemServiceRegistry: 	at android.content.ContextWrapper.getSystemService(ContextWrapper.java:934)
+11-16 19:46:18.592 18331 18373 E SystemServiceRegistry: 	at com.android.networkstack.tethering.Tethering.isEthernetSupported(Tethering.java:1582)
+11-16 19:46:18.592 18331 18373 E SystemServiceRegistry: 	at com.android.networkstack.tethering.Tethering.makeSupportedDownstreams(Tethering.java:2550)
+11-16 19:46:18.592 18331 18373 E SystemServiceRegistry: 	at com.android.networkstack.tethering.Tethering.updateSupportedDownstreams(Tethering.java:2524)
+11-16 19:46:18.592 18331 18373 E SystemServiceRegistry: 	at com.android.networkstack.tethering.Tethering.updateConfiguration(Tethering.java:546)
+11-16 19:46:18.592 18331 18373 E SystemServiceRegistry: 	at com.android.networkstack.tethering.Tethering.-$$Nest$mupdateConfiguration(Tethering.java:0)
+11-16 19:46:18.592 18331 18373 E SystemServiceRegistry: 	at com.android.networkstack.tethering.Tethering$StateReceiver.onReceive(Tethering.java:1184)
+11-16 19:46:18.592 18331 18373 E SystemServiceRegistry: 	at android.app.LoadedApk$ReceiverDispatcher$Args.lambda$getRunnable$0(LoadedApk.java:1802)
+11-16 19:46:18.592 18331 18373 E SystemServiceRegistry: 	at android.app.LoadedApk$ReceiverDispatcher$Args.$r8$lambda$gDuJqgxY6Zb-ifyeubKeivTLAwk(Unknown Source:0)
+11-16 19:46:18.592 18331 18373 E SystemServiceRegistry: 	at android.app.LoadedApk$ReceiverDispatcher$Args$$ExternalSyntheticLambda0.run(Unknown Source:2)
+11-16 19:46:18.592 18331 18373 E SystemServiceRegistry: 	at android.os.Handler.handleCallback(Handler.java:958)
+11-16 19:46:18.592 18331 18373 E SystemServiceRegistry: 	at android.os.Handler.dispatchMessage(Handler.java:99)
+11-16 19:46:18.592 18331 18373 E SystemServiceRegistry: 	at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:46:18.592 18331 18373 E SystemServiceRegistry: 	at android.os.Looper.loop(Looper.java:294)
+11-16 19:46:18.592 18331 18373 E SystemServiceRegistry: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+11-16 19:46:18.607 18717 18717 W ndroid.systemui: Unexpected CPU variant for x86: x86_64.
+11-16 19:46:18.607 18717 18717 W ndroid.systemui: Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, tremont, kabylake, default
+11-16 19:46:18.615 18692 18692 E IPCThreadState: Binder transaction failure: 2646073/29189/-22
+11-16 19:46:18.616 18692 18692 W TileService: SafetyCenterQsTileService - Couldn't get tile from IQSService.
+11-16 19:46:18.616 18692 18692 W TileService: android.os.DeadObjectException
+11-16 19:46:18.616 18692 18692 W TileService: 	at android.os.BinderProxy.transactNative(Native Method)
+11-16 19:46:18.616 18692 18692 W TileService: 	at android.os.BinderProxy.transact(BinderProxy.java:584)
+11-16 19:46:18.616 18692 18692 W TileService: 	at android.service.quicksettings.IQSService$Stub$Proxy.getTile(IQSService.java:289)
+11-16 19:46:18.616 18692 18692 W TileService: 	at android.service.quicksettings.TileService.onBind(TileService.java:396)
+11-16 19:46:18.616 18692 18692 W TileService: 	at com.android.permissioncontroller.permission.service.v33.SafetyCenterQsTileService.onBind(SafetyCenterQsTileService.kt:57)
+11-16 19:46:18.616 18692 18692 W TileService: 	at android.app.ActivityThread.handleBindService(ActivityThread.java:4681)
+11-16 19:46:18.616 18692 18692 W TileService: 	at android.app.ActivityThread.-$$Nest$mhandleBindService(Unknown Source:0)
+11-16 19:46:18.616 18692 18692 W TileService: 	at android.app.ActivityThread$H.handleMessage(ActivityThread.java:2272)
+11-16 19:46:18.616 18692 18692 W TileService: 	at android.os.Handler.dispatchMessage(Handler.java:106)
+11-16 19:46:18.616 18692 18692 W TileService: 	at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:46:18.616 18692 18692 W TileService: 	at android.os.Looper.loop(Looper.java:294)
+11-16 19:46:18.616 18692 18692 W TileService: 	at android.app.ActivityThread.main(ActivityThread.java:8177)
+11-16 19:46:18.616 18692 18692 W TileService: 	at java.lang.reflect.Method.invoke(Native Method)
+11-16 19:46:18.616 18692 18692 W TileService: 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:552)
+11-16 19:46:18.616 18692 18692 W TileService: 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:971)
+11-16 19:46:18.692 18717 18738 W OpenGLRenderer: Unknown dataspace 0
+11-16 19:46:18.697   474   474 W libgoldfish-rild: Multi-element reporting criteria are not supported with HIDL HAL
+11-16 19:46:18.711 18024 18156 E WifiScanningService: wifi driver loaded received while already loaded
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: Couldn't register to observe provider
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: java.lang.SecurityException: Failed to find provider com.google.android.flipendo.api for user 0; expected to find a valid ContentProvider for this authority
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3057)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at android.os.Parcel.createException(Parcel.java:3041)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at android.os.Parcel.readException(Parcel.java:3024)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at android.os.Parcel.readException(Parcel.java:2966)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at android.content.IContentService$Stub$Proxy.registerContentObserver(IContentService.java:1032)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at android.content.ContentResolver.registerContentObserver(ContentResolver.java:2728)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at com.google.android.systemui.statusbar.policy.BatteryControllerImplGoogle.init(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:39)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at com.google.android.systemui.statusbar.policy.GooglePolicyModule_ProvideBatteryControllerFactory.provideBatteryController(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:23)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at com.google.android.systemui.dagger.DaggerSysUIGoogleGlobalRootComponent$WMComponentImpl$SwitchingProvider.get0$com$google$android$systemui$dagger$DaggerSysUIGoogleGlobalRootComponent$SysUIGoogleSysUIComponentImpl$SwitchingProvider(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:69)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at com.google.android.systemui.dagger.DaggerSysUIGoogleGlobalRootComponent$WMComponentImpl$SwitchingProvider.get(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:125)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at dagger.internal.DoubleCheck.get(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:14)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at com.google.android.systemui.dagger.DaggerSysUIGoogleGlobalRootComponent$WMComponentImpl$SwitchingProvider.get0$com$google$android$systemui$dagger$DaggerSysUIGoogleGlobalRootComponent$SysUIGoogleSysUIComponentImpl$SwitchingProvider(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:5)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at com.google.android.systemui.dagger.DaggerSysUIGoogleGlobalRootComponent$WMComponentImpl$SwitchingProvider.get(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:125)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at dagger.internal.DoubleCheck.get(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:14)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at com.google.android.systemui.dagger.DaggerSysUIGoogleGlobalRootComponent$WMComponentImpl$SwitchingProvider.get1$com$google$android$systemui$dagger$DaggerSysUIGoogleGlobalRootComponent$SysUIGoogleSysUIComponentImpl$SwitchingProvider(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:77)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at com.google.android.systemui.dagger.DaggerSysUIGoogleGlobalRootComponent$WMComponentImpl$SwitchingProvider.get1(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:6)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at com.google.android.systemui.dagger.DaggerSysUIGoogleGlobalRootComponent$WMComponentImpl$SwitchingProvider.get(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:124)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at dagger.internal.DoubleCheck.get(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:14)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at com.google.android.systemui.dagger.DaggerSysUIGoogleGlobalRootComponent$WMComponentImpl$SwitchingProvider.get1$com$google$android$systemui$dagger$DaggerSysUIGoogleGlobalRootComponent$SysUIGoogleSysUIComponentImpl$SwitchingProvider(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:78)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at com.google.android.systemui.dagger.DaggerSysUIGoogleGlobalRootComponent$WMComponentImpl$SwitchingProvider.get1(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:6)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at com.google.android.systemui.dagger.DaggerSysUIGoogleGlobalRootComponent$WMComponentImpl$SwitchingProvider.get(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:124)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at dagger.internal.DoubleCheck.get(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:14)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at com.google.android.systemui.dagger.DaggerSysUIGoogleGlobalRootComponent$WMComponentImpl$SwitchingProvider.get1$com$google$android$systemui$dagger$DaggerSysUIGoogleGlobalRootComponent$SysUIGoogleSysUIComponentImpl$SwitchingProvider(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:79)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at com.google.android.systemui.dagger.DaggerSysUIGoogleGlobalRootComponent$WMComponentImpl$SwitchingProvider.get1(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:6)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at com.google.android.systemui.dagger.DaggerSysUIGoogleGlobalRootComponent$WMComponentImpl$SwitchingProvider.get(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:124)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at dagger.internal.DoubleCheck.get(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:14)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at com.google.android.systemui.dagger.DaggerSysUIGoogleGlobalRootComponent$WMComponentImpl$SwitchingProvider.get2(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:95)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at com.google.android.systemui.dagger.DaggerSysUIGoogleGlobalRootComponent$WMComponentImpl$SwitchingProvider.get(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:123)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at dagger.internal.DoubleCheck.get(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:14)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at com.google.android.systemui.dagger.DaggerSysUIGoogleGlobalRootComponent$WMComponentImpl$SwitchingProvider.get8(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:38)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at com.google.android.systemui.dagger.DaggerSysUIGoogleGlobalRootComponent$WMComponentImpl$SwitchingProvider.get(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:8)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at dagger.internal.DoubleCheck.get(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:14)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at com.google.android.systemui.dagger.DaggerSysUIGoogleGlobalRootComponent$SysUIGoogleSysUIComponentImpl.inject(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:29)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at java.lang.reflect.Method.invoke(Native Method)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at com.android.systemui.SystemUIAppComponentFactoryBase$instantiateProviderCompat$1.onContextAvailable(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:39)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at com.android.systemui.keyguard.CustomizationProvider.attachInfo(go/retraceme 19693c2b0a8439b7183751b64d60893829dbf56dc1e08e0669fc0cfc55754948:8)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at android.app.ActivityThread.installProvider(ActivityThread.java:7765)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at android.app.ActivityThread.installContentProviders(ActivityThread.java:7276)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at android.app.ActivityThread.handleBindApplication(ActivityThread.java:6983)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at android.app.ActivityThread.-$$Nest$mhandleBindApplication(Unknown Source:0)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at android.app.ActivityThread$H.handleMessage(ActivityThread.java:2236)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at android.os.Handler.dispatchMessage(Handler.java:106)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at android.os.Looper.loopOnce(Looper.java:205)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at android.os.Looper.loop(Looper.java:294)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at android.app.ActivityThread.main(ActivityThread.java:8177)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at java.lang.reflect.Method.invoke(Native Method)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:552)
+11-16 19:46:18.714 18717 18717 W BatteryControllerGoogle: 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:971)
+11-16 19:46:18.717   474   474 E RIL     : Error 0 opening logical channel: 0
+11-16 19:46:18.744 18024 18024 E IPCThreadState: Binder transaction failure: 2647069/29189/-22
+11-16 19:46:18.748 18024 18024 E IPCThreadState: Binder transaction failure: 2647130/29189/-22
+11-16 19:46:18.750 18717 18717 W Settings: Setting secure_frp_mode has moved from android.provider.Settings.Secure to android.provider.Settings.Global, returning global URI.
